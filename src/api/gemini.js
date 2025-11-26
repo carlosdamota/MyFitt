@@ -1,4 +1,4 @@
-const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+const GEMINI_MODEL = "gemini-2.5-flash";
 // La clave se provee en runtime o por variable de entorno
 const API_KEY = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : import.meta.env.VITE_GEMINI_API_KEY || "";
 

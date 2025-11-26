@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Save, ZapOff, Trophy, Loader, Trash2, History } from 'lucide-react';
+import { Save, ZapOff, Trophy, Loader, Trash2, History, X } from 'lucide-react';
 import { callGeminiAPI } from '../../api/gemini';
 import SimpleChart from '../stats/SimpleChart';
 
@@ -159,7 +159,19 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
 
       {geminiResponse && (
         <div className={`mt-4 p-3 rounded-lg border text-sm animate-in fade-in ${geminiResponseType === 'variants' ? 'bg-purple-900/30 border-purple-700/50' : 'bg-amber-900/30 border-amber-700/50'}`}>
-          <h4 className="font-bold text-white mb-2 flex items-center gap-2">{geminiResponseType === 'variants' ? <ZapOff size={16} className="text-purple-400" /> : <Trophy size={16} className="text-amber-400" />} Asistente AI:</h4>
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="font-bold text-white flex items-center gap-2">
+              {geminiResponseType === 'variants' ? <ZapOff size={16} className="text-purple-400" /> : <Trophy size={16} className="text-amber-400" />} 
+              Asistente AI:
+            </h4>
+            <button 
+              onClick={() => setGeminiResponse(null)}
+              className="text-slate-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
+              aria-label="Cerrar"
+            >
+              <X size={16} />
+            </button>
+          </div>
           {/* Renderizado simple del texto de Gemini */}
           <div className="text-slate-300 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: geminiResponse.replace(/\n/g, '<br/>') }} />
         </div>
