@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity, Cloud, BarChart2, AlertCircle, Clock, CheckCircle, Circle, Info, ChevronDown, RotateCcw, Pause, Play, Flame, Zap, Dumbbell, Loader, Utensils, X, User } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useWorkoutLogs } from './hooks/useWorkoutLogs';
@@ -11,18 +11,45 @@ import ExerciseTracker from './components/tracker/ExerciseTracker';
 import GlobalStats from './components/stats/GlobalStats';
 import NutritionDashboard from './components/nutrition/NutritionDashboard';
 import ProfileEditor from './components/profile/ProfileEditor';
+import CookieBanner from './components/legal/CookieBanner';
+import CookieSettings from './components/legal/CookieSettings';
+import { useCookieConsent } from './hooks/useCookieConsent';
+import Footer from './components/layout/Footer';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Legal from './pages/Legal';
+import Landing from './pages/Landing';
+import { initGA, logPageView } from './utils/analytics';
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState('app'); // 'app', 'privacy', 'terms', 'legal'
   const [activeTab, setActiveTab] = useState('day1');
   const [showStats, setShowStats] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showRoutineEditor, setShowRoutineEditor] = useState(false);
+  const [showCookieSettings, setShowCookieSettings] = useState(false);
+  
+  // Cookie consent
+  const { consent, acceptAll, rejectAll, updateConsent, hasResponded } = useCookieConsent();
+
+  // Initialize GA when consent changes
+  useEffect(() => {
+    if (consent.analytics) {
+      initGA(true);
+    }
+  }, [consent.analytics]);
+
+  // Log page views
+  useEffect(() => {
+    logPageView();
+  }, [currentPage]);
   const [completedExercises, setCompletedExercises] = useState({});
   const [expandedExercise, setExpandedExercise] = useState(null);
   
+  
   // Custom Hooks
-  const { user, authError } = useAuth();
+  const { user, authError, login } = useAuth();
   const { workoutLogs, saveLog, deleteLog, dbError, streak } = useWorkoutLogs(user);
   const { timer, isTimerRunning, resetTimer, toggleTimer } = useTimer(60);
   const { routines, loading: routinesLoading, saveRoutine, shareRoutine, importSharedRoutine } = useRoutines(user);
@@ -112,6 +139,18 @@ export default function App() {
     alert("Datos generados! Abre las estadísticas.");
   };
 
+
+
+  // Renderizar páginas legales si no estamos en la app principal
+  if (currentPage === 'privacy') return <Privacy />;
+  if (currentPage === 'terms') return <Terms />;
+  if (currentPage === 'legal') return <Legal />;
+
+  // Si no hay usuario, mostrar Landing Page
+  if (!user) {
+    return <Landing onLogin={login} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 font-sans selection:bg-blue-500/30">
       {/* Background Gradients */}
@@ -143,24 +182,42 @@ export default function App() {
           </div>
         </div>
       )}
+      
+      {/* Cookie Banner */}
+      {!hasResponded && (
+        <CookieBanner 
+          onAcceptAll={acceptAll}
+          onRejectAll={rejectAll}
+          onConfigure={() => setShowCookieSettings(true)}
+        />
+      )}
+      
+      {/* Cookie Settings Modal */}
+      {showCookieSettings && (
+        <CookieSettings 
+          currentConsent={consent}
+          onSave={updateConsent}
+          onClose={() => setShowCookieSettings(false)}
+        />
+      )}
+      
       {showRoutineEditor && <RoutineEditor initialData={currentRoutine} onSave={handleSaveRoutine} onCancel={() => setShowRoutineEditor(false)} onShare={handleShareRoutine} />}
       
-      <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-20 flex justify-between items-center">
+      <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-3 md:p-4 sticky top-0 z-20 flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-2"><Activity size={22} className="text-blue-400" />FitManual <span className="text-xs bg-blue-900 text-blue-200 px-1.5 py-0.5 rounded border border-blue-800">Cloud</span></h1>
+          <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-1 md:gap-2"><Activity size={18} className="text-blue-400 md:w-[22px] md:h-[22px]" /><span className="hidden xs:inline">FitManual</span><span className="xs:hidden">FM</span> <span className="hidden sm:inline text-xs bg-blue-900 text-blue-200 px-1.5 py-0.5 rounded border border-blue-800">Cloud</span></h1>
           {streak > 0 && (
             <div className="flex items-center gap-1 mt-1 animate-in slide-in-from-left-2">
               <Flame size={12} className="text-orange-500 fill-orange-500/20" />
-              <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wide">{streak} Días Racha</span>
+              <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wide"><span className="hidden xs:inline">{streak} Días Racha</span><span className="xs:hidden">{streak}d</span></span>
             </div>
           )}
         </div>
-        <div className="flex gap-3 items-center">
-          <button onClick={generateTestData} className="text-[10px] bg-red-900/50 text-red-200 px-2 py-1 rounded border border-red-800">TEST DATA</button>
+        <div className="flex gap-2 md:gap-3 items-center">
           <div className="flex items-center gap-1">{(dbError || authError) && <AlertCircle size={16} className="text-red-500" />}<Cloud size={16} className={user ? "text-green-400" : "text-slate-600"} /></div>
-          <button onClick={() => setShowProfile(true)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700 transition-colors"><User size={18} /></button>
-          <button onClick={() => setShowNutrition(true)} className="p-2 bg-slate-800 rounded-full text-green-400 hover:bg-slate-700 border border-slate-700 transition-colors"><Utensils size={18} /></button>
-          <button onClick={() => setShowStats(true)} className="p-2 bg-slate-800 rounded-full text-blue-400 hover:bg-slate-700 border border-slate-700 transition-colors"><BarChart2 size={18} /></button>
+          <button onClick={() => setShowProfile(true)} className="p-1.5 md:p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700 transition-colors"><User size={16} className="md:w-[18px] md:h-[18px]" /></button>
+          <button onClick={() => setShowNutrition(true)} className="p-1.5 md:p-2 bg-slate-800 rounded-full text-green-400 hover:bg-slate-700 border border-slate-700 transition-colors"><Utensils size={16} className="md:w-[18px] md:h-[18px]" /></button>
+          <button onClick={() => setShowStats(true)} className="p-1.5 md:p-2 bg-slate-800 rounded-full text-blue-400 hover:bg-slate-700 border border-slate-700 transition-colors"><BarChart2 size={16} className="md:w-[18px] md:h-[18px]" /></button>
         </div>
       </header>
 
@@ -214,6 +271,7 @@ export default function App() {
                               history={workoutLogs[ex.name] || []}
                               onTimerReset={resetTimer}
                               restTime={block.rest}
+                              user={user}
                             />
                           </div>
                         )}
@@ -227,6 +285,8 @@ export default function App() {
         </div>
         <div className="h-20" />
       </main>
+
+      <Footer onNavigate={setCurrentPage} />
 
       <div className={`fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-slate-800 p-4 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-transform duration-300 ${isTimerRunning || timer < 60 ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="max-w-md mx-auto flex items-center justify-between px-2">

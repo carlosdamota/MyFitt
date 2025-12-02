@@ -3,16 +3,24 @@ import { History, Trophy, Save, Loader, ZapOff, X, Trash2 } from 'lucide-react';
 import { callGeminiAPI } from '../../api/gemini';
 import SimpleChart from '../stats/SimpleChart';
 import { calculatePersonalBests, isNewRecord } from '../../utils/stats';
+import { useRateLimit } from '../../hooks/useRateLimit';
+import RateLimitError from '../errors/RateLimitError';
+import { logEvent } from '../../utils/analytics';
 
-const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset, restTime }) => {
+const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset, restTime, user }) => {
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [sets, setSets] = useState('3');
+  const [rpe, setRpe] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [geminiLoading, setGeminiLoading] = useState(false);
   const [geminiResponse, setGeminiResponse] = useState(null);
   const [geminiResponseType, setGeminiResponseType] = useState(null); // 'variants' or 'analysis'
   const [newRecordAlert, setNewRecordAlert] = useState(null); // Estado para alerta de nuevo récord
+  const [showRateLimitError, setShowRateLimitError] = useState(false);
+  
+  // Rate limiting: 20 análisis de ejercicios con IA por día
+  const rateLimitExercise = useRateLimit(user, 'analyze_exercise', 20);
 
   // Calcular PBs históricos
   const personalBests = useMemo(() => calculatePersonalBests(history), [history]);
@@ -56,7 +64,8 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
       date: new Date().toISOString(), 
       weight: parseFloat(weight), 
       reps: parseFloat(reps), 
-      sets: parseFloat(sets) 
+      sets: parseFloat(sets),
+      rpe: rpe ? parseFloat(rpe) : null
     });
 
     if (isRecord) {
@@ -68,6 +77,7 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
     setIsSaving(false);
     setWeight('');
     setReps('');
+    setRpe('');
     setGeminiResponse(null); // Limpiar análisis al guardar un nuevo log
     
     // Activar timer automáticamente si se proporcionan las props
@@ -80,9 +90,17 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
    * Gemini Feature 1: Generar Variantes de Progresión/Regresión
    */
   const handleGenerateVariants = useCallback(async () => {
+    // Verificar rate limit antes de generar variantes
+    const canAnalyze = await rateLimitExercise.checkAndIncrement();
+    if (!canAnalyze) {
+      setShowRateLimitError(true);
+      return;
+    }
+
     setGeminiLoading(true);
     setGeminiResponse(null);
     setGeminiResponseType('variants');
+    logEvent('Exercise', 'Generate Variants', exerciseName);
     const systemPrompt = "Eres un entrenador de fuerza experto. Proporciona 3 variantes de progresión o regresión (más fáciles o más difíciles) para el ejercicio solicitado. Describe brevemente cómo se realiza cada variante. Usa un formato de lista numerada.";
     const userPrompt = `Sugiere 3 variantes para el ejercicio: ${exerciseName}.`;
     
@@ -107,9 +125,17 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
       return;
     }
 
+    // Verificar rate limit antes de analizar
+    const canAnalyze = await rateLimitExercise.checkAndIncrement();
+    if (!canAnalyze) {
+      setShowRateLimitError(true);
+      return;
+    }
+
     setGeminiLoading(true);
     setGeminiResponse(null);
     setGeminiResponseType('analysis');
+    logEvent('Exercise', 'Analyze History', exerciseName);
 
     const formattedHistory = history.map(h => ({
       fecha: new Date(h.date).toLocaleDateString(),
@@ -139,6 +165,15 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
 
   return (
     <div className="mt-4 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+      {/* Rate Limit Error Modal */}
+      {showRateLimitError && (
+        <RateLimitError 
+          message={rateLimitExercise.error || "Has alcanzado el límite de 20 análisis de ejercicios con IA por día"}
+          resetAt={rateLimitExercise.resetAt}
+          onClose={() => setShowRateLimitError(false)}
+        />
+      )}
+
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-slate-400 font-bold uppercase flex items-center gap-1"><History size={12} /> Registrar Serie</span>
         
@@ -166,10 +201,11 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        <div><label className="block text-[10px] text-slate-500 mb-1">PESO (KG)</label><input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none" placeholder="0"/></div>
-        <div><label className="block text-[10px] text-slate-500 mb-1">REPS (MEDIA)</label><input type="number" value={reps} onChange={(e) => setReps(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none" placeholder="0"/></div>
-        <div><label className="block text-[10px] text-slate-500 mb-1">SERIES</label><input type="number" value={sets} onChange={(e) => setSets(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none"/></div>
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        <div className="col-span-1"><label className="block text-[10px] text-slate-500 mb-1">PESO</label><input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none" placeholder="kg"/></div>
+        <div className="col-span-1"><label className="block text-[10px] text-slate-500 mb-1">REPS</label><input type="number" value={reps} onChange={(e) => setReps(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none" placeholder="0"/></div>
+        <div className="col-span-1"><label className="block text-[10px] text-slate-500 mb-1">SETS</label><input type="number" value={sets} onChange={(e) => setSets(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none"/></div>
+        <div className="col-span-1"><label className="block text-[10px] text-slate-500 mb-1">RPE</label><input type="number" value={rpe} onChange={(e) => setRpe(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 outline-none" placeholder="1-10"/></div>
       </div>
       <button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-xs font-bold py-2 rounded flex items-center justify-center gap-2 transition-colors">
         {isSaving ? "GUARDANDO..." : <><Save size={14} /> GUARDAR DATOS EN NUBE</>}

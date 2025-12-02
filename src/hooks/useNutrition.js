@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc, onSnapshot, orderBy, limit } from 'firebase/firestore';
 import { db, appId } from '../config/firebase';
 
 export const useNutrition = (user) => {
@@ -15,11 +15,10 @@ export const useNutrition = (user) => {
     }
 
     const logsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'nutrition_logs');
-    // Escuchar cambios en tiempo real, ordenados por fecha descendente
-    // Nota: Firestore requiere índice para ordenar. Si falla, usaremos ordenamiento en cliente.
-    // Para simplificar y evitar errores de índice ahora, ordenaremos en cliente.
+    // Limit to last 100 items to prevent performance issues
+    const q = query(logsRef, limit(100));
     
-    const unsubscribe = onSnapshot(logsRef, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedLogs = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -81,5 +80,18 @@ export const useNutrition = (user) => {
     }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
   }, [logs]);
 
-  return { logs, loading, error, addFoodLog, deleteFoodLog, todayTotals };
+  // Calcular totales para una fecha específica
+  const getDayTotals = (date) => {
+    const targetDate = new Date(date).toDateString();
+    const dayLogs = logs.filter(log => new Date(log.date).toDateString() === targetDate);
+
+    return dayLogs.reduce((acc, log) => ({
+      calories: acc.calories + (log.calories || 0),
+      protein: acc.protein + (log.protein || 0),
+      carbs: acc.carbs + (log.carbs || 0),
+      fats: acc.fats + (log.fats || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+  };
+
+  return { logs, loading, error, addFoodLog, deleteFoodLog, todayTotals, getDayTotals };
 };

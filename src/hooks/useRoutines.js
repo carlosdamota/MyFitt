@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, setDoc, doc, query, addDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, query, addDoc, getDoc, limit } from 'firebase/firestore';
 import { db, appId } from '../config/firebase';
 import { routineData as defaultRoutineData } from '../data/routines';
 
@@ -19,7 +19,8 @@ export const useRoutines = (user) => {
       try {
         setLoading(true);
         const routinesRef = collection(db, 'artifacts', appId, 'users', user.uid, 'routines');
-        const q = query(routinesRef);
+        // Limit to 20 routines (more than enough for a weekly schedule + extras)
+        const q = query(routinesRef, limit(20));
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {

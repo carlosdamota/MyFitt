@@ -12,24 +12,17 @@ export const useAuth = () => {
       return;
     }
 
-    const initAuth = async () => {
-       try {
-          // Soporte para token inicial inyectado (si existe en el entorno global)
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } else {
-            await signInAnonymously(auth);
-          }
-       } catch (e) { 
-         console.error("Auth Error", e); 
-         setAuthError("Error de autenticación"); 
-       }
-    };
-
-    initAuth();
-    
     // Suscribirse a cambios de estado de autenticación
-    const unsubscribe = onAuthStateChanged(auth, setUser, (error) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      // Si hay un token inicial y no hay usuario, intentar login custom
+      if (!currentUser && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        signInWithCustomToken(auth, __initial_auth_token).catch(e => {
+          console.error("Custom Token Auth Error", e);
+          setAuthError("Error de autenticación con token");
+        });
+      }
+    }, (error) => {
         console.error("Auth State Error", error);
         setAuthError(error.message);
     });
@@ -37,5 +30,15 @@ export const useAuth = () => {
     return () => unsubscribe(); 
   }, []);
 
-  return { user, authError };
+  const login = async () => {
+    try {
+      await signInAnonymously(auth);
+    } catch (e) {
+      console.error("Login Error", e);
+      setAuthError("Error al iniciar sesión");
+      throw e;
+    }
+  };
+
+  return { user, authError, login };
 };

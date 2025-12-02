@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
+    
+    // Verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verificar si el usuario es el dueño de los datos
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ==========================================
+    // REGLAS DE SEGURIDAD
+    // ==========================================
+    
+    // Datos de usuarios (PRIVADO - Solo el owner puede acceder)
+    match /artifacts/{appId}/users/{userId}/{document=**} {
+      // Permitir lectura y escritura solo si el usuario es el dueño
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Rutinas compartidas (PÚBLICO para lectura, AUTENTICADO para escritura)
+    match /artifacts/{appId}/shared_routines/{routineId} {
+      // Cualquiera puede leer rutinas compartidas
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden crear rutinas compartidas
+      allow create: if isAuthenticated();
+      
+      // Solo el autor original puede modificar o eliminar su rutina compartida
+      allow update, delete: if isAuthenticated() && 
+        resource.data.originalAuthor == request.auth.uid;
+    }
+    
+    // Rate Limits (PRIVADO - Solo el owner puede acceder)
+    match /artifacts/{appId}/rate_limits/{userId}/{action} {
+      // Solo el dueño puede leer y escribir sus propios límites
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Denegar acceso a cualquier otra colección no especificada
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

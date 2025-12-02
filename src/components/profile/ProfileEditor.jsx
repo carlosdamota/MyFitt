@@ -3,6 +3,9 @@ import { User, Save, Ruler, Weight, Calendar, Dumbbell, Target, AlertCircle, Che
 import { useProfile } from '../../hooks/useProfile';
 import { generateRoutine } from '../../api/gemini';
 import { useRoutines } from '../../hooks/useRoutines';
+import { useRateLimit } from '../../hooks/useRateLimit';
+import RateLimitError from '../errors/RateLimitError';
+import { logEvent } from '../../utils/analytics';
 
 const ProfileEditor = ({ user, onClose }) => {
   const { profile, loading, saveProfile } = useProfile(user);
@@ -13,6 +16,11 @@ const ProfileEditor = ({ user, onClose }) => {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [genSuccess, setGenSuccess] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState("");
+  const [showRateLimitError, setShowRateLimitError] = useState(false);
+  
+  // Rate limiting: 5 generaciones de rutinas por día
+  const rateLimitRoutine = useRateLimit(user, 'generate_routine', 5);
 
   useEffect(() => {
     if (profile) {
@@ -45,6 +53,13 @@ const ProfileEditor = ({ user, onClose }) => {
   const confirmGeneration = async () => {
     setShowConfirmModal(false);
     
+    // Verificar rate limit antes de generar
+    const canGenerate = await rateLimitRoutine.checkAndIncrement();
+    if (!canGenerate) {
+      setShowRateLimitError(true);
+      return;
+    }
+    
     // Primero guardar el perfil para asegurar que usamos los datos más recientes
     await saveProfile(formData);
 
@@ -54,6 +69,7 @@ const ProfileEditor = ({ user, onClose }) => {
       const dayKeys = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6'];
       
       for (let i = 0; i < daysToGenerate; i++) {
+        setGenerationProgress(`Generando día ${i + 1} de ${daysToGenerate}...`);
         const dayRoutine = await generateRoutine({ ...formData, dayNumber: i + 1, totalDays: daysToGenerate });
         if (dayRoutine) {
           await saveRoutine(dayKeys[i], dayRoutine);
@@ -61,8 +77,14 @@ const ProfileEditor = ({ user, onClose }) => {
       }
       
       setGenSuccess(true);
-      alert(`¡${daysToGenerate} rutinas generadas con éxito!`);
-      onClose(); // Cerrar para ver las rutinas
+      setGenerationProgress("¡Completado!");
+      
+      // Log analytics event
+      logEvent('Routine', 'Generated', `${daysToGenerate} days`);
+      
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (error) {
       alert("Error generando rutina: " + error.message);
     } finally {
@@ -74,6 +96,15 @@ const ProfileEditor = ({ user, onClose }) => {
 
   return (
     <>
+      {/* Rate Limit Error Modal */}
+      {showRateLimitError && (
+        <RateLimitError 
+          message={rateLimitRoutine.error || "Has alcanzado el límite de 5 generaciones de rutinas por día"}
+          resetAt={rateLimitRoutine.resetAt}
+          onClose={() => setShowRateLimitError(false)}
+        />
+      )}
+
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
@@ -108,6 +139,17 @@ const ProfileEditor = ({ user, onClose }) => {
                 Generar
               </button>
             </div>
+            {isGenerating && (
+              <div className="mt-4 text-center">
+                <div className="flex items-center justify-center gap-2 text-blue-400 mb-2">
+                  <Loader size={16} className="animate-spin" />
+                  <span className="text-xs font-bold">{generationProgress}</span>
+                </div>
+                <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 animate-pulse w-full"></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
