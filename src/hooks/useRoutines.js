@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, setDoc, doc, query } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, query, addDoc, getDoc } from 'firebase/firestore';
 import { db, appId } from '../config/firebase';
 import { routineData as defaultRoutineData } from '../data/routines';
 
@@ -72,5 +72,66 @@ export const useRoutines = (user) => {
     }
   };
 
-  return { routines, loading, error, saveRoutine };
+  /**
+   * Comparte una rutina publicándola en una colección pública.
+   * @param {string} routineId - ID de la rutina (ej. 'day1')
+   * @param {object} routineData - Datos de la rutina
+   * @returns {string|null} - ID de la rutina compartida o null si falla
+   */
+  const shareRoutine = async (routineId, routineData) => {
+    if (!user || !db) return null;
+    try {
+      // Crear un documento en una colección pública 'shared_routines'
+      const sharedRef = collection(db, 'artifacts', appId, 'shared_routines');
+      
+      const docRef = await addDoc(sharedRef, {
+        ...routineData,
+        originalAuthor: user.uid,
+        originalName: routineData.title || routineId,
+        sharedAt: new Date().toISOString()
+      });
+
+      return docRef.id;
+    } catch (err) {
+      console.error("Error sharing routine:", err);
+      setError("Error compartiendo la rutina");
+      return null;
+    }
+  };
+
+  /**
+   * Importa una rutina compartida a la colección del usuario.
+   * @param {string} sharedId - ID de la rutina compartida
+   * @param {string} targetDayId - ID del día donde se guardará (ej. 'day1')
+   */
+  const importSharedRoutine = async (sharedId, targetDayId) => {
+    if (!user || !db) return false;
+    try {
+      const sharedRef = doc(db, 'artifacts', appId, 'shared_routines', sharedId);
+      const sharedSnap = await getDoc(sharedRef);
+
+      if (!sharedSnap.exists()) {
+        setError("La rutina compartida no existe");
+        return false;
+      }
+
+      const routineData = sharedSnap.data();
+      // Limpiar metadatos de compartido antes de guardar
+      const { originalAuthor, originalName, sharedAt, ...cleanData } = routineData;
+      
+      // Guardar en la colección del usuario
+      await saveRoutine(targetDayId, {
+        ...cleanData,
+        title: `${cleanData.title} (Importada)`
+      });
+      
+      return true;
+    } catch (err) {
+      console.error("Error importing routine:", err);
+      setError("Error importando la rutina");
+      return false;
+    }
+  };
+
+  return { routines, loading, error, saveRoutine, shareRoutine, importSharedRoutine };
 };

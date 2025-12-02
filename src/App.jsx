@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Cloud, BarChart2, AlertCircle, Clock, CheckCircle, Circle, Info, ChevronDown, RotateCcw, Pause, Play, Flame, Zap, Dumbbell, Loader } from 'lucide-react';
+import { Activity, Cloud, BarChart2, AlertCircle, Clock, CheckCircle, Circle, Info, ChevronDown, RotateCcw, Pause, Play, Flame, Zap, Dumbbell, Loader, Utensils, X, User } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useWorkoutLogs } from './hooks/useWorkoutLogs';
 import { useTimer } from './hooks/useTimer';
@@ -9,10 +9,14 @@ import RoutineEditor from './components/routines/RoutineEditor';
 import { Edit } from 'lucide-react';
 import ExerciseTracker from './components/tracker/ExerciseTracker';
 import GlobalStats from './components/stats/GlobalStats';
+import NutritionDashboard from './components/nutrition/NutritionDashboard';
+import ProfileEditor from './components/profile/ProfileEditor';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('day1');
   const [showStats, setShowStats] = useState(false);
+  const [showNutrition, setShowNutrition] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [showRoutineEditor, setShowRoutineEditor] = useState(false);
   const [completedExercises, setCompletedExercises] = useState({});
   const [expandedExercise, setExpandedExercise] = useState(null);
@@ -21,13 +25,40 @@ export default function App() {
   const { user, authError } = useAuth();
   const { workoutLogs, saveLog, deleteLog, dbError, streak } = useWorkoutLogs(user);
   const { timer, isTimerRunning, resetTimer, toggleTimer } = useTimer(60);
-  const { routines, loading: routinesLoading, saveRoutine } = useRoutines(user);
+  const { routines, loading: routinesLoading, saveRoutine, shareRoutine, importSharedRoutine } = useRoutines(user);
+
+  // Verificar si hay una rutina compartida en la URL al cargar
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareId = params.get('shareId');
+    
+    if (shareId && user && !routinesLoading) {
+      // Preguntar al usuario si quiere importar
+      if (window.confirm("¿Quieres importar esta rutina compartida a tu colección?")) {
+        // Por defecto, importamos en el tab activo o creamos uno nuevo si pudiéramos (por ahora sobrescribe el activo o usa uno libre)
+        // Simplificación: Importar en el tab activo
+        importSharedRoutine(shareId, activeTab).then(success => {
+          if (success) {
+            alert("¡Rutina importada con éxito!");
+            // Limpiar URL
+            window.history.replaceState({}, document.title, "/");
+          } else {
+            alert("Error al importar la rutina. Verifica que el enlace sea correcto.");
+          }
+        });
+      }
+    }
+  }, [user, routinesLoading, activeTab]);
 
   const handleSaveRoutine = async (updatedRoutine) => {
     const success = await saveRoutine(activeTab, updatedRoutine);
     if (success) {
       setShowRoutineEditor(false);
     }
+  };
+
+  const handleShareRoutine = async (routineToShare) => {
+    return await shareRoutine(activeTab, routineToShare);
   };
 
   const toggleComplete = (day, exerciseName) => { 
@@ -90,7 +121,29 @@ export default function App() {
       </div>
 
       {showStats && <GlobalStats logs={workoutLogs} onClose={() => setShowStats(false)} />}
-      {showRoutineEditor && <RoutineEditor initialData={currentRoutine} onSave={handleSaveRoutine} onCancel={() => setShowRoutineEditor(false)} />}
+      {showNutrition && (
+        <div className="fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col">
+          <div className="bg-slate-900 p-4 flex justify-between items-center border-b border-slate-800">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2"><Utensils size={20} className="text-green-400"/> Nutrición</h2>
+            <button onClick={() => setShowNutrition(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><X size={20} /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <NutritionDashboard user={user} />
+          </div>
+        </div>
+      )}
+      {showProfile && (
+        <div className="fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col">
+          <div className="bg-slate-900 p-4 flex justify-between items-center border-b border-slate-800">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2"><User size={20} className="text-blue-400"/> Perfil de Atleta</h2>
+            <button onClick={() => setShowProfile(false)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><X size={20} /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <ProfileEditor user={user} onClose={() => setShowProfile(false)} />
+          </div>
+        </div>
+      )}
+      {showRoutineEditor && <RoutineEditor initialData={currentRoutine} onSave={handleSaveRoutine} onCancel={() => setShowRoutineEditor(false)} onShare={handleShareRoutine} />}
       
       <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-20 flex justify-between items-center">
         <div>
@@ -105,6 +158,8 @@ export default function App() {
         <div className="flex gap-3 items-center">
           <button onClick={generateTestData} className="text-[10px] bg-red-900/50 text-red-200 px-2 py-1 rounded border border-red-800">TEST DATA</button>
           <div className="flex items-center gap-1">{(dbError || authError) && <AlertCircle size={16} className="text-red-500" />}<Cloud size={16} className={user ? "text-green-400" : "text-slate-600"} /></div>
+          <button onClick={() => setShowProfile(true)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700 transition-colors"><User size={18} /></button>
+          <button onClick={() => setShowNutrition(true)} className="p-2 bg-slate-800 rounded-full text-green-400 hover:bg-slate-700 border border-slate-700 transition-colors"><Utensils size={18} /></button>
           <button onClick={() => setShowStats(true)} className="p-2 bg-slate-800 rounded-full text-blue-400 hover:bg-slate-700 border border-slate-700 transition-colors"><BarChart2 size={18} /></button>
         </div>
       </header>

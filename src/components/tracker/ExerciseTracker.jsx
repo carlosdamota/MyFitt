@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Save, ZapOff, Trophy, Loader, Trash2, History, X } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { History, Trophy, Save, Loader, ZapOff, X, Trash2 } from 'lucide-react';
 import { callGeminiAPI } from '../../api/gemini';
 import SimpleChart from '../stats/SimpleChart';
+import { calculatePersonalBests, isNewRecord } from '../../utils/stats';
 
 const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset, restTime }) => {
   const [weight, setWeight] = useState('');
@@ -11,6 +12,10 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
   const [geminiLoading, setGeminiLoading] = useState(false);
   const [geminiResponse, setGeminiResponse] = useState(null);
   const [geminiResponseType, setGeminiResponseType] = useState(null); // 'variants' or 'analysis'
+  const [newRecordAlert, setNewRecordAlert] = useState(null); // Estado para alerta de nuevo récord
+
+  // Calcular PBs históricos
+  const personalBests = useMemo(() => calculatePersonalBests(history), [history]);
 
   // Lógica de Sobrecarga Progresiva (Fase 1)
   const suggestion = useMemo(() => {
@@ -41,12 +46,25 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
   const handleSave = async () => {
     if (!weight || !reps) return;
     setIsSaving(true);
+    setNewRecordAlert(null); // Reset alerta
+
+    // Verificar si es récord ANTES de guardar (optimista)
+    const newSet = { weight: parseFloat(weight), reps: parseFloat(reps) };
+    const isRecord = isNewRecord(newSet, personalBests);
+
     await onSave(exerciseName, { 
       date: new Date().toISOString(), 
       weight: parseFloat(weight), 
       reps: parseFloat(reps), 
       sets: parseFloat(sets) 
     });
+
+    if (isRecord) {
+      setNewRecordAlert(`¡NUEVO RÉCORD! ${weight}kg x ${reps}`);
+      // Auto-ocultar alerta después de 5s
+      setTimeout(() => setNewRecordAlert(null), 5000);
+    }
+
     setIsSaving(false);
     setWeight('');
     setReps('');
@@ -121,12 +139,30 @@ const ExerciseTracker = ({ exerciseName, onSave, onDelete, history, onTimerReset
 
   return (
     <div className="mt-4 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
-      <div className="flex items-center justify-between mb-3"><span className="text-xs text-slate-400 font-bold uppercase flex items-center gap-1"><History size={12} /> Registrar Serie</span></div>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-slate-400 font-bold uppercase flex items-center gap-1"><History size={12} /> Registrar Serie</span>
+        
+        {/* Mostrar PBs actuales */}
+        {personalBests && (
+           <div className="flex gap-2">
+             {personalBests.low && <span className="text-[10px] bg-red-900/40 text-red-300 px-1.5 py-0.5 rounded border border-red-800/50" title="Fuerza (1-5 reps)">🏆 {personalBests.low.weight}kg</span>}
+             {personalBests.mid && <span className="text-[10px] bg-blue-900/40 text-blue-300 px-1.5 py-0.5 rounded border border-blue-800/50" title="Hipertrofia (6-12 reps)">🏅 {personalBests.mid.weight}kg</span>}
+           </div>
+        )}
+      </div>
       
       {suggestion && (
         <div className="mb-3 bg-indigo-900/30 border border-indigo-500/30 p-2 rounded flex items-center gap-2 animate-in slide-in-from-left-2">
           <Trophy size={14} className="text-indigo-400" />
           <span className="text-xs text-indigo-200 font-medium">Meta: <span className="text-white font-bold">{suggestion.text}</span></span>
+        </div>
+      )}
+
+      {/* Alerta de Nuevo Récord */}
+      {newRecordAlert && (
+        <div className="mb-3 bg-yellow-500/20 border border-yellow-500/50 p-2 rounded flex items-center justify-center gap-2 animate-in zoom-in duration-300">
+          <Trophy size={16} className="text-yellow-400 animate-bounce" />
+          <span className="text-xs text-yellow-200 font-bold uppercase tracking-wide">{newRecordAlert}</span>
         </div>
       )}
 

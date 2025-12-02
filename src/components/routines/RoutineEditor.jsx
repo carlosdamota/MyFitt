@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Plus, Trash2, X, Dumbbell, Clock, AlignLeft, Hash, GripVertical } from 'lucide-react';
+import { Save, Plus, Trash2, X, Dumbbell, Clock, AlignLeft, Hash, GripVertical, Share2, Copy, Check } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -54,7 +54,7 @@ const SortableExerciseItem = ({ exercise, exIndex, blockIndex, updateExercise, r
   );
 };
 
-const RoutineEditor = ({ initialData, onSave, onCancel }) => {
+const RoutineEditor = ({ initialData, onSave, onCancel, onShare }) => {
   const [routine, setRoutine] = useState(initialData || {
     title: 'Nueva Rutina',
     focus: 'Full Body',
@@ -64,6 +64,9 @@ const RoutineEditor = ({ initialData, onSave, onCancel }) => {
     border: 'border-slate-800',
     blocks: []
   });
+  const [shareUrl, setShareUrl] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -137,15 +140,53 @@ const RoutineEditor = ({ initialData, onSave, onCancel }) => {
     setRoutine(prev => ({ ...prev, blocks: newBlocks }));
   };
 
+  const handleShare = async () => {
+    if (!onShare) return;
+    setIsSharing(true);
+    const sharedId = await onShare(routine);
+    if (sharedId) {
+      // Generar URL (en producción sería la URL real de la app)
+      const url = `${window.location.origin}?shareId=${sharedId}`;
+      setShareUrl(url);
+    }
+    setIsSharing(false);
+  };
+
+  const copyToClipboard = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pb-20">
       <div className="sticky top-0 bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 flex justify-between items-center z-10">
         <h2 className="text-lg font-bold text-white">Editar Rutina</h2>
         <div className="flex gap-2">
+          {onShare && (
+            <button onClick={handleShare} disabled={isSharing} className="p-2 text-blue-400 hover:bg-blue-900/20 rounded transition-colors" title="Compartir Rutina">
+              {isSharing ? <div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent"></div> : <Share2 size={20} />}
+            </button>
+          )}
           <button onClick={onCancel} className="p-2 text-slate-400 hover:text-white"><X size={20} /></button>
           <button onClick={() => onSave(routine)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-blue-500"><Save size={16} /> Guardar</button>
         </div>
       </div>
+
+      {shareUrl && (
+        <div className="bg-blue-900/20 border-b border-blue-800/50 p-4 animate-in slide-in-from-top">
+          <div className="max-w-md mx-auto flex flex-col gap-2">
+            <span className="text-xs text-blue-300 font-bold uppercase">¡Rutina lista para compartir!</span>
+            <div className="flex gap-2">
+              <input readOnly value={shareUrl} className="flex-1 bg-slate-950 border border-blue-800 rounded px-3 py-2 text-xs text-blue-200 outline-none" />
+              <button onClick={copyToClipboard} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded flex items-center gap-2 transition-colors">
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="p-4 space-y-6 max-w-md mx-auto">
         {/* Configuración General */}

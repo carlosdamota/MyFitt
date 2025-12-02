@@ -4,11 +4,13 @@ import { callGeminiAPI } from '../../api/gemini';
 import SimpleChart from './SimpleChart';
 import LogViewer from './LogViewer';
 import { routineData } from '../../data/routines';
+import { getWeeklyStats } from '../../utils/stats';
 
 const GlobalStats = ({ logs, onClose }) => {
-  const [viewMode, setViewMode] = useState('charts'); // 'charts' or 'logs'
+  const [viewMode, setViewMode] = useState('charts'); // 'charts', 'logs', 'weekly'
   const [geminiLoading, setGeminiLoading] = useState(false);
   const [globalAnalysis, setGlobalAnalysis] = useState(null);
+  const [weeklyReport, setWeeklyReport] = useState(null);
 
   const aggregatedData = useMemo(() => {
     const dateMap = {};
@@ -65,6 +67,32 @@ const GlobalStats = ({ logs, onClose }) => {
     setGlobalAnalysis(null);
   }, [logs]);
 
+  /**
+   * Gemini Feature 4: Reporte Semanal de Consistencia
+   */
+  const handleWeeklyReport = useCallback(async () => {
+    setGeminiLoading(true);
+    setWeeklyReport(null);
+
+    const stats = getWeeklyStats(logs, routineData);
+    
+    const systemPrompt = "Eres un coach de fitness personal. Genera un reporte semanal breve y motivador. Estructura la respuesta en 3 secciones claras: '🎉 Logros' (destaca consistencia y volumen), '⚠️ Atención' (menciona si faltaron días o grupos musculares clave), y '💡 Consejo' (una recomendación accionable para la próxima semana). Usa emojis. Sé conciso.";
+    const userPrompt = `Genera un reporte semanal basado en estos datos:
+    - Días entrenados: ${stats.daysTrained} (Objetivo ideal: 3-5)
+    - Volumen total: ${stats.totalVolume} kg (Semana anterior: ${stats.previousWeekVolume} kg)
+    - Músculos trabajados: ${stats.musclesWorked.join(', ') || 'Ninguno'}
+    `;
+
+    try {
+      const response = await callGeminiAPI(userPrompt, systemPrompt);
+      setWeeklyReport(response);
+    } catch (e) {
+      setWeeklyReport("No se pudo generar el reporte semanal. Intenta de nuevo.");
+    } finally {
+      setGeminiLoading(false);
+    }
+  }, [logs]);
+
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col">
@@ -75,18 +103,9 @@ const GlobalStats = ({ logs, onClose }) => {
       
       {/* Pestañas */}
       <div className="flex p-2 bg-slate-900 gap-2">
-        <button 
-          onClick={() => setViewMode('charts')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${viewMode === 'charts' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
-        >
-          GRÁFICAS
-        </button>
-        <button 
-          onClick={() => setViewMode('logs')}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${viewMode === 'logs' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
-        >
-          DIARIO / EXCEL
-        </button>
+        <button onClick={() => setViewMode('charts')} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${viewMode === 'charts' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>GRÁFICAS</button>
+        <button onClick={() => setViewMode('weekly')} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${viewMode === 'weekly' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>COACH SEMANAL</button>
+        <button onClick={() => setViewMode('logs')} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${viewMode === 'logs' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>DIARIO</button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
@@ -184,6 +203,34 @@ const GlobalStats = ({ logs, onClose }) => {
               </div>
             </div>
           </>
+        ) : viewMode === 'weekly' ? (
+            <div className="space-y-4">
+                <div className="bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/30 p-6 rounded-2xl text-center">
+                    <h3 className="text-xl font-bold text-white mb-2">Tu Resumen Semanal</h3>
+                    <p className="text-sm text-slate-400 mb-6">Deja que la IA analice tu progreso y te guíe.</p>
+                    
+                    {!weeklyReport && (
+                        <button 
+                            onClick={handleWeeklyReport} 
+                            disabled={geminiLoading}
+                            className="bg-white text-purple-900 hover:bg-purple-100 disabled:bg-slate-600 disabled:text-slate-400 px-6 py-3 rounded-full font-bold shadow-lg shadow-purple-900/50 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                        >
+                            {geminiLoading ? <Loader className="animate-spin" /> : <><ZapOff size={20} /> Generar Reporte</>}
+                        </button>
+                    )}
+                </div>
+
+                {weeklyReport && (
+                    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-5 animate-in fade-in slide-in-from-bottom-4">
+                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: weeklyReport.replace(/\n/g, '<br/>').replace(/(🎉 Logros|⚠️ Atención|💡 Consejo)/g, '<strong class="text-white text-lg block mt-4 mb-2">$1</strong>') }} />
+                        
+                        <div className="mt-6 pt-4 border-t border-slate-800 flex justify-between text-xs text-slate-500">
+                            <span>Generado por Gemini AI</span>
+                            <span>{new Date().toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                )}
+            </div>
         ) : (
           <LogViewer logs={logs} />
         )}
