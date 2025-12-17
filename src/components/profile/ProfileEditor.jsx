@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, Ruler, Weight, Calendar, Dumbbell, Target, AlertCircle, Check, Zap, Loader, Clock, X } from 'lucide-react';
+import { User, Save, Ruler, Weight, Calendar, Dumbbell, Target, AlertCircle, Check, Zap, Loader, Clock, X, Utensils } from 'lucide-react';
 import { useProfile } from '../../hooks/useProfile';
 import { generateRoutine } from '../../api/gemini';
 import { useRoutines } from '../../hooks/useRoutines';
@@ -202,6 +202,21 @@ const ProfileEditor = ({ user, onClose }) => {
               <option value="male">Hombre</option>
               <option value="female">Mujer</option>
               <option value="other">Otro</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs text-slate-500 mb-1 flex items-center gap-1"><Utensils size={12} /> Tipo de Dieta</label>
+            <select 
+              value={formData.dietType || 'balanced'} 
+              onChange={(e) => handleChange('dietType', e.target.value)} 
+              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none"
+            >
+              <option value="balanced">Equilibrada (Estándar)</option>
+              <option value="high_protein">Alta en Proteína</option>
+              <option value="keto">Keto (Cetogénica)</option>
+              <option value="paleo">Paleo</option>
+              <option value="low_carb">Baja en Carbohidratos</option>
             </select>
           </div>
         </div>

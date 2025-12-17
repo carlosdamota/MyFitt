@@ -1,22 +1,16 @@
-import ReactGA from 'react-ga4';
+import { logEvent as firebaseLogEvent, setAnalyticsCollectionEnabled } from 'firebase/analytics';
+import { analytics } from '../config/firebase';
 
 /**
- * Inicializar Google Analytics
+ * Inicializar/Configurar Analytics
  * @param {boolean} consentGiven - Si el usuario ha dado consentimiento
  */
 export const initGA = (consentGiven) => {
-  if (!consentGiven) return;
-  
-  const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-  
-  if (MEASUREMENT_ID) {
-    ReactGA.initialize(MEASUREMENT_ID, {
-      gaOptions: {
-        anonymizeIp: true, // RGPD compliance
-      }
-    });
-  } else {
-    console.warn('Google Analytics Measurement ID not found');
+  if (analytics) {
+    setAnalyticsCollectionEnabled(analytics, consentGiven);
+    if (consentGiven) {
+      console.log('Firebase Analytics enabled');
+    }
   }
 };
 
@@ -24,11 +18,14 @@ export const initGA = (consentGiven) => {
  * Registrar vista de página
  */
 export const logPageView = () => {
-  // Solo loguear si GA está inicializado (verificado internamente por react-ga4)
-  try {
-    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
-  } catch (e) {
-    // Ignorar errores si GA no está inicializado
+  if (analytics) {
+    try {
+      firebaseLogEvent(analytics, 'page_view', {
+        page_path: window.location.pathname
+      });
+    } catch (e) {
+      console.warn('Error logging page view:', e);
+    }
   }
 };
 
@@ -39,13 +36,14 @@ export const logPageView = () => {
  * @param {string} label - Etiqueta opcional (ej. 'Leg Day')
  */
 export const logEvent = (category, action, label) => {
-  try {
-    ReactGA.event({
-      category,
-      action,
-      label,
-    });
-  } catch (e) {
-    // Ignorar errores
+  if (analytics) {
+    try {
+      firebaseLogEvent(analytics, action, {
+        event_category: category,
+        event_label: label
+      });
+    } catch (e) {
+      console.warn('Error logging event:', e);
+    }
   }
 };

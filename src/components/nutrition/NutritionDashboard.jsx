@@ -46,9 +46,49 @@ const NutritionDashboard = ({ user }) => {
     const bmr = 10 * weight + 6.25 * (profile.height || 175) - 5 * (profile.age || 30) + (profile.gender === 'male' ? 5 : -161);
     const tdee = bmr * 1.5; // Factor de actividad moderada
     const targetCalories = Math.round(tdee * caloriesMultiplier);
-    const targetProtein = Math.round(weight * proteinPerKg);
-    const targetFats = Math.round(weight * 0.8);
-    const targetCarbs = Math.round((targetCalories - (targetProtein * 4) - (targetFats * 9)) / 4);
+    const dietType = profile.dietType || 'balanced';
+    
+    // Ratios de macros según dieta (Proteína, Grasa, Carbos)
+    let pRatio = 0.30; // 30%
+    let fRatio = 0.25; // 25%
+    let cRatio = 0.45; // 45%
+
+    if (dietType === 'keto') {
+      pRatio = 0.25;
+      fRatio = 0.70;
+      cRatio = 0.05;
+    } else if (dietType === 'paleo') {
+      pRatio = 0.40;
+      fRatio = 0.40;
+      cRatio = 0.20;
+    } else if (dietType === 'high_protein') {
+      pRatio = 0.45;
+      fRatio = 0.25;
+      cRatio = 0.30;
+    } else if (dietType === 'low_carb') {
+      pRatio = 0.40;
+      fRatio = 0.40;
+      cRatio = 0.20;
+    }
+
+    // Ajuste fino por objetivo (si es necesario)
+    if (goal === 'muscle_gain') {
+       // En volumen, aseguramos suficientes carbos si no es keto
+       if (dietType !== 'keto') cRatio += 0.05; 
+    }
+
+    // Normalizar ratios para que sumen 1
+    const totalRatio = pRatio + fRatio + cRatio;
+    pRatio = pRatio / totalRatio;
+    fRatio = fRatio / totalRatio;
+    cRatio = cRatio / totalRatio;
+
+
+    
+    // Calcular gramos
+    const targetProtein = Math.round((targetCalories * pRatio) / 4);
+    const targetFats = Math.round((targetCalories * fRatio) / 9);
+    const targetCarbs = Math.round((targetCalories * cRatio) / 4);
 
     return {
       calories: targetCalories,

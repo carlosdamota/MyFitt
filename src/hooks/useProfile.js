@@ -31,6 +31,7 @@ export const useProfile = (user) => {
           availableDays: 3,
           dailyTimeMinutes: 60, // Tiempo disponible por sesión en minutos
           equipment: 'gym_full', // gym_full, dumbbells_only, bodyweight, home_gym
+          dietType: 'balanced', // balanced, keto, paleo, high_protein, low_carb
           injuries: ''
         });
       }

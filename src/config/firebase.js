@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 // Intentar obtener la configuración de variables de entorno o de la variable global inyectada
 const getFirebaseConfig = () => {
@@ -26,13 +27,22 @@ const getFirebaseConfig = () => {
 const firebaseConfig = getFirebaseConfig();
 export const appId = typeof __app_id !== 'undefined' ? __app_id : 'fitmanual-default';
 
+
 let auth = null;
 let db = null;
+let analytics = null;
 
 if (firebaseConfig) {
   const app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+  
+  isSupported().then(yes => {
+    if (yes) {
+      analytics = getAnalytics(app);
+    }
+  });
 }
 
-export { auth, db };
+export { auth, db, analytics };
+
