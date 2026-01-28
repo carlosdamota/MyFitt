@@ -193,6 +193,8 @@ const WorkoutDay = ({
                             onTimerReset={onResetTimer}
                             restTime={block.rest}
                             user={user}
+                            isLastInBlock={i === block.exercises.length - 1}
+                            configuredReps={ex.reps}
                           />
                         </div>
                       )}

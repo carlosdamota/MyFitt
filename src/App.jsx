@@ -4,6 +4,7 @@ import { Loader, Utensils, User } from "lucide-react";
 // Hooks
 import { useAuth } from "./hooks/useAuth";
 import { useWorkoutLogs } from "./hooks/useWorkoutLogs";
+import { useProfile } from "./hooks/useProfile";
 import { useTimer } from "./hooks/useTimer";
 import { useRoutines } from "./hooks/useRoutines";
 import { useCookieConsent } from "./hooks/useCookieConsent";
@@ -47,6 +48,7 @@ export default function App() {
 
   // Custom Hooks
   const { user, authError, login } = useAuth();
+  const { profile } = useProfile(user);
   const { workoutLogs, saveLog, deleteLog, coachAdvice, saveCoachAdvice, dbError, streak } =
     useWorkoutLogs(user);
   const { timer, isTimerRunning, resetTimer, toggleTimer } = useTimer(60);
@@ -147,6 +149,7 @@ export default function App() {
           onClose={() => setShowStats(false)}
           coachHistory={coachAdvice}
           onSaveAdvice={saveCoachAdvice}
+          userWeight={profile?.weight}
         />
       )}
 

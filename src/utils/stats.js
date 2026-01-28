@@ -95,12 +95,36 @@ export const isNewRecord = (newSet, currentPbs) => {
  * @param {Object} routineData - Datos de rutina para mapear ejercicios a músculos
  * @returns {Object} - Estadísticas semanales { daysTrained, totalVolume, musclesWorked, previousWeekVolume }
  */
-export const getWeeklyStats = (logs, routineData) => {
+// Helper to identify bodyweight exercises
+export const isBodyweightExercise = (name) => {
+  const bodyweightKeywords = [
+    "flexiones",
+    "dominadas",
+    "fondos",
+    "zancadas",
+    "burpees",
+    "plancha",
+    "core",
+    "abdominales",
+    "l-sit",
+    "pino",
+    "crunches",
+    "leg raises",
+    "sentadilla libre",
+    "bridge",
+  ];
+  const lowerName = name.toLowerCase();
+  return bodyweightKeywords.some((keyword) => lowerName.includes(keyword));
+};
+
+export const getWeeklyStats = (logs, routineData, userWeightStr) => {
   const now = new Date();
   const oneWeekAgo = new Date(now);
   oneWeekAgo.setDate(now.getDate() - 7);
   const twoWeeksAgo = new Date(now);
   twoWeeksAgo.setDate(now.getDate() - 14);
+
+  const userWeight = parseFloat(userWeightStr) || 70;
 
   let currentWeekDays = new Set();
   let totalVolume = 0;
@@ -131,7 +155,10 @@ export const getWeeklyStats = (logs, routineData) => {
       const weight = parseFloat(log.weight) || 0;
       const reps = parseInt(log.reps) || 0;
       const sets = parseInt(log.sets) || 1;
-      const volume = weight * reps * sets;
+
+      // Si el peso es 0 y es de calistenia, usamos el peso corporal
+      const effectiveWeight = weight === 0 && isBodyweightExercise(exName) ? userWeight : weight;
+      const volume = effectiveWeight * reps * sets;
 
       if (logDate >= oneWeekAgo) {
         // Esta semana

@@ -14,3 +14,15 @@ body {
   background-color: #020617; /* slate-950 fallback */
   color: #f1f5f9; /* slate-100 fallback */
 }
+
+@theme {
+  --animate-shimmer: shimmer 2s linear infinite;
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+}

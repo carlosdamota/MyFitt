@@ -4,9 +4,10 @@ import { callGeminiAPI } from "../../api/gemini";
 import SimpleChart from "./SimpleChart";
 import LogViewer from "./LogViewer";
 import { routineData } from "../../data/routines";
-import { getWeeklyStats } from "../../utils/stats";
+import { getWeeklyStats, isBodyweightExercise } from "../../utils/stats";
 
-const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice }) => {
+const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice, userWeight: profileWeight }) => {
+  const userWeight = parseFloat(profileWeight) || 70;
   const [viewMode, setViewMode] = useState("charts"); // 'charts', 'logs', 'weekly'
   const [geminiLoading, setGeminiLoading] = useState(false);
   const [globalAnalysis, setGlobalAnalysis] = useState(null);
@@ -14,10 +15,12 @@ const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice }) => {
 
   const aggregatedData = useMemo(() => {
     const dateMap = {};
-    Object.values(logs).forEach((exerciseLogs) => {
+    Object.entries(logs).forEach(([exName, exerciseLogs]) => {
       exerciseLogs.forEach((log) => {
         const dateKey = new Date(log.date).toISOString().split("T")[0]; // Usar formato YYYY-MM-DD para ordenar
-        const volume = log.weight * log.reps * log.sets;
+        const weight = parseFloat(log.weight) || 0;
+        const effectiveWeight = weight === 0 && isBodyweightExercise(exName) ? userWeight : weight;
+        const volume = effectiveWeight * log.reps * log.sets;
         if (!dateMap[dateKey]) dateMap[dateKey] = { date: dateKey, val: 0, count: 0 };
         dateMap[dateKey].val += volume;
         dateMap[dateKey].count += 1;
@@ -76,7 +79,7 @@ const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice }) => {
   const handleWeeklyReport = useCallback(async () => {
     setGeminiLoading(true);
 
-    const stats = getWeeklyStats(logs, routineData);
+    const stats = getWeeklyStats(logs, routineData, userWeight);
 
     const systemPrompt = `Eres un ENTRENADOR PERSONAL DE ÉLITE y COACH DE FUERZA. Tu tono es PROFESIONAL, CRÍTICO y EXIGENTE, pero constructivo. 
     NO eres un animador; eres alguien que busca el máximo rendimiento.
@@ -252,10 +255,12 @@ const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice }) => {
                     const recentLogs = exLogs.filter((l) => new Date(l.date) >= thirtyDaysAgo);
                     if (recentLogs.length === 0) return;
 
-                    const exVol = recentLogs.reduce(
-                      (acc, curr) => acc + curr.weight * curr.reps * curr.sets,
-                      0,
-                    );
+                    const exVol = recentLogs.reduce((acc, curr) => {
+                      const weight = parseFloat(curr.weight) || 0;
+                      const effectiveWeight =
+                        weight === 0 && isBodyweightExercise(exName) ? userWeight : weight;
+                      return acc + effectiveWeight * curr.reps * curr.sets;
+                    }, 0);
                     const muscle = exerciseToMuscle[exName] || "Otros";
 
                     muscleVol[muscle] = (muscleVol[muscle] || 0) + exVol;
@@ -356,7 +361,10 @@ const GlobalStats = ({ logs, onClose, coachHistory, onSaveAdvice }) => {
             )}
           </div>
         ) : (
-          <LogViewer logs={logs} />
+          <LogViewer
+            logs={logs}
+            userWeight={userWeight}
+          />
         )}
       </div>
     </div>
