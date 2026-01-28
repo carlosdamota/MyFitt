@@ -69,9 +69,15 @@ export const useWorkoutLogs = (user) => {
             setWorkoutLogs(data.logs);
             setCoachAdvice(data.coachAdvice || null);
           } else {
-            // Estructura antigua: el documento entero son los logs
-            setWorkoutLogs(data);
-            setCoachAdvice(null);
+            // Estructura antigua: filtrar metadatos para evitar TypeErrors
+            const filteredLogs = {};
+            Object.entries(data).forEach(([key, value]) => {
+              if (Array.isArray(value)) {
+                filteredLogs[key] = value;
+              }
+            });
+            setWorkoutLogs(filteredLogs);
+            setCoachAdvice(data.coachAdvice || null);
           }
         } else {
           setWorkoutLogs({});
