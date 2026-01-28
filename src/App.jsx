@@ -34,7 +34,7 @@ import { initGA, logPageView } from "./utils/analytics";
 
 export default function App() {
   // Page & UI State
-  const [currentPage, setCurrentPage] = useState("app");
+  const [currentPage, setCurrentPage] = useState("home");
   const [activeTab, setActiveTab] = useState("day1");
   const [showStats, setShowStats] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
@@ -42,6 +42,7 @@ export default function App() {
   const [showRoutineEditor, setShowRoutineEditor] = useState(false);
   const [showCookieSettings, setShowCookieSettings] = useState(false);
   const [completedExercises, setCompletedExercises] = useState({});
+  const [guestMode, setGuestMode] = useState(false);
 
   // Cookie consent
   const { consent, acceptAll, rejectAll, updateConsent, hasResponded } = useCookieConsent();
@@ -129,9 +130,18 @@ export default function App() {
   if (currentPage === "terms") return <Terms />;
   if (currentPage === "legal") return <Legal />;
 
-  // Landing page for unauthenticated users
-  if (!user) {
-    return <Landing onLogin={login} />;
+  // Home / Landing entry point
+  if (currentPage === "home") {
+    return (
+      <Landing
+        onLogin={async () => {
+          if (!user) await login();
+          setCurrentPage("app");
+        }}
+        onExplore={() => setCurrentPage("app")}
+        user={user}
+      />
+    );
   }
 
   return (
@@ -221,6 +231,11 @@ export default function App() {
         onShowProfile={() => setShowProfile(true)}
         onShowNutrition={() => setShowNutrition(true)}
         onShowStats={() => setShowStats(true)}
+        onLogin={async () => {
+          await login();
+          setCurrentPage("app");
+        }}
+        guestMode={true} // Siempre mostrar botón de login si no hay user y estamos en dashboard
       />
 
       {/* Main Content */}
