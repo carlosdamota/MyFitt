@@ -47,7 +47,8 @@ export default function App() {
 
   // Custom Hooks
   const { user, authError, login } = useAuth();
-  const { workoutLogs, saveLog, deleteLog, dbError, streak } = useWorkoutLogs(user);
+  const { workoutLogs, saveLog, deleteLog, coachAdvice, saveCoachAdvice, dbError, streak } =
+    useWorkoutLogs(user);
   const { timer, isTimerRunning, resetTimer, toggleTimer } = useTimer(60);
   const {
     routines,
