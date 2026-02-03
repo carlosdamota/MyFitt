@@ -7,19 +7,44 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependency directories
+node_modules/
+jspm_packages/
 
-# Editor directories and files
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# IDEs and Editors
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# AI Agent metadata
+.agent/
+audit_report.md
+
+# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*

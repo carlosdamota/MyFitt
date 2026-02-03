@@ -32,8 +32,10 @@ service cloud.firestore {
       // Cualquiera puede leer rutinas compartidas
       allow read: if true;
       
-      // Solo usuarios autenticados pueden crear rutinas compartidas
-      allow create: if isAuthenticated();
+      // Solo usuarios autenticados pueden crear rutinas compartidas, 
+      // y deben marcarse a sí mismos como autores
+      allow create: if isAuthenticated() && 
+        request.resource.data.originalAuthor == request.auth.uid;
       
       // Solo el autor original puede modificar o eliminar su rutina compartida
       allow update, delete: if isAuthenticated() && 
