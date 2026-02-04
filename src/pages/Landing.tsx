@@ -34,7 +34,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
             <span className='text-sm font-medium text-slate-300'>V2.0 Ahora Disponible</span>
           </div>
 
-          <h1 className='text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent'>
+          <h1 className='text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-linear-to-b from-white to-slate-400 bg-clip-text text-transparent'>
             Tu Entrenador Personal <br />
             <span className='text-blue-500'>Potenciado por IA</span>
           </h1>
@@ -105,7 +105,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
 
         {/* App Preview (Abstract) */}
         <div className='relative w-full max-w-4xl aspect-video bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden group'>
-          <div className='absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-900/90 to-blue-900/20' />
+          <div className='absolute inset-0 bg-linear-to-tr from-slate-900 via-slate-900/90 to-blue-900/20' />
           <div className='absolute inset-0 flex items-center justify-center'>
             <div className='text-center'>
               <Activity

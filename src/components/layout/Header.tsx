@@ -40,7 +40,8 @@ const Header: React.FC<HeaderProps> = ({
     <header className='bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-3 md:p-4 sticky top-0 z-20 flex justify-between items-center'>
       <div className='flex items-center gap-3'>
         <div>
-          <h1 className='text-lg md:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-1 md:gap-2'>
+          <h1 className='text-lg md:text-xl font-bold bg-clip-text text-transparent flex items-center gap-1 md:gap-2 relative'>
+            <div className='absolute inset-0 bg-linear-to-r from-blue-500/20 to-purple-500/20 blur-2xl -z-10 animate-pulse' />
             <Activity
               size={18}
               className='text-blue-400 md:w-[22px] md:h-[22px]'

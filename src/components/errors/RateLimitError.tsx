@@ -43,7 +43,7 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClo
   }, [resetAt]);
 
   return (
-    <div className='fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200'>
+    <div className='fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
       <div className='bg-slate-900 border border-red-500/50 rounded-2xl p-6 max-w-md mx-4 animate-in zoom-in-95 duration-200 shadow-2xl'>
         <div className='flex items-start gap-3 mb-4'>
           <div className='p-2 bg-red-600/20 rounded-lg'>

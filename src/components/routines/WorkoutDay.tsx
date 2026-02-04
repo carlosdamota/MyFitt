@@ -177,7 +177,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                           <div className='mt-4 pl-11 animate-in slide-in-from-top-2 duration-200'>
                             <div className='w-full h-48 bg-slate-800 rounded-xl border border-slate-700 mb-3 overflow-hidden relative group flex items-center justify-center p-2'>
                               <ExerciseIcon type={ex.svg} />
-                              <div className='absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent pointer-events-none' />
+                              <div className='absolute inset-0 bg-linear-to-t from-slate-900/50 to-transparent pointer-events-none' />
                             </div>
                             <div className='flex items-start gap-3 bg-blue-900/20 border border-blue-900/30 p-3 rounded-lg mb-3'>
                               <Info

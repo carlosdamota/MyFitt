@@ -27,7 +27,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
         allLogs.push({
           exercise,
           ...entry,
-          volume: effectiveWeight * entry.reps * entry.sets,
+          volume: effectiveWeight * (entry.reps || 0) * (entry.sets || 0),
         });
       });
     });

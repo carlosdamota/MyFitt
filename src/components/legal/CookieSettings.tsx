@@ -17,7 +17,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
   };
 
   return (
-    <div className='fixed inset-0 z-[400] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200'>
+    <div className='fixed inset-0 z-400 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
       <div className='bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-2xl mx-4 animate-in zoom-in-95 duration-200 shadow-2xl max-h-[90vh] overflow-y-auto'>
         {/* Header */}
         <div className='flex items-start gap-3 mb-6'>
@@ -124,8 +124,8 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
             Cancelar
           </button>
           <button
-            onClick={handleSave}
-            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg transition-all'
+            onClick={() => onSave(tempConsent)}
+            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-900/40 transition-all active:scale-95'
           >
             Guardar Preferencias
           </button>

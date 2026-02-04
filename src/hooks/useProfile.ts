@@ -81,12 +81,9 @@ export const useProfile = (user: User | null): UseProfileReturn => {
       const profileRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "profile");
 
       // Filtrar valores undefined ya que Firestore no los soporta
-      const cleanData = Object.entries(profileData).reduce((acc, [key, value]) => {
-        if (value !== undefined) {
-          acc[key as keyof UserProfile] = value;
-        }
-        return acc;
-      }, {} as Partial<UserProfile>);
+      const cleanData = Object.fromEntries(
+        Object.entries(profileData).filter(([_, v]) => v !== undefined),
+      ) as Partial<UserProfile>;
 
       await setDoc(
         profileRef,

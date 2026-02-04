@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Loader, Utensils, User } from "lucide-react";
-import type { Routine } from "./types";
+import React, { useState, useEffect, useMemo } from "react";
+import { Loader } from "lucide-react";
 
 // Hooks
 import { useAuth } from "./hooks/useAuth";
@@ -14,16 +13,10 @@ import { useCookieConsent } from "./hooks/useCookieConsent";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import TimerOverlay from "./components/layout/TimerOverlay";
-import Modal from "./components/common/Modal";
+import AppModals from "./components/layout/AppModals";
 import RoutineTabs from "./components/routines/RoutineTabs";
-import RoutineManager from "./components/routines/RoutineManager";
 import WorkoutDay from "./components/routines/WorkoutDay";
-import RoutineEditor from "./components/routines/RoutineEditor";
-import GlobalStats from "./components/stats/GlobalStats";
-import NutritionDashboard from "./components/nutrition/NutritionDashboard";
-import ProfileEditor from "./components/profile/ProfileEditor";
 import CookieBanner from "./components/legal/CookieBanner";
-import CookieSettings from "./components/legal/CookieSettings";
 
 // Pages
 import Privacy from "./pages/Privacy";
@@ -35,7 +28,6 @@ import Landing from "./pages/Landing";
 import { initGA, logPageView } from "./utils/analytics";
 
 export default function App() {
-  // Page & UI State
   const [currentPage, setCurrentPage] = useState<string>("home");
   const [activeTab, setActiveTab] = useState<string>("day1");
   const [showStats, setShowStats] = useState<boolean>(false);
@@ -45,12 +37,8 @@ export default function App() {
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
   const [showCookieSettings, setShowCookieSettings] = useState<boolean>(false);
   const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
-  const [guestMode, setGuestMode] = useState<boolean>(false);
 
-  // Cookie consent
   const { consent, acceptAll, rejectAll, updateConsent, hasResponded } = useCookieConsent();
-
-  // Custom Hooks
   const { user, authError, login } = useAuth();
   const { profile } = useProfile(user);
   const { workoutLogs, saveLog, deleteLog, coachAdvice, saveCoachAdvice, dbError, streak } =
@@ -64,78 +52,45 @@ export default function App() {
     importSharedRoutine,
   } = useRoutines(user);
 
-  // Initialize GA when consent changes
   useEffect(() => {
-    if (consent.analytics) {
-      initGA(true);
-    }
+    if (consent.analytics) initGA(true);
   }, [consent.analytics]);
-
-  // Log page views
   useEffect(() => {
     logPageView();
   }, [currentPage]);
 
-  // Handle shared routine import from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shareId = params.get("shareId");
-
     if (shareId && user && !routinesLoading) {
-      if (window.confirm("¿Quieres importar esta rutina compartida a tu colección?")) {
+      if (window.confirm("¿Quieres importar esta rutina compartida?")) {
         importSharedRoutine(shareId, activeTab).then((success) => {
           if (success) {
-            alert("¡Rutina importada con éxito!");
+            alert("¡Rutina importada!");
             window.history.replaceState({}, document.title, "/");
-          } else {
-            alert("Error al importar la rutina. Verifica que el enlace sea correcto.");
           }
         });
       }
     }
   }, [user, routinesLoading, activeTab, importSharedRoutine]);
 
-  // Sincronizar activeTab con la rutina activa del perfil
   useEffect(() => {
     if (profile?.activeRoutineId && routines[profile.activeRoutineId]) {
       setActiveTab(profile.activeRoutineId);
     }
   }, [profile?.activeRoutineId, routines]);
 
-  // Handlers
-  const handleSaveRoutine = async (updatedRoutine: Routine): Promise<void> => {
-    const success = await saveRoutine(activeTab, updatedRoutine);
-    if (success) setShowRoutineEditor(false);
-  };
-
-  const handleShareRoutine = async (routineToShare: Routine): Promise<string | null> => {
-    return await shareRoutine(activeTab, routineToShare);
-  };
-
-  const toggleComplete = (day: string, exerciseName: string): void => {
-    const key = `${day}-${exerciseName}`;
-    setCompletedExercises((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  // Filter routines to display in tabs (Program siblings or standalone)
-  // Moved up to avoid hook order violation before conditional returns
-  const programRoutines = React.useMemo(() => {
+  const programRoutines = useMemo(() => {
     const activeData = routines[activeTab];
     if (!activeData) return routines;
-
     if (activeData.programId) {
-      // Return only routines from the same program
       return Object.fromEntries(
         Object.entries(routines).filter(([, r]) => r.programId === activeData.programId),
       );
     }
-
-    // If no programId, show all legacy/standalone routines (excluding those belonging to other programs)
-    // This restores the "classic" view for default routines
     return Object.fromEntries(Object.entries(routines).filter(([, r]) => !r.programId));
   }, [routines, activeTab]);
 
-  // Loading state
   if (routinesLoading) {
     return (
       <div className='min-h-screen bg-slate-950 flex items-center justify-center text-blue-500'>
@@ -147,19 +102,12 @@ export default function App() {
     );
   }
 
-  // Ensure activeTab is valid
   const currentRoutine = routines[activeTab] || Object.values(routines)[0];
-  if (!routines[activeTab] && Object.keys(routines).length > 0) {
-    setActiveTab(Object.keys(routines)[0]);
-  }
 
-  // Render legal pages
   if (currentPage === "privacy") return <Privacy />;
   if (currentPage === "terms") return <Terms />;
   if (currentPage === "legal") return <Legal />;
-
-  // Home / Landing entry point
-  if (currentPage === "home") {
+  if (currentPage === "home")
     return (
       <Landing
         onLogin={async () => {
@@ -170,59 +118,43 @@ export default function App() {
         user={user}
       />
     );
-  }
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-200 pb-24 font-sans selection:bg-blue-500/30'>
-      {/* Background Gradients */}
       <div className='fixed inset-0 z-0 pointer-events-none'>
         <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-900/10 blur-[100px]' />
         <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-900/10 blur-[100px]' />
       </div>
 
-      {/* Modals */}
-      {showStats && (
-        <GlobalStats
-          logs={workoutLogs}
-          onClose={() => setShowStats(false)}
-          coachHistory={coachAdvice || ""}
-          onSaveAdvice={saveCoachAdvice}
-          userWeight={profile?.weight || 70}
-        />
-      )}
+      <AppModals
+        user={user}
+        showStats={showStats}
+        setShowStats={setShowStats}
+        showNutrition={showNutrition}
+        setShowNutrition={setShowNutrition}
+        showProfile={showProfile}
+        setShowProfile={setShowProfile}
+        showRoutineEditor={showRoutineEditor}
+        setShowRoutineEditor={setShowRoutineEditor}
+        showRoutineManager={showRoutineManager}
+        setShowRoutineManager={setShowRoutineManager}
+        showCookieSettings={showCookieSettings}
+        setShowCookieSettings={setShowCookieSettings}
+        workoutLogs={workoutLogs}
+        coachAdvice={coachAdvice || ""}
+        saveCoachAdvice={saveCoachAdvice}
+        profile={profile}
+        routines={routines}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        handleSaveRoutine={async (r) => {
+          if (await saveRoutine(activeTab, r)) setShowRoutineEditor(false);
+        }}
+        handleShareRoutine={(r) => shareRoutine(activeTab, r)}
+        consent={consent}
+        updateConsent={updateConsent}
+      />
 
-      <Modal
-        isOpen={showNutrition}
-        onClose={() => setShowNutrition(false)}
-        title='Nutrición'
-        icon={
-          <Utensils
-            size={20}
-            className='text-green-400'
-          />
-        }
-      >
-        <NutritionDashboard user={user} />
-      </Modal>
-
-      <Modal
-        isOpen={showProfile}
-        onClose={() => setShowProfile(false)}
-        title='Perfil de Atleta'
-        icon={
-          <User
-            size={20}
-            className='text-blue-400'
-          />
-        }
-      >
-        <ProfileEditor
-          user={user}
-          onClose={() => setShowProfile(false)}
-        />
-      </Modal>
-
-      {/* Cookie Banner */}
       {!hasResponded && (
         <CookieBanner
           onAcceptAll={acceptAll}
@@ -231,38 +163,6 @@ export default function App() {
         />
       )}
 
-      {/* Cookie Settings Modal */}
-      {showCookieSettings && (
-        <CookieSettings
-          currentConsent={consent}
-          onSave={updateConsent}
-          onClose={() => setShowCookieSettings(false)}
-        />
-      )}
-
-      {/* Routine Editor */}
-      {showRoutineEditor && (
-        <RoutineEditor
-          initialData={currentRoutine}
-          onSave={handleSaveRoutine}
-          onCancel={() => setShowRoutineEditor(false)}
-          onShare={handleShareRoutine}
-        />
-      )}
-
-      {/* Routine Manager */}
-      {showRoutineManager && (
-        <RoutineManager
-          user={user}
-          onClose={() => setShowRoutineManager(false)}
-          onSelectRoutine={(id) => {
-            setActiveTab(id);
-            setShowRoutineManager(false);
-          }}
-        />
-      )}
-
-      {/* Header */}
       <Header
         user={user}
         streak={streak}
@@ -276,22 +176,23 @@ export default function App() {
           await login();
           setCurrentPage("app");
         }}
-        guestMode={true} // Siempre mostrar botón de login si no hay user y estamos en dashboard
+        guestMode={true}
       />
 
-      {/* Main Content */}
       <main className='p-4 relative z-10'>
         <RoutineTabs
           routines={programRoutines}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
-
         <WorkoutDay
           routine={currentRoutine}
           dayKey={activeTab}
           completedExercises={completedExercises}
-          onToggleComplete={toggleComplete}
+          onToggleComplete={(day, ex) => {
+            const key = `${day}-${ex}`;
+            setCompletedExercises((prev) => ({ ...prev, [key]: !prev[key] }));
+          }}
           onEditRoutine={() => setShowRoutineEditor(true)}
           onResetTimer={resetTimer}
           onSaveLog={saveLog}
@@ -299,14 +200,9 @@ export default function App() {
           workoutLogs={workoutLogs}
           user={user}
         />
-
-        <div className='h-20' />
       </main>
 
-      {/* Footer */}
       <Footer onNavigate={setCurrentPage} />
-
-      {/* Timer Overlay */}
       <TimerOverlay
         timer={timer}
         isRunning={isTimerRunning}

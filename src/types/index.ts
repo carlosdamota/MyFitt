@@ -110,3 +110,25 @@ export interface RateLimitData {
   resetAt: string;
   lastAction: string | null;
 }
+
+// ============================================
+// User Profile Types
+// ============================================
+
+export interface ProfileFormData {
+  weight: string;
+  height: string;
+  age: string;
+  gender: "male" | "female" | "other";
+  dietType: "balanced" | "keto" | "paleo" | "high_protein" | "low_carb";
+  goal: "muscle_gain" | "fat_loss" | "strength" | "endurance";
+  experienceLevel: "beginner" | "intermediate" | "advanced";
+  availableDays: number;
+  dailyTimeMinutes: number;
+  equipment: "gym_full" | "dumbbells_only" | "bodyweight" | "home_gym";
+  injuries: string;
+}
+
+export interface UserProfile extends ProfileFormData {
+  activeRoutineId?: string;
+}

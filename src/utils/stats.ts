@@ -56,6 +56,11 @@ export const isBodyweightExercise = (name: string): boolean => {
     "crunches",
     "leg raises",
     "sentadilla libre",
+    "sentadillas",
+    "sentadilla goblet",
+    "glúteo",
+    "dead bug",
+    "rueda abdominal",
     "bridge",
   ];
   const lowerName = name.toLowerCase();
