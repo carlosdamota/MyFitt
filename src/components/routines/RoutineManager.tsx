@@ -132,7 +132,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
               {groupedRoutines.defaults.length > 0 && (
                 <div className='space-y-3'>
                   <h3 className='text-xs font-bold text-slate-500 uppercase tracking-widest px-2'>
-                    Rutinas MyFitt
+                    Rutinas FitForge
                   </h3>
                   {groupedRoutines.defaults.map(([programId, group]) => (
                     <ProgramCard

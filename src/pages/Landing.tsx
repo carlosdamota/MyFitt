@@ -64,7 +64,9 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
                 <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
                 <span className='relative inline-flex rounded-full h-3 w-3 bg-emerald-500'></span>
               </span>
-              <span className='text-sm font-medium text-slate-300'>Entrenamiento inteligente listo en minutos</span>
+              <span className='text-sm font-medium text-slate-300'>
+                Entrenamiento inteligente listo en minutos
+              </span>
             </div>
 
             <h1 className='text-4xl md:text-6xl font-extrabold tracking-tight leading-tight'>
@@ -73,7 +75,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
             </h1>
 
             <p className='text-lg text-slate-300 max-w-xl leading-relaxed'>
-              FitManual transforma tus datos en sesiones claras: volumen, descanso, nutricion y
+              FitForge transforma tus datos en sesiones claras: volumen, descanso, nutricion y
               progresion guiada. Tu tablero diario te dice que hacer y por que funciona.
             </p>
 
@@ -98,9 +100,15 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
             </div>
 
             <div className='flex flex-wrap gap-3 text-xs text-slate-400'>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>Sin tarjeta</span>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>Datos privados</span>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>IA con limites claros</span>
+              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+                Sin tarjeta
+              </span>
+              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+                Datos privados
+              </span>
+              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+                IA con limites claros
+              </span>
             </div>
           </div>
 
@@ -151,16 +159,31 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
           <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Como funciona</p>
-              <h2 className='text-3xl md:text-4xl font-bold text-white'>De cero a plan completo en 3 pasos</h2>
+              <h2 className='text-3xl md:text-4xl font-bold text-white'>
+                De cero a plan completo en 3 pasos
+              </h2>
             </div>
             <div className='text-sm text-slate-400 max-w-md'>
-              Configura tu perfil, deja que la IA componga el plan, y registra progreso con feedback accionable.
+              Configura tu perfil, deja que la IA componga el plan, y registra progreso con feedback
+              accionable.
             </div>
           </div>
           <div className='grid md:grid-cols-3 gap-6'>
-            <StepCard step='01' title='Define tu contexto' desc='Equipo, dias disponibles, objetivo y nivel. Lo esencial, sin ruido.' />
-            <StepCard step='02' title='Genera tu semana' desc='La IA diseña bloques de ejercicios con descansos y progresion.' />
-            <StepCard step='03' title='Mide y ajusta' desc='Registra sesiones, ve volumen y recibe feedback inmediato.' />
+            <StepCard
+              step='01'
+              title='Define tu contexto'
+              desc='Equipo, dias disponibles, objetivo y nivel. Lo esencial, sin ruido.'
+            />
+            <StepCard
+              step='02'
+              title='Genera tu semana'
+              desc='La IA diseña bloques de ejercicios con descansos y progresion.'
+            />
+            <StepCard
+              step='03'
+              title='Mide y ajusta'
+              desc='Registra sesiones, ve volumen y recibe feedback inmediato.'
+            />
           </div>
         </section>
 
@@ -168,7 +191,9 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
           <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Opciones</p>
-              <h2 className='text-3xl md:text-4xl font-bold text-white'>Todo lo que necesitas en un panel</h2>
+              <h2 className='text-3xl md:text-4xl font-bold text-white'>
+                Todo lo que necesitas en un panel
+              </h2>
             </div>
             <p className='text-sm text-slate-400 max-w-md'>
               Alterna entre rutinas, nutricion, IA y estadisticas sin perder el contexto.
@@ -176,22 +201,42 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
           </div>
           <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-5'>
             <OptionCard
-              icon={<Dumbbell size={20} className='text-cyan-300' />}
+              icon={
+                <Dumbbell
+                  size={20}
+                  className='text-cyan-300'
+                />
+              }
               title='Rutinas dinamicas'
               desc='Edita dias, guarda programas y sincroniza tu progreso.'
             />
             <OptionCard
-              icon={<Sparkles size={20} className='text-emerald-300' />}
+              icon={
+                <Sparkles
+                  size={20}
+                  className='text-emerald-300'
+                />
+              }
               title='Generador IA'
               desc='Planes semanales, variantes de ejercicios y analisis.'
             />
             <OptionCard
-              icon={<Utensils size={20} className='text-amber-300' />}
+              icon={
+                <Utensils
+                  size={20}
+                  className='text-amber-300'
+                />
+              }
               title='Nutricion practica'
               desc='Registros rapidos y macros sugeridos por objetivo.'
             />
             <OptionCard
-              icon={<BarChart2 size={20} className='text-indigo-300' />}
+              icon={
+                <BarChart2
+                  size={20}
+                  className='text-indigo-300'
+                />
+              }
               title='Progreso visible'
               desc='Volumen, consistencia y rachas con grafica clara.'
             />
@@ -202,29 +247,51 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
           <div className='grid md:grid-cols-[1fr,0.9fr] gap-10 items-center'>
             <div className='space-y-6'>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Beneficios reales</p>
-              <h2 className='text-3xl md:text-4xl font-bold text-white'>Planificacion clara, ejecucion sin dudas</h2>
+              <h2 className='text-3xl md:text-4xl font-bold text-white'>
+                Planificacion clara, ejecucion sin dudas
+              </h2>
               <p className='text-slate-400'>
-                Los bloques de entrenamiento vienen con descansos sugeridos, foco muscular y sugerencias
-                inteligentes. No pierdes tiempo pensando que hacer: solo entrenas.
+                Los bloques de entrenamiento vienen con descansos sugeridos, foco muscular y
+                sugerencias inteligentes. No pierdes tiempo pensando que hacer: solo entrenas.
               </p>
               <div className='grid sm:grid-cols-2 gap-4'>
                 <FeatureCard
-                  icon={<Zap size={20} className='text-amber-300' />}
+                  icon={
+                    <Zap
+                      size={20}
+                      className='text-amber-300'
+                    />
+                  }
                   title='Sesiones precisas'
                   desc='Bloques con volumen y descanso definidos para cada dia.'
                 />
                 <FeatureCard
-                  icon={<Target size={20} className='text-cyan-300' />}
+                  icon={
+                    <Target
+                      size={20}
+                      className='text-cyan-300'
+                    />
+                  }
                   title='Objetivo claro'
                   desc='Rutinas alineadas a fuerza, hipertrofia o perdida grasa.'
                 />
                 <FeatureCard
-                  icon={<Shield size={20} className='text-emerald-300' />}
+                  icon={
+                    <Shield
+                      size={20}
+                      className='text-emerald-300'
+                    />
+                  }
                   title='Datos privados'
                   desc='Tu historial es tuyo, sin anuncios ni rastreo invasivo.'
                 />
                 <FeatureCard
-                  icon={<Activity size={20} className='text-indigo-300' />}
+                  icon={
+                    <Activity
+                      size={20}
+                      className='text-indigo-300'
+                    />
+                  }
                   title='Feedback IA'
                   desc='Analisis semanal y variaciones de ejercicios.'
                 />
@@ -253,7 +320,9 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
           <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Planes</p>
-              <h2 className='text-3xl md:text-4xl font-bold text-white'>Elige tu ritmo de entrenamiento</h2>
+              <h2 className='text-3xl md:text-4xl font-bold text-white'>
+                Elige tu ritmo de entrenamiento
+              </h2>
             </div>
             <p className='text-sm text-slate-400 max-w-md'>
               Empieza gratis y sube a Pro cuando quieras mas IA y automatizaciones.
@@ -265,11 +334,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
               badge='Ideal para empezar'
               price='0 €'
               desc='Acceso base a rutinas y seguimiento.'
-              features={[
-                "Rutinas guardadas",
-                "Seguimiento de progresos",
-                "IA semanal limitada",
-              ]}
+              features={["Rutinas guardadas", "Seguimiento de progresos", "IA semanal limitada"]}
               cta='Comenzar gratis'
               onClick={onLogin}
               tone='neutral'
@@ -279,11 +344,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
               badge='Mas potencia'
               price='4.99 € / mes'
               desc='IA avanzada, nutricion y analisis completos.'
-              features={[
-                "Cuota IA mensual ampliada",
-                "Analisis avanzado",
-                "Portal de suscripcion",
-              ]}
+              features={["Cuota IA mensual ampliada", "Analisis avanzado", "Portal de suscripcion"]}
               cta='Probar Pro'
               onClick={onLogin}
               tone='accent'
@@ -292,9 +353,11 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
         </section>
 
         <section className='rounded-3xl border border-slate-800 bg-slate-900/60 p-8 md:p-10 text-center'>
-          <h2 className='text-3xl md:text-4xl font-bold text-white mb-4'>Listo para entrenar en serio</h2>
+          <h2 className='text-3xl md:text-4xl font-bold text-white mb-4'>
+            Listo para entrenar en serio
+          </h2>
           <p className='text-slate-300 max-w-2xl mx-auto mb-6'>
-            Abre FitManual, crea tu plan y empieza hoy. Menos dudas, mas accion.
+            Abre FitForge, crea tu plan y empieza hoy. Menos dudas, mas accion.
           </p>
           <button
             onClick={onLogin}
@@ -307,7 +370,7 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
       </div>
 
       <footer className='border-t border-slate-900 py-8 text-center text-slate-600 text-sm'>
-        <p>&copy; {new Date().getFullYear()} FitManual. Todos los derechos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} FitForge. Todos los derechos reservados.</p>
       </footer>
     </div>
   );
@@ -353,9 +416,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 }) => (
   <div
     className={`rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
-      tone === "accent"
-        ? "border-cyan-400/40 bg-cyan-500/10"
-        : "border-slate-800 bg-slate-900/60"
+      tone === "accent" ? "border-cyan-400/40 bg-cyan-500/10" : "border-slate-800 bg-slate-900/60"
     }`}
   >
     <div className='flex items-start justify-between'>
@@ -374,7 +435,10 @@ const PlanCard: React.FC<PlanCardProps> = ({
     <p className='text-slate-300'>{desc}</p>
     <ul className='space-y-2 text-sm text-slate-400'>
       {features.map((item) => (
-        <li key={item} className='flex items-center gap-2'>
+        <li
+          key={item}
+          className='flex items-center gap-2'
+        >
           <span className='w-1.5 h-1.5 rounded-full bg-cyan-300' />
           {item}
         </li>

@@ -1,4 +1,4 @@
-// Shared types for the MyFitt application
+// Shared types for the FitForge application
 import type { User } from "firebase/auth";
 
 // Re-export Firebase User type for convenience

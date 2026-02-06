@@ -107,9 +107,7 @@ const Header: React.FC<HeaderProps> = ({
     setMobileOpen(false);
   };
 
-  const renewalLabel = currentPeriodEnd
-    ? new Date(currentPeriodEnd).toLocaleDateString()
-    : "";
+  const renewalLabel = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : "";
 
   return (
     <>
@@ -127,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({
                   size={18}
                   className='text-cyan-300 md:w-[22px] md:h-[22px]'
                 />
-                <span className='text-white hidden sm:inline'>FitManual</span>
+                <span className='text-white hidden sm:inline'>FitForge</span>
                 <span className='text-white sm:hidden'>FM</span>
               </button>
               {streak > 0 && (
@@ -249,7 +247,7 @@ const Header: React.FC<HeaderProps> = ({
               size={20}
               className='text-cyan-300'
             />
-            <span className='text-lg font-bold text-white'>FitManual</span>
+            <span className='text-lg font-bold text-white'>FitForge</span>
           </div>
           <button
             onClick={() => setMobileOpen(false)}

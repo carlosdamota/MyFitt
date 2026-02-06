@@ -12,9 +12,9 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
           {/* Brand & Copyright */}
           <div className='text-center md:text-left'>
-            <h3 className='text-lg font-bold text-white mb-1'>FitManual</h3>
+            <h3 className='text-lg font-bold text-white mb-1'>FitForge</h3>
             <p className='text-xs text-slate-500'>
-              &copy; {new Date().getFullYear()} FitManual. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} FitForge. Todos los derechos reservados.
             </p>
           </div>
 
@@ -44,7 +44,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Disclaimer */}
         <div className='mt-8 pt-6 border-t border-slate-900 text-center'>
           <p className='text-[10px] text-slate-600 max-w-2xl mx-auto leading-relaxed'>
-            FitManual es una herramienta de seguimiento de fitness. No ofrecemos consejo médico.
+            FitForge es una herramienta de seguimiento de fitness. No ofrecemos consejo médico.
             Consulta siempre a un profesional de la salud antes de comenzar cualquier programa de
             ejercicios. Desarrollado con{" "}
             <Heart
