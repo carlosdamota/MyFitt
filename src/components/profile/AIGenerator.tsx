@@ -1,11 +1,29 @@
-import React, { useState } from "react";
-import { Zap, Loader, Check } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Zap, Loader, Check, Dumbbell } from "lucide-react";
 import { generateFullProgram } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { ProfileFormData } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
+
+// Motivational phrases for loading state
+const MOTIVATIONAL_PHRASES = [
+  "Preparando tu entrenamiento personalizado... 💪",
+  "Analizando tu perfil de atleta...",
+  "Los campeones se forjan en el gimnasio 🏆",
+  "Diseñando ejercicios perfectos para ti...",
+  "El dolor de hoy es la fuerza del mañana 🔥",
+  "Calculando las mejores series y repeticiones...",
+  "Cada repetición cuenta, cada día suma 📈",
+  "Optimizando tu programa de entrenamiento...",
+  "Tu mejor versión está a punto de nacer ⭐",
+  "La constancia vence al talento",
+  "Generando tu rutina con inteligencia artificial...",
+  "No hay atajos hacia ningún lugar que valga la pena ir 🎯",
+  "Personalizando ejercicios para tus objetivos...",
+  "El éxito es la suma de pequeños esfuerzos repetidos día tras día",
+];
 
 interface AIGeneratorProps {
   user: FirebaseUser | null;
@@ -61,6 +79,21 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   const [genSuccess, setGenSuccess] = useState<boolean>(false);
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState<number>(0);
+
+  // Rotate motivational phrases every 3 seconds during generation
+  useEffect(() => {
+    if (!isGenerating) {
+      setCurrentPhraseIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setCurrentPhraseIndex((prev) => (prev + 1) % MOTIVATIONAL_PHRASES.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isGenerating]);
 
   const confirmGeneration = async (): Promise<void> => {
     if (!formData) return;
@@ -108,9 +141,16 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
         const dayRoutine = program.days[i];
         setGenerationProgress(`Guardando día ${i + 1}: ${dayRoutine.title}...`);
 
-        await createRoutine(`Día ${i + 1} - ${dayRoutine.title}`, {
+        // Extract focus from title if it contains "Día X:" pattern
+        const titleParts =
+          dayRoutine.title?.replace(/^Día \d+[:\s-]*/, "").trim() ||
+          dayRoutine.focus ||
+          `Rutina ${i + 1}`;
+        const cleanTitle = `${program.programName || "Programa"}: ${titleParts}`;
+
+        await createRoutine(cleanTitle, {
           ...dayRoutine,
-          title: dayRoutine.title,
+          title: cleanTitle,
           programId: programId,
           active: false,
           dayNumber: i + 1,
@@ -153,6 +193,47 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           onClose={() => setShowRateLimitError(false)}
           onUpgrade={onUpgrade}
         />
+      )}
+
+      {/* Fullscreen Loading Modal with Motivational Phrases */}
+      {isGenerating && (
+        <div className='fixed inset-0 z-100 flex flex-col items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300'>
+          <div className='flex flex-col items-center max-w-md text-center'>
+            {/* Animated Icon */}
+            <div className='relative mb-8'>
+              <div className='w-24 h-24 rounded-full bg-linear-to-br from-blue-600/30 to-purple-600/30 flex items-center justify-center'>
+                <Dumbbell
+                  size={40}
+                  className='text-blue-400 animate-pulse'
+                />
+              </div>
+              <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin' />
+            </div>
+
+            {/* Motivational Phrase */}
+            <p className='text-xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400 mb-4 min-h-12 transition-all duration-500 ease-in-out'>
+              {MOTIVATIONAL_PHRASES[currentPhraseIndex]}
+            </p>
+
+            {/* Progress Info */}
+            <p className='text-sm text-slate-400 mb-6'>
+              {generationProgress || "Iniciando generación..."}
+            </p>
+
+            {/* Progress Bar */}
+            <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
+              <div
+                className='h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse'
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            {/* Tip */}
+            <p className='text-xs text-slate-500 mt-6'>
+              La IA está creando un programa único para ti. Esto puede tardar hasta 30 segundos.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Confirmation Modal */}

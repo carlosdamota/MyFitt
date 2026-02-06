@@ -15,7 +15,7 @@ const cleanJsonText = (text: string): string =>
 
 export const parseNutritionLog = async (text: string): Promise<NutritionLog> => {
   try {
-    const response = await callAI("nutrition_parse", { text });
+    const response = await callAI("nutrition_parse", { log: text });
     const cleanJson = cleanJsonText(response.text);
     const parsed = JSON.parse(cleanJson);
 

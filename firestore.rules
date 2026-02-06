@@ -46,6 +46,16 @@ service cloud.firestore {
           : false;
     }
 
+    function isValidNutritionLog() {
+      return request.resource.data.food is string
+        && request.resource.data.calories is number
+        && request.resource.data.protein is number
+        && request.resource.data.carbs is number
+        && request.resource.data.fats is number
+        && request.resource.data.mealType in ["breakfast", "lunch", "dinner", "snack"]
+        && request.resource.data.date is string;
+    }
+
     // ==========================================
     // REGLAS DE SEGURIDAD
     // ==========================================
@@ -60,6 +70,12 @@ service cloud.firestore {
     match /artifacts/{appId}/users/{userId}/app_data/{docId} {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidAppData(docId);
+      allow delete: if isOwner(userId);
+    }
+
+    match /artifacts/{appId}/users/{userId}/nutrition_logs/{logId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidNutritionLog();
       allow delete: if isOwner(userId);
     }
 

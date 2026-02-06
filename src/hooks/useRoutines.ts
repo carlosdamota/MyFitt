@@ -27,12 +27,14 @@ export interface UseRoutinesReturn {
 }
 
 export const useRoutines = (user: User | null): UseRoutinesReturn => {
-  const [routines, setRoutines] = useState<RoutineData>(defaultRoutineData);
+  // Start empty - defaults will be loaded only if user has NO saved routines
+  const [routines, setRoutines] = useState<RoutineData>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !db) {
+      // No user - show defaults for demo/guest mode
       setRoutines(defaultRoutineData);
       setLoading(false);
       return;
@@ -46,26 +48,15 @@ export const useRoutines = (user: User | null): UseRoutinesReturn => {
         const q = query(routinesRef, limit(20));
         const querySnapshot = await getDocs(q);
 
-        const mergedRoutines: RoutineData = { ...defaultRoutineData };
+        // Always include default routines (isDefault: true) + user's generated routines
+        // Defaults cannot be deleted, user routines can
+        const userRoutines: RoutineData = {};
+        querySnapshot.forEach((docSnap) => {
+          userRoutines[docSnap.id] = docSnap.data() as Routine;
+        });
 
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((docSnap) => {
-            // Overwrite or append user routines
-            // If user has a routine with same ID as default, user's version wins (customization)
-            // But since we changed default IDs to "default_*", collisions are unlikely unless user manually created one with that ID
-            mergedRoutines[docSnap.id] = docSnap.data() as Routine;
-          });
-        }
-
-        // Ordenar por claves para consistencia visual
-        const sortedRoutines = Object.keys(mergedRoutines)
-          .sort()
-          .reduce<RoutineData>((obj, key) => {
-            obj[key] = mergedRoutines[key];
-            return obj;
-          }, {});
-
-        setRoutines(sortedRoutines);
+        // Merge: defaults first, then user routines (user routines with same ID override defaults)
+        setRoutines({ ...defaultRoutineData, ...userRoutines });
       } catch (err) {
         console.error("Error fetching routines:", err);
         setError("Error cargando rutinas personalizadas");
@@ -143,6 +134,14 @@ export const useRoutines = (user: User | null): UseRoutinesReturn => {
 
   const deleteRoutine = async (routineId: string): Promise<boolean> => {
     if (!user || !db) return false;
+
+    // Protect default routines from deletion
+    const routine = routines[routineId];
+    if (routine?.isDefault) {
+      console.warn("Cannot delete default routines");
+      return false;
+    }
+
     try {
       const docRef = doc(db!, "artifacts", appId, "users", user!.uid, "routines", routineId);
       await deleteDoc(docRef);

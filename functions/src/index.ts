@@ -197,6 +197,133 @@ const callGemini = async (prompt: string, systemInstruction = "") => {
   return text;
 };
 
+const extractJsonText = (text: string): string => {
+  const fencedMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fencedMatch?.[1]) return fencedMatch[1].trim();
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return text.slice(firstBrace, lastBrace + 1).trim();
+  }
+  return text.trim();
+};
+
+const parseJsonWithFixes = (text: string) => {
+  const cleaned = extractJsonText(text)
+    .replace(/\uFEFF/g, "")
+    .replace(/,\s*([}\]])/g, "$1");
+  return JSON.parse(cleaned);
+};
+
+const normalizeNutritionLog = (value: any) => {
+  if (!value || typeof value !== "object") return null;
+
+  if (Array.isArray(value.meals)) {
+    const meals = value.meals as Array<Record<string, any>>;
+    const totals = meals.reduce(
+      (acc, meal) => ({
+        calories: acc.calories + Number(meal.calories ?? 0),
+        protein: acc.protein + Number(meal.protein ?? 0),
+        carbs: acc.carbs + Number(meal.carbs ?? 0),
+        fats: acc.fats + Number(meal.fat ?? meal.fats ?? 0),
+      }),
+      { calories: 0, protein: 0, carbs: 0, fats: 0 },
+    );
+
+    const nameList = meals
+      .map((meal) => String(meal.name ?? meal.food ?? "").trim())
+      .filter(Boolean);
+
+    return {
+      food: nameList.length > 0 ? nameList.join(", ") : "Comida",
+      calories: totals.calories,
+      protein: totals.protein,
+      carbs: totals.carbs,
+      fats: totals.fats,
+      mealType: value.mealType ?? "snack",
+    };
+  }
+
+  return {
+    food: value.food ?? value.name ?? "Comida",
+    calories: value.calories ?? 0,
+    protein: value.protein ?? 0,
+    carbs: value.carbs ?? 0,
+    fats: value.fats ?? value.fat ?? 0,
+    mealType: value.mealType ?? "snack",
+  };
+};
+
+const buildFallbackProgram = (totalDays: number) => {
+  const days = Array.from({ length: totalDays }, (_, index) => ({
+    title: `Dia ${index + 1}`,
+    focus: "Full body",
+    mode: "metabolic",
+    weight: "Carga Media",
+    bg: "bg-slate-900",
+    border: "border-slate-800",
+    blocks: [
+      {
+        id: 1,
+        rest: 60,
+        exercises: [{ name: "Sentadillas", reps: "10-12" }],
+      },
+      {
+        id: 2,
+        rest: 60,
+        exercises: [{ name: "Flexiones", reps: "10-12" }],
+      },
+      {
+        id: 3,
+        rest: 45,
+        exercises: [{ name: "Plancha", reps: "30-45s" }],
+      },
+    ],
+  }));
+  return {
+    programName: "Programa Personalizado",
+    description: "Programa generado automaticamente.",
+    days,
+  };
+};
+
+const normalizeProgram = (value: any, totalDays: number) => {
+  const safeValue = typeof value === "object" && value ? value : {};
+  const rawDays = Array.isArray(safeValue.days) ? safeValue.days : [];
+  const daysBase = rawDays.length > 0 ? rawDays : Array.from({ length: totalDays }, () => ({}));
+
+  const days = daysBase.map((day: any, index: number) => {
+    const rawBlocks = Array.isArray(day?.blocks) ? day.blocks : [];
+    const blocksBase = rawBlocks.length > 0 ? rawBlocks : [{ id: 1, rest: 60, exercises: [] }];
+    const blocks = blocksBase.map((block: any, blockIndex: number) => {
+      const rawExercises = Array.isArray(block?.exercises) ? block.exercises : [];
+      const exercises =
+        rawExercises.length > 0 ? rawExercises : [{ name: "Sentadillas", reps: "10-12" }];
+      return {
+        id: block?.id ?? blockIndex + 1,
+        rest: block?.rest ?? 60,
+        exercises,
+      };
+    });
+
+    return {
+      title: day?.title ?? `Dia ${index + 1}`,
+      focus: day?.focus ?? "Full body",
+      mode: day?.mode ?? "metabolic",
+      weight: day?.weight ?? "Carga Media",
+      bg: day?.bg ?? "bg-slate-900",
+      border: day?.border ?? "border-slate-800",
+      blocks,
+    };
+  });
+
+  return {
+    programName: safeValue.programName ?? "Programa Personalizado",
+    description: safeValue.description ?? "Programa generado automaticamente.",
+    days,
+  };
+};
+
 import { NutritionLogSchema, GeneratedProgramSchema } from "./schemas.js";
 import { z } from "zod";
 
@@ -213,26 +340,19 @@ const buildPrompt = (task: string, payload: Record<string, unknown>) => {
   switch (task) {
     case "nutrition_parse": {
       const log = String(payload.log ?? "");
-      const system = `Eres un nutricionista experto. Analiza el registro de comidas del usuario y devuelve un objeto JSON valido con la siguiente estructura (sin markdown):
+      const system = `Eres un nutricionista experto. Analiza el texto del usuario y devuelve SOLO un objeto JSON valido (sin markdown, sin texto extra) con esta estructura:
 {
-  "meals": [
-    {
-      "name": "Nombre de la comida",
-      "calories": 500,
-      "protein": 30,
-      "carbs": 50,
-      "fat": 15,
-      "time": "12:00"
-    }
-  ],
-  "totals": {
-    "calories": 2000,
-    "protein": 120,
-    "carbs": 200,
-    "fat": 60
-  },
-  "suggestions": ["Sugerencia 1", "Sugerencia 2"]
-}`;
+  "food": "Descripcion corta de la comida",
+  "calories": 500,
+  "protein": 30,
+  "carbs": 50,
+  "fats": 15,
+  "mealType": "breakfast" | "lunch" | "dinner" | "snack"
+}
+Reglas:
+1. Si hay multiples alimentos, suma los macros en un solo registro.
+2. Usa mealType segun el contexto; si no esta claro, usa "snack".
+3. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Analiza este registro de comidas: ${log}`,
@@ -263,9 +383,8 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
                "name": "Nombre Ejercicio",
                "reps": "10-12",
                "note": "Nota opcional",
-               "svg": "dumbbell",
-               "svg_icon": "<svg...>...</svg>"
-             }
+               "svg": "pullup" | "floor_press" | "pushup_feet_elevated" | "one_arm_row" | "plank" | "deadbug" | "glute_bridge" | "side_squat" | "goblet_squat" | "rdl" | "calf_raise_bilateral" | "face_pull" | "bicep_curl" | "tricep_extension" | "shoulder_press" | "leg_raise" | "dumbbell" | "barbell" | "bodyweight"
+              }
           ]
         }
       ]
@@ -276,7 +395,26 @@ Reglas importantes:
 1. Debes generar EXACTAMENTE ${totalDays} dias.
 2. Distribuye los grupos musculares logicamente durante la semana.
 3. Cada dia debe tener al menos 3 bloques de ejercicios.
-4. "svg_icon": Genera un string SVG minimalista (viewBox 0 0 24 24) que represente visualmente el ejercicio. Solo path, stroke y fill. Mantenlo muy simple y geometrico.`;
+4. Elige el valor "svg" mas apropiado segun el ejercicio:
+   - pullup: dominadas, chin-ups
+   - floor_press: press de pecho, press de suelo
+   - pushup_feet_elevated: flexiones, push-ups
+   - one_arm_row: remos, rows
+   - plank: planchas, isometricos
+   - deadbug: ejercicios de core en suelo
+   - glute_bridge: puentes de gluteo, hip thrust
+   - goblet_squat: sentadillas con peso
+   - rdl: peso muerto rumano
+   - calf_raise_bilateral: pantorrillas
+   - face_pull: tirantes, face pulls
+   - bicep_curl: curl de biceps
+   - tricep_extension: extensiones de triceps
+   - shoulder_press: press de hombros
+   - leg_raise: elevaciones de piernas
+   - dumbbell: ejercicios generales con mancuernas
+   - barbell: ejercicios generales con barra
+   - bodyweight: ejercicios de peso corporal generales
+5. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,
@@ -328,26 +466,41 @@ export const aiGenerate = onRequest(
       // --- ZOD VALIDATION START ---
       let validatedData: any = { text };
       try {
-        const cleanJson = text
-          .replace(/```json/g, "")
-          .replace(/```/g, "")
-          .trim();
-        const parsed = JSON.parse(cleanJson);
+        let parsed: any;
+        try {
+          parsed = parseJsonWithFixes(text);
+        } catch (parseError) {
+          console.error("AI JSON Parse Error:", parseError);
+          parsed = null;
+        }
 
         if (task === "nutrition_parse") {
-          validatedData = NutritionLogSchema.parse(parsed);
-          // Re-wrap in text struct to maintain backward compatibility if client expects raw text,
-          // OR if client expects the object structure directly.
-          // Looking at client code: it expects { text: string... } but parses text internally.
-          // Since we already parsed/validated here in backend, we should technically return the object.
-          // BUT, to avoid breaking client which does `JSON.parse(response.text)`, we should probably
-          // just ensure it validates, and then return the original text (or re-stringified valid data).
-          // Let's re-stringify the validated data to ensure it's clean.
-          validatedData = { text: JSON.stringify(validatedData) };
+          const normalized = normalizeNutritionLog(parsed ?? {});
+          const nutritionResult = NutritionLogSchema.safeParse(normalized ?? {});
+          if (!nutritionResult.success) {
+            throw new Error("ai_validation_failed");
+          }
+          validatedData = { text: JSON.stringify(nutritionResult.data) };
         } else if (task === "routine_program") {
-          // Validate but handle potential partial failures or just strict structure
-          const valid = GeneratedProgramSchema.parse(parsed);
-          validatedData = { text: JSON.stringify(valid) };
+          const totalDays = Number(payload.totalDays ?? 3);
+          const validated = GeneratedProgramSchema.safeParse(parsed ?? {});
+          if (validated.success) {
+            validatedData = { text: JSON.stringify(validated.data) };
+          } else {
+            const normalized = normalizeProgram(parsed, totalDays);
+            const normalizedResult = GeneratedProgramSchema.safeParse(normalized);
+            if (normalizedResult.success) {
+              validatedData = { text: JSON.stringify(normalizedResult.data) };
+            } else {
+              const fallback = buildFallbackProgram(totalDays);
+              const fallbackResult = GeneratedProgramSchema.safeParse(fallback);
+              if (fallbackResult.success) {
+                validatedData = { text: JSON.stringify(fallbackResult.data) };
+              } else {
+                throw new Error("ai_validation_failed");
+              }
+            }
+          }
         }
       } catch (validationError) {
         console.error("AI Validation Error:", validationError);

@@ -30,8 +30,17 @@ interface MacroBarProps {
 }
 
 const MacroBar: React.FC<MacroBarProps> = ({ label, current, target, color, icon: Icon }) => {
-  const percentage = (current / target) * 100;
+  const percentage = target > 0 ? (current / target) * 100 : 0;
   const isOver = current > target;
+
+  // Map text colors to gradient backgrounds for better visibility
+  const getGradient = () => {
+    if (isOver) return "bg-linear-to-r from-red-600 to-red-400";
+    if (color.includes("blue")) return "bg-linear-to-r from-blue-600 to-blue-400";
+    if (color.includes("purple")) return "bg-linear-to-r from-purple-600 to-purple-400";
+    if (color.includes("yellow")) return "bg-linear-to-r from-yellow-600 to-yellow-400";
+    return "bg-linear-to-r from-slate-600 to-slate-400";
+  };
 
   return (
     <div className='space-y-1'>
@@ -51,7 +60,7 @@ const MacroBar: React.FC<MacroBarProps> = ({ label, current, target, color, icon
       </div>
       <div className='h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800/50 shadow-inner'>
         <div
-          className={`h-full transition-all duration-300 shadow-[0_0_8px_rgba(0,0,0,0.5)] ${isOver ? "bg-red-500" : color.replace("text-", "bg-")}`}
+          className={`h-full transition-all duration-300 ${getGradient()} shadow-lg`}
           style={{ width: `${Math.min(percentage, 100)}%` }}
         />
       </div>
