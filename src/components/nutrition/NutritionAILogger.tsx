@@ -1,37 +1,45 @@
 import React, { useState } from "react";
 import { Sparkles, Loader, Plus } from "lucide-react";
-import { useRateLimit } from "../../hooks/useRateLimit";
 import { parseNutritionLog } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { User as FirebaseUser } from "firebase/auth";
+import { AiError } from "../../api/ai";
 
 interface NutritionAILoggerProps {
   user: FirebaseUser | null;
   onAddLog: (data: any) => Promise<boolean>;
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
 }
 
-const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog }) => {
+const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
+  user,
+  onAddLog,
+  onRequireAuth,
+  onUpgrade,
+}) => {
   const [input, setInput] = useState<string>("");
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
-
-  // Rate limiting: 50 logs de nutrición con IA por día
-  const rateLimitNutrition = useRateLimit(user, "parse_nutrition", 50);
+  const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
+  const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const canParse = await rateLimitNutrition.checkAndIncrement();
-    if (!canParse) {
-      setShowRateLimitError(true);
+    if (!user) {
+      setError("Inicia sesión para usar la IA de nutrición.");
+      onRequireAuth?.();
       return;
     }
 
     setAnalyzing(true);
     setError(null);
+    setQuotaMessage("Límite de IA alcanzado");
+    setQuotaResetAt(null);
 
     try {
       const nutritionData = await parseNutritionLog(input);
@@ -43,7 +51,16 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog })
         setError("No se pudo entender el alimento. Intente ser más específico.");
       }
     } catch (err) {
-      setError((err as Error).message);
+      if (err instanceof AiError && err.code === "quota_exceeded") {
+        setQuotaMessage(err.message);
+        setQuotaResetAt(err.resetAt ?? null);
+        setShowRateLimitError(true);
+      } else if (err instanceof AiError && err.code === "auth_required") {
+        setError(err.message);
+        onRequireAuth?.();
+      } else {
+        setError((err as Error).message);
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -53,9 +70,10 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog })
     <div className='bg-linear-to-br from-indigo-900/20 to-slate-900 p-5 rounded-2xl border border-indigo-500/30 shadow-xl'>
       {showRateLimitError && (
         <RateLimitError
-          message={rateLimitNutrition.error || "Límite de IA alcanzado"}
-          resetAt={rateLimitNutrition.resetAt}
+          message={quotaMessage}
+          resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
+          onUpgrade={onUpgrade}
         />
       )}
 

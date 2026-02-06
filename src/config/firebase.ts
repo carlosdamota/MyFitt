@@ -7,6 +7,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Type for Firebase configuration
 interface FirebaseConfig {
@@ -55,6 +56,14 @@ if (firebaseConfig) {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+
+  const appCheckKey = import.meta.env.VITE_FIREBASE_APPCHECK_KEY as string | undefined;
+  if (appCheckKey) {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(appCheckKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+  }
 
   isSupported().then((yes) => {
     if (yes && app) {

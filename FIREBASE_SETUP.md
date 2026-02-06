@@ -24,20 +24,44 @@ Abre tu archivo `.env` y rellena los datos con lo que ves en la consola:
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | `messagingSenderId` |
 | `VITE_FIREBASE_APP_ID` | `appId` |
 
+Variables adicionales:
+
+| Variable en .env | Uso |
+|------------------|-----|
+| `VITE_API_BASE_URL` | URL base de Cloud Functions (ej: `https://REGION-PROYECTO.cloudfunctions.net`) |
+| `VITE_FIREBASE_APPCHECK_KEY` | reCAPTCHA v3 site key para App Check |
+
 ## 4. Activar Servicios (¡Importante!)
 Para que la app funcione, debes activar **Authentication** y **Firestore Database**:
 
 ### Authentication
 1. En el menú izquierdo, ve a **Compilación** -> **Authentication**.
 2. Haz clic en **"Comenzar"**.
-3. En la pestaña **"Sign-in method"**, busca **"Anónimo"**.
-4. Habilítalo y guarda.
+3. En la pestaña **"Sign-in method"**, habilita **Google** y **Correo/Contraseña**.
+4. Guarda los cambios.
 
 ### Firestore Database
 1. En el menú izquierdo, ve a **Compilación** -> **Firestore Database**.
 2. Haz clic en **"Crear base de datos"**.
 3. Selecciona una ubicación (ej: `eur3` o `us-central1`).
-4. **Reglas de Seguridad**: Para empezar rápido, selecciona **"Comenzar en modo de prueba"** (esto permite leer/escribir a cualquiera por 30 días).
-   * *Nota: Para producción deberías configurar reglas que solo permitan al usuario leer/escribir sus propios datos.*
+4. **Reglas de Seguridad**: Selecciona **"Comenzar en modo bloqueado"** y luego publica las reglas del archivo `firestore.rules`.
+   * *Nota: En producción no uses modo de prueba.*
+
+### App Check (Recomendado)
+1. En el menú izquierdo, ve a **Compilación** -> **App Check**.
+2. Registra tu app web y habilita **reCAPTCHA v3**.
+3. Agrega la key en tu `.env` como `VITE_FIREBASE_APPCHECK_KEY`.
+
+### Cloud Functions (Billing + IA)
+Configura variables de entorno en Functions:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_PRO_MONTHLY`
+- `GEMINI_API_KEY`
+- `PRO_AI_MONTHLY_QUOTA` (ej. 40)
+- `FREE_AI_WEEKLY_QUOTA` (ej. 1)
+- `FITMANUAL_APP_ID` (default: `fitmanual-default`)
+- `WEB_ORIGIN` (URL de la PWA)
 
 ¡Listo! Reinicia tu servidor de desarrollo (`pnpm dev`) para que cargue las nuevas variables.

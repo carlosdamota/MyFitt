@@ -1,18 +1,49 @@
+@import "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap";
 @import "tailwindcss";
 
 /* Estilos globales */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Sora", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
+  /* Background colors */
+  --bg-0: #050812;
+  --bg-1: #0b1224;
+  --bg-2: #0f172a;
+  --bg-3: #1e293b;
+
+  /* Text/ink colors */
+  --ink-0: #f8fafc;
+  --ink-1: #cbd5f5;
+  --ink-2: #94a3b8;
+  --ink-3: #64748b;
+
+  /* Accent colors */
+  --accent-primary: #22d3ee;
+  --accent-primary-hover: #06b6d4;
+  --accent-secondary: #f59e0b;
+  --accent-secondary-hover: #d97706;
+
+  /* Status colors */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #020617; /* slate-950 fallback */
-  color: #f1f5f9; /* slate-100 fallback */
+  background-color: var(--bg-0);
+  color: var(--ink-0);
 }
 
 @theme {

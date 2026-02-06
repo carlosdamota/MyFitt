@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Loader, ZapOff, Trophy, X } from "lucide-react";
-import { useRateLimit } from "../../hooks/useRateLimit";
-import { callGeminiAPI } from "../../api/gemini";
+import { callAI, AiError } from "../../api/ai";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { WorkoutLogEntry } from "../../types";
@@ -11,47 +10,57 @@ interface ExerciseAIAssistantProps {
   user: FirebaseUser | null;
   exerciseName: string;
   history: WorkoutLogEntry[];
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
 }
 
 const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   user,
   exerciseName,
   history,
+  onRequireAuth,
+  onUpgrade,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<string | null>(null);
   const [responseType, setResponseType] = useState<"variants" | "analysis" | null>(null);
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
-
-  // Rate limiting: 20 análisis de ejercicios con IA por día
-  const rateLimitExercise = useRateLimit(user, "analyze_exercise", 20);
+  const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
+  const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
 
   const handleGenerateVariants = useCallback(async (): Promise<void> => {
-    const canAnalyze = await rateLimitExercise.checkAndIncrement();
-    if (!canAnalyze) {
-      setShowRateLimitError(true);
+    if (!user) {
+      setResponse("Inicia sesión para usar el coach de IA.");
+      onRequireAuth?.();
       return;
     }
 
     setLoading(true);
     setResponse(null);
     setResponseType("variants");
+    setQuotaMessage("Límite de IA alcanzado");
+    setQuotaResetAt(null);
     logEvent("Exercise", "Generate Variants", exerciseName);
 
-    const systemPrompt =
-      "Eres un entrenador de fuerza experto. Proporciona 3 variantes de progresión o regresión (más fáciles o más difíciles) para el ejercicio solicitado. Describe brevemente cómo se realiza cada variante. Usa un formato de lista numerada.";
-    const userPrompt = `Sugiere 3 variantes para el ejercicio: ${exerciseName}.`;
-
     try {
-      const resp = await callGeminiAPI(userPrompt, systemPrompt);
-      setResponse(resp);
+      const resp = await callAI("exercise_variants", { exerciseName });
+      setResponse(resp.text);
     } catch (e) {
-      setResponse("Error al generar las variantes. Intenta de nuevo.");
+      if (e instanceof AiError && e.code === "quota_exceeded") {
+        setQuotaMessage(e.message);
+        setQuotaResetAt(e.resetAt ?? null);
+        setShowRateLimitError(true);
+      } else if (e instanceof AiError && e.code === "auth_required") {
+        setResponse(e.message);
+        onRequireAuth?.();
+      } else {
+        setResponse("Error al generar las variantes. Intenta de nuevo.");
+      }
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [exerciseName, rateLimitExercise]);
+  }, [exerciseName, onRequireAuth, user]);
 
   const handleAnalyzeHistory = useCallback(async (): Promise<void> => {
     if (history.length === 0) {
@@ -60,15 +69,17 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
       return;
     }
 
-    const canAnalyze = await rateLimitExercise.checkAndIncrement();
-    if (!canAnalyze) {
-      setShowRateLimitError(true);
+    if (!user) {
+      setResponse("Inicia sesión para usar el coach de IA.");
+      onRequireAuth?.();
       return;
     }
 
     setLoading(true);
     setResponse(null);
     setResponseType("analysis");
+    setQuotaMessage("Límite de IA alcanzado");
+    setQuotaResetAt(null);
     logEvent("Exercise", "Analyze History", exerciseName);
 
     const formattedHistory = history.map((h) => ({
@@ -78,28 +89,37 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
       series: h.sets || 0,
     }));
 
-    const systemPrompt =
-      "Eres un coach de entrenamiento motivacional y analítico. Identifica el mayor logro en el historial. Proporciona una frase motivacional concisa y amigable. NO uses markdown (ej. **).";
-    const userPrompt = `Analiza el historial de: ${exerciseName}. Logs: ${JSON.stringify(formattedHistory)}`;
-
     try {
-      const resp = await callGeminiAPI(userPrompt, systemPrompt);
-      setResponse(resp);
+      const resp = await callAI("exercise_analysis", {
+        exerciseName,
+        history: formattedHistory,
+      });
+      setResponse(resp.text);
     } catch (e) {
-      setResponse("Error al analizar el historial.");
+      if (e instanceof AiError && e.code === "quota_exceeded") {
+        setQuotaMessage(e.message);
+        setQuotaResetAt(e.resetAt ?? null);
+        setShowRateLimitError(true);
+      } else if (e instanceof AiError && e.code === "auth_required") {
+        setResponse(e.message);
+        onRequireAuth?.();
+      } else {
+        setResponse("Error al analizar el historial.");
+      }
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [exerciseName, history, rateLimitExercise]);
+  }, [exerciseName, history, onRequireAuth, user]);
 
   return (
     <div className='mt-4'>
       {showRateLimitError && (
         <RateLimitError
-          message={rateLimitExercise.error || "Límite de IA alcanzado"}
-          resetAt={rateLimitExercise.resetAt}
+          message={quotaMessage}
+          resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
+          onUpgrade={onUpgrade}
         />
       )}
 
@@ -164,10 +184,7 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
               <X size={14} />
             </button>
           </div>
-          <div
-            className='text-slate-200 leading-relaxed'
-            dangerouslySetInnerHTML={{ __html: response.replace(/\n/g, "<br/>") }}
-          />
+          <div className='text-slate-200 leading-relaxed whitespace-pre-wrap'>{response}</div>
         </div>
       )}
     </div>

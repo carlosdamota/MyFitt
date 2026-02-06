@@ -13,6 +13,7 @@ export interface Exercise {
   reps: string;
   note?: string;
   svg?: string;
+  svg_icon?: string;
   muscleGroup?: string;
 }
 
@@ -115,6 +116,17 @@ export interface RateLimitData {
 // User Profile Types
 // ============================================
 
+export type EquipmentOption =
+  | "gym_full"
+  | "home_gym"
+  | "dumbbells_only"
+  | "bodyweight"
+  | "barbell_plates"
+  | "pullup_bar"
+  | "resistance_bands"
+  | "bench"
+  | "kettlebells";
+
 export interface ProfileFormData {
   weight: string;
   height: string;
@@ -125,7 +137,7 @@ export interface ProfileFormData {
   experienceLevel: "beginner" | "intermediate" | "advanced";
   availableDays: number;
   dailyTimeMinutes: number;
-  equipment: "gym_full" | "dumbbells_only" | "bodyweight" | "home_gym";
+  equipment: EquipmentOption[];
   injuries: string;
 }
 

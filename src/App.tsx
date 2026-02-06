@@ -14,6 +14,7 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import TimerOverlay from "./components/layout/TimerOverlay";
 import AppModals from "./components/layout/AppModals";
+import AuthModal from "./components/auth/AuthModal";
 import RoutineTabs from "./components/routines/RoutineTabs";
 import WorkoutDay from "./components/routines/WorkoutDay";
 import CookieBanner from "./components/legal/CookieBanner";
@@ -32,14 +33,16 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>("day1");
   const [showStats, setShowStats] = useState<boolean>(false);
   const [showNutrition, setShowNutrition] = useState<boolean>(false);
+  const [showAICoach, setShowAICoach] = useState<boolean>(false);
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [showRoutineEditor, setShowRoutineEditor] = useState<boolean>(false);
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
   const [showCookieSettings, setShowCookieSettings] = useState<boolean>(false);
   const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 
   const { consent, acceptAll, rejectAll, updateConsent, hasResponded } = useCookieConsent();
-  const { user, authError, login } = useAuth();
+  const { user, authError, loginWithGoogle, loginWithEmail, signupWithEmail, logout } = useAuth();
   const { profile } = useProfile(user);
   const { workoutLogs, saveLog, deleteLog, coachAdvice, saveCoachAdvice, dbError, streak } =
     useWorkoutLogs(user);
@@ -51,6 +54,24 @@ export default function App() {
     shareRoutine,
     importSharedRoutine,
   } = useRoutines(user);
+
+  const handleRequireAuth = (): void => setShowAuthModal(true);
+
+  const handleUpgrade = (): void => {
+    setShowAICoach(false);
+    setShowNutrition(false);
+    setShowStats(false);
+    setShowProfile(true);
+  };
+
+  const handleLogout = async (): Promise<void> => {
+    await logout();
+    setCurrentPage("home");
+  };
+
+  const handleGoHome = (): void => {
+    setCurrentPage("home");
+  };
 
   useEffect(() => {
     if (consent.analytics) initGA(true);
@@ -109,21 +130,37 @@ export default function App() {
   if (currentPage === "legal") return <Legal />;
   if (currentPage === "home")
     return (
-      <Landing
-        onLogin={async () => {
-          if (!user) await login();
-          setCurrentPage("app");
-        }}
-        onExplore={() => setCurrentPage("app")}
-        user={user}
-      />
+      <>
+        <Landing
+          onLogin={() => {
+            if (user) {
+              setCurrentPage("app");
+            } else {
+              setShowAuthModal(true);
+            }
+          }}
+          onExplore={() => setCurrentPage("app")}
+          user={user}
+        />
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            setCurrentPage("app");
+          }}
+          loginWithGoogle={loginWithGoogle}
+          loginWithEmail={loginWithEmail}
+          signupWithEmail={signupWithEmail}
+        />
+      </>
     );
 
   return (
-    <div className='min-h-screen bg-slate-950 text-slate-200 pb-24 font-sans selection:bg-blue-500/30'>
+    <div className='min-h-screen bg-[var(--bg-0)] text-slate-200 pb-24 font-sans selection:bg-cyan-500/30'>
       <div className='fixed inset-0 z-0 pointer-events-none'>
-        <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-900/10 blur-[100px]' />
-        <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-900/10 blur-[100px]' />
+        <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[110px]' />
+        <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-amber-500/10 blur-[110px]' />
       </div>
 
       <AppModals
@@ -132,6 +169,8 @@ export default function App() {
         setShowStats={setShowStats}
         showNutrition={showNutrition}
         setShowNutrition={setShowNutrition}
+        showAICoach={showAICoach}
+        setShowAICoach={setShowAICoach}
         showProfile={showProfile}
         setShowProfile={setShowProfile}
         showRoutineEditor={showRoutineEditor}
@@ -153,6 +192,20 @@ export default function App() {
         handleShareRoutine={(r) => shareRoutine(activeTab, r)}
         consent={consent}
         updateConsent={updateConsent}
+        onRequireAuth={handleRequireAuth}
+        onUpgrade={handleUpgrade}
+      />
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          if (currentPage === "home") setCurrentPage("app");
+        }}
+        loginWithGoogle={loginWithGoogle}
+        loginWithEmail={loginWithEmail}
+        signupWithEmail={signupWithEmail}
       />
 
       {!hasResponded && (
@@ -169,17 +222,17 @@ export default function App() {
         dbError={dbError}
         authError={authError}
         onShowProfile={() => setShowProfile(true)}
+        onShowAICoach={() => setShowAICoach(true)}
         onShowNutrition={() => setShowNutrition(true)}
         onShowRoutines={() => setShowRoutineManager(true)}
         onShowStats={() => setShowStats(true)}
-        onLogin={async () => {
-          await login();
-          setCurrentPage("app");
-        }}
+        onLogin={() => setShowAuthModal(true)}
+        onLogout={handleLogout}
+        onGoHome={handleGoHome}
         guestMode={true}
       />
 
-      <main className='p-4 relative z-10'>
+      <main className='p-4 relative z-10 space-y-6'>
         <RoutineTabs
           routines={programRoutines}
           activeTab={activeTab}
@@ -199,6 +252,8 @@ export default function App() {
           onDeleteLog={deleteLog}
           workoutLogs={workoutLogs}
           user={user}
+          onRequireAuth={handleRequireAuth}
+          onShowSubscription={handleUpgrade}
         />
       </main>
 

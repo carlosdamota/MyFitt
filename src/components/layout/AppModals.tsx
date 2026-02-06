@@ -1,9 +1,10 @@
 import React from "react";
-import { Utensils, User as UserIcon } from "lucide-react";
+import { Utensils, User as UserIcon, Sparkles } from "lucide-react";
 import Modal from "../common/Modal";
 import GlobalStats from "../stats/GlobalStats";
 import NutritionDashboard from "../nutrition/NutritionDashboard";
 import ProfileEditor from "../profile/ProfileEditor";
+import AICoachPanel from "../ai/AICoachPanel";
 import CookieSettings from "../legal/CookieSettings";
 import RoutineEditor from "../routines/RoutineEditor";
 import RoutineManager from "../routines/RoutineManager";
@@ -16,6 +17,8 @@ interface AppModalsProps {
   setShowStats: (show: boolean) => void;
   showNutrition: boolean;
   setShowNutrition: (show: boolean) => void;
+  showAICoach: boolean;
+  setShowAICoach: (show: boolean) => void;
   showProfile: boolean;
   setShowProfile: (show: boolean) => void;
   showRoutineEditor: boolean;
@@ -37,6 +40,8 @@ interface AppModalsProps {
   handleShareRoutine: (routine: Routine) => Promise<string | null>;
   consent: any;
   updateConsent: (consent: any) => void;
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
 }
 
 const AppModals: React.FC<AppModalsProps> = ({
@@ -45,6 +50,8 @@ const AppModals: React.FC<AppModalsProps> = ({
   setShowStats,
   showNutrition,
   setShowNutrition,
+  showAICoach,
+  setShowAICoach,
   showProfile,
   setShowProfile,
   showRoutineEditor,
@@ -64,6 +71,8 @@ const AppModals: React.FC<AppModalsProps> = ({
   handleShareRoutine,
   consent,
   updateConsent,
+  onRequireAuth,
+  onUpgrade,
 }) => {
   const currentRoutine = routines[activeTab] || Object.values(routines)[0];
 
@@ -77,6 +86,7 @@ const AppModals: React.FC<AppModalsProps> = ({
           onSaveAdvice={saveCoachAdvice}
           userWeight={profile?.weight || 70}
           routines={routines}
+          onRequireAuth={onRequireAuth}
         />
       )}
 
@@ -91,7 +101,37 @@ const AppModals: React.FC<AppModalsProps> = ({
           />
         }
       >
-        <NutritionDashboard user={user} />
+        <NutritionDashboard
+          user={user}
+          onRequireAuth={onRequireAuth}
+          onUpgrade={onUpgrade}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={showAICoach}
+        onClose={() => setShowAICoach(false)}
+        title='AI Coach'
+        icon={
+          <Sparkles
+            size={20}
+            className='text-emerald-300'
+          />
+        }
+      >
+        <AICoachPanel
+          user={user}
+          onRequireAuth={onRequireAuth}
+          onShowProfile={() => {
+            setShowAICoach(false);
+            setShowProfile(true);
+          }}
+          onShowRoutines={() => {
+            setShowAICoach(false);
+            setShowRoutineManager(true);
+          }}
+          onUpgrade={onUpgrade}
+        />
       </Modal>
 
       <Modal
@@ -108,6 +148,7 @@ const AppModals: React.FC<AppModalsProps> = ({
         <ProfileEditor
           user={user}
           onClose={() => setShowProfile(false)}
+          onRequireAuth={onRequireAuth}
         />
       </Modal>
 

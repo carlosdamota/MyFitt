@@ -35,7 +35,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
             type='number'
             value={weight}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setWeight(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
             placeholder='kg'
           />
         </div>
@@ -45,7 +45,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
             type='number'
             value={reps}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setReps(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
             placeholder='0'
           />
         </div>
@@ -55,7 +55,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
             type='number'
             value={sets}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setSets(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
           />
         </div>
         <div className='col-span-1'>
@@ -64,7 +64,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
             type='number'
             value={rpe}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setRpe(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
             placeholder='1-10'
           />
         </div>

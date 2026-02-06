@@ -14,17 +14,18 @@ export const NutritionLogSchema = z.object({
   mealType: MealTypeSchema,
 });
 export type NutritionLog = z.infer<typeof NutritionLogSchema>;
-
-// Schema for exercise in a routine block
 export const ExerciseSchema = z.object({
   name: z.string(),
   reps: z.string().describe('Rep range, e.g., "10-12"'),
   note: z.string().optional(),
   svg: z.enum(["dumbbell", "barbell", "bodyweight"]).optional(),
+  svg_icon: z
+    .string()
+    .optional()
+    .describe("A simple, minimalist SVG string representing the exercise"),
 });
 export type Exercise = z.infer<typeof ExerciseSchema>;
 
-// Schema for a routine block
 export const RoutineBlockSchema = z.object({
   id: z.number(),
   rest: z.number().default(60),
@@ -59,7 +60,7 @@ export const UserProfileSchema = z.object({
   availableDays: z.number().optional(),
   dayNumber: z.number().optional(),
   dailyTimeMinutes: z.number().optional(),
-  equipment: z.string(),
+  equipment: z.union([z.string(), z.array(z.string())]),
   injuries: z.string().optional(),
   weight: z.number(),
   height: z.number(),

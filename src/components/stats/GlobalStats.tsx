@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { TrendingUp, X, Trophy, Dumbbell } from "lucide-react";
 import LogViewer from "./LogViewer";
+import Modal from "../common/Modal";
 import { isBodyweightExercise } from "../../utils/stats";
 import type { WorkoutLogs, RoutineData } from "../../types";
 
@@ -16,6 +17,7 @@ interface GlobalStatsProps {
   onSaveAdvice: (advice: string) => void;
   userWeight: string | number;
   routines: RoutineData;
+  onRequireAuth?: () => void;
 }
 
 interface AggregatedDataPoint {
@@ -31,6 +33,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   onSaveAdvice,
   userWeight,
   routines,
+  onRequireAuth,
 }) => {
   const [viewMode, setViewMode] = useState<"charts" | "logs" | "weekly">("charts");
 
@@ -99,7 +102,10 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
       <div className='flex-1 overflow-y-auto p-4 space-y-6 bg-linear-to-b from-slate-900 to-slate-950'>
         {viewMode === "charts" ? (
           <>
-            <DailyVolumeChart data={aggregatedData} />
+            <DailyVolumeChart
+              data={aggregatedData}
+              onRequireAuth={onRequireAuth}
+            />
             <MuscleFocusChart
               logs={logs}
               routines={routines}
@@ -131,6 +137,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
             userWeight={userWeight}
             coachHistory={coachHistory}
             onSaveAdvice={onSaveAdvice}
+            onRequireAuth={onRequireAuth}
           />
         ) : (
           <LogViewer

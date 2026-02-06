@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Zap, Loader, Check } from "lucide-react";
-import { useRateLimit } from "../../hooks/useRateLimit";
 import { generateFullProgram } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { ProfileFormData } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
+import { AiError } from "../../api/ai";
 
 interface AIGeneratorProps {
   user: FirebaseUser | null;
@@ -18,7 +18,27 @@ interface AIGeneratorProps {
   setIsGenerating: (loading: boolean) => void;
   savedSuccess: boolean;
   handleSubmit: (e: any) => Promise<void>;
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
+  showSaveButton?: boolean;
 }
+
+const equipmentLabels: Record<string, string> = {
+  gym_full: "Gimnasio completo",
+  home_gym: "Home gym (Barra + jaula)",
+  dumbbells_only: "Solo mancuernas",
+  bodyweight: "Peso corporal",
+  barbell_plates: "Barra y discos",
+  pullup_bar: "Barra de dominadas",
+  resistance_bands: "Bandas elásticas",
+  bench: "Banco",
+  kettlebells: "Kettlebells",
+};
+
+const formatEquipment = (equipment: ProfileFormData["equipment"]): string => {
+  if (!equipment || equipment.length === 0) return "Peso corporal";
+  return equipment.map((value) => equipmentLabels[value] ?? value).join(", ");
+};
 
 const AIGenerator: React.FC<AIGeneratorProps> = ({
   user,
@@ -31,23 +51,23 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   setIsGenerating,
   savedSuccess,
   handleSubmit,
+  onRequireAuth,
+  onUpgrade,
+  showSaveButton = true,
 }) => {
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
   const [genSuccess, setGenSuccess] = useState<boolean>(false);
-
-  // Rate limiting: 5 generaciones de rutinas por día
-  const rateLimitRoutine = useRateLimit(user, "generate_routine", 5);
+  const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
+  const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
 
   const confirmGeneration = async (): Promise<void> => {
     if (!formData) return;
     setShowConfirmModal(false);
 
-    // Verificar rate limit antes de generar
-    const canGenerate = await rateLimitRoutine.checkAndIncrement();
-    if (!canGenerate) {
-      setShowRateLimitError(true);
+    if (!user) {
+      onRequireAuth?.();
       return;
     }
 
@@ -56,6 +76,8 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
 
     setIsGenerating(true);
     setGenSuccess(false);
+    setQuotaMessage("Límite de IA alcanzado");
+    setQuotaResetAt(null);
     try {
       const daysToGenerate = formData.availableDays || 3;
       setGenerationProgress("Generando programa completo con inteligencia artificial...");
@@ -68,7 +90,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
         dietType: formData.dietType,
         experienceLevel: formData.experienceLevel,
         goal: formData.goal,
-        equipment: formData.equipment,
+        equipment: formatEquipment(formData.equipment),
         injuries: formData.injuries,
         dailyTimeMinutes:
           typeof formData.dailyTimeMinutes === "string"
@@ -105,8 +127,16 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
         onSuccess();
       }, 1500);
     } catch (error) {
-      console.error(error);
-      alert("Error generando rutina: " + (error as Error).message);
+      if (error instanceof AiError && error.code === "quota_exceeded") {
+        setQuotaMessage(error.message);
+        setQuotaResetAt(error.resetAt ?? null);
+        setShowRateLimitError(true);
+      } else if (error instanceof AiError && error.code === "auth_required") {
+        onRequireAuth?.();
+      } else {
+        console.error(error);
+        alert("Error generando rutina: " + (error as Error).message);
+      }
     } finally {
       setIsGenerating(false);
       setShowConfirmModal(false);
@@ -118,9 +148,10 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       {/* Rate Limit Error Modal */}
       {showRateLimitError && (
         <RateLimitError
-          message={rateLimitRoutine.error || "Límite alcanzado"}
-          resetAt={rateLimitRoutine.resetAt}
+          message={quotaMessage}
+          resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
+          onUpgrade={onUpgrade}
         />
       )}
 
@@ -178,33 +209,37 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
 
       {/* Action Buttons */}
       <div className='flex gap-3'>
-        <button
-          onClick={handleSubmit}
-          disabled={isSaving || isGenerating}
-          className={`flex-1 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
-            savedSuccess
-              ? "bg-green-600 text-white shadow-green-900/20"
-              : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
-          }`}
-        >
-          {isSaving ? (
-            <Loader
-              size={18}
-              className='animate-spin'
-            />
-          ) : savedSuccess ? (
-            <>
-              <Check size={18} /> Guardado
-            </>
-          ) : (
-            "Guardar Perfil"
-          )}
-        </button>
+        {showSaveButton && (
+          <button
+            onClick={handleSubmit}
+            disabled={isSaving || isGenerating}
+            className={`flex-1 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
+              savedSuccess
+                ? "bg-green-600 text-white shadow-green-900/20"
+                : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+            }`}
+          >
+            {isSaving ? (
+              <Loader
+                size={18}
+                className='animate-spin'
+              />
+            ) : savedSuccess ? (
+              <>
+                <Check size={18} /> Guardado
+              </>
+            ) : (
+              "Guardar Perfil"
+            )}
+          </button>
+        )}
 
         <button
           onClick={() => setShowConfirmModal(true)}
           disabled={isGenerating || isSaving}
-          className='flex-1 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-900/40 transition-all transform active:scale-95'
+          className={`bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-900/40 transition-all transform active:scale-95 ${
+            showSaveButton ? "flex-1" : "w-full"
+          }`}
         >
           {isGenerating ? (
             <Loader

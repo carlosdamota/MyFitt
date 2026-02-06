@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ZapOff, Loader, Cloud } from "lucide-react";
 import { getWeeklyStats } from "../../utils/stats";
-import { callGeminiAPI } from "../../api/gemini";
+import { callAI, AiError } from "../../api/ai";
 import type { WorkoutLogs, RoutineData } from "../../types";
 
 interface WeeklyCoachProps {
@@ -10,6 +10,7 @@ interface WeeklyCoachProps {
   userWeight: string | number;
   coachHistory: string;
   onSaveAdvice: (advice: string) => void;
+  onRequireAuth?: () => void;
 }
 
 const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
@@ -18,32 +19,40 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
   userWeight,
   coachHistory,
   onSaveAdvice,
+  onRequireAuth,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [report, setReport] = useState<string | null>(null);
+  const [quotaMessage, setQuotaMessage] = useState<string | null>(null);
 
   const handleGenerateReport = async () => {
     setLoading(true);
+    setQuotaMessage(null);
     const stats = getWeeklyStats(logs, routines, userWeight);
 
-    const systemPrompt = `Eres un ENTRENADOR PERSONAL DE ÉLITE. Tu tono es PROFESIONAL, CRÍTICO y EXIGENTE. 
-    Analiza la frecuencia, sobrecarga progresiva y consistencia. Máximo 150 palabras. Sin markdown como **. Usa emojis.`;
-
-    const userPrompt = `Datos Semanales:
-    - Dias: ${stats.daysTrained} (${stats.trainingDates.join(", ")})
-    - Volumen: ${stats.totalVolume}kg (Anterior: ${stats.previousWeekVolume}kg)
-    - Musculos: ${stats.musclesWorked.join(", ")}
-    - Ejercicios: ${Object.entries(stats.currentWeekExercises)
-      .map(([n, d]) => `${n}: Max ${d.maxWeight}kg`)
-      .join(", ")}
-    - Contexto Previo: ${coachHistory || "Ninguno"}`;
-
     try {
-      const response = await callGeminiAPI(userPrompt, systemPrompt);
-      setReport(response);
-      onSaveAdvice(response);
+      const response = await callAI("weekly_coach", {
+        stats: {
+          daysTrained: stats.daysTrained,
+          trainingDates: stats.trainingDates,
+          totalVolume: stats.totalVolume,
+          previousWeekVolume: stats.previousWeekVolume,
+          musclesWorked: stats.musclesWorked,
+          currentWeekExercises: stats.currentWeekExercises,
+          coachHistory: coachHistory || "Ninguno",
+        },
+      });
+      setReport(response.text);
+      onSaveAdvice(response.text);
     } catch (e) {
-      setReport("Error al generar el reporte.");
+      if (e instanceof AiError && e.code === "quota_exceeded") {
+        setQuotaMessage(e.message);
+      } else if (e instanceof AiError && e.code === "auth_required") {
+        setReport(e.message);
+        onRequireAuth?.();
+      } else {
+        setReport("Error al generar el reporte.");
+      }
     } finally {
       setLoading(false);
     }
@@ -90,15 +99,15 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
           <div className='flex items-center gap-2 mb-4 text-purple-400 font-bold text-xs uppercase tracking-widest'>
             <ZapOff size={14} /> Reporte de Inteligencia
           </div>
-          <div
-            className='text-slate-200 whitespace-pre-wrap leading-relaxed'
-            dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, "<br/>") }}
-          />
+          <div className='text-slate-200 whitespace-pre-wrap leading-relaxed'>{report}</div>
           <div className='mt-6 pt-4 border-t border-slate-800/50 flex justify-between text-[10px] text-slate-500 font-bold'>
             <span>AUDITORÍA GEMINI AI</span>
             <span>{new Date().toLocaleDateString()}</span>
           </div>
         </div>
+      )}
+      {quotaMessage && (
+        <p className='text-[10px] text-amber-400 font-semibold'>{quotaMessage}</p>
       )}
     </div>
   );

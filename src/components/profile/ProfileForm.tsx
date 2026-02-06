@@ -4,17 +4,13 @@ import {
   Weight,
   Ruler,
   Utensils,
-  Target,
-  Calendar,
-  Clock,
-  Dumbbell,
-  AlertCircle,
 } from "lucide-react";
 import type { ProfileFormData } from "../../types";
+import GoalsContextPanel from "./GoalsContextPanel";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
-  handleChange: (field: keyof ProfileFormData, value: string | number) => void;
+  handleChange: (field: keyof ProfileFormData, value: string | number | string[]) => void;
   handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   isSaving: boolean;
   isGenerating: boolean;
@@ -117,110 +113,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
       </div>
 
-      <div className='bg-slate-900/50 p-4 rounded-2xl border border-slate-800'>
-        <h3 className='text-sm font-bold text-slate-400 uppercase mb-4 flex items-center gap-2'>
-          <Target size={16} /> Objetivos y Contexto
-        </h3>
-
-        <div className='space-y-4'>
-          <div>
-            <label className='text-xs text-slate-500 mb-1'>Objetivo Principal</label>
-            <select
-              value={formData.goal}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleChange("goal", e.target.value)}
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-            >
-              <option value='muscle_gain'>Ganar Músculo (Hipertrofia)</option>
-              <option value='strength'>Ganar Fuerza</option>
-              <option value='fat_loss'>Perder Grasa</option>
-              <option value='endurance'>Resistencia / Salud General</option>
-            </select>
-          </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1'>Nivel de Experiencia</label>
-            <select
-              value={formData.experienceLevel}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleChange("experienceLevel", e.target.value)
-              }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-            >
-              <option value='beginner'>Principiante (0-1 años)</option>
-              <option value='intermediate'>Intermedio (1-3 años)</option>
-              <option value='advanced'>Avanzado (3+ años)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1 flex items-center gap-1'>
-              <Calendar size={12} /> Días Disponibles por Semana
-            </label>
-            <div className='flex gap-2'>
-              {[2, 3, 4, 5, 6].map((days) => (
-                <button
-                  key={days}
-                  type='button'
-                  onClick={() => handleChange("availableDays", days)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors ${formData.availableDays === days ? "bg-blue-600 border-blue-500 text-white" : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"}`}
-                >
-                  {days}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1 flex items-center gap-1'>
-              <Clock size={12} /> Tiempo Disponible por Sesión (minutos)
-            </label>
-            <div className='flex gap-2'>
-              {[30, 45, 60, 75, 90].map((time) => (
-                <button
-                  key={time}
-                  type='button'
-                  onClick={() => handleChange("dailyTimeMinutes", time)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors ${formData.dailyTimeMinutes === time ? "bg-blue-600 border-blue-500 text-white" : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500"}`}
-                >
-                  {time}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1 flex items-center gap-1'>
-              <Dumbbell size={12} /> Equipamiento Disponible
-            </label>
-            <select
-              value={formData.equipment}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleChange("equipment", e.target.value)
-              }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-            >
-              <option value='gym_full'>Gimnasio Completo</option>
-              <option value='home_gym'>Home Gym (Barra + Jaula)</option>
-              <option value='dumbbells_only'>Solo Mancuernas</option>
-              <option value='bodyweight'>Peso Corporal (Calistenia)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1 flex items-center gap-1'>
-              <AlertCircle size={12} /> Lesiones / Limitaciones
-            </label>
-            <textarea
-              value={formData.injuries}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                handleChange("injuries", e.target.value)
-              }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none h-20 resize-none'
-              placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
-            />
-          </div>
-        </div>
-      </div>
+      <GoalsContextPanel
+        formData={formData}
+        onChange={handleChange}
+      />
     </form>
   );
 };

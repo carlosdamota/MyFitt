@@ -47,7 +47,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col'
+      className='fixed inset-0 z-50 bg-slate-950/95 animate-in slide-in-from-bottom duration-300 flex flex-col'
       role='dialog'
       aria-modal='true'
       aria-labelledby='modal-title'
@@ -70,7 +70,7 @@ const Modal: React.FC<ModalProps> = ({
           <X size={20} />
         </button>
       </div>
-      <div className={`flex-1 overflow-y-auto p-4 ${className}`}>{children}</div>
+      <div className={`flex-1 overflow-y-auto p-4 text-slate-200 ${className}`}>{children}</div>
     </div>
   );
 };

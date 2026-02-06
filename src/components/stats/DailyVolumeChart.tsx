@@ -1,15 +1,17 @@
 import React, { useState, useCallback } from "react";
 import { BarChart2, Cloud, Loader, ZapOff } from "lucide-react";
 import SimpleChart from "./SimpleChart";
-import { callGeminiAPI } from "../../api/gemini";
+import { callAI, AiError } from "../../api/ai";
 
 interface DailyVolumeChartProps {
   data: { date: string; val: number; count: number }[];
+  onRequireAuth?: () => void;
 }
 
-const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data }) => {
+const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysis, setAnalysis] = useState<string | null>(null);
+  const [quotaMessage, setQuotaMessage] = useState<string | null>(null);
 
   const handleAnalysis = useCallback(async () => {
     if (data.length < 3) {
@@ -19,21 +21,25 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data }) => {
 
     setLoading(true);
     setAnalysis(null);
-
-    const trendData = data.map((d) => ({ fecha: d.date, volumen: d.val }));
-    const systemPrompt =
-      "Eres un coach de entrenamiento experto. Analiza la tendencia del volumen diario. Ofrece un análisis conciso de 2-3 frases y una frase motivacional. SIN markdown.";
-    const userPrompt = `Analiza la tendencia de este volumen diario: ${JSON.stringify(trendData)}`;
+    setQuotaMessage(null);
 
     try {
-      const resp = await callGeminiAPI(userPrompt, systemPrompt);
-      setAnalysis(resp);
+      const trendData = data.map((d) => ({ fecha: d.date, volumen: d.val }));
+      const resp = await callAI("volume_trend", { trendData });
+      setAnalysis(resp.text);
     } catch (e) {
-      setAnalysis("Error al realizar el análisis.");
+      if (e instanceof AiError && e.code === "quota_exceeded") {
+        setQuotaMessage(e.message);
+      } else if (e instanceof AiError && e.code === "auth_required") {
+        setAnalysis(e.message);
+        onRequireAuth?.();
+      } else {
+        setAnalysis("Error al realizar el análisis.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [data]);
+  }, [data, onRequireAuth]);
 
   return (
     <div className='bg-slate-900 rounded-2xl border border-slate-800 p-4 shadow-xl'>
@@ -84,11 +90,11 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data }) => {
             />{" "}
             Veredicto IA
           </h4>
-          <div
-            className='text-slate-200 whitespace-pre-wrap leading-relaxed'
-            dangerouslySetInnerHTML={{ __html: analysis.replace(/\n/g, "<br/>") }}
-          />
+          <div className='text-slate-200 whitespace-pre-wrap leading-relaxed'>{analysis}</div>
         </div>
+      )}
+      {quotaMessage && (
+        <p className='text-[10px] text-amber-400 mt-3 font-semibold'>{quotaMessage}</p>
       )}
     </div>
   );

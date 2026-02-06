@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
+import type { EquipmentOption } from "../types";
 
 export interface UserProfile {
   weight: string | number;
@@ -12,7 +13,7 @@ export interface UserProfile {
   goal: "muscle_gain" | "fat_loss" | "strength" | "endurance";
   availableDays: number;
   dailyTimeMinutes: number;
-  equipment: "gym_full" | "dumbbells_only" | "bodyweight" | "home_gym";
+  equipment: EquipmentOption[];
   dietType: "balanced" | "keto" | "paleo" | "high_protein" | "low_carb";
   injuries: string;
   activeRoutineId?: string;
@@ -35,10 +36,20 @@ const defaultProfile: UserProfile = {
   goal: "muscle_gain",
   availableDays: 3,
   dailyTimeMinutes: 60,
-  equipment: "gym_full",
+  equipment: ["gym_full"],
   dietType: "balanced",
   injuries: "",
   activeRoutineId: undefined,
+};
+
+const normalizeEquipment = (value: unknown): EquipmentOption[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is EquipmentOption => typeof item === "string");
+  }
+  if (typeof value === "string" && value) {
+    return [value as EquipmentOption];
+  }
+  return defaultProfile.equipment;
 };
 
 export const useProfile = (user: User | null): UseProfileReturn => {
@@ -59,7 +70,12 @@ export const useProfile = (user: User | null): UseProfileReturn => {
       profileRef,
       (docSnap) => {
         if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
+          const data = docSnap.data() as Partial<UserProfile>;
+          setProfile({
+            ...defaultProfile,
+            ...data,
+            equipment: normalizeEquipment(data.equipment),
+          });
         } else {
           setProfile(defaultProfile);
         }

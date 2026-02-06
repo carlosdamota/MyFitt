@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import {
-  signInAnonymously,
   signInWithCustomToken,
   onAuthStateChanged,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  linkWithPopup,
+  linkWithCredential,
+  GoogleAuthProvider,
+  EmailAuthProvider,
+  signOut,
   type User,
 } from "firebase/auth";
 import { auth } from "../config/firebase";
@@ -13,7 +20,10 @@ declare const __initial_auth_token: string | undefined;
 export interface UseAuthReturn {
   user: User | null;
   authError: string | null;
-  login: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const useAuth = (): UseAuthReturn => {
@@ -49,19 +59,67 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, []);
 
-  const login = async (): Promise<void> => {
+  const loginWithGoogle = async (): Promise<void> => {
+    if (!auth) {
+      setAuthError("Firebase no configurado");
+      throw new Error("Firebase no configurado");
+    }
+    const provider = new GoogleAuthProvider();
+    try {
+      if (auth.currentUser?.isAnonymous) {
+        await linkWithPopup(auth.currentUser, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
+    } catch (e) {
+      console.error("Google Login Error", e);
+      setAuthError("Error al iniciar sesión con Google");
+      throw e;
+    }
+  };
+
+  const loginWithEmail = async (email: string, password: string): Promise<void> => {
     if (!auth) {
       setAuthError("Firebase no configurado");
       throw new Error("Firebase no configurado");
     }
     try {
-      await signInAnonymously(auth);
+      if (auth.currentUser?.isAnonymous) {
+        const credential = EmailAuthProvider.credential(email, password);
+        await linkWithCredential(auth.currentUser, credential);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
     } catch (e) {
-      console.error("Login Error", e);
-      setAuthError("Error al iniciar sesión");
+      console.error("Email Login Error", e);
+      setAuthError("Error al iniciar sesión con email");
       throw e;
     }
   };
 
-  return { user, authError, login };
+  const signupWithEmail = async (email: string, password: string): Promise<void> => {
+    if (!auth) {
+      setAuthError("Firebase no configurado");
+      throw new Error("Firebase no configurado");
+    }
+    try {
+      if (auth.currentUser?.isAnonymous) {
+        const credential = EmailAuthProvider.credential(email, password);
+        await linkWithCredential(auth.currentUser, credential);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+    } catch (e) {
+      console.error("Email Signup Error", e);
+      setAuthError("Error al crear la cuenta");
+      throw e;
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    if (!auth) return;
+    await signOut(auth);
+  };
+
+  return { user, authError, loginWithGoogle, loginWithEmail, signupWithEmail, logout };
 };

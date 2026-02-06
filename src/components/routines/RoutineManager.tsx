@@ -5,14 +5,23 @@ import { Trash2, Check, Plus, Calendar, Dumbbell, Zap, MoreVertical, X } from "l
 import type { User } from "firebase/auth";
 import type { Routine } from "../../types";
 import ProgramCard from "./ProgramCard";
+import ProBanner from "../common/ProBanner";
 
 interface RoutineManagerProps {
   user: User | null;
   onClose: () => void;
   onSelectRoutine?: (routineId: string) => void;
+  isPro?: boolean;
+  onRequireAuth?: () => void;
 }
 
-const RoutineManager: React.FC<RoutineManagerProps> = ({ user, onClose, onSelectRoutine }) => {
+const RoutineManager: React.FC<RoutineManagerProps> = ({
+  user,
+  onClose,
+  onSelectRoutine,
+  isPro = false,
+  onRequireAuth,
+}) => {
   const { routines, deleteRoutine, loading: loadingRoutines } = useRoutines(user);
   const { profile, saveProfile } = useProfile(user);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -228,13 +237,22 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({ user, onClose, onSelect
           )}
         </div>
 
-        <div className='p-4 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl flex justify-end'>
-          <button
-            onClick={onClose}
-            className='px-4 py-2 text-sm font-bold text-slate-400 hover:text-white transition-colors'
-          >
-            Cerrar
-          </button>
+        <div className='p-4 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl space-y-3'>
+          {!isPro && onRequireAuth && (
+            <ProBanner
+              isPro={isPro}
+              onUpgrade={onRequireAuth}
+              variant='subtle'
+            />
+          )}
+          <div className='flex justify-end'>
+            <button
+              onClick={onClose}
+              className='px-4 py-2 text-sm font-bold text-slate-400 hover:text-white transition-colors'
+            >
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
     </div>

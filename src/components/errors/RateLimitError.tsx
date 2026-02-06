@@ -5,9 +5,10 @@ interface RateLimitErrorProps {
   message: string;
   resetAt: string | null;
   onClose: () => void;
+  onUpgrade?: () => void;
 }
 
-const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClose }) => {
+const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClose, onUpgrade }) => {
   const [timeUntilReset, setTimeUntilReset] = useState<string>("");
 
   useEffect(() => {
@@ -79,17 +80,30 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClo
 
         <div className='bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-4'>
           <p className='text-xs text-blue-200'>
-            💡 <strong>¿Por qué hay límites?</strong> Para mantener la app gratuita y evitar costos
-            excesivos de API. Los límites se resetean cada día a medianoche (UTC).
+            💡 <strong>¿Por qué hay límites?</strong> Para mantener la app estable y cubrir costos
+            de API. Los límites se resetean según tu plan (semanal o mensual).
           </p>
         </div>
 
-        <button
-          onClick={onClose}
-          className='w-full py-2.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
-        >
-          Entendido
-        </button>
+        <div className='flex gap-3'>
+          {onUpgrade && (
+            <button
+              onClick={() => {
+                onUpgrade();
+                onClose();
+              }}
+              className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors'
+            >
+              Pasar a Pro
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
+          >
+            Entendido
+          </button>
+        </div>
       </div>
     </div>
   );

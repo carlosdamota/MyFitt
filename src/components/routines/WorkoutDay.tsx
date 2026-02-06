@@ -11,11 +11,13 @@ import {
   Info,
   Edit,
   Shield,
+  Crown,
 } from "lucide-react";
 import ExerciseIcon from "../icons/ExerciseIcons";
 import ExerciseTracker from "../tracker/ExerciseTracker";
 import type { User } from "firebase/auth";
 import type { Routine, WorkoutLogs, WorkoutLogEntry } from "../../types";
+import { useEntitlement } from "../../hooks/useEntitlement";
 
 interface WorkoutDayProps {
   routine: Routine;
@@ -28,6 +30,8 @@ interface WorkoutDayProps {
   onDeleteLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   workoutLogs: WorkoutLogs;
   user: User | null;
+  onRequireAuth?: () => void;
+  onShowSubscription?: () => void;
 }
 
 const WorkoutDay: React.FC<WorkoutDayProps> = ({
@@ -41,8 +45,13 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   onDeleteLog,
   workoutLogs,
   user,
+  onRequireAuth,
+  onShowSubscription,
 }) => {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
+  const { plan } = useEntitlement(user);
+
+  const showProCta = !!user && plan === "free";
 
   return (
     <>
@@ -78,6 +87,32 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
           {routine.weight}
         </div>
       </div>
+
+      {showProCta && (
+        <div className='mb-6 p-4 rounded-2xl border border-slate-800 bg-slate-900/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3'>
+          <div className='flex items-center gap-3'>
+            <div className='p-2 rounded-xl bg-amber-500/15 text-amber-300'>
+              <Crown size={18} />
+            </div>
+            <div>
+              <p className='text-sm font-semibold text-white'>Desbloquea Pro para mas IA</p>
+              <p className='text-xs text-slate-400'>Rutinas avanzadas y analisis completos.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              if (onShowSubscription) {
+                onShowSubscription();
+              } else {
+                onRequireAuth?.();
+              }
+            }}
+            className='px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors'
+          >
+            Pasar a Pro
+          </button>
+        </div>
+      )}
 
       {/* Warmup Section */}
       {routine.warmup && (
@@ -176,7 +211,14 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                         {isExpanded && (
                           <div className='mt-4 pl-11 animate-in slide-in-from-top-2 duration-200'>
                             <div className='w-full h-48 bg-slate-800 rounded-xl border border-slate-700 mb-3 overflow-hidden relative group flex items-center justify-center p-2'>
-                              <ExerciseIcon type={ex.svg} />
+                              {ex.svg_icon ? (
+                                <div
+                                  className='w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:text-white/80 [&>svg]:stroke-current'
+                                  dangerouslySetInnerHTML={{ __html: ex.svg_icon }}
+                                />
+                              ) : (
+                                <ExerciseIcon type={ex.svg} />
+                              )}
                               <div className='absolute inset-0 bg-linear-to-t from-slate-900/50 to-transparent pointer-events-none' />
                             </div>
                             <div className='flex items-start gap-3 bg-blue-900/20 border border-blue-900/30 p-3 rounded-lg mb-3'>
@@ -196,6 +238,8 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                               user={user}
                               isLastInBlock={i === block.exercises.length - 1}
                               configuredReps={ex.reps}
+                              onRequireAuth={onRequireAuth}
+                              onUpgrade={onShowSubscription}
                             />
                           </div>
                         )}

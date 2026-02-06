@@ -1,24 +1,22 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Loader, Check } from "lucide-react";
 import { useProfile } from "../../hooks/useProfile";
-import { useRoutines } from "../../hooks/useRoutines";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
-import AIGenerator from "./AIGenerator";
+import SubscriptionPanel from "./SubscriptionPanel";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
 
 interface ProfileEditorProps {
   user: FirebaseUser | null;
   onClose: () => void;
+  onRequireAuth?: () => void;
 }
 
-const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose }) => {
+const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireAuth }) => {
   const { profile, loading, saveProfile } = useProfile(user);
-  const { createRoutine } = useRoutines(user);
   const [formData, setFormData] = useState<ProfileFormData | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
 
@@ -28,13 +26,27 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose }) => {
     }
   }, [profile]);
 
-  const handleChange = (field: keyof ProfileFormData, value: string | number): void => {
+  const handleChange = (
+    field: keyof ProfileFormData,
+    value: string | number | string[],
+  ): void => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
     setSavedSuccess(false);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     if (e) e.preventDefault();
+    if (!formData) return;
+    setIsSaving(true);
+    const success = await saveProfile(formData);
+    if (success) {
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    }
+    setIsSaving(false);
+  };
+
+  const handleSaveClick = async (): Promise<void> => {
     if (!formData) return;
     setIsSaving(true);
     const success = await saveProfile(formData);
@@ -55,21 +67,36 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose }) => {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         isSaving={isSaving}
-        isGenerating={isGenerating}
+        isGenerating={false}
         savedSuccess={savedSuccess}
       />
 
-      <AIGenerator
+      <button
+        onClick={handleSaveClick}
+        disabled={isSaving}
+        className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
+          savedSuccess
+            ? "bg-green-600 text-white shadow-green-900/20"
+            : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+        }`}
+      >
+        {isSaving ? (
+          <Loader
+            size={18}
+            className='animate-spin'
+          />
+        ) : savedSuccess ? (
+          <>
+            <Check size={18} /> Guardado
+          </>
+        ) : (
+          "Guardar Perfil"
+        )}
+      </button>
+
+      <SubscriptionPanel
         user={user}
-        formData={formData}
-        saveProfile={saveProfile}
-        createRoutine={createRoutine}
-        isSaving={isSaving}
-        isGenerating={isGenerating}
-        setIsGenerating={setIsGenerating}
-        savedSuccess={savedSuccess}
-        handleSubmit={handleSubmit}
-        onSuccess={() => setShowRoutineManager(true)}
+        onRequireAuth={onRequireAuth}
       />
 
       <div className='mt-4 pt-4 border-t border-slate-800 text-center'>

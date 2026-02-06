@@ -22,6 +22,8 @@ interface ExerciseTrackerProps {
   user: User | null;
   isLastInBlock: boolean;
   configuredReps?: string;
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
 }
 
 interface SuggestionData {
@@ -41,6 +43,8 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   user,
   isLastInBlock,
   configuredReps,
+  onRequireAuth,
+  onUpgrade,
 }) => {
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
@@ -226,6 +230,8 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         user={user}
         exerciseName={exerciseName}
         history={history}
+        onRequireAuth={onRequireAuth}
+        onUpgrade={onUpgrade}
       />
 
       <RecentLogsList

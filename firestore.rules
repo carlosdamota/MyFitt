@@ -17,14 +17,55 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
+    // Validadores de escritura
+    function isValidRoutine() {
+      return request.resource.data.title is string
+        && request.resource.data.blocks is list
+        && request.resource.data.blocks.size() <= 24;
+    }
+
+    function isValidAppData(docId) {
+      return docId == "logs"
+        ? request.resource.data.keys().hasOnly(["logs", "coachAdvice", "updatedAt"])
+        : docId == "profile"
+          ? request.resource.data.keys().hasOnly([
+              "weight",
+              "height",
+              "age",
+              "gender",
+              "experienceLevel",
+              "goal",
+              "availableDays",
+              "dailyTimeMinutes",
+              "equipment",
+              "dietType",
+              "injuries",
+              "activeRoutineId",
+              "updatedAt"
+            ])
+          : false;
+    }
+
     // ==========================================
     // REGLAS DE SEGURIDAD
     // ==========================================
     
     // Datos de usuarios (PRIVADO - Solo el owner puede acceder)
-    match /artifacts/{appId}/users/{userId}/{document=**} {
-      // Permitir lectura y escritura solo si el usuario es el dueño
-      allow read, write: if isOwner(userId);
+    match /artifacts/{appId}/users/{userId}/routines/{routineId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidRoutine();
+      allow delete: if isOwner(userId);
+    }
+
+    match /artifacts/{appId}/users/{userId}/app_data/{docId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidAppData(docId);
+      allow delete: if isOwner(userId);
+    }
+
+    match /artifacts/{appId}/users/{userId}/billing/{docId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
     }
     
     // Rutinas compartidas (PÚBLICO para lectura, AUTENTICADO para escritura)
@@ -35,17 +76,20 @@ service cloud.firestore {
       // Solo usuarios autenticados pueden crear rutinas compartidas, 
       // y deben marcarse a sí mismos como autores
       allow create: if isAuthenticated() && 
-        request.resource.data.originalAuthor == request.auth.uid;
+        request.resource.data.originalAuthor == request.auth.uid &&
+        isValidRoutine();
       
       // Solo el autor original puede modificar o eliminar su rutina compartida
-      allow update, delete: if isAuthenticated() && 
+      allow update: if isAuthenticated() && 
+        resource.data.originalAuthor == request.auth.uid &&
+        isValidRoutine();
+      allow delete: if isAuthenticated() && 
         resource.data.originalAuthor == request.auth.uid;
     }
     
-    // Rate Limits (PRIVADO - Solo el owner puede acceder)
+    // Rate Limits (deprecated, server-side only)
     match /artifacts/{appId}/rate_limits/{userId}/{action} {
-      // Solo el dueño puede leer y escribir sus propios límites
-      allow read, write: if isOwner(userId);
+      allow read, write: if false;
     }
     
     // Denegar acceso a cualquier otra colección no especificada

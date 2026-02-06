@@ -10,6 +10,8 @@ import MealHistory from "./MealHistory";
 
 interface NutritionDashboardProps {
   user: User | null;
+  onRequireAuth?: () => void;
+  onUpgrade?: () => void;
 }
 
 interface MacroTargets {
@@ -19,7 +21,7 @@ interface MacroTargets {
   fats: number;
 }
 
-const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user }) => {
+const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequireAuth, onUpgrade }) => {
   const { logs, loading, addFoodLog, deleteFoodLog, getDayTotals } = useNutrition(user);
   const { profile } = useProfile(user);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -96,6 +98,8 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user }) => {
         <NutritionAILogger
           user={user}
           onAddLog={addFoodLog}
+          onRequireAuth={onRequireAuth}
+          onUpgrade={onUpgrade}
         />
       )}
 
