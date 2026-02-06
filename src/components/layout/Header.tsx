@@ -121,9 +121,10 @@ const Header: React.FC<HeaderProps> = ({
                 className='text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2 relative hover:opacity-80 transition-opacity'
               >
                 <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
-                <Activity
-                  size={18}
-                  className='text-cyan-300 md:w-[22px] md:h-[22px]'
+                <img
+                  src='/favicon.svg'
+                  alt='FitForge Logo'
+                  className='w-5 h-5 md:w-6 md:h-6'
                 />
                 <span className='text-white hidden sm:inline'>FitForge</span>
                 <span className='text-white sm:hidden'>FM</span>
@@ -243,9 +244,10 @@ const Header: React.FC<HeaderProps> = ({
         {/* Sidebar Header */}
         <div className='p-4 border-b border-slate-800 flex justify-between items-center'>
           <div className='flex items-center gap-2'>
-            <Activity
-              size={20}
-              className='text-cyan-300'
+            <img
+              src='/favicon.svg'
+              alt='FitForge Logo'
+              className='w-6 h-6'
             />
             <span className='text-lg font-bold text-white'>FitForge</span>
           </div>
