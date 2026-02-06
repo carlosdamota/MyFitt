@@ -104,15 +104,15 @@ const Privacy = () => {
               en:
             </p>
             <a
-              href='mailto:soporte@fitforge.app'
+              href='mailto:daymondoomdev@duck.com'
               className='inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors'
             >
-              <Mail size={20} /> soporte@fitforge.app
+              <Mail size={20} /> daymondoomdev@duck.com
             </a>
           </section>
 
           <div className='pt-8 border-t border-slate-800 text-sm text-slate-500'>
-            Última actualización: Diciembre 2025
+            Última actualización: Febrero 2026
           </div>
         </div>
       </div>

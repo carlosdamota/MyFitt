@@ -13,6 +13,7 @@ interface AICoachPanelProps {
   onShowProfile?: () => void;
   onShowRoutines?: () => void;
   onUpgrade?: () => void;
+  isPro?: boolean;
 }
 
 const AICoachPanel: React.FC<AICoachPanelProps> = ({
@@ -21,6 +22,7 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
   onShowProfile,
   onShowRoutines,
   onUpgrade,
+  isPro,
 }) => {
   const { profile, loading, saveProfile } = useProfile(user);
   const { createRoutine } = useRoutines(user);
@@ -33,10 +35,7 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
     }
   }, [profile]);
 
-  const handleChange = (
-    field: keyof ProfileFormData,
-    value: string | number | string[],
-  ): void => {
+  const handleChange = (field: keyof ProfileFormData, value: string | number | string[]): void => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
   };
 
@@ -106,6 +105,7 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
         onRequireAuth={onRequireAuth}
         onUpgrade={onUpgrade}
         showSaveButton={false}
+        isPro={isPro}
       />
     </div>
   );

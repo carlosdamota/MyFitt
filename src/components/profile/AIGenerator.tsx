@@ -6,6 +6,7 @@ import RateLimitError from "../errors/RateLimitError";
 import type { ProfileFormData } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
+import { useEntitlement } from "../../hooks/useEntitlement";
 
 // Motivational phrases for loading state
 const MOTIVATIONAL_PHRASES = [
@@ -39,6 +40,7 @@ interface AIGeneratorProps {
   onRequireAuth?: () => void;
   onUpgrade?: () => void;
   showSaveButton?: boolean;
+  isPro?: boolean;
 }
 
 const equipmentLabels: Record<string, string> = {
@@ -72,6 +74,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   onRequireAuth,
   onUpgrade,
   showSaveButton = true,
+  isPro,
 }) => {
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<string>("");
@@ -80,6 +83,13 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+  const [showPaywall, setShowPaywall] = useState<boolean>(false);
+  const { plan } = useEntitlement(user);
+
+  // Determine effective status
+  const effectiveIsPro = isPro !== undefined ? isPro : plan === "pro";
+  const isFree = !effectiveIsPro;
 
   // Rotate motivational phrases every 3 seconds during generation
   useEffect(() => {

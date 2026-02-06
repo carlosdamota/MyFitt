@@ -8,6 +8,7 @@ import { useProfile } from "./hooks/useProfile";
 import { useTimer } from "./hooks/useTimer";
 import { useRoutines } from "./hooks/useRoutines";
 import { useCookieConsent } from "./hooks/useCookieConsent";
+import { useEntitlement } from "./hooks/useEntitlement";
 
 // Components
 import Header from "./components/layout/Header";
@@ -54,6 +55,10 @@ export default function App() {
     shareRoutine,
     importSharedRoutine,
   } = useRoutines(user);
+
+  // Billing / Pro Status
+  const { plan, loading: entitlementLoading } = useEntitlement(user);
+  const isPro = plan === "pro"; // Centralized Pro status check
 
   const handleRequireAuth = (): void => setShowAuthModal(true);
 
@@ -165,6 +170,7 @@ export default function App() {
 
       <AppModals
         user={user}
+        isPro={isPro}
         showStats={showStats}
         setShowStats={setShowStats}
         showNutrition={showNutrition}
@@ -218,6 +224,7 @@ export default function App() {
 
       <Header
         user={user}
+        isPro={isPro}
         streak={streak}
         dbError={dbError}
         authError={authError}
@@ -241,6 +248,7 @@ export default function App() {
         <WorkoutDay
           routine={currentRoutine}
           dayKey={activeTab}
+          isPro={isPro}
           completedExercises={completedExercises}
           onToggleComplete={(day, ex) => {
             const key = `${day}-${ex}`;

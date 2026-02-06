@@ -45,7 +45,7 @@ const getFirebaseConfig = (): FirebaseConfig | null => {
 };
 
 const firebaseConfig = getFirebaseConfig();
-export const appId: string = typeof __app_id !== "undefined" ? __app_id : "fitforge-default";
+export const appId: string = typeof __app_id !== "undefined" ? __app_id : "fitmanual-default";
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;

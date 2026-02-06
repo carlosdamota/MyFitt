@@ -29,6 +29,7 @@ interface HeaderProps {
   onLogout: () => void | Promise<void>;
   onGoHome: () => void;
   guestMode: boolean;
+  isPro?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -45,9 +46,13 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
   onGoHome,
   guestMode,
+  isPro,
 }) => {
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
-  const { plan, currentPeriodEnd } = useEntitlement(user);
+  const { plan: hookPlan, currentPeriodEnd } = useEntitlement(user);
+
+  // Determine effective plan
+  const plan = isPro !== undefined ? (isPro ? "pro" : "free") : hookPlan;
 
   const navItems = [
     {

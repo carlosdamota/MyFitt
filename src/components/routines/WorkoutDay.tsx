@@ -32,6 +32,7 @@ interface WorkoutDayProps {
   user: User | null;
   onRequireAuth?: () => void;
   onShowSubscription?: () => void;
+  isPro?: boolean;
 }
 
 const WorkoutDay: React.FC<WorkoutDayProps> = ({
@@ -47,11 +48,14 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   user,
   onRequireAuth,
   onShowSubscription,
+  isPro,
 }) => {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const { plan } = useEntitlement(user);
 
-  const showProCta = !!user && plan === "free";
+  // Use prop if available, otherwise fall back to hook
+  const effectiveIsPro = isPro !== undefined ? isPro : plan === "pro";
+  const showProCta = !!user && !effectiveIsPro;
 
   return (
     <>

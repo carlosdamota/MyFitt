@@ -70,8 +70,36 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
     Object.entries(routines).forEach(([id, routine]) => {
       if (routine.programId) {
         if (!groups[routine.programId]) {
+          let programTitle = routine.title;
+
+          // 1. Check for known default programs
+          const defaultTitles: Record<string, string> = {
+            default_base_5: "Rutina Base (5 Días)",
+            default_fullbody_3: "Full Body (3 Días)",
+            default_upperlower_4: "Torso / Pierna (4 Días)",
+          };
+
+          if (defaultTitles[routine.programId]) {
+            programTitle = defaultTitles[routine.programId];
+          }
+          // 2. Try to extract program name from "ProgramName: Day X" format
+          else if (routine.title.includes(":")) {
+            const potentialName = routine.title.split(":")[0].trim();
+            // If the prefix is just "Día X", ignores it. If it's "My Plan", keeps it.
+            if (!potentialName.match(/^Día \d+$/i) && !potentialName.match(/^Day \d+$/i)) {
+              programTitle = potentialName;
+            }
+          }
+
+          // 3. Fallback cleanup
+          if (programTitle === routine.title) {
+            programTitle = programTitle.replace(/^(Día|Day)\s*\d+[:\s-]*/i, "").trim();
+            programTitle = programTitle.replace(/ - Día \d+$/, "");
+            if (!programTitle) programTitle = "Programa Personalizado";
+          }
+
           groups[routine.programId] = {
-            title: routine.title.replace(/ - Día \d+$/, ""), // Remove " - Día X" suffix for group title if present
+            title: programTitle,
             routines: [],
           };
         }

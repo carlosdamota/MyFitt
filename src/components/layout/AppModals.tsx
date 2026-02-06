@@ -42,6 +42,7 @@ interface AppModalsProps {
   updateConsent: (consent: any) => void;
   onRequireAuth?: () => void;
   onUpgrade?: () => void;
+  isPro?: boolean;
 }
 
 const AppModals: React.FC<AppModalsProps> = ({
@@ -73,6 +74,7 @@ const AppModals: React.FC<AppModalsProps> = ({
   updateConsent,
   onRequireAuth,
   onUpgrade,
+  isPro,
 }) => {
   const currentRoutine = routines[activeTab] || Object.values(routines)[0];
 
@@ -131,6 +133,7 @@ const AppModals: React.FC<AppModalsProps> = ({
             setShowRoutineManager(true);
           }}
           onUpgrade={onUpgrade}
+          isPro={isPro}
         />
       </Modal>
 
@@ -172,6 +175,7 @@ const AppModals: React.FC<AppModalsProps> = ({
       {showRoutineManager && (
         <RoutineManager
           user={user}
+          isPro={isPro}
           onClose={() => setShowRoutineManager(false)}
           onSelectRoutine={(id) => {
             setActiveTab(id);

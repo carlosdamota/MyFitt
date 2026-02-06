@@ -37,7 +37,7 @@ const Legal = () => {
               </p>
               <p>
                 <span className='text-slate-500 w-32 inline-block'>Contacto:</span>{" "}
-                soporte@fitforge.app
+                daymondoomdev@duck.com
               </p>
               <p>
                 <span className='text-slate-500 w-32 inline-block'>Actividad:</span> Aplicación de
@@ -84,7 +84,7 @@ const Legal = () => {
           </section>
 
           <div className='pt-8 border-t border-slate-800 text-sm text-slate-500'>
-            Última actualización: Diciembre 2025
+            Última actualización: Febrero 2026
           </div>
         </div>
       </div>
