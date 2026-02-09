@@ -13,8 +13,9 @@ const auth = getAuth();
 const APP_ID = process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
-const PRO_AI_MONTHLY_QUOTA = Number(process.env.PRO_AI_MONTHLY_QUOTA ?? "40");
-const FREE_AI_WEEKLY_QUOTA = Number(process.env.FREE_AI_WEEKLY_QUOTA ?? "1");
+const PRO_AI_MONTHLY_QUOTA = Number(process.env.PRO_AI_MONTHLY_QUOTA ?? "100");
+const FREE_AI_MONTHLY_QUOTA = Number(process.env.FREE_AI_MONTHLY_QUOTA ?? "5");
+const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
@@ -96,7 +97,8 @@ const getQuotaForPlan = (plan: PlanType) => {
   if (plan === "pro") {
     return { quota: PRO_AI_MONTHLY_QUOTA, resetInDays: 30 };
   }
-  return { quota: FREE_AI_WEEKLY_QUOTA, resetInDays: 7 };
+  // Free users: monthly quota now (not weekly)
+  return { quota: FREE_AI_MONTHLY_QUOTA, resetInDays: 30 };
 };
 
 const ensureEntitlement = async (uid: string, jwtPlan: PlanType) => {
@@ -504,6 +506,21 @@ export const aiGenerate = onRequest(
           plan: quotaState.plan,
         });
         return;
+      }
+
+      // Validate days limit for Free users
+      if (task === "routine_program" && plan === "free") {
+        const requestedDays = Number(payload.totalDays ?? payload.availableDays ?? 3);
+        if (requestedDays > FREE_MAX_DAYS) {
+          // Release the quota we just consumed since we're rejecting
+          await releaseQuota(uid, plan);
+          sendJson(res, 403, {
+            error: "days_restricted",
+            message: `Las rutinas de ${requestedDays} días son exclusivas de Pro`,
+            maxDays: FREE_MAX_DAYS,
+          });
+          return;
+        }
       }
 
       const { system, user } = buildPrompt(task, payload);

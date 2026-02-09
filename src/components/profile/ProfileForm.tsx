@@ -1,10 +1,5 @@
 import React, { ChangeEvent, FormEvent } from "react";
-import {
-  User,
-  Weight,
-  Ruler,
-  Utensils,
-} from "lucide-react";
+import { User, Weight, Ruler, Utensils } from "lucide-react";
 import type { ProfileFormData } from "../../types";
 import GoalsContextPanel from "./GoalsContextPanel";
 
@@ -15,6 +10,8 @@ interface ProfileFormProps {
   isSaving: boolean;
   isGenerating: boolean;
   savedSuccess: boolean;
+  isPro?: boolean;
+  onUpgrade?: () => void;
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
@@ -24,6 +21,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   isSaving,
   isGenerating,
   savedSuccess,
+  isPro,
+  onUpgrade,
 }) => {
   return (
     <form
@@ -116,6 +115,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       <GoalsContextPanel
         formData={formData}
         onChange={handleChange}
+        isPro={isPro}
+        onUpgrade={onUpgrade}
       />
     </form>
   );

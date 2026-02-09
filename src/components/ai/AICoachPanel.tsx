@@ -89,6 +89,8 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
       <GoalsContextPanel
         formData={formData}
         onChange={handleChange}
+        isPro={isPro}
+        onUpgrade={onUpgrade}
       />
 
       <AIGenerator

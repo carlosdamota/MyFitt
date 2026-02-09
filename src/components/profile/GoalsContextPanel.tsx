@@ -1,10 +1,12 @@
 import React, { ChangeEvent } from "react";
-import { Target, Calendar, Clock, Dumbbell, AlertCircle, Check } from "lucide-react";
+import { Target, Calendar, Clock, Dumbbell, AlertCircle, Check, Lock, Crown } from "lucide-react";
 import type { ProfileFormData } from "../../types";
 
 interface GoalsContextPanelProps {
   formData: ProfileFormData;
   onChange: (field: keyof ProfileFormData, value: string | number | string[]) => void;
+  isPro?: boolean;
+  onUpgrade?: () => void;
 }
 
 type EquipmentOption = ProfileFormData["equipment"][number];
@@ -25,7 +27,14 @@ const equipmentOptions: Array<{
   { value: "kettlebells", label: "Kettlebells", description: "Balones rusos" },
 ];
 
-const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({ formData, onChange }) => {
+const FREE_MAX_DAYS = 2;
+
+const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
+  formData,
+  onChange,
+  isPro = false,
+  onUpgrade,
+}) => {
   const equipmentSelection = formData.equipment;
   const toggleEquipment = (value: EquipmentOption): void => {
     const nextSelection = equipmentSelection.includes(value)
@@ -80,21 +89,36 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({ formData, onChang
             <Calendar size={12} /> Dias Disponibles por Semana
           </label>
           <div className='mt-2 flex items-center gap-2 w-full'>
-            {[2, 3, 4, 5, 6].map((days) => (
-              <button
-                key={days}
-                type='button'
-                onClick={() => onChange("availableDays", days)}
-                className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors ${
-                  formData.availableDays === days
-                    ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                    : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500 hover:bg-slate-900"
-                }`}
-              >
-                {days}
-              </button>
-            ))}
+            {[2, 3, 4, 5, 6].map((days) => {
+              const isLocked = !isPro && days > FREE_MAX_DAYS;
+              return (
+                <button
+                  key={days}
+                  type='button'
+                  disabled={isLocked}
+                  onClick={() => (isLocked ? onUpgrade?.() : onChange("availableDays", days))}
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors relative ${
+                    isLocked
+                      ? "bg-slate-950/50 border-slate-800 text-slate-600 cursor-pointer hover:border-amber-600/50"
+                      : formData.availableDays === days
+                        ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
+                        : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500 hover:bg-slate-900"
+                  }`}
+                  title={isLocked ? "Desbloquea más días con Pro" : undefined}
+                >
+                  {days}
+                  {isLocked && (
+                    <Crown className='absolute -top-1 -right-1 w-3 h-3 text-amber-500' />
+                  )}
+                </button>
+              );
+            })}
           </div>
+          {!isPro && (
+            <p className='text-[10px] text-amber-500/70 mt-2 flex items-center gap-1'>
+              <Crown size={10} /> Rutinas de 3+ días exclusivas de Pro
+            </p>
+          )}
 
           <label className='text-xs text-slate-500 flex items-center gap-1 mt-4'>
             <Clock size={12} /> Tiempo Disponible por Sesion (minutos)

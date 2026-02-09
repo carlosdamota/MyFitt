@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { Dumbbell, Loader, Check } from "lucide-react";
 import { useProfile } from "../../hooks/useProfile";
+import { useEntitlement } from "../../hooks/useEntitlement";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
@@ -15,6 +16,8 @@ interface ProfileEditorProps {
 
 const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireAuth }) => {
   const { profile, loading, saveProfile } = useProfile(user);
+  const { plan } = useEntitlement(user);
+  const isPro = plan === "pro";
   const [formData, setFormData] = useState<ProfileFormData | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
@@ -26,10 +29,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireA
     }
   }, [profile]);
 
-  const handleChange = (
-    field: keyof ProfileFormData,
-    value: string | number | string[],
-  ): void => {
+  const handleChange = (field: keyof ProfileFormData, value: string | number | string[]): void => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
     setSavedSuccess(false);
   };
@@ -69,6 +69,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireA
         isSaving={isSaving}
         isGenerating={false}
         savedSuccess={savedSuccess}
+        isPro={isPro}
       />
 
       <button
