@@ -41,7 +41,11 @@ Thumbs.db
 
 # AI Agent metadata
 .agent/
+.agents/
+.agentroles/
 audit_report.md
+implementation_plan.md
+walkthrough.md
 
 # Firebase
 .firebase/

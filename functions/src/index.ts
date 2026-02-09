@@ -420,6 +420,48 @@ Reglas importantes:
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,
       };
     }
+    case "exercise_variants": {
+      const exerciseName = String(payload.exerciseName ?? "");
+      const system = `Eres un experto en biomecanica. Tu tarea es sugerir variantes de ejercicios.
+Devuelve SOLO texto plano con 3 variantes para el ejercicio dado, explicando brevemente el beneficio de cada una.
+Formato:
+1. Variante A: Beneficio
+2. Variante B: Beneficio
+3. Variante C: Beneficio`;
+      return {
+        system,
+        user: `Sugiere 3 variantes para: ${exerciseName}`,
+      };
+    }
+    case "exercise_analysis": {
+      const exerciseName = String(payload.exerciseName ?? "");
+      const history = JSON.stringify(payload.history ?? []);
+      const system = `Eres un entrenador personal analitico. Analiza el historial de un ejercicio especifico.
+Devuelve SOLO texto plano (max 3 lineas) con una conclusion sobre el progreso (fuerza, volumen o estancamiento) y una recomendacion corta.`;
+      return {
+        system,
+        user: `Analiza este historial para ${exerciseName}: ${history}`,
+      };
+    }
+    case "volume_trend": {
+      const data = JSON.stringify(payload.data ?? []);
+      const system = `Eres un analista de datos deportivos. Analiza la tendencia de volumen semanal.
+Devuelve SOLO texto plano (max 2 lineas) indicando si la tendencia es ascendente, descendente o estancada, y si es adecuada para hipertrofia.`;
+      return {
+        system,
+        user: `Analiza esta tendencia de volumen: ${data}`,
+      };
+    }
+    case "weekly_coach": {
+      const stats = JSON.stringify(payload.stats ?? {});
+      const system = `Eres un coach motivacional y tecnico. Analiza el resumen semanal del usuario.
+Devuelve SOLO texto plano (un parrafo breve) felicitando por los logros y sugiriendo un enfoque para la proxima semana.`;
+      return {
+        system,
+        user: `Analiza este resumen semanal: ${stats}`,
+      };
+    }
+
     default:
       throw new Error("unknown_task");
   }
