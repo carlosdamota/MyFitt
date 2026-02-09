@@ -631,7 +631,47 @@ export const createCheckoutSession = onRequest(
       });
 
       sendJson(res, 200, { url: session.url });
-    } catch (err) {
+    } catch (err: any) {
+      // Handle "No such customer" error (e.g. customer deleted in Stripe dashboard)
+      if (err?.code === "resource_missing" && err?.param === "customer") {
+        console.warn("Stripe customer missing, recreating...", err.message);
+        try {
+          const { uid } = await requireAuth(req);
+          const customerRef = billingCollection(uid).doc("customer");
+
+          // Clear invalid customer ID
+          await customerRef.delete();
+
+          // Create new customer
+          const customer = await stripe.customers.create({ metadata: { uid } });
+          const newCustomerId = customer.id;
+          await customerRef.set({ stripeCustomerId: newCustomerId }, { merge: true });
+
+          // Retry session creation
+          const defaultOrigin = allowedOrigins[0] || "";
+          const successUrl =
+            sanitizeReturnUrl(req.body?.successUrl, allowedOrigins) || defaultOrigin;
+          const cancelUrl = sanitizeReturnUrl(req.body?.cancelUrl, allowedOrigins) || defaultOrigin;
+
+          const session = await stripe.checkout.sessions.create({
+            mode: "subscription",
+            customer: newCustomerId,
+            line_items: [{ price: stripePricePro, quantity: 1 }],
+            success_url: successUrl || "https://example.com/success",
+            cancel_url: cancelUrl || "https://example.com/cancel",
+            client_reference_id: uid,
+            metadata: { uid },
+          });
+
+          sendJson(res, 200, { url: session.url });
+          return;
+        } catch (retryErr) {
+          const message = retryErr instanceof Error ? retryErr.message : "unknown_retry_error";
+          sendJson(res, 500, { error: "checkout_failed_retry", message });
+          return;
+        }
+      }
+
       const message = err instanceof Error ? err.message : "unknown_error";
       sendJson(res, 500, { error: "checkout_failed", message });
     }
