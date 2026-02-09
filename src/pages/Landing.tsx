@@ -333,19 +333,29 @@ const Landing: React.FC<LandingProps> = ({ onLogin, onExplore, user }) => {
               title='Free'
               badge='Ideal para empezar'
               price='0 €'
-              desc='Acceso base a rutinas y seguimiento.'
-              features={["Rutinas guardadas", "Seguimiento de progresos", "IA semanal limitada"]}
+              desc='Prueba el sistema y crea tus primeras rutinas.'
+              features={[
+                "Rutinas de 1-2 días",
+                "5 generaciones IA/mes",
+                "Seguimiento de progresos",
+                "Tracking de nutrición",
+              ]}
               cta='Comenzar gratis'
               onClick={onLogin}
               tone='neutral'
             />
             <PlanCard
               title='Pro'
-              badge='Mas potencia'
+              badge='Sin límites'
               price='4.99 € / mes'
-              desc='IA avanzada, nutricion y analisis completos.'
-              features={["Cuota IA mensual ampliada", "Analisis avanzado", "Portal de suscripcion"]}
-              cta='Probar Pro'
+              desc='Programas completos con IA avanzada y análisis.'
+              features={[
+                "Rutinas de hasta 6 días",
+                "100 generaciones IA/mes",
+                "Programas multi-semana",
+                "Portal de suscripción",
+              ]}
+              cta='Desbloquear Pro'
               onClick={onLogin}
               tone='accent'
             />
