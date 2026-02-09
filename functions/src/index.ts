@@ -313,6 +313,8 @@ const normalizeProgram = (value: any, totalDays: number) => {
       weight: day?.weight ?? "Carga Media",
       bg: day?.bg ?? "bg-slate-900",
       border: day?.border ?? "border-slate-800",
+      warmup: day?.warmup,
+      cooldown: day?.cooldown,
       blocks,
     };
   });
@@ -374,6 +376,8 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
       "weight": "Carga Alta" | "Carga Media",
       "bg": "bg-slate-900",
       "border": "border-slate-800",
+      "warmup": { "type": "push" | "pull" | "legs" | "full", "text": "Descripcion breve calentamiento" },
+      "cooldown": { "text": "Descripcion breve vuelta a la calma" },
       "blocks": [
         {
           "id": 1,

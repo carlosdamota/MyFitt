@@ -115,6 +115,17 @@ export const GeneratedRoutineSchema = z.object({
   weight: WeightSchema,
   bg: z.string().default("bg-slate-900"),
   border: z.string().default("border-slate-800"),
+  warmup: z
+    .object({
+      type: z.string().optional(),
+      text: z.string(),
+    })
+    .optional(),
+  cooldown: z
+    .object({
+      text: z.string(),
+    })
+    .optional(),
   blocks: z.array(RoutineBlockSchema).min(1),
 });
 export type GeneratedRoutine = z.infer<typeof GeneratedRoutineSchema>;
