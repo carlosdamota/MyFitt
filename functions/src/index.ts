@@ -725,29 +725,52 @@ const updatePlanForCustomer = async (
   isPro: boolean,
   subscriptionId?: string,
 ) => {
-  const userQuery = await db
-    .collectionGroup("billing")
-    .where("stripeCustomerId", "==", customerId)
-    .limit(1)
-    .get();
-  if (userQuery.empty) return;
+  console.log("updatePlanForCustomer called:", { customerId, isPro, subscriptionId });
 
-  const customerDoc = userQuery.docs[0];
-  const uid = customerDoc.ref.parent.parent?.id;
-  if (!uid) return;
+  try {
+    const userQuery = await db
+      .collectionGroup("billing")
+      .where("stripeCustomerId", "==", customerId)
+      .limit(1)
+      .get();
 
-  const plan: PlanType = isPro ? "pro" : "free";
-  await auth.setCustomUserClaims(uid, { plan });
-  await billingCollection(uid)
-    .doc("entitlement")
-    .set(
-      {
-        plan,
-        subscriptionId: subscriptionId ?? null,
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+    console.log("Query result:", { empty: userQuery.empty, size: userQuery.size });
+
+    if (userQuery.empty) {
+      console.warn("No billing document found for customer:", customerId);
+      return;
+    }
+
+    const customerDoc = userQuery.docs[0];
+    const uid = customerDoc.ref.parent.parent?.id;
+    console.log("Found user:", { uid, docPath: customerDoc.ref.path });
+
+    if (!uid) {
+      console.warn("Could not extract UID from document path");
+      return;
+    }
+
+    const plan: PlanType = isPro ? "pro" : "free";
+    console.log("Setting plan:", { uid, plan });
+
+    await auth.setCustomUserClaims(uid, { plan });
+    console.log("Custom claims set successfully");
+
+    await billingCollection(uid)
+      .doc("entitlement")
+      .set(
+        {
+          plan,
+          subscriptionId: subscriptionId ?? null,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    console.log("Entitlement document updated successfully");
+  } catch (err) {
+    console.error("updatePlanForCustomer error:", err);
+    throw err; // Re-throw to be caught by webhook handler
+  }
 };
 
 export const stripeWebhook = onRequest(
