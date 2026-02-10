@@ -43,25 +43,28 @@ export interface WeeklyStats {
  */
 export const isBodyweightExercise = (name: string): boolean => {
   const bodyweightKeywords = [
-    "flexiones",
-    "dominadas",
-    "fondos",
-    "zancadas",
-    "burpees",
+    "flexion",
+    "dominada",
+    "fondo",
+    "zancada",
+    "burpee",
     "plancha",
     "core",
-    "abdominales",
+    "abdominal",
     "l-sit",
     "pino",
-    "crunches",
-    "leg raises",
-    "sentadilla libre",
-    "sentadillas",
-    "sentadilla goblet",
+    "crunch",
+    "leg raise",
+    "sentadilla",
+    "gluteo",
     "glúteo",
     "dead bug",
-    "rueda abdominal",
+    "rueda",
     "bridge",
+    "puente",
+    "salto",
+    "hollow",
+    "superman",
   ];
   const lowerName = name.toLowerCase();
   return bodyweightKeywords.some((keyword) => lowerName.includes(keyword));
@@ -204,10 +207,9 @@ export const getWeeklyStats = (
       const reps = parseInt(String(log.reps ?? 0)) || 0;
       const sets = parseInt(String(log.sets ?? 1)) || 1;
 
-      // Si el peso es 0 y es de calistenia, usamos 1 para contar repeticiones como volumen base
-      // Esto evita que el peso corporal infle artificialmente el tonelaje
-      const effectiveWeight = weight === 0 && isBodyweightExercise(exName) ? 1 : weight;
-      const volume = effectiveWeight * reps * sets;
+      // Cálculo estricto de volumen: Peso * Reps * Series
+      // Para calistenia sin lastre (0kg), el volumen es 0.
+      const volume = weight * reps * sets;
 
       if (logDate >= oneWeekAgo) {
         // Esta semana

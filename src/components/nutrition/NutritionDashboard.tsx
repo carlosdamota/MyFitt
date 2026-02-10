@@ -21,9 +21,13 @@ interface MacroTargets {
   fats: number;
 }
 
-const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequireAuth, onUpgrade }) => {
+const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
+  user,
+  onRequireAuth,
+  onUpgrade,
+}) => {
   const { logs, loading, addFoodLog, deleteFoodLog, getDayTotals } = useNutrition(user);
-  const { profile } = useProfile(user);
+  const { profile, saveProfile } = useProfile(user);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // Calcular objetivos basados en el perfil
@@ -87,8 +91,48 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequire
     setSelectedDate(newDate);
   };
 
+  const handleGoalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    saveProfile({ goal: e.target.value as any });
+  };
+
+  const handleDietChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    saveProfile({ dietType: e.target.value as any });
+  };
+
   return (
-    <div className='space-y-6 pb-20 overflow-y-auto max-h-[85vh] px-1'>
+    <div className='space-y-6 pb-20 overflow-y-auto max-h-[85vh] px-1 relative'>
+      <div className='grid grid-cols-2 gap-4 bg-slate-900/50 p-3 rounded-xl border border-slate-800'>
+        <div>
+          <label className='text-[10px] uppercase font-bold text-slate-500 mb-1 block'>
+            Objetivo
+          </label>
+          <select
+            value={profile?.goal || "muscle_gain"}
+            onChange={handleGoalChange}
+            className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-xs focus:border-blue-500 outline-none'
+          >
+            <option value='muscle_gain'>Ganar Músculo</option>
+            <option value='fat_loss'>Perder Grasa</option>
+            <option value='strength'>Ganar Fuerza</option>
+            <option value='endurance'>Resistencia</option>
+          </select>
+        </div>
+        <div>
+          <label className='text-[10px] uppercase font-bold text-slate-500 mb-1 block'>Dieta</label>
+          <select
+            value={profile?.dietType || "balanced"}
+            onChange={handleDietChange}
+            className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-xs focus:border-blue-500 outline-none'
+          >
+            <option value='balanced'>Equilibrada</option>
+            <option value='high_protein'>Alta en Proteína</option>
+            <option value='keto'>Keto</option>
+            <option value='paleo'>Paleo</option>
+            <option value='low_carb'>Low Carb</option>
+          </select>
+        </div>
+      </div>
+
       <MacroSummary
         dayTotals={dayTotals}
         targets={targets}

@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Share2 } from "lucide-react";
 import { isBodyweightExercise } from "../../utils/stats";
 import type { WorkoutLogs, WorkoutLogEntry } from "../../types";
+import { SocialShareModal } from "../common/SocialShareModal";
 
 interface LogViewerProps {
   logs: WorkoutLogs;
@@ -20,14 +21,13 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
     Object.entries(logs).forEach(([exercise, entries]) => {
       entries.forEach((entry) => {
         const weight = parseFloat(String(entry.weight)) || 0;
-        const effectiveWeight =
-          weight === 0 && isBodyweightExercise(exercise)
-            ? parseFloat(String(userWeight)) || 70
-            : weight;
+        // Volumen real (Tonelaje)
+        const volume = weight * (entry.reps || 0) * (entry.sets || 0);
+
         allLogs.push({
           exercise,
           ...entry,
-          volume: effectiveWeight * (entry.reps || 0) * (entry.sets || 0),
+          volume,
         });
       });
     });
@@ -45,6 +45,10 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
     });
     return groups;
   }, [flatLogs]);
+
+  const [shareData, setShareData] = React.useState<{ date: string; logs: FlatLogEntry[] } | null>(
+    null,
+  );
 
   const handleExportCSV = (): void => {
     // Encabezado CSV
@@ -92,9 +96,18 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
           >
             <div className='bg-slate-800/50 px-3 py-2 border-b border-slate-800 flex justify-between items-center'>
               <span className='text-slate-300 font-bold text-xs'>{date}</span>
-              <span className='text-[10px] text-slate-500 font-mono'>
-                {daysLogs.length} Ejercicios
-              </span>
+              <div className='flex items-center gap-3'>
+                <span className='text-[10px] text-slate-500 font-mono'>
+                  {daysLogs.length} Ejercicios
+                </span>
+                <button
+                  onClick={() => setShareData({ date, logs: daysLogs })}
+                  className='text-blue-400 hover:text-blue-300 transition-colors p-1'
+                  title='Compartir en Redes'
+                >
+                  <Share2 size={14} />
+                </button>
+              </div>
             </div>
             <div className='divide-y divide-slate-800'>
               {daysLogs.map((log, i) => (
@@ -109,7 +122,15 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
                     {log.weight}kg <span className='text-slate-600'>x</span> {log.reps}
                   </div>
                   <div className='col-span-2 text-right text-slate-400'>{log.sets} series</div>
-                  <div className='col-span-2 text-right text-blue-400 font-mono'>{log.volume}</div>
+                  <div className='col-span-2 text-right font-mono'>
+                    {log.volume > 0 ? (
+                      <span className='text-blue-400'>{log.volume}</span>
+                    ) : (
+                      <span className='text-emerald-400'>
+                        {log.reps ? log.reps * (log.sets || 1) : 0} reps
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -122,6 +143,16 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
           </div>
         ))}
       </div>
+
+      {/* Share Modal */}
+      {shareData && (
+        <SocialShareModal
+          isOpen={!!shareData}
+          onClose={() => setShareData(null)}
+          date={shareData.date}
+          logs={shareData.logs}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent } from "react";
-import { User, Weight, Ruler, Utensils } from "lucide-react";
+import { User, Weight, Ruler } from "lucide-react";
 import type { ProfileFormData } from "../../types";
-import GoalsContextPanel from "./GoalsContextPanel";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -90,34 +89,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               <option value='other'>Otro</option>
             </select>
           </div>
-
-          <div>
-            <label className='text-xs text-slate-500 mb-1 flex items-center gap-1'>
-              <Utensils size={12} /> Tipo de Dieta
-            </label>
-            <select
-              value={formData.dietType || "balanced"}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleChange("dietType", e.target.value)
-              }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-            >
-              <option value='balanced'>Equilibrada (Estándar)</option>
-              <option value='high_protein'>Alta en Proteína</option>
-              <option value='keto'>Keto (Cetogénica)</option>
-              <option value='paleo'>Paleo</option>
-              <option value='low_carb'>Baja en Carbohidratos</option>
-            </select>
-          </div>
         </div>
       </div>
-
-      <GoalsContextPanel
-        formData={formData}
-        onChange={handleChange}
-        isPro={isPro}
-        onUpgrade={onUpgrade}
-      />
     </form>
   );
 };
