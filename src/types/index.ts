@@ -75,6 +75,15 @@ export type WorkoutLogs = Record<string, WorkoutLogEntry[]>;
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
+export interface Ingredient {
+  name: string;
+  amount: string;
+  cal: number;
+  p: number;
+  c: number;
+  f: number;
+}
+
 export interface NutritionLogEntry {
   id: string;
   food: string;
@@ -84,6 +93,7 @@ export interface NutritionLogEntry {
   fats: number;
   mealType: MealType;
   date: string;
+  ingredients?: Ingredient[];
 }
 
 export interface MacroTotals {

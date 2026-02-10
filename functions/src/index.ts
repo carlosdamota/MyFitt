@@ -13,6 +13,7 @@ const auth = getAuth();
 const APP_ID = process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_LITE = process.env.GEMINI_MODEL_LITE ?? "gemini-2.5-flash-lite";
 const PRO_AI_MONTHLY_QUOTA = Number(process.env.PRO_AI_MONTHLY_QUOTA ?? "40");
 const FREE_AI_WEEKLY_QUOTA = Number(process.env.FREE_AI_WEEKLY_QUOTA ?? "1");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
@@ -169,11 +170,12 @@ const consumeQuota = async (uid: string, plan: PlanType) => {
   return { allowed: true, ...ent, used };
 };
 
-const callGemini = async (prompt: string, systemInstruction = "") => {
+const callGemini = async (prompt: string, systemInstruction = "", model?: string) => {
   if (!GEMINI_API_KEY) {
     throw new Error("gemini_key_missing");
   }
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+  const targetModel = model || GEMINI_MODEL;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${GEMINI_API_KEY}`;
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
     systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -218,32 +220,58 @@ const parseJsonWithFixes = (text: string) => {
 const normalizeNutritionLog = (value: any) => {
   if (!value || typeof value !== "object") return null;
 
+  // Normalize ingredients array from various AI response shapes
+  let ingredients: Array<Record<string, any>> = [];
+  if (Array.isArray(value.ingredients)) {
+    ingredients = value.ingredients.map((ing: any) => ({
+      name: ing.name ?? "Ingrediente",
+      amount: ing.amount ?? ing.quantity ?? "1 ración",
+      cal: Number(ing.cal ?? ing.calories ?? 0),
+      p: Number(ing.p ?? ing.protein ?? 0),
+      c: Number(ing.c ?? ing.carbs ?? 0),
+      f: Number(ing.f ?? ing.fats ?? ing.fat ?? 0),
+    }));
+  }
+
+  // Handle legacy "meals" array format from older prompts
   if (Array.isArray(value.meals)) {
     const meals = value.meals as Array<Record<string, any>>;
-    const totals = meals.reduce(
-      (acc, meal) => ({
-        calories: acc.calories + Number(meal.calories ?? 0),
-        protein: acc.protein + Number(meal.protein ?? 0),
-        carbs: acc.carbs + Number(meal.carbs ?? 0),
-        fats: acc.fats + Number(meal.fat ?? meal.fats ?? 0),
+    ingredients = meals.map((meal) => ({
+      name: String(meal.name ?? meal.food ?? "Ingrediente").trim(),
+      amount: meal.amount ?? "1 ración",
+      cal: Number(meal.calories ?? meal.cal ?? 0),
+      p: Number(meal.protein ?? meal.p ?? 0),
+      c: Number(meal.carbs ?? meal.c ?? 0),
+      f: Number(meal.fat ?? meal.fats ?? meal.f ?? 0),
+    }));
+  }
+
+  // Calculate totals from ingredients if available
+  if (ingredients.length > 0) {
+    const totals = ingredients.reduce(
+      (acc, ing) => ({
+        calories: acc.calories + ing.cal,
+        protein: acc.protein + ing.p,
+        carbs: acc.carbs + ing.c,
+        fats: acc.fats + ing.f,
       }),
       { calories: 0, protein: 0, carbs: 0, fats: 0 },
     );
 
-    const nameList = meals
-      .map((meal) => String(meal.name ?? meal.food ?? "").trim())
-      .filter(Boolean);
+    const nameList = ingredients.map((i) => i.name).filter(Boolean);
 
     return {
-      food: nameList.length > 0 ? nameList.join(", ") : "Comida",
+      food: value.food ?? (nameList.length > 0 ? nameList.join(", ") : "Comida"),
       calories: totals.calories,
       protein: totals.protein,
       carbs: totals.carbs,
       fats: totals.fats,
       mealType: value.mealType ?? "snack",
+      ingredients,
     };
   }
 
+  // Fallback: flat object without ingredients
   return {
     food: value.food ?? value.name ?? "Comida",
     calories: value.calories ?? 0,
@@ -251,6 +279,7 @@ const normalizeNutritionLog = (value: any) => {
     carbs: value.carbs ?? 0,
     fats: value.fats ?? value.fat ?? 0,
     mealType: value.mealType ?? "snack",
+    ingredients: [],
   };
 };
 
@@ -342,22 +371,19 @@ const buildPrompt = (task: string, payload: Record<string, unknown>) => {
   switch (task) {
     case "nutrition_parse": {
       const log = String(payload.log ?? "");
-      const system = `Eres un nutricionista experto. Analiza el texto del usuario y devuelve SOLO un objeto JSON valido (sin markdown, sin texto extra) con esta estructura:
-{
-  "food": "Descripcion corta de la comida",
-  "calories": 500,
-  "protein": 30,
-  "carbs": 50,
-  "fats": 15,
-  "mealType": "breakfast" | "lunch" | "dinner" | "snack"
-}
+      const system = `Nutricionista. Devuelve SOLO JSON valido, sin markdown.
+Estructura exacta:
+{"food":"Nombre corto","calories":0,"protein":0,"carbs":0,"fats":0,"mealType":"snack","ingredients":[{"name":"X","amount":"1 ud","cal":0,"p":0,"c":0,"f":0}]}
 Reglas:
-1. Si hay multiples alimentos, suma los macros en un solo registro.
-2. Usa mealType segun el contexto; si no esta claro, usa "snack".
-3. No incluyas campos adicionales ni texto fuera del JSON.`;
+1. ingredients: lista cada alimento por separado con name, amount, cal(kcal), p(proteina g), c(carbos g), f(grasa g)
+2. Si no hay peso/cantidad, usa racion estandar (ej: "1 pieza", "2 rebanadas", "1 taza", "100g")
+3. calories/protein/carbs/fats = suma de todos los ingredientes
+4. mealType: breakfast|lunch|dinner|snack segun contexto, default snack
+5. food: nombre descriptivo corto del plato completo
+6. Solo JSON, sin texto extra`;
       return {
         system,
-        user: `Analiza este registro de comidas: ${log}`,
+        user: log,
       };
     }
     case "routine_program": {
@@ -507,7 +533,8 @@ export const aiGenerate = onRequest(
       }
 
       const { system, user } = buildPrompt(task, payload);
-      const text = await callGemini(user, system);
+      const modelForTask = task === "nutrition_parse" ? GEMINI_MODEL_LITE : undefined;
+      const text = await callGemini(user, system, modelForTask);
 
       // --- ZOD VALIDATION START ---
       let validatedData: any = { text };

@@ -130,6 +130,16 @@ const MealTypeSchemaForParse = z.preprocess(
 );
 
 export const MealTypeSchema = z.enum(["breakfast", "lunch", "dinner", "snack"]);
+
+export const IngredientSchema = z.object({
+  name: z.string(),
+  amount: z.string().default("1 ración"),
+  cal: z.coerce.number().min(0).default(0),
+  p: z.coerce.number().min(0).default(0),
+  c: z.coerce.number().min(0).default(0),
+  f: z.coerce.number().min(0).default(0),
+});
+
 export const NutritionLogSchema = z.object({
   food: z.string().default("Comida").describe("Short, descriptive name of the meal"),
   calories: z.coerce.number().min(0).default(0).describe("Estimated kcal"),
@@ -137,4 +147,5 @@ export const NutritionLogSchema = z.object({
   carbs: z.coerce.number().min(0).default(0).describe("Estimated grams of carbs"),
   fats: z.coerce.number().min(0).default(0).describe("Estimated grams of fats"),
   mealType: MealTypeSchemaForParse,
+  ingredients: z.array(IngredientSchema).optional().default([]),
 });
