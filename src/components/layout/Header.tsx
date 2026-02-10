@@ -1,13 +1,14 @@
 import React, { useState } from "react";
+import { NavLink, Link } from "react-router";
 import {
-  Activity,
   Cloud,
   BarChart2,
   AlertCircle,
   Flame,
   Utensils,
   User,
-  Dumbbell,
+  Home,
+  LayoutGrid,
   Menu,
   X,
   Sparkles,
@@ -20,99 +21,108 @@ interface HeaderProps {
   streak: number;
   dbError: string | null;
   authError: string | null;
-  onShowProfile: () => void;
-  onShowAICoach: () => void;
-  onShowNutrition: () => void;
-  onShowRoutines: () => void;
-  onShowStats: () => void;
   onLogin: () => void;
   onLogout: () => void | Promise<void>;
-  onGoHome: () => void;
-  guestMode: boolean;
   isPro?: boolean;
 }
+
+interface NavItem {
+  label: string;
+  to: string;
+  icon: React.ReactNode;
+}
+
+const navItems: NavItem[] = [
+  {
+    label: "Home",
+    to: "/app",
+    icon: (
+      <Home
+        size={18}
+        className='text-cyan-300'
+      />
+    ),
+  },
+  {
+    label: "Mis Rutinas",
+    to: "/app/routines",
+    icon: (
+      <LayoutGrid
+        size={18}
+        className='text-slate-300'
+      />
+    ),
+  },
+  {
+    label: "Nutrición",
+    to: "/app/nutrition",
+    icon: (
+      <Utensils
+        size={18}
+        className='text-amber-300'
+      />
+    ),
+  },
+  {
+    label: "IA Coach",
+    to: "/app/coach",
+    icon: (
+      <Sparkles
+        size={18}
+        className='text-emerald-300'
+      />
+    ),
+  },
+  {
+    label: "Estadísticas",
+    to: "/app/stats",
+    icon: (
+      <BarChart2
+        size={18}
+        className='text-indigo-300'
+      />
+    ),
+  },
+  {
+    label: "Perfil",
+    to: "/app/profile",
+    icon: (
+      <User
+        size={18}
+        className='text-slate-200'
+      />
+    ),
+  },
+];
 
 const Header: React.FC<HeaderProps> = ({
   user,
   streak,
   dbError,
   authError,
-  onShowProfile,
-  onShowAICoach,
-  onShowNutrition,
-  onShowRoutines,
-  onShowStats,
   onLogin,
   onLogout,
-  onGoHome,
-  guestMode,
   isPro,
 }) => {
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const { plan: hookPlan, currentPeriodEnd } = useEntitlement(user);
 
-  // Determine effective plan
   const plan = isPro !== undefined ? (isPro ? "pro" : "free") : hookPlan;
-
-  const navItems = [
-    {
-      label: "Rutinas",
-      onClick: onShowRoutines,
-      icon: (
-        <Dumbbell
-          size={18}
-          className='text-cyan-300'
-        />
-      ),
-    },
-    {
-      label: "Nutrición",
-      onClick: onShowNutrition,
-      icon: (
-        <Utensils
-          size={18}
-          className='text-amber-300'
-        />
-      ),
-    },
-    {
-      label: "IA Coach",
-      onClick: onShowAICoach,
-      icon: (
-        <Sparkles
-          size={18}
-          className='text-emerald-300'
-        />
-      ),
-    },
-    {
-      label: "Estadísticas",
-      onClick: onShowStats,
-      icon: (
-        <BarChart2
-          size={18}
-          className='text-indigo-300'
-        />
-      ),
-    },
-    {
-      label: "Perfil",
-      onClick: onShowProfile,
-      icon: (
-        <User
-          size={18}
-          className='text-slate-200'
-        />
-      ),
-    },
-  ];
-
-  const handleNavClick = (action: () => void) => {
-    action();
-    setMobileOpen(false);
-  };
-
   const renewalLabel = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : "";
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+      isActive
+        ? "text-white bg-slate-800 shadow-inner"
+        : "text-slate-300 hover:text-white hover:bg-slate-800/70"
+    }`;
+
+  const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors ${
+      isActive
+        ? "text-white bg-slate-800 shadow-inner"
+        : "text-slate-200 hover:bg-slate-800 hover:text-white"
+    }`;
 
   return (
     <>
@@ -121,8 +131,8 @@ const Header: React.FC<HeaderProps> = ({
           {/* Logo & Streak */}
           <div className='flex items-center gap-3'>
             <div>
-              <button
-                onClick={onGoHome}
+              <Link
+                to='/app'
                 className='text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2 relative hover:opacity-80 transition-opacity'
               >
                 <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
@@ -133,7 +143,7 @@ const Header: React.FC<HeaderProps> = ({
                 />
                 <span className='text-white hidden sm:inline'>FitForge</span>
                 <span className='text-white sm:hidden'>FM</span>
-              </button>
+              </Link>
               {streak > 0 && (
                 <div className='flex items-center gap-1 mt-1'>
                   <Flame
@@ -151,14 +161,15 @@ const Header: React.FC<HeaderProps> = ({
           {/* Desktop Nav */}
           <nav className='hidden lg:flex items-center gap-1'>
             {navItems.map((item) => (
-              <button
+              <NavLink
                 key={item.label}
-                onClick={() => handleNavClick(item.onClick)}
-                className='flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors'
+                to={item.to}
+                end={item.to === "/app"}
+                className={linkClass}
               >
                 {item.icon}
                 {item.label}
-              </button>
+              </NavLink>
             ))}
           </nav>
 
@@ -201,7 +212,7 @@ const Header: React.FC<HeaderProps> = ({
             )}
 
             {/* Auth buttons */}
-            {guestMode && !user && (
+            {!user && (
               <button
                 onClick={onLogin}
                 className='text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-3 py-1.5 rounded-xl transition-colors hidden sm:flex items-center gap-1'
@@ -268,20 +279,22 @@ const Header: React.FC<HeaderProps> = ({
         {/* Sidebar Nav Items */}
         <nav className='p-4 space-y-2'>
           {navItems.map((item) => (
-            <button
+            <NavLink
               key={item.label}
-              onClick={() => handleNavClick(item.onClick)}
-              className='w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium text-slate-200 hover:bg-slate-800 hover:text-white transition-colors'
+              to={item.to}
+              end={item.to === "/app"}
+              className={mobileLinkClass}
+              onClick={() => setMobileOpen(false)}
             >
               {item.icon}
               {item.label}
-            </button>
+            </NavLink>
           ))}
         </nav>
 
         {/* Sidebar Footer - Auth */}
         <div className='absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800'>
-          {guestMode && !user && (
+          {!user && (
             <button
               onClick={() => {
                 onLogin();

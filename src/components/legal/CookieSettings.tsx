@@ -124,7 +124,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
             Cancelar
           </button>
           <button
-            onClick={() => onSave(tempConsent)}
+            onClick={handleSave}
             className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-900/40 transition-all active:scale-95'
           >
             Guardar Preferencias

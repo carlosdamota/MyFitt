@@ -1,5 +1,7 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, Calendar, Trash2, Loader } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Loader } from "lucide-react";
+import MealDetailCard from "./MealDetailCard";
+import type { Ingredient } from "../../types";
 
 interface Meal {
   id?: string;
@@ -9,6 +11,7 @@ interface Meal {
   carbs: number;
   fats: number;
   calories: number;
+  ingredients?: Ingredient[];
 }
 
 interface MealHistoryProps {
@@ -88,39 +91,18 @@ const MealHistory: React.FC<MealHistoryProps> = ({
       ) : (
         <div className='space-y-3'>
           {dayLogs.map((log) => (
-            <div
+            <MealDetailCard
               key={log.id}
-              className='bg-slate-900/80 p-4 rounded-2xl border border-slate-800 flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300 hover:border-slate-700 transition-colors group'
-            >
-              <div className='flex-1'>
-                <h4 className='font-bold text-slate-200 text-sm group-hover:text-white transition-colors'>
-                  {log.food}
-                </h4>
-                <div className='flex gap-4 text-[11px] text-slate-500 mt-1.5 font-mono font-bold'>
-                  <span className='text-blue-500/80 flex items-center gap-1'>
-                    <span className='w-1 h-1 bg-blue-500 rounded-full' /> {log.protein}p
-                  </span>
-                  <span className='text-purple-500/80 flex items-center gap-1'>
-                    <span className='w-1 h-1 bg-purple-500 rounded-full' /> {log.carbs}c
-                  </span>
-                  <span className='text-yellow-500/80 flex items-center gap-1'>
-                    <span className='w-1 h-1 bg-yellow-500 rounded-full' /> {log.fats}f
-                  </span>
-                  <span className='text-white ml-auto bg-slate-950 px-2 py-0.5 rounded-md border border-slate-800'>
-                    {log.calories} KCAL
-                  </span>
-                </div>
-              </div>
-              {isToday && log.id && (
-                <button
-                  onClick={() => onDeleteLog(log.id!)}
-                  className='ml-4 text-slate-700 hover:text-red-400 p-2.5 hover:bg-red-900/10 rounded-xl transition-all opacity-40 group-hover:opacity-100'
-                  title='Borrar comida'
-                >
-                  <Trash2 size={18} />
-                </button>
-              )}
-            </div>
+              id={log.id}
+              food={log.food}
+              calories={log.calories}
+              protein={log.protein}
+              carbs={log.carbs}
+              fats={log.fats}
+              ingredients={log.ingredients}
+              canDelete={isToday && !!log.id}
+              onDelete={onDeleteLog}
+            />
           ))}
         </div>
       )}

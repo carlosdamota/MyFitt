@@ -30,41 +30,41 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
     <div className='space-y-3'>
       <div className='grid grid-cols-4 gap-2 mb-3'>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-500 mb-1 font-bold'>PESO</label>
+          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>PESO</label>
           <input
             type='number'
             value={weight}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setWeight(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-950/30 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500/50 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-600'
             placeholder='kg'
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-500 mb-1 font-bold'>REPS</label>
+          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>REPS</label>
           <input
             type='number'
             value={reps}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setReps(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-950/30 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500/50 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-600'
             placeholder='0'
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-500 mb-1 font-bold'>SETS</label>
+          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>SETS</label>
           <input
             type='number'
             value={sets}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setSets(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-950/30 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500/50 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-600'
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-500 mb-1 font-bold'>RPE</label>
+          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>RPE</label>
           <input
             type='number'
             value={rpe}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setRpe(e.target.value)}
-            className='w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500 outline-none transition-colors'
+            className='w-full bg-slate-950/30 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:border-blue-500/50 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-600'
             placeholder='1-10'
           />
         </div>
