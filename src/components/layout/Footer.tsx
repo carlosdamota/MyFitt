@@ -1,11 +1,8 @@
 import React from "react";
+import { Link } from "react-router";
 import { Shield, FileText, Scale, Heart } from "lucide-react";
 
-interface FooterProps {
-  onNavigate: (page: string) => void;
-}
-
-const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+const Footer: React.FC = () => {
   return (
     <footer className='bg-slate-950 border-t border-slate-900 py-8 px-4 mt-12'>
       <div className='max-w-4xl mx-auto'>
@@ -20,24 +17,24 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Links */}
           <div className='flex flex-wrap justify-center gap-6'>
-            <button
-              onClick={() => onNavigate("privacy")}
+            <Link
+              to='/privacy'
               className='text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1.5'
             >
               <Shield size={14} /> Privacidad
-            </button>
-            <button
-              onClick={() => onNavigate("terms")}
+            </Link>
+            <Link
+              to='/terms'
               className='text-xs text-slate-400 hover:text-purple-400 transition-colors flex items-center gap-1.5'
             >
               <FileText size={14} /> Términos
-            </button>
-            <button
-              onClick={() => onNavigate("legal")}
+            </Link>
+            <Link
+              to='/legal'
               className='text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1.5'
             >
               <Scale size={14} /> Legal
-            </button>
+            </Link>
           </div>
         </div>
 

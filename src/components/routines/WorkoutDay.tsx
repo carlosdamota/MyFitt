@@ -57,181 +57,276 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const effectiveIsPro = isPro !== undefined ? isPro : plan === "pro";
   const showProCta = !!user && !effectiveIsPro;
 
+  // Calculate progress
+  const totalExercises = routine.blocks
+    ? routine.blocks.reduce((acc, block) => acc + block.exercises.length, 0)
+    : 0;
+
+  const completedCount = routine.blocks
+    ? routine.blocks.reduce((acc, block) => {
+        return (
+          acc + block.exercises.filter((ex) => completedExercises[`${dayKey}-${ex.name}`]).length
+        );
+      }, 0)
+    : 0;
+
+  const progressPercentage =
+    totalExercises > 0 ? Math.round((completedCount / totalExercises) * 100) : 0;
+
   return (
     <>
+      {/* Sticky Progress Header */}
+      {totalExercises > 0 && (
+        <div className='sticky top-0 z-30 -mx-4 px-4 py-3 bg-slate-950/80 backdrop-blur-md border-b border-white/5 mb-6 transition-all duration-300'>
+          <div className='flex justify-between items-end mb-1'>
+            <span className='text-xs font-bold text-slate-400 uppercase tracking-wider'>
+              Tu Progreso
+            </span>
+            <span className='text-sm font-bold text-blue-400'>{progressPercentage}%</span>
+          </div>
+          <div className='h-1.5 w-full bg-slate-800 rounded-full overflow-hidden'>
+            <div
+              className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500 ease-out'
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Routine Header Card */}
       <div
-        className={`p-5 rounded-2xl border mb-6 ${routine.bg} ${routine.border} relative overflow-hidden`}
+        className={`p-6 rounded-3xl border mb-6 ${routine.bg} ${routine.border} relative overflow-hidden group`}
       >
-        <div className='absolute top-0 right-0 p-4 opacity-10'>
-          <Dumbbell size={80} />
+        <div className='absolute -right-4 -top-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-700'>
+          <Dumbbell size={120} />
         </div>
-        <div className='flex justify-between items-start mb-1'>
-          <h2 className='text-2xl font-bold text-white'>{routine.title}</h2>
+        <div className='flex justify-between items-start mb-4 relative z-10'>
+          <div>
+            <h2 className='text-3xl font-black text-white mb-2 leading-tight'>{routine.title}</h2>
+            <div className='flex items-center gap-3 text-sm text-slate-200/80'>
+              <div className='flex items-center gap-1.5'>
+                <Activity
+                  size={16}
+                  className='text-blue-300'
+                />
+                <span>{routine.focus}</span>
+              </div>
+              <span className='w-1 h-1 rounded-full bg-slate-400/50' />
+              <div className='flex items-center gap-1.5'>
+                <Clock
+                  size={16}
+                  className='text-purple-300'
+                />
+                <span>~{totalExercises * 5} min</span>
+              </div>
+            </div>
+          </div>
           <button
             onClick={onEditRoutine}
-            className='p-2 bg-slate-900/50 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors'
+            className='p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl text-white transition-all hover:scale-105 active:scale-95 border border-white/10 shadow-lg'
             aria-label='Editar rutina'
           >
-            <Edit size={16} />
+            <Edit size={18} />
           </button>
         </div>
-        <div className='flex items-center gap-2 text-sm text-slate-300 mb-4'>
-          <Activity size={14} />
-          <span>{routine.focus}</span>
-        </div>
+
         <div
-          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border ${
+          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border bg-slate-950/20 backdrop-blur-sm ${
             routine.mode === "heavy"
-              ? "bg-red-500/20 border-red-500/50 text-red-400"
-              : "bg-green-500/20 border-green-500/50 text-green-400"
+              ? "border-red-500/30 text-red-200"
+              : "border-green-500/30 text-green-200"
           }`}
         >
-          {routine.mode === "heavy" ? <Flame size={14} /> : <Zap size={14} />}
+          {routine.mode === "heavy" ? (
+            <Flame
+              size={14}
+              className='text-red-400'
+            />
+          ) : (
+            <Zap
+              size={14}
+              className='text-green-400'
+            />
+          )}
           {routine.weight}
         </div>
       </div>
 
       {showProCta && (
-        <div className='mb-6 p-4 rounded-2xl border border-slate-800 bg-slate-900/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3'>
-          <div className='flex items-center gap-3'>
-            <div className='p-2 rounded-xl bg-amber-500/15 text-amber-300'>
-              <Crown size={18} />
+        <div className='mb-6 p-1 rounded-2xl bg-linear-to-r from-amber-500/20 via-orange-500/20 to-red-500/20'>
+          <div className='bg-slate-900/90 backdrop-blur-sm rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+            <div className='flex items-center gap-4'>
+              <div className='p-3 rounded-2xl bg-linear-to-br from-amber-500/20 to-orange-600/20 text-amber-400 shadow-inner border border-amber-500/10'>
+                <Crown size={24} />
+              </div>
+              <div>
+                <p className='text-base font-bold text-white mb-0.5'>Desbloquea el Modo Pro</p>
+                <p className='text-xs text-slate-400'>
+                  Accede a rutinas avanzadas, métricas detalladas y tu IA Coach.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className='text-sm font-semibold text-white'>Desbloquea Pro para mas IA</p>
-              <p className='text-xs text-slate-400'>Rutinas avanzadas y analisis completos.</p>
-            </div>
+            <button
+              onClick={() => {
+                if (onShowSubscription) {
+                  onShowSubscription();
+                } else {
+                  onRequireAuth?.();
+                }
+              }}
+              className='px-6 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-0.5'
+            >
+              Mejorar Plan
+            </button>
           </div>
-          <button
-            onClick={() => {
-              if (onShowSubscription) {
-                onShowSubscription();
-              } else {
-                onRequireAuth?.();
-              }
-            }}
-            className='px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors'
-          >
-            Pasar a Pro
-          </button>
         </div>
       )}
 
       {/* Warmup Section */}
       {routine.warmup && (
-        <div className='bg-slate-900/40 border border-slate-800 rounded-2xl p-4 mb-6 flex items-start gap-4'>
-          <div className='p-2 bg-blue-500/10 rounded-xl text-blue-400'>
+        <div className='bg-slate-900/40 border border-slate-800 rounded-2xl p-5 mb-8 flex items-start gap-4'>
+          <div className='p-2.5 bg-orange-500/10 rounded-xl text-orange-400 shrink-0 border border-orange-500/10'>
             <Flame size={20} />
           </div>
           <div>
-            <h3 className='text-sm font-bold text-slate-400 uppercase tracking-wider mb-1'>
+            <h3 className='text-sm font-bold text-slate-400 uppercase tracking-wider mb-2'>
               Calentamiento
             </h3>
-            <p className='text-slate-300 text-sm leading-relaxed'>{routine.warmup.text}</p>
+            <p className='text-slate-300 text-sm leading-7'>{routine.warmup.text}</p>
           </div>
         </div>
       )}
 
       {/* Exercise Blocks */}
-      <div className='space-y-4'>
+      <div className='space-y-6'>
         {routine.blocks && routine.blocks.length > 0 ? (
           routine.blocks.map((block, index) => (
             <div
               key={`${block.id}-${index}`}
-              className='bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden'
+              className='relative'
             >
-              <div className='bg-slate-800/50 px-4 py-3 flex justify-between items-center border-b border-slate-800'>
-                <span className='text-sm font-bold text-slate-400 tracking-wider'>
-                  BLOQUE {block.id} (SUPERSERIE)
+              {/* Block Header */}
+              <div className='flex items-center justify-between mb-3 px-1'>
+                <span className='text-xs font-bold text-blue-400/80 uppercase tracking-widest pl-2 border-l-2 border-blue-500/50'>
+                  BLOQUE {block.id} • SUPERSERIE
                 </span>
                 <button
                   onClick={() => onResetTimer(block.rest)}
-                  className='group flex items-center gap-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-blue-400 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border border-slate-700 hover:border-blue-500'
-                  aria-label={`Descansar ${block.rest} segundos`}
+                  className='group flex items-center gap-2 bg-slate-900/80 hover:bg-blue-600 hover:text-white text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors border border-slate-800 hover:border-blue-500 backdrop-blur-sm'
                 >
-                  <Clock size={14} />
-                  <span>DESCANSAR {block.rest}s</span>
+                  <Clock size={12} />
+                  <span>{block.rest}s DESCANSO</span>
                 </button>
               </div>
-              <div className='divide-y divide-slate-800'>
+
+              <div className='space-y-3'>
                 {block.exercises.map((ex, i) => {
                   const exerciseKey = `${dayKey}-${ex.name}`;
                   const isCompleted = completedExercises[exerciseKey];
                   const isExpanded = expandedExercise === ex.name;
 
+                  // Clean class construction
+                  const cardClasses = `relative overflow-hidden rounded-2xl border transition-all duration-300 ${
+                    isCompleted
+                      ? "bg-slate-950/40 border-slate-800/50 opacity-60 grayscale"
+                      : "bg-slate-900/60 border-white/5 shadow-lg hover:border-white/10 hover:bg-slate-800/80 hover:shadow-xl backdrop-blur-md"
+                  }`;
+
                   return (
                     <div
                       key={`${ex.name}-${i}`}
-                      className={`transition-colors duration-300 ${isCompleted ? "bg-slate-900/50 opacity-50" : "bg-transparent"}`}
+                      className={cardClasses}
                     >
-                      <div className='p-4'>
+                      {/* Active indicator strip */}
+                      {!isCompleted && (
+                        <div className='absolute left-0 top-0 bottom-0 w-1 bg-blue-500/50' />
+                      )}
+
+                      <div className='p-4 sm:p-5'>
                         <div className='flex items-center gap-4'>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onToggleComplete(dayKey, ex.name);
                             }}
-                            className={`shrink-0 transition-all duration-200 ${isCompleted ? "text-green-500 scale-110" : "text-slate-600 hover:text-slate-400"}`}
-                            aria-label={
-                              isCompleted
-                                ? `Marcar ${ex.name} como no completado`
-                                : `Marcar ${ex.name} como completado`
-                            }
+                            className={`shrink-0 transition-transform duration-200 active:scale-90 ${
+                              isCompleted ? "text-green-500" : "text-slate-600 hover:text-blue-500"
+                            }`}
                           >
                             {isCompleted ? (
                               <CheckCircle
-                                size={28}
-                                fill='rgba(34, 197, 94, 0.2)'
+                                size={32}
+                                className='fill-green-500/20'
                               />
                             ) : (
-                              <Circle size={28} />
+                              <Circle
+                                size={32}
+                                strokeWidth={1.5}
+                              />
                             )}
                           </button>
+
                           <div
                             className='flex-1 cursor-pointer'
                             onClick={() => setExpandedExercise(isExpanded ? null : ex.name)}
                           >
-                            <div className='flex justify-between items-start'>
+                            <div className='flex justify-between items-center'>
                               <div>
                                 <h3
-                                  className={`font-bold text-base ${isCompleted ? "text-slate-500 line-through" : "text-slate-200"}`}
+                                  className={`font-bold text-lg leading-tight mb-1 ${
+                                    isCompleted
+                                      ? "text-slate-500 line-through decoration-2 decoration-slate-700"
+                                      : "text-white"
+                                  }`}
                                 >
                                   {ex.name}
                                 </h3>
-                                <p className='text-sm text-blue-400 font-mono mt-0.5'>{ex.reps}</p>
+                                <div className='flex items-center gap-2'>
+                                  <span className='text-sm font-mono text-blue-400 bg-blue-900/20 px-1.5 rounded border border-blue-500/20'>
+                                    {ex.reps}
+                                  </span>
+                                </div>
                               </div>
                               <div
-                                className={`transform transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                                className={`w-8 h-8 flex items-center justify-center rounded-full bg-slate-800/50 text-slate-400 transition-all duration-300 ${
+                                  isExpanded
+                                    ? "rotate-180 bg-slate-700 text-white"
+                                    : "hover:bg-slate-800 hover:text-white"
+                                }`}
                               >
-                                <ChevronDown
-                                  size={20}
-                                  className='text-slate-600'
-                                />
+                                <ChevronDown size={18} />
                               </div>
                             </div>
                           </div>
                         </div>
+
+                        {/* Expandable Content */}
                         {isExpanded && (
-                          <div className='mt-4 pl-11 animate-in slide-in-from-top-2 duration-200'>
-                            <div className='w-full h-48 bg-slate-800 rounded-xl border border-slate-700 mb-3 overflow-hidden relative group flex items-center justify-center p-2'>
+                          <div className='mt-5 pt-5 border-t border-white/5 animate-in slide-in-from-top-2 duration-300'>
+                            <div className='w-full h-48 bg-slate-950/50 rounded-xl border border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4'>
                               {ex.svg_icon ? (
                                 <div
-                                  className='w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:text-white/80 [&>svg]:stroke-current'
+                                  className='w-full h-full flex items-center justify-center [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:text-white/90 [&>svg]:stroke-current [&>svg]:drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]'
                                   dangerouslySetInnerHTML={{ __html: ex.svg_icon }}
                                 />
                               ) : (
                                 <ExerciseIcon type={ex.svg} />
                               )}
-                              <div className='absolute inset-0 bg-linear-to-t from-slate-900/50 to-transparent pointer-events-none' />
+                              <div className='absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none' />
                             </div>
-                            <div className='flex items-start gap-3 bg-blue-900/20 border border-blue-900/30 p-3 rounded-lg mb-3'>
-                              <Info
-                                size={18}
-                                className='text-blue-400 shrink-0 mt-0.5'
-                              />
-                              <p className='text-sm text-slate-300 leading-relaxed'>{ex.note}</p>
-                            </div>
+
+                            {ex.note && (
+                              <div className='flex items-start gap-3 bg-blue-950/30 border border-blue-500/20 p-4 rounded-xl mb-4'>
+                                <Info
+                                  size={18}
+                                  className='text-blue-400 shrink-0 mt-0.5'
+                                />
+                                <p className='text-sm text-blue-100/80 leading-relaxed'>
+                                  {ex.note}
+                                </p>
+                              </div>
+                            )}
+
                             <ExerciseTracker
                               exerciseName={ex.name}
                               onSave={onSaveLog}
@@ -255,23 +350,26 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
             </div>
           ))
         ) : (
-          <div className='p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 border-dashed'>
-            <p className='text-slate-500'>No hay ejercicios en esta rutina.</p>
+          <div className='p-12 text-center bg-slate-900/20 rounded-3xl border border-slate-800 border-dashed'>
+            <div className='w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-4 text-slate-600'>
+              <Dumbbell size={32} />
+            </div>
+            <p className='text-slate-500 font-medium'>No hay ejercicios en esta rutina.</p>
           </div>
         )}
       </div>
 
       {/* Cooldown Section */}
       {routine.cooldown && (
-        <div className='bg-slate-900/40 border border-slate-800 rounded-2xl p-4 mt-8 flex items-start gap-4'>
-          <div className='p-2 bg-green-500/10 rounded-xl text-green-400'>
+        <div className='bg-slate-900/40 border border-slate-800 rounded-2xl p-5 mt-8 flex items-start gap-4'>
+          <div className='p-2.5 bg-green-500/10 rounded-xl text-green-400 shrink-0 border border-green-500/10'>
             <Shield size={20} />
           </div>
           <div>
-            <h3 className='text-sm font-bold text-slate-400 uppercase tracking-wider mb-1'>
+            <h3 className='text-sm font-bold text-slate-400 uppercase tracking-wider mb-2'>
               Vuelta a la Calma
             </h3>
-            <p className='text-slate-300 text-sm leading-relaxed'>{routine.cooldown.text}</p>
+            <p className='text-slate-300 text-sm leading-7'>{routine.cooldown.text}</p>
           </div>
         </div>
       )}

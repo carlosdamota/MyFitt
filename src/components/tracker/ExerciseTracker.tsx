@@ -150,7 +150,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   };
 
   return (
-    <div className='mt-4 bg-slate-800/50 p-3 rounded-xl border border-slate-700 shadow-xl'>
+    <div className='mt-4 bg-slate-900/40 backdrop-blur-md p-4 rounded-2xl border border-white/5 shadow-xl'>
       <div className='flex items-center justify-between mb-3'>
         <span className='text-xs text-slate-400 font-bold uppercase flex items-center gap-1.5'>
           <History
@@ -163,12 +163,12 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         {personalBests && (
           <div className='flex gap-2'>
             {personalBests.low && (
-              <span className='text-[10px] bg-red-900/30 text-red-300 px-2 py-0.5 rounded-lg border border-red-800/30'>
+              <span className='text-[10px] bg-red-500/10 text-red-300 px-2 py-0.5 rounded-lg border border-red-500/20'>
                 🏆 {personalBests.low.weight}kg
               </span>
             )}
             {personalBests.mid && (
-              <span className='text-[10px] bg-blue-900/30 text-blue-300 px-2 py-0.5 rounded-lg border border-blue-800/30'>
+              <span className='text-[10px] bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded-lg border border-blue-500/20'>
                 🏅 {personalBests.mid.weight}kg
               </span>
             )}
@@ -182,7 +182,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       />
 
       {newRecordAlert && (
-        <div className='mb-3 bg-yellow-500/10 border border-yellow-500/30 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-lg shadow-yellow-900/10'>
+        <div className='mb-3 bg-yellow-500/10 border border-yellow-500/20 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-lg shadow-yellow-900/10'>
           <Trophy
             size={16}
             className='text-yellow-400 animate-bounce'
@@ -206,9 +206,9 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         isSaving={isSaving}
       />
 
-      <div className='mt-4 p-3 bg-slate-900/40 rounded-xl border border-slate-700/50'>
+      <div className='mt-4 p-3 bg-white/5 rounded-xl border border-white/5'>
         <div className='flex items-center justify-between mb-3'>
-          <span className='text-[10px] text-slate-500 font-bold uppercase'>Descanso</span>
+          <span className='text-[10px] text-slate-400 font-bold uppercase'>Descanso</span>
           <span className='text-[10px] text-blue-400 font-bold'>
             Sug: {getSuggestedRestTime()}s
           </span>
@@ -218,7 +218,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
             <button
               key={s}
               onClick={() => onTimerReset(s)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${s === getSuggestedRestTime() ? "bg-blue-600 border-blue-500 text-white" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700"}`}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${s === getSuggestedRestTime() ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/40" : "bg-transparent border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}`}
             >
               {s}s
             </button>
