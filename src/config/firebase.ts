@@ -59,6 +59,10 @@ if (firebaseConfig) {
 
   const appCheckKey = import.meta.env.VITE_FIREBASE_APPCHECK_KEY as string | undefined;
   if (appCheckKey) {
+    if (import.meta.env.DEV) {
+      // @ts-ignore
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    }
     initializeAppCheck(app, {
       provider: new ReCaptchaV3Provider(appCheckKey),
       isTokenAutoRefreshEnabled: true,
