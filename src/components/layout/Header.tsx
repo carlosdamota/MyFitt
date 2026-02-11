@@ -138,11 +138,13 @@ const Header: React.FC<HeaderProps> = ({
                 <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
                 <img
                   src='/favicon.svg'
-                  alt='FitForge Logo'
+                  alt='FITTWIZ Logo'
                   className='w-5 h-5 md:w-6 md:h-6'
                 />
-                <span className='text-white hidden sm:inline'>FitForge</span>
-                <span className='text-white sm:hidden'>FM</span>
+                <span className='text-white hidden sm:inline font-black italic tracking-tighter text-xl'>
+                  FITTWIZ
+                </span>
+                <span className='text-white sm:hidden font-black italic tracking-tighter'>FW</span>
               </Link>
               {streak > 0 && (
                 <div className='flex items-center gap-1 mt-1'>
@@ -262,10 +264,10 @@ const Header: React.FC<HeaderProps> = ({
           <div className='flex items-center gap-2'>
             <img
               src='/favicon.svg'
-              alt='FitForge Logo'
+              alt='FITTWIZ Logo'
               className='w-6 h-6'
             />
-            <span className='text-lg font-bold text-white'>FitForge</span>
+            <span className='text-lg font-black italic tracking-tighter text-white'>FITTWIZ</span>
           </div>
           <button
             onClick={() => setMobileOpen(false)}

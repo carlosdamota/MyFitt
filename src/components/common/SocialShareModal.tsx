@@ -64,7 +64,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
         if (navigator.share && navigator.canShare({ files: [file] })) {
           await navigator.share({
-            title: "Mi Entrenamiento en FitForge",
+            title: "Mi Entrenamiento en FITTWIZ",
             text: `He completado un entrenamiento de ${totalExercises} ejercicios con ${totalVolume}kg de volumen!`,
             files: [file],
           });

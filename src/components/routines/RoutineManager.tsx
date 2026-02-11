@@ -195,7 +195,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
               {groupedRoutines.defaults.length > 0 && (
                 <div className='space-y-4'>
                   <h3 className='flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1'>
-                    <Zap size={14} /> Rutinas FitForge
+                    <Zap size={14} /> Rutinas FITTWIZ
                   </h3>
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                     {groupedRoutines.defaults.map(([programId, group]) => (

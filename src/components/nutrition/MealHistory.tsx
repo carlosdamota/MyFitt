@@ -85,7 +85,7 @@ const MealHistory: React.FC<MealHistoryProps> = ({
         <div className='bg-slate-900/30 rounded-2xl border border-dashed border-slate-800 py-10 flex flex-col items-center justify-center gap-2'>
           <p className='text-slate-600 text-sm font-medium italic'>Nada registrado para este día</p>
           <p className='text-[10px] text-slate-700 uppercase font-bold tracking-tighter'>
-            FitForge Nutrición
+            FITTWIZ Nutrición
           </p>
         </div>
       ) : (

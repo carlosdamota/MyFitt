@@ -1,4 +1,4 @@
-// Shared types for the FitForge application
+// Shared types for the FITTWIZ application
 import type { User } from "firebase/auth";
 
 // Re-export Firebase User type for convenience

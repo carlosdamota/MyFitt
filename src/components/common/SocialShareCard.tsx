@@ -305,13 +305,13 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               className='text-3xl font-black italic uppercase tracking-tighter'
               style={{ color: "#ffffff" }}
             >
-              FITFORGE
+              FITTWIZ
             </h3>
             <p
               className='text-lg font-medium'
               style={{ color: "#52525b" }}
             >
-              get.fitforge.app
+              fittwiz.app
             </p>
           </div>
         </div>

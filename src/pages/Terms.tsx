@@ -31,7 +31,7 @@ const Terms = () => {
             <div>
               <h3 className='text-yellow-500 font-bold mb-1'>Descargo de Responsabilidad Médico</h3>
               <p className='text-sm text-yellow-200/80'>
-                FitForge no es un sustituto del consejo médico profesional. Consulta siempre con un
+                FITTWIZ no es un sustituto del consejo médico profesional. Consulta siempre con un
                 médico antes de comenzar cualquier programa de ejercicios o nutrición. El uso de
                 esta aplicación es bajo tu propio riesgo.
               </p>
@@ -41,7 +41,7 @@ const Terms = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>1. Aceptación de los Términos</h2>
             <p>
-              Al acceder y utilizar FitForge, aceptas estar sujeto a estos Términos de Uso. Si no
+              Al acceder y utilizar FITTWIZ, aceptas estar sujeto a estos Términos de Uso. Si no
               estás de acuerdo con alguna parte de los términos, no podrás acceder al servicio.
             </p>
           </section>
@@ -49,9 +49,9 @@ const Terms = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>2. Uso del Servicio</h2>
             <p>
-              FitForge es una herramienta personal para el seguimiento de entrenamientos. Te
-              comprometes a usar el servicio solo para fines legales y de acuerdo con estos
-              términos.
+              FITTWIZ es una herramienta personal desarrollada de forma independiente para el
+              seguimiento de entrenamientos. Te comprometes a usar el servicio solo para fines
+              legales y de acuerdo con estos términos.
             </p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>No debes usar el servicio para ninguna actividad ilegal o no autorizada.</li>
@@ -64,7 +64,7 @@ const Terms = () => {
             <h2 className='text-xl font-bold text-white mb-4'>3. Propiedad Intelectual</h2>
             <p>
               El servicio y su contenido original, características y funcionalidad son y seguirán
-              siendo propiedad exclusiva de FitForge y sus licenciantes.
+              siendo propiedad exclusiva del desarrollador de FITTWIZ y sus licenciantes.
             </p>
           </section>
 
@@ -72,28 +72,27 @@ const Terms = () => {
             <h2 className='text-xl font-bold text-white mb-4'>4. Cuentas de Usuario</h2>
             <p>
               Al crear una cuenta con nosotros, garantizas que la información que proporcionas es
-              precisa, completa y actual. Nos reservamos el derecho de terminar cuentas que violen
-              estos términos.
+              precisa, completa y actual. El desarrollador se reserva el derecho de terminar cuentas
+              que violen estos términos.
             </p>
           </section>
 
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>5. Limitación de Responsabilidad</h2>
             <p>
-              En ningún caso FitForge, ni sus directores, empleados, socios, agentes, proveedores o
-              afiliados, serán responsables por daños indirectos, incidentales, especiales,
-              consecuentes o punitivos, incluyendo sin limitación, pérdida de beneficios, datos,
-              uso, buena voluntad, u otras pérdidas intangibles, resultantes de tu acceso o uso o
-              incapacidad de acceder o usar el servicio.
+              En ningún caso el desarrollador de FITTWIZ será responsable por daños indirectos,
+              incidentales, especiales, consecuentes o punitivos, incluyendo sin limitación, pérdida
+              de beneficios, datos, uso, buena voluntad, u otras pérdidas intangibles, resultantes
+              de tu acceso o uso o incapacidad de acceder o usar el servicio.
             </p>
           </section>
 
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>6. Cambios</h2>
             <p>
-              Nos reservamos el derecho, a nuestra sola discreción, de modificar o reemplazar estos
-              Términos en cualquier momento. Intentaremos proporcionar un aviso de al menos 30 días
-              antes de que cualquier término nuevo entre en vigor.
+              El desarrollador se reserva el derecho, a su sola discreción, de modificar o
+              reemplazar estos Términos en cualquier momento. Intentaremos proporcionar un aviso de
+              al menos 30 días antes de que cualquier término nuevo entre en vigor.
             </p>
           </section>
 

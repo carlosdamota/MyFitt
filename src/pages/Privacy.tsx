@@ -26,9 +26,8 @@ const Privacy = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>1. Introducción</h2>
             <p>
-              En FitForge, nos tomamos muy en serio tu privacidad. Esta política describe cómo
-              recopilamos, usamos y protegemos tu información personal cuando utilizas nuestra
-              aplicación.
+              En FITTWIZ, la privacidad es una prioridad. Esta política describe cómo se recopila,
+              usa y protege tu información personal cuando utilizas la aplicación.
             </p>
           </section>
 
@@ -57,7 +56,7 @@ const Privacy = () => {
 
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>3. Cómo Usamos tu Información</h2>
-            <p>Utilizamos tus datos exclusivamente para:</p>
+            <p>Se utilizan tus datos exclusivamente para:</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>
                 Proporcionarte las funcionalidades de la aplicación (guardar tus rutinas, mostrar tu
@@ -71,7 +70,7 @@ const Privacy = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>4. Almacenamiento y Seguridad</h2>
             <p>
-              Tus datos se almacenan de forma segura en Google Firebase (Firestore). Implementamos
+              Tus datos se almacenan de forma segura en Google Firebase (Firestore). Se implementan
               reglas de seguridad estrictas para asegurar que solo tú puedas acceder y modificar tus
               datos personales.
             </p>
@@ -80,8 +79,8 @@ const Privacy = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>5. Compartir Datos</h2>
             <p>
-              No vendemos ni compartimos tu información personal con terceros. Los datos enviados a
-              la API de Gemini para generar rutinas son anónimos y no se utilizan para entrenar sus
+              No se vende ni comparte tu información personal con terceros. Los datos enviados a la
+              API de Gemini para generar rutinas son anónimos y no se utilizan para entrenar sus
               modelos.
             </p>
           </section>

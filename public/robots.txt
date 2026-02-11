@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /app/
-Sitemap: https://fitforge.app/sitemap.xml
+Sitemap: https://fittwiz.app/sitemap.xml

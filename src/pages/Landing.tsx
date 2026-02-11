@@ -61,7 +61,7 @@ const Landing: React.FC = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "FitForge",
+    name: "FITTWIZ",
     applicationCategory: "HealthApplication",
     operatingSystem: "Web",
     offers: {
@@ -76,12 +76,12 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-[var(--bg-0)] text-white font-sans selection:bg-cyan-500/30'>
+    <div className='min-h-screen bg-(--bg-0) text-white font-sans selection:bg-cyan-500/30'>
       <Helmet>
-        <title>FitForge - Tu Entrenador Personal con IA</title>
+        <title>FITTWIZ - Tu Entrenador Personal con IA</title>
         <meta
           name='description'
-          content='Genera rutinas de gimnasio personalizadas con IA. FitForge adapta tu entrenamiento, controla tu volumen y te guía paso a paso para maximizar tus resultados. Empieza gratis.'
+          content='Genera rutinas de gimnasio personalizadas con IA. FITTWIZ adapta tu entrenamiento, controla tu volumen y te guía paso a paso para maximizar tus resultados. Empieza gratis.'
         />
         <meta
           name='keywords'
@@ -95,11 +95,11 @@ const Landing: React.FC = () => {
         />
         <meta
           property='og:url'
-          content='https://fitforge.app/'
+          content='https://fittwiz.app/'
         />
         <meta
           property='og:title'
-          content='FitForge - Tu Entrenador Personal con IA'
+          content='FITTWIZ - Tu Entrenador Personal con IA'
         />
         <meta
           property='og:description'
@@ -107,7 +107,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='og:image'
-          content='https://fitforge.app/og-image.jpg'
+          content='https://fittwiz.app/og-image.jpg'
         />
 
         {/* Twitter */}
@@ -117,11 +117,11 @@ const Landing: React.FC = () => {
         />
         <meta
           property='twitter:url'
-          content='https://fitforge.app/'
+          content='https://fittwiz.app/'
         />
         <meta
           property='twitter:title'
-          content='FitForge - Tu Entrenador Personal con IA'
+          content='FITTWIZ - Tu Entrenador Personal con IA'
         />
         <meta
           property='twitter:description'
@@ -129,7 +129,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='twitter:image'
-          content='https://fitforge.app/og-image.jpg'
+          content='https://fittwiz.app/og-image.jpg'
         />
 
         <script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
@@ -153,7 +153,7 @@ const Landing: React.FC = () => {
       >
         <div className='absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-cyan-500/15 blur-[120px]' />
         <div className='absolute bottom-[-25%] right-[-10%] w-[55%] h-[55%] rounded-full bg-amber-500/15 blur-[140px]' />
-        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(30,41,59,0.6),_transparent_55%)]' />
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(30,41,59,0.6),transparent_55%)]' />
       </div>
 
       <main className='relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-20'>
@@ -178,7 +178,7 @@ const Landing: React.FC = () => {
             </h1>
 
             <p className='text-lg text-slate-300 max-w-xl leading-relaxed'>
-              FitForge transforma tus datos en sesiones claras: volumen, descanso, nutrición y
+              FITTWIZ transforma tus datos en sesiones claras: volumen, descanso, nutrición y
               progresión guiada. Tu tablero diario te dice qué hacer y por qué funciona.
             </p>
 
@@ -508,7 +508,7 @@ const Landing: React.FC = () => {
             Listo para entrenar en serio
           </h2>
           <p className='text-slate-300 max-w-2xl mx-auto mb-6'>
-            Abre FitForge, crea tu plan y empieza hoy. Menos dudas, más acción.
+            Abre FITTWIZ, crea tu plan y empieza hoy. Menos dudas, más acción.
           </p>
           <button
             onClick={onLogin}
@@ -521,7 +521,7 @@ const Landing: React.FC = () => {
       </main>
 
       <footer className='border-t border-slate-900 py-8 text-center text-slate-600 text-sm'>
-        <p>&copy; {new Date().getFullYear()} FitForge. Todos los derechos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} FITTWIZ. Todos los derechos reservados.</p>
         <div className='mt-2 flex justify-center gap-4'>
           <a
             href='/privacy'

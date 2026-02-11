@@ -33,7 +33,8 @@ const Legal = () => {
             </h2>
             <div className='bg-slate-900 p-6 rounded-xl border border-slate-800 space-y-3'>
               <p>
-                <span className='text-slate-500 w-32 inline-block'>Nombre:</span> FitForge App
+                <span className='text-slate-500 w-32 inline-block'>Titular:</span> Carlos D.
+                (Desarrollador Independiente)
               </p>
               <p>
                 <span className='text-slate-500 w-32 inline-block'>Contacto:</span>{" "}
@@ -49,7 +50,7 @@ const Legal = () => {
           <section>
             <h2 className='text-xl font-bold text-white mb-4'>1. Objeto</h2>
             <p>
-              El presente aviso legal regula el uso del sitio web y aplicación FitForge, que pone a
+              El presente aviso legal regula el uso del sitio web y aplicación FITTWIZ, que pone a
               disposición de los usuarios de Internet.
             </p>
           </section>
@@ -61,8 +62,9 @@ const Legal = () => {
             <p>
               Todos los derechos de propiedad industrial e intelectual de la totalidad de elementos
               contenidos en esta Web, incluidas las marcas comerciales, formatos, diseños gráficos,
-              textos, imágenes y documentos, pertenecen a FitForge y se encuentran protegidos por
-              las leyes españolas e internacionales sobre propiedad Intelectual e Industrial.
+              textos, imágenes y documentos, pertenecen al titular de FITTWIZ y se encuentran
+              protegidos por las leyes españolas e internacionales sobre propiedad Intelectual e
+              Industrial.
             </p>
           </section>
 

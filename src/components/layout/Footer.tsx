@@ -9,9 +9,11 @@ const Footer: React.FC = () => {
         <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
           {/* Brand & Copyright */}
           <div className='text-center md:text-left'>
-            <h3 className='text-lg font-bold text-white mb-1'>FitForge</h3>
+            <h3 className='text-lg font-black italic uppercase tracking-tighter text-white mb-1'>
+              FITTWIZ
+            </h3>
             <p className='text-xs text-slate-500'>
-              &copy; {new Date().getFullYear()} FitForge. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} FITTWIZ. Todos los derechos reservados.
             </p>
           </div>
 
@@ -41,7 +43,7 @@ const Footer: React.FC = () => {
         {/* Disclaimer */}
         <div className='mt-8 pt-6 border-t border-slate-900 text-center'>
           <p className='text-[10px] text-slate-600 max-w-2xl mx-auto leading-relaxed'>
-            FitForge es una herramienta de seguimiento de fitness. No ofrecemos consejo médico.
+            FITTWIZ es una herramienta de seguimiento de fitness. No ofrecemos consejo médico.
             Consulta siempre a un profesional de la salud antes de comenzar cualquier programa de
             ejercicios. Desarrollado con{" "}
             <Heart
