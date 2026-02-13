@@ -1,5 +1,5 @@
-import React, { ChangeEvent } from "react";
-import { Save } from "lucide-react";
+import React, { ChangeEvent, useState, useRef, useEffect } from "react";
+import { Save, Info } from "lucide-react";
 
 interface SetEntryFormProps {
   weight: string;
@@ -13,6 +13,49 @@ interface SetEntryFormProps {
   onSave: () => Promise<void>;
   isSaving: boolean;
 }
+
+const InfoTooltip: React.FC<{ text: string }> = ({ text }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
+        setIsVisible(false);
+      }
+    };
+    if (isVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isVisible]);
+
+  return (
+    <div
+      className='relative inline-block ml-1.5 align-middle'
+      ref={tooltipRef}
+    >
+      <button
+        type='button'
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsVisible(!isVisible);
+        }}
+        className='text-slate-500 hover:text-blue-400 transition-colors focus:outline-none'
+      >
+        <Info size={12} />
+      </button>
+      {isVisible && (
+        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 text-xs text-slate-300 pointer-events-none animate-in fade-in zoom-in-95 duration-200'>
+          {text}
+          <div className='absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95' />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SetEntryForm: React.FC<SetEntryFormProps> = ({
   weight,
@@ -30,7 +73,10 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
     <div className='space-y-3'>
       <div className='grid grid-cols-4 gap-2 mb-3'>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>PESO</label>
+          <label className='flex items-center text-[10px] text-slate-400 mb-1 font-bold'>
+            PESO
+            <InfoTooltip text='Kilos levantados en la serie. Usa 0 si es solo peso corporal.' />
+          </label>
           <input
             type='number'
             value={weight}
@@ -40,7 +86,10 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>REPS</label>
+          <label className='flex items-center text-[10px] text-slate-400 mb-1 font-bold'>
+            REPS
+            <InfoTooltip text='Repeticiones completas realizadas con buena técnica.' />
+          </label>
           <input
             type='number'
             value={reps}
@@ -50,7 +99,10 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>SETS</label>
+          <label className='flex items-center text-[10px] text-slate-400 mb-1 font-bold'>
+            SETS
+            <InfoTooltip text='Series efectivas realizadas con este peso y repeticiones.' />
+          </label>
           <input
             type='number'
             value={sets}
@@ -59,7 +111,10 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           />
         </div>
         <div className='col-span-1'>
-          <label className='block text-[10px] text-slate-400 mb-1 font-bold'>RPE</label>
+          <label className='flex items-center text-[10px] text-slate-400 mb-1 font-bold'>
+            RPE
+            <InfoTooltip text='Esfuerzo (1-10). 10 es fallo muscular, 8 es dejar 2 en reserva.' />
+          </label>
           <input
             type='number'
             value={rpe}
