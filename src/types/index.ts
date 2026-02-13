@@ -15,6 +15,7 @@ export interface Exercise {
   svg?: string;
   svg_icon?: string;
   muscleGroup?: string;
+  instructions?: string[];
 }
 
 export interface RoutineBlock {

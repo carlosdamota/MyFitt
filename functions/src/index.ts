@@ -297,17 +297,50 @@ const buildFallbackProgram = (totalDays: number) => {
       {
         id: 1,
         rest: 60,
-        exercises: [{ name: "Sentadillas", reps: "10-12" }],
+        exercises: [
+          {
+            name: "Sentadillas",
+            reps: "10-12",
+            instructions: [
+              "Coloca los pies a la anchura de los hombros.",
+              "Baja la cadera hacia atrás y abajo, manteniendo la espalda recta.",
+              "Desciende hasta que los muslos estén paralelos al suelo.",
+              "Sube empujando con los talones y contrae glúteos al final.",
+            ],
+          },
+        ],
       },
       {
         id: 2,
         rest: 60,
-        exercises: [{ name: "Flexiones", reps: "10-12" }],
+        exercises: [
+          {
+            name: "Flexiones",
+            reps: "10-12",
+            instructions: [
+              "Colócate en plancha, manos bajo los hombros.",
+              "Baja el pecho hasta casi tocar el suelo, codos cerca del cuerpo.",
+              "Mantén el cuerpo en línea recta desde la cabeza a los talones.",
+              "Empuja el suelo para volver a la posición inicial.",
+            ],
+          },
+        ],
       },
       {
         id: 3,
         rest: 45,
-        exercises: [{ name: "Plancha", reps: "30-45s" }],
+        exercises: [
+          {
+            name: "Plancha",
+            reps: "30-45s",
+            instructions: [
+              "Apoya los antebrazos y los pies en el suelo.",
+              "Mantén el cuerpo recto como una tabla, desde la cabeza a los talones.",
+              "Contrae fuertemente abdomen y glúteos para evitar que la cadera caiga.",
+              "Respira de forma constante sin perder la tensión.",
+            ],
+          },
+        ],
       },
     ],
   }));
@@ -415,7 +448,8 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
                "name": "Nombre Ejercicio",
                "reps": "10-12",
                "note": "Nota opcional",
-               "svg": "pullup" | "floor_press" | "pushup_feet_elevated" | "one_arm_row" | "plank" | "deadbug" | "glute_bridge" | "side_squat" | "goblet_squat" | "rdl" | "calf_raise_bilateral" | "face_pull" | "bicep_curl" | "tricep_extension" | "shoulder_press" | "leg_raise" | "dumbbell" | "barbell" | "bodyweight"
+               "svg": "pullup" | "floor_press" | "pushup_feet_elevated" | "one_arm_row" | "plank" | "deadbug" | "glute_bridge" | "side_squat" | "goblet_squat" | "rdl" | "calf_raise_bilateral" | "face_pull" | "bicep_curl" | "tricep_extension" | "shoulder_press" | "leg_raise" | "dumbbell" | "barbell" | "bodyweight",
+               "instructions": ["Paso 1", "Paso 2", "Paso 3"]
               }
           ]
         }
@@ -427,7 +461,8 @@ Reglas importantes:
 1. Debes generar EXACTAMENTE ${totalDays} dias.
 2. Distribuye los grupos musculares logicamente durante la semana.
 3. Cada dia debe tener al menos 3 bloques de ejercicios.
-4. Elige el valor "svg" mas apropiado segun el ejercicio:
+4. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
+5. Elige el valor "svg" mas apropiado segun el ejercicio:
    - pullup: dominadas, chin-ups
    - floor_press: press de pecho, press de suelo
    - pushup_feet_elevated: flexiones, push-ups
@@ -446,23 +481,25 @@ Reglas importantes:
    - dumbbell: ejercicios generales con mancuernas
    - barbell: ejercicios generales con barra
    - bodyweight: ejercicios de peso corporal generales
-5. No incluyas campos adicionales ni texto fuera del JSON.`;
+6. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,
       };
     }
-    case "exercise_variants": {
+    case "exercise_instructions": {
       const exerciseName = String(payload.exerciseName ?? "");
-      const system = `Eres un experto en biomecanica. Tu tarea es sugerir variantes de ejercicios.
-Devuelve SOLO texto plano con 3 variantes para el ejercicio dado, explicando brevemente el beneficio de cada una.
-Formato:
-1. Variante A: Beneficio
-2. Variante B: Beneficio
-3. Variante C: Beneficio`;
+      const system = `Eres un experto entrenador personal. Tu tarea es explicar como realizar un ejercicio.
+Devuelve SOLO un array JSON de strings con los pasos. Sin markdown.
+Ejemplo: ["Paso 1...", "Paso 2...", "Paso 3..."]
+Instrucciones para: ${exerciseName}
+Reglas:
+1. Maximo 4 pasos.
+2. Se conciso y directo.
+3. Enfocate en la tecnica correcta.`;
       return {
         system,
-        user: `Sugiere 3 variantes para: ${exerciseName}`,
+        user: `Dame las instrucciones paso a paso para: ${exerciseName}`,
       };
     }
     case "exercise_analysis": {

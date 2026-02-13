@@ -139,7 +139,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             disabled={processing === "checkout"}
             className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60 relative overflow-hidden group'
           >
-            <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000' />
+            <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000' />
             <CreditCard size={16} /> Desbloquear Oferta Pro (2.99€)
           </button>
         )}

@@ -49,6 +49,7 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor / Bar */}
           <path
             d='M10 20 H90'
             strokeLinecap='round'
@@ -58,18 +59,51 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
             d='M25 20 V40 M75 20 V40'
             strokeLinecap='round'
           />
+          {/* Head */}
           <circle
             cx='50'
             cy='35'
-            r='8'
+            r='6'
+          />
+          {/* Torso */}
+          <path
+            d='M50 41 V65'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Shoulders */}
+          <path
+            d='M35 45 H65'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arms (bent at elbows) */}
+          <path
+            d='M35 45 L30 30 L25 40'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
           <path
-            d='M50 43 V65 M50 65 L35 85 M50 65 L65 85'
+            d='M65 45 L70 30 L75 40'
             strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Hips */}
+          <path
+            d='M40 65 H60'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Legs */}
+          <path
+            d='M42 65 L45 80 L50 90'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
           <path
-            d='M25 40 L50 45 L75 40'
+            d='M58 65 L55 80 L50 90'
             strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );
@@ -82,30 +116,62 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor */}
           <path
             d='M10 85 H90'
             strokeLinecap='round'
             opacity={floorOpacity}
           />
+          {/* Bench/Body lying */}
           <path
-            d='M30 85 L40 70 L70 70'
+            d='M30 85 L70 85'
+            strokeWidth='4'
             strokeLinecap='round'
           />
+          {/* Legs bent */}
+          <path
+            d='M30 85 L20 70 L30 85'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Left leg hidden/abstract */}
+          <path
+            d='M30 85 L25 70 L35 85'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Head */}
           <circle
             cx='75'
-            cy='62'
-            r='7'
+            cy='82'
+            r='5'
           />
+          {/* Arms pushing up */}
           <path
-            d='M70 70 L85 55'
+            d='M65 82 L70 65'
             strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Barbell */}
+          <path
+            d='M60 65 L80 65'
+            strokeLinecap='round'
+            strokeWidth='4'
           />
           <rect
-            x='80'
-            y='45'
-            width='12'
+            x='58'
+            y='62'
+            width='4'
             height='6'
-            rx='2'
+            rx='1'
+            fill='currentColor'
+          />
+          <rect
+            x='78'
+            y='62'
+            width='4'
+            height='6'
+            rx='1'
             fill='currentColor'
           />
         </svg>
@@ -119,8 +185,9 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Bench/Box */}
           <rect
-            x='15'
+            x='10'
             y='65'
             width='20'
             height='20'
@@ -128,19 +195,34 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
             opacity={floorOpacity}
             fill='currentColor'
           />
-          <path
-            d='M35 65 L80 85'
-            strokeWidth='5'
-            strokeLinecap='round'
-          />
+          {/* Head */}
           <circle
             cx='85'
-            cy='75'
-            r='7'
+            cy='72'
+            r='5'
+          />
+          {/* Torso */}
+          <path
+            d='M80 75 L55 65'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Legs (Elevated) */}
+          <path
+            d='M55 65 L40 60 L20 65'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arms (Pushing) */}
+          <path
+            d='M75 73 L75 85 L80 95'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
           <path
-            d='M80 85 L90 95'
+            d='M80 73 L85 85 L90 95'
             strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );
@@ -153,29 +235,65 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Bench */}
           <path
             d='M20 75 H50 V55 H20 Z'
             opacity={floorOpacity}
             fill='currentColor'
           />
+          {/* Torso (Bent over) */}
+          <path
+            d='M70 45 L50 45'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Head */}
           <circle
-            cx='60'
-            cy='35'
-            r='8'
+            cx='75'
+            cy='45'
+            r='5'
           />
+          {/* Legs (Stance) */}
           <path
-            d='M60 43 L55 65 L45 75'
+            d='M50 45 L45 60 L45 75'
             strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Knee on bench */}
+          <path
+            d='M50 45 L60 60 L60 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Standing leg */}
+          {/* Arm (Rowing) */}
+          <path
+            d='M65 48 L60 65 L60 70'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
-          <path
-            d='M55 65 L75 60'
-            strokeLinecap='round'
+          {/* Dumbbell */}
+          <rect
+            x='55'
+            y='70'
+            width='10'
+            height='6'
+            rx='2'
+            fill='currentColor'
+          />
+          <line
+            x1='60'
+            y1='70'
+            x2='60'
+            y2='80'
+            stroke='currentColor'
+            strokeWidth='2'
           />
           <rect
-            x='75'
-            y='55'
-            width='8'
-            height='15'
+            x='55'
+            y='80'
+            width='10'
+            height='6'
             rx='2'
             fill='currentColor'
           />
@@ -190,24 +308,35 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor */}
           <path
             d='M10 85 H90'
             strokeLinecap='round'
             opacity={floorOpacity}
           />
-          <path
-            d='M30 80 L75 80'
-            strokeWidth='8'
-            strokeLinecap='round'
-          />
+          {/* Head */}
           <circle
             cx='85'
-            cy='72'
-            r='7'
+            cy='68'
+            r='5'
           />
+          {/* Body (Straight line) */}
           <path
-            d='M25 80 L20 65'
+            d='M80 70 L30 75'
+            strokeWidth='4'
             strokeLinecap='round'
+          />
+          {/* Arms (Support) */}
+          <path
+            d='M80 70 L80 85 L90 85'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Legs */}
+          <path
+            d='M30 75 L25 85'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );
@@ -220,29 +349,50 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor */}
           <path
             d='M20 80 H80'
             opacity={floorOpacity}
             strokeLinecap='round'
           />
+          {/* Head */}
+          <circle
+            cx='50'
+            cy='75'
+            r='5'
+          />
+          {/* Torso (Lying) */}
           <path
-            d='M30 75 L70 75'
+            d='M45 78 L55 78'
             strokeWidth='6'
             strokeLinecap='round'
           />
-          <circle
-            cx='50'
-            cy='65'
-            r='7'
-          />
+          {/* Arms (Reaching up/back) */}
           <path
-            d='M40 75 L30 50 M60 75 L70 50'
+            d='M53 78 L55 60 L60 50'
             strokeLinecap='round'
-          />
+            strokeWidth='3'
+          />{" "}
+          {/* Right arm */}
           <path
-            d='M45 65 L35 85 M55 65 L65 40'
+            d='M53 78 L45 60 L35 50'
             strokeLinecap='round'
-          />
+            strokeWidth='3'
+          />{" "}
+          {/* Left arm */}
+          {/* Legs (Table top / Extended) */}
+          <path
+            d='M47 78 L45 60 L55 50'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Right leg */}
+          <path
+            d='M47 78 L45 60 L35 60'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Left leg */}
         </svg>
       );
     case "glute_bridge":
@@ -254,21 +404,42 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor */}
           <path
             d='M10 85 H90'
             opacity={floorOpacity}
             strokeLinecap='round'
           />
-          <path
-            d='M30 85 L50 60 L80 85'
-            strokeWidth='5'
-            strokeLinecap='round'
-          />
+          {/* Head */}
           <circle
             cx='85'
-            cy='75'
-            r='7'
+            cy='80'
+            r='5'
           />
+          {/* Shoulders */}
+          <path
+            d='M80 82 L70 85'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Torso/Hips (Bridged) */}
+          <path
+            d='M70 85 L50 65'
+            strokeWidth='4'
+            strokeLinecap='round'
+          />
+          {/* Legs */}
+          <path
+            d='M50 65 L30 85'
+            strokeWidth='3'
+            strokeLinecap='round'
+          />
+          <path
+            d='M30 85 L35 85'
+            strokeWidth='3'
+            strokeLinecap='round'
+          />{" "}
+          {/* Feet */}
         </svg>
       );
     case "side_squat":
@@ -280,19 +451,41 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
             cx='50'
             cy='25'
-            r='8'
+            r='5'
           />
+          {/* Torso */}
           <path
-            d='M50 33 V55 L20 85 M50 55 L80 65'
+            d='M50 30 V55'
             strokeLinecap='round'
             strokeWidth='4'
           />
+          {/* Legs (Side lunge) */}
           <path
-            d='M35 45 L65 45'
+            d='M50 55 L30 70 L25 90'
             strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Bent leg */}
+          <path
+            d='M50 55 L70 65 L85 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Straight leg */}
+          {/* Arms */}
+          <path
+            d='M50 35 L40 50'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 35 L60 50'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );
@@ -305,20 +498,44 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
             cx='50'
             cy='25'
-            r='8'
+            r='6'
           />
+          {/* Torso - slightly forward lean */}
           <path
-            d='M50 33 L50 60 M30 85 L50 70 L70 85'
+            d='M50 31 L45 55'
             strokeLinecap='round'
-            strokeWidth='6'
+            strokeWidth='4'
           />
-          <circle
-            cx='50'
-            cy='50'
-            r='7'
+          {/* Legs - Squat position */}
+          <path
+            d='M45 55 L25 65 L25 85'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Back leg */}
+          <path
+            d='M45 55 L65 65 L65 85'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Front leg */}
+          {/* Arms holding weight */}
+          <path
+            d='M48 35 L55 45 L48 40'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Weight */}
+          <rect
+            x='45'
+            y='38'
+            width='8'
+            height='10'
+            rx='2'
             fill='currentColor'
           />
           <path
@@ -338,36 +555,58 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
-          <path
-            d='M30 35 L50 55 L70 35'
-            strokeLinecap='round'
-            strokeWidth='4'
-          />
-          <path
-            d='M50 55 V85 M35 95 L50 85 L65 95'
-            strokeLinecap='round'
-          />
-          <path
-            d='M25 40 H75'
-            strokeWidth='2'
-            opacity='0.5'
-          />
-          <circle
-            cx='20'
-            cy='40'
-            r='4'
-            fill='currentColor'
-          />
-          <circle
-            cx='80'
-            cy='40'
-            r='4'
-            fill='currentColor'
-          />
+          {/* Floor */}
           <path
             d='M10 98 H90'
             opacity={floorOpacity}
             strokeLinecap='round'
+          />
+          {/* Head */}
+          <circle
+            cx='80'
+            cy='35'
+            r='5'
+          />
+          {/* Torso (Hinging) */}
+          <path
+            d='M80 40 L50 60'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Legs (Slight knee bend) */}
+          <path
+            d='M50 60 L45 80 L35 95'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 60 L55 80 L65 95'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arms (Holding bar) */}
+          <path
+            d='M75 45 L60 70'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Barbell */}
+          <path
+            d='M50 70 L70 70'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          <circle
+            cx='50'
+            cy='70'
+            r='4'
+            fill='currentColor'
+          />
+          <circle
+            cx='70'
+            cy='70'
+            r='4'
+            fill='currentColor'
           />
         </svg>
       );
@@ -381,19 +620,45 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
-          <path
-            d='M50 20 V65'
-            strokeLinecap='round'
-          />
-          <path
-            d='M40 90 L50 75 L60 90'
-            strokeLinecap='round'
-            strokeWidth='4'
-          />
+          {/* Floor */}
           <path
             d='M20 95 H80'
             opacity={floorOpacity}
             strokeLinecap='round'
+          />
+          {/* Head */}
+          <circle
+            cx='50'
+            cy='20'
+            r='5'
+          />
+          {/* Torso */}
+          <path
+            d='M50 25 V55'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Legs (On toes) */}
+          <path
+            d='M50 55 L45 75 L45 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 55 L55 75 L55 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arms (Hanging or support) */}
+          <path
+            d='M50 30 L40 50'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 30 L60 50'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );
@@ -407,18 +672,36 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
             cx='50'
             cy='30'
-            r='8'
+            r='5'
           />
+          {/* Torso */}
           <path
-            d='M20 45 L50 55 L80 45'
-            strokeWidth='5'
+            d='M50 35 V65'
             strokeLinecap='round'
+            strokeWidth='4'
           />
+          {/* Shoulders - Arms pulling back */}
           <path
-            d='M50 38 V65'
+            d='M50 40 L25 40 L20 30'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Left arm */}
+          <path
+            d='M50 40 L75 40 L80 30'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />{" "}
+          {/* Right arm */}
+          {/* Cable/Rope indicator */}
+          <path
+            d='M20 30 L50 10 L80 30'
+            strokeWidth='1'
+            strokeDasharray='4 2'
             opacity='0.5'
           />
         </svg>
@@ -433,24 +716,40 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
-            cx='45'
+            cx='50'
             cy='25'
-            r='8'
+            r='5'
           />
+          {/* Torso */}
           <path
-            d='M45 33 V65 L35 90 M45 65 L55 90'
-            strokeLinecap='round'
-          />
-          <path
-            d='M45 45 L70 35'
+            d='M50 30 V60'
             strokeLinecap='round'
             strokeWidth='4'
           />
+          {/* Legs */}
+          <path
+            d='M50 60 L40 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 60 L60 90'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arm (Curling) */}
+          <path
+            d='M50 35 L50 50 L70 35'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Dumbbell */}
           <circle
             cx='75'
             cy='30'
-            r='6'
+            r='5'
             fill='currentColor'
           />
         </svg>
@@ -464,20 +763,39 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
             cx='50'
             cy='30'
-            r='8'
+            r='5'
           />
-          <path d='M50 38 V70' />
+          {/* Torso */}
           <path
-            d='M50 38 L70 15 L85 30'
+            d='M50 35 V65'
             strokeLinecap='round'
             strokeWidth='4'
           />
+          {/* Legs */}
+          <path
+            d='M50 65 L40 95'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 65 L60 95'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Arm (Overhead extension) */}
+          <path
+            d='M50 40 L50 15 L70 25'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Dumbbell */}
           <circle
-            cx='88'
-            cy='33'
+            cx='75'
+            cy='30'
             r='5'
             fill='currentColor'
           />
@@ -493,29 +811,50 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Head */}
           <circle
             cx='50'
-            cy='25'
-            r='8'
+            cy='30'
+            r='5'
           />
+          {/* Torso */}
           <path
-            d='M20 45 L50 50 L80 45'
-            strokeWidth='5'
+            d='M50 35 V65'
             strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Legs (Seated or Standing) */}
+          <path
+            d='M50 65 L40 90'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
           <path
-            d='M50 33 V65'
-            opacity='0.5'
+            d='M50 65 L60 90'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
+          {/* Arms (Pressing up) */}
+          <path
+            d='M50 40 L25 40 L25 25'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          <path
+            d='M50 40 L75 40 L75 25'
+            strokeLinecap='round'
+            strokeWidth='3'
+          />
+          {/* Dumbbells */}
           <circle
-            cx='15'
-            cy='40'
+            cx='25'
+            cy='20'
             r='5'
             fill='currentColor'
           />
           <circle
-            cx='85'
-            cy='40'
+            cx='75'
+            cy='20'
             r='5'
             fill='currentColor'
           />
@@ -530,25 +869,40 @@ const ExerciseIcon: React.FC<ExerciseIconProps> = ({
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         >
+          {/* Floor */}
           <path
             d='M20 85 H80'
             opacity={floorOpacity}
             strokeLinecap='round'
           />
-          <path
-            d='M30 80 L60 80'
-            strokeWidth='6'
-            strokeLinecap='round'
-          />
-          <path
-            d='M60 80 L75 40'
-            strokeWidth='5'
-            strokeLinecap='round'
-          />
+          {/* Head */}
           <circle
-            cx='25'
-            cy='72'
-            r='7'
+            cx='30'
+            cy='80'
+            r='5'
+          />
+          {/* Torso (Lying flat) */}
+          <path
+            d='M35 82 L60 82'
+            strokeLinecap='round'
+            strokeWidth='4'
+          />
+          {/* Legs (Raised) */}
+          <path
+            d='M60 82 L75 40'
+            strokeWidth='3'
+            strokeLinecap='round'
+          />
+          <path
+            d='M60 82 L80 45'
+            strokeWidth='3'
+            strokeLinecap='round'
+          />
+          {/* Arms (By side) */}
+          <path
+            d='M40 82 L50 82'
+            strokeLinecap='round'
+            strokeWidth='3'
           />
         </svg>
       );

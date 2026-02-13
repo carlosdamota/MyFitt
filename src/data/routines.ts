@@ -325,7 +325,17 @@ export const routineData: RoutineData = {
         exercises: [
           { name: "Peso Muerto Rumano", reps: "3x 10-12", svg: "rdl_bilateral" },
           { name: "Press Militar (Mancuernas)", reps: "3x 8-10", svg: "shoulder_press" },
-          { name: "Dominadas (o Jalón)", reps: "3x Fallo/12", svg: "pullup" },
+          {
+            name: "Dominadas (o Jalón)",
+            reps: "3x Fallo/12",
+            svg: "pullup",
+            instructions: [
+              "Agarra la barra con las manos algo más abiertas que los hombros.",
+              "Cuelga completamente extendido, activando las escápulas.",
+              "Tira del pecho hacia la barra, llevando los codos hacia abajo.",
+              "Baja controladamente hasta estirar los brazos por completo.",
+            ],
+          },
         ],
       },
     ],

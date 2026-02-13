@@ -211,13 +211,10 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                 <span className='text-xs font-bold text-blue-400/80 uppercase tracking-widest pl-2 border-l-2 border-blue-500/50'>
                   BLOQUE {block.id} • SUPERSERIE
                 </span>
-                <button
-                  onClick={() => onResetTimer(block.rest)}
-                  className='group flex items-center gap-2 bg-slate-900/80 hover:bg-blue-600 hover:text-white text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors border border-slate-800 hover:border-blue-500 backdrop-blur-sm'
-                >
+                <div className='flex items-center gap-2 bg-slate-900/80 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-lg border border-slate-800 backdrop-blur-sm'>
                   <Clock size={12} />
                   <span>{block.rest}s DESCANSO</span>
-                </button>
+                </div>
               </div>
 
               <div className='space-y-3'>
@@ -338,6 +335,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                               user={user}
                               isLastInBlock={i === block.exercises.length - 1}
                               configuredReps={ex.reps}
+                              instructions={ex.instructions}
                               onRequireAuth={onRequireAuth}
                               onUpgrade={onShowSubscription}
                             />

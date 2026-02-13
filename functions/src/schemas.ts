@@ -70,6 +70,7 @@ export const ExerciseSchema = z.object({
     .describe(
       "A simple, minimalist SVG string representing the exercise. <svg viewBox='0 0 24 24'>...</svg>",
     ),
+  instructions: z.array(z.string()).optional(),
 });
 export type Exercise = z.infer<typeof ExerciseSchema>;
 

@@ -43,6 +43,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   user,
   isLastInBlock,
   configuredReps,
+  instructions,
   onRequireAuth,
   onUpgrade,
 }) => {
@@ -206,30 +207,16 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         isSaving={isSaving}
       />
 
-      <div className='mt-4 p-3 bg-white/5 rounded-xl border border-white/5'>
-        <div className='flex items-center justify-between mb-3'>
-          <span className='text-[10px] text-slate-400 font-bold uppercase'>Descanso</span>
-          <span className='text-[10px] text-blue-400 font-bold'>
-            Sug: {getSuggestedRestTime()}s
-          </span>
-        </div>
-        <div className='flex gap-2'>
-          {[30, 60, 90, 120, 180].map((s) => (
-            <button
-              key={s}
-              onClick={() => onTimerReset(s)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${s === getSuggestedRestTime() ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/40" : "bg-transparent border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}`}
-            >
-              {s}s
-            </button>
-          ))}
-        </div>
+      <div className='mt-4 p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between'>
+        <span className='text-[10px] text-slate-400 font-bold uppercase'>Descanso Sugerido</span>
+        <span className='text-xs font-bold text-blue-400'>{getSuggestedRestTime()}s</span>
       </div>
 
       <ExerciseAIAssistant
         user={user}
         exerciseName={exerciseName}
         history={history}
+        instructions={instructions}
         onRequireAuth={onRequireAuth}
         onUpgrade={onUpgrade}
       />

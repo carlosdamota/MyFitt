@@ -2,7 +2,7 @@ import { getIdToken } from "firebase/auth";
 import { auth } from "../config/firebase";
 
 export type AiTask =
-  | "exercise_variants"
+  | "exercise_instructions"
   | "exercise_analysis"
   | "volume_trend"
   | "weekly_coach"
@@ -42,7 +42,10 @@ const requireToken = async (): Promise<string> => {
   return getIdToken(user, true);
 };
 
-export const callAI = async (task: AiTask, payload: Record<string, unknown>): Promise<AiResponse> => {
+export const callAI = async (
+  task: AiTask,
+  payload: Record<string, unknown>,
+): Promise<AiResponse> => {
   const token = await requireToken();
   const response = await fetch(buildUrl("/aiGenerate"), {
     method: "POST",
