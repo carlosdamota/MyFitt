@@ -23,36 +23,31 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
       <div className='flex justify-between items-start mb-4 relative z-10'>
         <div>
           <h2 className='text-3xl font-black text-white mb-2 leading-tight'>{routine.title}</h2>
-          <div className='flex items-center gap-3 text-sm text-slate-200/80'>
+          <div className='flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-200/80'>
             <div className='flex items-center gap-1.5'>
               <Activity
-                size={16}
+                size={14}
                 className='text-blue-300'
               />
               <span>{routine.focus}</span>
             </div>
-            <span className='w-1 h-1 rounded-full bg-slate-400/50' />
+            <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-400/50' />
             <div className='flex items-center gap-1.5'>
               <Clock
-                size={16}
+                size={14}
                 className='text-purple-300'
               />
               <span>~{totalExercises * 5} min</span>
             </div>
           </div>
         </div>
-        <button
-          onClick={onEditRoutine}
-          className='p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl text-white transition-all hover:scale-105 active:scale-95 border border-white/10 shadow-lg'
-          aria-label='Editar rutina'
-        >
-          <Edit size={18} />
-        </button>
       </div>
 
       <div
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border bg-slate-950/20 backdrop-blur-sm ${
-          routine.mode === "heavy" ? "border-red-500/30 text-red-200" : "border-green-500/30 text-green-200"
+          routine.mode === "heavy"
+            ? "border-red-500/30 text-red-200"
+            : "border-green-500/30 text-green-200"
         }`}
       >
         {routine.mode === "heavy" ? (

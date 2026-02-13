@@ -140,6 +140,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               isLastInBlock={isLastInBlock}
               configuredReps={exercise.reps}
               instructions={exercise.instructions}
+              onMarkComplete={() => {
+                if (!isCompleted) onToggleComplete(dayKey, exercise.name);
+              }}
+              onUnmarkComplete={() => {
+                if (isCompleted) onToggleComplete(dayKey, exercise.name);
+              }}
               onRequireAuth={onRequireAuth}
               onUpgrade={onShowSubscription}
             />

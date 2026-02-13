@@ -23,6 +23,8 @@ interface ExerciseTrackerProps {
   isLastInBlock: boolean;
   configuredReps?: string;
   instructions?: string[];
+  onMarkComplete?: () => void;
+  onUnmarkComplete?: () => void;
   onRequireAuth?: () => void;
   onUpgrade?: () => void;
 }
@@ -45,6 +47,8 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   isLastInBlock,
   configuredReps,
   instructions,
+  onMarkComplete,
+  onUnmarkComplete,
   onRequireAuth,
   onUpgrade,
 }) => {
@@ -96,11 +100,19 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
     return { weight: lastWeight, reps: lastReps, text: "Mantén el ritmo actual", type: "steady" };
   }, [history]);
 
-  const applySuggestion = (): void => {
+  const handleApplySuggestion = (): void => {
     if (!smartSuggestion) return;
     setWeight(smartSuggestion.weight.toString());
     setReps(smartSuggestion.reps.toString());
     setRpe(smartSuggestion.type === "steady" ? "8" : "");
+  };
+
+  const wrappedOnDelete = async (exercise: string, entry: WorkoutLogEntry) => {
+    await onDelete(exercise, entry);
+    // If the history length was 1, it means we just deleted the last log
+    if (history.length === 1 && onUnmarkComplete) {
+      onUnmarkComplete();
+    }
   };
 
   const handleSave = async (): Promise<void> => {
@@ -121,6 +133,9 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       setNewRecordAlert(`¡NUEVO RÉCORD! ${weight}kg x ${reps}`);
       setTimeout(() => setNewRecordAlert(null), 5000);
     }
+
+    // Auto-mark exercise as completed
+    if (onMarkComplete) onMarkComplete();
 
     setIsSaving(false);
     setWeight("");
@@ -180,7 +195,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
 
       <SmartSuggestion
         suggestion={smartSuggestion}
-        onApply={applySuggestion}
+        onApply={handleApplySuggestion}
       />
 
       {newRecordAlert && (
@@ -225,7 +240,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       <RecentLogsList
         logs={recentLogs}
         exerciseName={exerciseName}
-        onDelete={onDelete}
+        onDelete={wrappedOnDelete}
       />
 
       {chartData.length > 0 && (
