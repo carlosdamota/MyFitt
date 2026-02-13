@@ -11,12 +11,15 @@ import Terms from "./pages/Terms";
 import Legal from "./pages/Legal";
 
 // App pages (lazy-loaded for code splitting)
-const WorkoutDashboard = React.lazy(() => import("./pages/WorkoutDashboard"));
-const NutritionPage = React.lazy(() => import("./pages/NutritionPage"));
-const StatsPage = React.lazy(() => import("./pages/StatsPage"));
-const CoachPage = React.lazy(() => import("./pages/CoachPage"));
-const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
-const RoutinesPage = React.lazy(() => import("./pages/RoutinesPage"));
+import { lazyImport } from "./utils/lazyImport";
+
+// App pages (lazy-loaded for code splitting)
+const WorkoutDashboard = lazyImport(() => import("./pages/WorkoutDashboard"));
+const NutritionPage = lazyImport(() => import("./pages/NutritionPage"));
+const StatsPage = lazyImport(() => import("./pages/StatsPage"));
+const CoachPage = lazyImport(() => import("./pages/CoachPage"));
+const ProfilePage = lazyImport(() => import("./pages/ProfilePage"));
+const RoutinesPage = lazyImport(() => import("./pages/RoutinesPage"));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
