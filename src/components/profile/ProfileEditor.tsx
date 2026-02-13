@@ -116,6 +116,26 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireA
           onClose={() => setShowRoutineManager(false)}
         />
       )}
+
+      {/* Secret Developer Mode Trigger */}
+      <div className='mt-8 text-center'>
+        <p
+          onClick={() => {
+            const newCount = ((window as any)._devTapCount =
+              ((window as any)._devTapCount || 0) + 1);
+            if (newCount === 7) {
+              const currentOptOut = localStorage.getItem("fittwiz_analytics_optout") === "true";
+              const newState = !currentOptOut;
+              localStorage.setItem("fittwiz_analytics_optout", String(newState));
+              alert(`Modo Desarrollador: Analytics ${newState ? "DESACTIVADO" : "ACTIVADO"}`);
+              (window as any)._devTapCount = 0;
+            }
+          }}
+          className='text-[10px] text-slate-700 font-mono cursor-default select-none active:text-slate-500'
+        >
+          v1.0.0
+        </p>
+      </div>
     </div>
   );
 };

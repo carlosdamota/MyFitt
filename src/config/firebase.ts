@@ -71,7 +71,15 @@ if (firebaseConfig) {
 
   isSupported().then((yes) => {
     if (yes && app) {
-      analytics = getAnalytics(app);
+      // Check for opt-out key in localStorage
+      const isOptedOut = localStorage.getItem("fittwiz_analytics_optout") === "true";
+      const isDev = import.meta.env.DEV;
+
+      if (isOptedOut || isDev) {
+        console.log(`[Analytics] Disabled. Reason: ${isDev ? "Development Mode" : "User Opt-out"}`);
+      } else {
+        analytics = getAnalytics(app);
+      }
     }
   });
 }
