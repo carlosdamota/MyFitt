@@ -850,6 +850,7 @@ export const stripeWebhook = onRequest(
           }
           break;
         }
+        case "customer.subscription.created":
         case "customer.subscription.updated":
         case "customer.subscription.deleted": {
           const subscription = event.data.object as Stripe.Subscription;
