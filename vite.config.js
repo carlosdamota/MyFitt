@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      includeAssets: ["favicon.svg", "apple-touch-icon.png", "robots.txt"],
       manifest: {
         name: "FITTWIZ",
         short_name: "FITTWIZ",
@@ -19,6 +19,9 @@ export default defineConfig({
         background_color: "#020617",
         display: "standalone",
         orientation: "portrait",
+        start_url: "/",
+        scope: "/",
+        id: "/",
         icons: [
           {
             src: "pwa-192x192.png",
