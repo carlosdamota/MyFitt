@@ -227,7 +227,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   }}
                 >
                   <span style={{ color: "#ffffff", fontSize: "32px", fontWeight: "bold" }}>
-                    {log.weight > 0 ? `${log.weight}` : "BW"}
+                    {Number(log.weight ?? 0) > 0 ? `${log.weight}` : "BW"}
                   </span>
                   <span
                     style={{

@@ -303,9 +303,11 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                           <div className='mt-5 pt-5 border-t border-white/5 animate-in slide-in-from-top-2 duration-300'>
                             <div className='w-full h-48 bg-slate-950/50 rounded-xl border border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4'>
                               {ex.svg_icon ? (
-                                <div
-                                  className='w-full h-full flex items-center justify-center [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:text-white/90 [&>svg]:stroke-current [&>svg]:drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                                  dangerouslySetInnerHTML={{ __html: ex.svg_icon }}
+                                <img
+                                  src={`data:image/svg+xml;utf8,${encodeURIComponent(ex.svg_icon)}`}
+                                  alt={`Ilustración de ${ex.name}`}
+                                  className='w-full h-full object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                                  loading='lazy'
                                 />
                               ) : (
                                 <ExerciseIcon type={getExerciseIcon(ex.name, ex.svg)} />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRoutines } from "../../hooks/useRoutines";
 import { useProfile } from "../../hooks/useProfile";
-import { Trash2, Check, Plus, Calendar, Dumbbell, Zap, MoreVertical, X } from "lucide-react";
+import { Trash2, Check, Plus, Calendar, Dumbbell, Zap, X } from "lucide-react";
 import type { User } from "firebase/auth";
 import type { Routine } from "../../types";
 import ProgramCard from "./ProgramCard";
