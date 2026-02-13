@@ -6,6 +6,30 @@ interface ExerciseIconProps {
   className?: string;
 }
 
+export const EXERCISE_ICON_KEYS = [
+  "pullup",
+  "floor_press",
+  "pushup_feet_elevated",
+  "one_arm_row",
+  "plank",
+  "deadbug",
+  "glute_bridge",
+  "side_squat",
+  "goblet_squat",
+  "rdl_bilateral",
+  "rdl",
+  "calf_raise_bilateral",
+  "seated_calf_raise",
+  "face_pull",
+  "rear_delt_fly",
+  "bicep_curl",
+  "hammer_curl",
+  "tricep_extension",
+  "shoulder_press",
+  "lateral_raise",
+  "leg_raise",
+];
+
 const ExerciseIcon: React.FC<ExerciseIconProps> = ({
   type,
   className = "w-full h-full object-contain",

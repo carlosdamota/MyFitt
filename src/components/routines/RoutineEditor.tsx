@@ -31,6 +31,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Routine, Exercise, RoutineBlock } from "../../types";
+import ExerciseIcon from "../icons/ExerciseIcons";
+import { getExerciseIcon } from "../../utils/exerciseIcons";
 
 interface SortableExerciseItemProps {
   exercise: Exercise;
@@ -82,10 +84,22 @@ const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
           <X size={16} />
         </button>
         <div className='flex items-center gap-2'>
-          <Dumbbell
-            size={16}
-            className='text-slate-500 shrink-0'
-          />
+          {(() => {
+            const iconType = getExerciseIcon(exercise.name, exercise.svg);
+            return iconType ? (
+              <div className='w-4 h-4 shrink-0 text-slate-500'>
+                <ExerciseIcon
+                  type={iconType}
+                  className='w-full h-full fill-current'
+                />
+              </div>
+            ) : (
+              <Dumbbell
+                size={16}
+                className='text-slate-500 shrink-0'
+              />
+            );
+          })()}
           <input
             type='text'
             value={exercise.name}

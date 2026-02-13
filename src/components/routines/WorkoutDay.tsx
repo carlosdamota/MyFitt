@@ -14,6 +14,7 @@ import {
   Crown,
 } from "lucide-react";
 import ExerciseIcon from "../icons/ExerciseIcons";
+import { getExerciseIcon } from "../../utils/exerciseIcons";
 import ExerciseTracker from "../tracker/ExerciseTracker";
 import type { User } from "firebase/auth";
 import type { Routine, WorkoutLogs, WorkoutLogEntry } from "../../types";
@@ -310,7 +311,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                                   dangerouslySetInnerHTML={{ __html: ex.svg_icon }}
                                 />
                               ) : (
-                                <ExerciseIcon type={ex.svg} />
+                                <ExerciseIcon type={getExerciseIcon(ex.name, ex.svg)} />
                               )}
                               <div className='absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none' />
                             </div>

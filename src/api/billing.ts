@@ -22,7 +22,11 @@ const parseErrorMessage = (data: unknown, fallback: string) => {
   return fallback;
 };
 
-export const createCheckoutSession = async (successUrl?: string, cancelUrl?: string) => {
+export const createCheckoutSession = async (
+  successUrl?: string,
+  cancelUrl?: string,
+  couponId?: string,
+) => {
   const token = await requireToken();
   const response = await fetch(buildUrl("/createCheckoutSession"), {
     method: "POST",
@@ -30,7 +34,7 @@ export const createCheckoutSession = async (successUrl?: string, cancelUrl?: str
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ successUrl, cancelUrl }),
+    body: JSON.stringify({ successUrl, cancelUrl, couponId }),
   });
 
   const data = (await response.json().catch(() => ({}))) as { url?: string; message?: string };

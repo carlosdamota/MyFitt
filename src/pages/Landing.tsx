@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/auth/AuthModal";
+import { createCheckoutSession } from "../api/billing";
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -36,7 +37,7 @@ interface OptionCardProps {
 interface PlanCardProps {
   title: string;
   badge: string;
-  price: string;
+  price: React.ReactNode;
   desc: string;
   features: string[];
   cta: string;
@@ -49,9 +50,23 @@ const Landing: React.FC = () => {
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const onLogin = () => {
+  const onLogin = async () => {
     if (user) {
-      navigate("/app");
+      if (document.referrer.includes("checkout")) {
+        // Simple redirect if already logged in and just browsing
+        navigate("/app");
+        return;
+      }
+      // If user clicks "Unlock Pro" while logged in, go to checkout with coupon
+      try {
+        const origin = window.location.origin;
+        // Hardcoded Founders Coupon
+        const url = await createCheckoutSession(origin, origin, "OmyEug7I");
+        window.location.assign(url);
+      } catch (error) {
+        console.error("Checkout error:", error);
+        navigate("/app");
+      }
     } else {
       setShowAuthModal(true);
     }
@@ -487,16 +502,21 @@ const Landing: React.FC = () => {
             />
             <PlanCard
               title='Pro'
-              badge='Sin límites'
-              price='4.99 € / mes'
-              desc='Programas completos con IA avanzada y análisis.'
+              badge='Oferta Lanzamiento'
+              price={
+                <span className='flex flex-col items-end leading-tight'>
+                  <span className='line-through text-slate-500 text-xs'>4.99 €</span>
+                  <span className='text-emerald-400'>2.99 € / mes</span>
+                </span>
+              }
+              desc='Programas completos con IA avanzada y análisis (Precio reducido por tiempo limitado).'
               features={[
                 "Rutinas de hasta 6 días",
                 "100 generaciones IA/mes",
                 "Programas multi-semana",
                 "Portal de suscripción",
               ]}
-              cta='Desbloquear Pro'
+              cta='Desbloquear Oferta Pro'
               onClick={onLogin}
               tone='accent'
             />

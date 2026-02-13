@@ -37,7 +37,8 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
     setProcessing("checkout");
     try {
       const origin = window.location.origin;
-      const url = await createCheckoutSession(origin, origin);
+      // Hardcoded Founders Coupon
+      const url = await createCheckoutSession(origin, origin, "OmyEug7I");
       window.location.assign(url);
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo iniciar el pago.";
@@ -82,7 +83,6 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
 
   return (
     <div className='rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4'>
-
       <div className='flex items-center justify-between gap-3'>
         <div>
           <p className='text-xs text-slate-500 uppercase tracking-wider'>Suscripcion</p>
@@ -137,9 +137,10 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             type='button'
             onClick={handleCheckout}
             disabled={processing === "checkout"}
-            className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60'
+            className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60 relative overflow-hidden group'
           >
-            <CreditCard size={16} /> Pasar a Pro
+            <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000' />
+            <CreditCard size={16} /> Desbloquear Oferta Pro (2.99€)
           </button>
         )}
         <p className='text-xs text-slate-500 sm:self-center'>
