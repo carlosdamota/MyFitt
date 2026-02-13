@@ -14,7 +14,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
     // Helper to format date like "Monday, 12 Oct"
     const formatDate = (dateString: string) => {
       try {
+        if (!dateString) return "";
         const d = new Date(dateString);
+        if (isNaN(d.getTime())) return dateString;
         return d.toLocaleDateString("es-ES", {
           weekday: "long",
           day: "numeric",
@@ -227,7 +229,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   }}
                 >
                   <span style={{ color: "#ffffff", fontSize: "32px", fontWeight: "bold" }}>
-                    {Number(log.weight ?? 0) > 0 ? `${log.weight}` : "BW"}
+                    {(log.weight ?? 0) > 0 ? log.weight : "BW"}
                   </span>
                   <span
                     style={{

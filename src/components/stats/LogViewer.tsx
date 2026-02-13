@@ -35,16 +35,29 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
     return allLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [logs, userWeight]);
 
-  // Agrupar por Fecha
   const groupedByDate = useMemo(() => {
     const groups: Record<string, FlatLogEntry[]> = {};
     flatLogs.forEach((log) => {
-      const dateKey = new Date(log.date).toLocaleDateString();
+      const dateKey = log.date.split("T")[0];
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(log);
     });
     return groups;
   }, [flatLogs]);
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
 
   const [shareData, setShareData] = React.useState<{ date: string; logs: FlatLogEntry[] } | null>(
     null,
@@ -95,7 +108,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
             className='bg-slate-900 rounded-lg border border-slate-800 overflow-hidden'
           >
             <div className='bg-slate-800/50 px-3 py-2 border-b border-slate-800 flex justify-between items-center'>
-              <span className='text-slate-300 font-bold text-xs'>{date}</span>
+              <span className='text-slate-300 font-bold text-xs'>{formatDate(date)}</span>
               <div className='flex items-center gap-3'>
                 <span className='text-[10px] text-slate-500 font-mono'>
                   {daysLogs.length} Ejercicios
