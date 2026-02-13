@@ -40,6 +40,7 @@ export const ExerciseSchema = z.object({
   name: z.string(),
   reps: RepsSchema.describe('Rep range, e.g., "10-12"'),
   note: z.string().optional(),
+  muscleGroup: z.string().optional(),
   svg: z
     .enum([
       "pullup",
