@@ -106,6 +106,8 @@ export const ExerciseSchema = z.object({
     .optional(),
   svg_icon: z
     .string()
+    .max(4000)
+    .regex(/^<svg[\s\S]*<\/svg>$/i)
     .optional()
     .describe("A simple, minimalist SVG string representing the exercise"),
 });

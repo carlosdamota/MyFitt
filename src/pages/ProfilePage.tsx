@@ -9,7 +9,6 @@ export default function ProfilePage() {
   return (
     <ProfileEditor
       user={user}
-      onClose={() => window.history.back()}
       onRequireAuth={onRequireAuth}
     />
   );

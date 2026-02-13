@@ -33,7 +33,7 @@ export default function DashboardLayout() {
   const { consent, acceptAll, rejectAll, updateConsent, hasResponded } = useCookieConsent();
   const { user, authError, loginWithGoogle, loginWithEmail, signupWithEmail, logout } = useAuth();
   const { timer, isTimerRunning, resetTimer, toggleTimer } = useTimer(60);
-  const { plan, loading: entitlementLoading } = useEntitlement(user);
+  const { plan } = useEntitlement(user);
   const isPro = plan === "pro";
   const navigate = useNavigate();
 

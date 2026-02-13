@@ -83,8 +83,6 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  const [showPaywall, setShowPaywall] = useState<boolean>(false);
   const { plan } = useEntitlement(user);
 
   // Determine effective status

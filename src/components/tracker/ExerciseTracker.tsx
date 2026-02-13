@@ -22,6 +22,7 @@ interface ExerciseTrackerProps {
   user: User | null;
   isLastInBlock: boolean;
   configuredReps?: string;
+  instructions?: string[];
   onRequireAuth?: () => void;
   onUpgrade?: () => void;
 }

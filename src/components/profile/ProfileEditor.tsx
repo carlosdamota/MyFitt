@@ -10,11 +10,10 @@ import type { ProfileFormData } from "../../types";
 
 interface ProfileEditorProps {
   user: FirebaseUser | null;
-  onClose: () => void;
   onRequireAuth?: () => void;
 }
 
-const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onClose, onRequireAuth }) => {
+const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) => {
   const { profile, loading, saveProfile } = useProfile(user);
   const { plan } = useEntitlement(user);
   const isPro = plan === "pro";
