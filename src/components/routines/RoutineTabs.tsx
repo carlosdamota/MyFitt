@@ -10,7 +10,7 @@ interface RoutineTabsProps {
 const RoutineTabs: React.FC<RoutineTabsProps> = ({ routines, activeTab, onTabChange }) => {
   return (
     <nav
-      className='flex overflow-x-auto gap-2 mb-6 pb-2 no-scrollbar snap-x'
+      className='flex overflow-x-auto gap-4 mb-4 p-2 no-scrollbar snap-x'
       aria-label='Seleccionar día de rutina'
     >
       {(() => {

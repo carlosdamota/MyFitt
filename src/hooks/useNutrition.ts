@@ -1,5 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, query, addDoc, deleteDoc, doc, onSnapshot, limit } from "firebase/firestore";
+import {
+  collection,
+  query,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  limit,
+  orderBy,
+} from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
 import type { NutritionLogEntry, MacroTotals, MealType } from "../types";
@@ -28,7 +37,7 @@ export const useNutrition = (user: User | null): UseNutritionReturn => {
 
     const logsRef = collection(db, "artifacts", appId, "users", user.uid, "nutrition_logs");
     // Limit to last 100 items to prevent performance issues
-    const q = query(logsRef, limit(100));
+    const q = query(logsRef, orderBy("date", "desc"), limit(100));
 
     const unsubscribe = onSnapshot(
       q,
@@ -40,9 +49,6 @@ export const useNutrition = (user: User | null): UseNutritionReturn => {
               ...docSnap.data(),
             }) as NutritionLogEntry,
         );
-
-        // Ordenar en cliente por fecha descendente
-        fetchedLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
         setLogs(fetchedLogs);
         setLoading(false);
