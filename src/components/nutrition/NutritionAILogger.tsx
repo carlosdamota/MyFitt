@@ -5,6 +5,8 @@ import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
+import { useEntitlement } from "../../hooks/useEntitlement";
+import NutritionPhotoCapture from "./NutritionPhotoCapture";
 
 interface NutritionAILoggerProps {
   user: FirebaseUser | null;
@@ -25,10 +27,14 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
+  const [imageData, setImageData] = useState<string | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string | null>(null);
+  const { plan } = useEntitlement(user);
+  const isPro = plan === "pro";
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !imageData) return;
 
     if (!user) {
       setError("Inicia sesión para usar la IA de nutrición.");
@@ -42,11 +48,21 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
     setQuotaResetAt(null);
 
     try {
-      const nutritionData = await parseNutritionLog(input);
+      const nutritionData = await parseNutritionLog(
+        input,
+        imageData && isPro
+          ? {
+              data: imageData,
+              mimeType: imageMimeType || undefined,
+            }
+          : undefined,
+      );
       if (nutritionData) {
         await onAddLog(nutritionData);
         logEvent("Nutrition", "Logged with AI", nutritionData.food);
         setInput("");
+        setImageData(null);
+        setImageMimeType(null);
       } else {
         setError("No se pudo entender el alimento. Intente ser más específico.");
       }
@@ -98,7 +114,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
         />
         <button
           type='submit'
-          disabled={analyzing || !input.trim()}
+          disabled={analyzing || (!input.trim() && !imageData)}
           className='absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all disabled:bg-slate-800 disabled:text-slate-600 shadow-lg active:scale-90'
         >
           {analyzing ? (
@@ -112,6 +128,22 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
         </button>
       </form>
 
+      <NutritionPhotoCapture
+        disabled={analyzing}
+        isPro={isPro}
+        imagePreview={imageData}
+        onPhotoSelected={(dataUrl, mimeType) => {
+          setImageData(dataUrl);
+          setImageMimeType(mimeType);
+          setError(null);
+        }}
+        onClearPhoto={() => {
+          setImageData(null);
+          setImageMimeType(null);
+        }}
+        onUpgrade={onUpgrade}
+      />
+
       {error && (
         <p className='text-xs text-red-500 mt-2 font-medium flex items-center gap-1.5'>
           <span className='w-1 h-1 bg-red-500 rounded-full' /> {error}
@@ -120,7 +152,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
 
       {!error && (
         <p className='text-[10px] text-slate-500 mt-3 italic font-medium'>
-          Describe tu comida y la IA calculará automáticamente los macros.
+          Describe tu comida o sube una foto del plato para que la IA calcule macros.
         </p>
       )}
     </div>

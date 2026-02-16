@@ -45,6 +45,10 @@ const requireToken = async (): Promise<string> => {
 export const callAI = async (
   task: AiTask,
   payload: Record<string, unknown>,
+  options?: {
+    image?: string;
+    imageMimeType?: string;
+  },
 ): Promise<AiResponse> => {
   const token = await requireToken();
   const response = await fetch(buildUrl("/aiGenerate"), {
@@ -53,7 +57,12 @@ export const callAI = async (
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ task, payload }),
+    body: JSON.stringify({
+      task,
+      payload,
+      ...(options?.image ? { image: options.image } : {}),
+      ...(options?.imageMimeType ? { imageMimeType: options.imageMimeType } : {}),
+    }),
   });
 
   if (response.status === 401) {

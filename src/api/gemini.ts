@@ -13,9 +13,21 @@ const cleanJsonText = (text: string): string =>
     .replace(/```/g, "")
     .trim();
 
-export const parseNutritionLog = async (text: string): Promise<NutritionLog> => {
+export const parseNutritionLog = async (
+  text: string,
+  image?: { data: string; mimeType?: string },
+): Promise<NutritionLog> => {
   try {
-    const response = await callAI("nutrition_parse", { log: text });
+    const response = await callAI(
+      "nutrition_parse",
+      { log: text },
+      image
+        ? {
+            image: image.data,
+            imageMimeType: image.mimeType,
+          }
+        : undefined,
+    );
     const cleanJson = cleanJsonText(response.text);
     const parsed = JSON.parse(cleanJson);
 
