@@ -26,8 +26,9 @@ interface AiFunctionDeps {
   auth: Auth;
   appId: string;
   geminiApiKey: string;
-  geminiModel: string;
-  geminiModelLite: string;
+  geminiDefaultModel: string;
+  geminiNutritionModelFree: string;
+  geminiNutritionModelPro: string;
   proAiMonthlyQuota: number;
   freeAiMonthlyQuota: number;
   freeMaxDays: number;
@@ -39,13 +40,24 @@ export const createAiGenerateFunction = ({
   auth,
   appId,
   geminiApiKey,
-  geminiModel,
-  geminiModelLite,
+  geminiDefaultModel,
+  geminiNutritionModelFree,
+  geminiNutritionModelPro,
   proAiMonthlyQuota,
   freeAiMonthlyQuota,
   freeMaxDays,
   webOrigin,
 }: AiFunctionDeps) => {
+  type GeminiPart =
+    | { text: string }
+    | { inline_data: { mime_type: string; data: string } }
+    | { inlineData: { mimeType: string; data: string } };
+
+  type GeminiTool = {
+    google_search_retrieval?: Record<string, never>;
+    googleSearchRetrieval?: Record<string, never>;
+  };
+
   const addDays = (date: Date, days: number): Date => {
     const next = new Date(date);
     next.setUTCDate(next.getUTCDate() + days);
@@ -123,14 +135,73 @@ export const createAiGenerateFunction = ({
     await entRef.set({ used, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
   };
 
-  const callGemini = async (prompt: string, systemInstruction = "", model?: string) => {
+  const getImagePart = (rawImage: unknown, rawMimeType?: unknown): GeminiPart | null => {
+    let data = "";
+    let mimeType = typeof rawMimeType === "string" && rawMimeType ? rawMimeType : "image/jpeg";
+
+    if (typeof rawImage === "string") {
+      const dataUriMatch = rawImage.match(/^data:(image\/[\w.+-]+);base64,(.+)$/i);
+      if (dataUriMatch) {
+        mimeType = dataUriMatch[1];
+        data = dataUriMatch[2];
+      } else {
+        data = rawImage;
+      }
+    } else if (rawImage && typeof rawImage === "object") {
+      const imageObject = rawImage as { data?: unknown; base64?: unknown; mimeType?: unknown };
+      const candidateData =
+        typeof imageObject.data === "string"
+          ? imageObject.data
+          : typeof imageObject.base64 === "string"
+            ? imageObject.base64
+            : "";
+
+      if (typeof imageObject.mimeType === "string" && imageObject.mimeType) {
+        mimeType = imageObject.mimeType;
+      }
+
+      const dataUriMatch = candidateData.match(/^data:(image\/[\w.+-]+);base64,(.+)$/i);
+      if (dataUriMatch) {
+        mimeType = dataUriMatch[1];
+        data = dataUriMatch[2];
+      } else {
+        data = candidateData;
+      }
+    }
+
+    if (!data) return null;
+    return {
+      inline_data: {
+        mime_type: mimeType,
+        data,
+      },
+    };
+  };
+
+  const callGemini = async ({
+    parts,
+    systemInstruction = "",
+    model,
+    tools,
+  }: {
+    parts: GeminiPart[];
+    systemInstruction?: string;
+    model?: string;
+    tools?: GeminiTool[];
+  }) => {
     if (!geminiApiKey) throw new Error("gemini_key_missing");
-    const targetModel = model || geminiModel;
+    const targetModel = model || geminiDefaultModel;
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${geminiApiKey}`;
-    const payload = {
-      contents: [{ parts: [{ text: prompt }] }],
+    const payload: {
+      contents: Array<{ parts: GeminiPart[] }>;
+      systemInstruction: { parts: Array<{ text: string }> };
+      tools?: GeminiTool[];
+    } = {
+      contents: [{ parts }],
       systemInstruction: { parts: [{ text: systemInstruction }] },
     };
+
+    if (tools && tools.length > 0) payload.tools = tools;
 
     const response = await fetch(apiUrl, {
       method: "POST",
@@ -145,7 +216,11 @@ export const createAiGenerateFunction = ({
     const result = (await response.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
     };
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text =
+      result.candidates?.[0]?.content?.parts
+        ?.map((part) => part.text)
+        .filter((part): part is string => typeof part === "string")
+        .join("\n") ?? "";
     if (!text) throw new Error("gemini_empty");
     return text;
   };
@@ -169,6 +244,8 @@ export const createAiGenerateFunction = ({
       currentUid = uid;
       const task = String(req.body?.task ?? "");
       const payload = (req.body?.payload ?? {}) as Record<string, unknown>;
+      const rawImage = req.body?.image;
+      const rawImageMimeType = req.body?.imageMimeType;
 
       const quotaState = await consumeQuota(uid, plan);
       if (!quotaState.allowed) {
@@ -195,8 +272,32 @@ export const createAiGenerateFunction = ({
       }
 
       const { system, user } = buildPrompt(task, payload);
-      const modelForTask = task === "nutrition_parse" ? geminiModelLite : undefined;
-      const text = await callGemini(user, system, modelForTask);
+
+      const isNutritionTask = task === "nutrition_parse";
+      const nutritionModel = plan === "pro" ? geminiNutritionModelPro : geminiNutritionModelFree;
+      const modelForTask = isNutritionTask ? nutritionModel : undefined;
+
+      const parts: GeminiPart[] = [{ text: user }];
+      if (isNutritionTask && plan === "pro") {
+        const imagePart = getImagePart(rawImage, rawImageMimeType);
+        if (imagePart) {
+          parts.push(imagePart);
+          if (!user.trim()) {
+            parts[0] = { text: "Analiza la comida de la imagen y devuelve el JSON solicitado." };
+          }
+        }
+      }
+
+      const tools: GeminiTool[] | undefined = isNutritionTask
+        ? [{ google_search_retrieval: {}, googleSearchRetrieval: {} }]
+        : undefined;
+
+      const text = await callGemini({
+        parts,
+        systemInstruction: system,
+        model: modelForTask,
+        tools,
+      });
 
       let validatedData: { text: string } = { text };
       try {

@@ -16,11 +16,14 @@ const auth = getAuth();
 
 const APP_ID = process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_DEFAULT = process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_NUTRITION_FREE =
+  process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
+const GEMINI_MODEL_NUTRITION_PRO =
+  process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
 const PRO_AI_MONTHLY_QUOTA = Number(process.env.PRO_AI_MONTHLY_QUOTA ?? "100");
 const FREE_AI_MONTHLY_QUOTA = Number(process.env.FREE_AI_MONTHLY_QUOTA ?? "5");
 const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
-const GEMINI_MODEL_LITE = process.env.GEMINI_MODEL_LITE ?? "gemini-2.5-flash-lite";
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
@@ -33,8 +36,9 @@ export const aiGenerate = createAiGenerateFunction({
   auth,
   appId: APP_ID,
   geminiApiKey: GEMINI_API_KEY,
-  geminiModel: GEMINI_MODEL,
-  geminiModelLite: GEMINI_MODEL_LITE,
+  geminiDefaultModel: GEMINI_MODEL_DEFAULT,
+  geminiNutritionModelFree: GEMINI_MODEL_NUTRITION_FREE,
+  geminiNutritionModelPro: GEMINI_MODEL_NUTRITION_PRO,
   proAiMonthlyQuota: PRO_AI_MONTHLY_QUOTA,
   freeAiMonthlyQuota: FREE_AI_MONTHLY_QUOTA,
   freeMaxDays: FREE_MAX_DAYS,
