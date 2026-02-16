@@ -54,8 +54,7 @@ export const createAiGenerateFunction = ({
     | { inlineData: { mimeType: string; data: string } };
 
   type GeminiTool = {
-    google_search_retrieval?: Record<string, never>;
-    googleSearchRetrieval?: Record<string, never>;
+    google_search?: Record<string, never>;
   };
 
   const addDays = (date: Date, days: number): Date => {
@@ -289,7 +288,7 @@ export const createAiGenerateFunction = ({
       }
 
       const tools: GeminiTool[] | undefined = isNutritionTask
-        ? [{ google_search_retrieval: {}, googleSearchRetrieval: {} }]
+        ? [{ google_search: {} }]
         : undefined;
 
       const text = await callGemini({
