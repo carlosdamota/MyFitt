@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AlertTriangle, Clock, X } from "lucide-react";
+import ProUpgrade from "../common/ProUpgrade";
 
 interface RateLimitErrorProps {
   message: string;
@@ -8,7 +9,12 @@ interface RateLimitErrorProps {
   onUpgrade?: () => void;
 }
 
-const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClose, onUpgrade }) => {
+const RateLimitError: React.FC<RateLimitErrorProps> = ({
+  message,
+  resetAt,
+  onClose,
+  onUpgrade,
+}) => {
   const [timeUntilReset, setTimeUntilReset] = useState<string>("");
 
   useEffect(() => {
@@ -87,15 +93,13 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({ message, resetAt, onClo
 
         <div className='flex gap-3'>
           {onUpgrade && (
-            <button
-              onClick={() => {
-                onUpgrade();
-                onClose();
-              }}
-              className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors'
-            >
-              Pasar a Pro
-            </button>
+            <ProUpgrade
+              mini
+              context='unlimited_usage'
+              buttonText='Pasar a Pro'
+              onClick={onClose}
+              className='flex-1 justify-center py-2.5 h-auto bg-blue-600 text-white hover:bg-blue-500 border-none'
+            />
           )}
           <button
             onClick={onClose}

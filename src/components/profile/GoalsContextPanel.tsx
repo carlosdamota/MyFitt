@@ -1,5 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { Target, Calendar, Clock, Dumbbell, AlertCircle, Check, Lock, Crown } from "lucide-react";
+import ProUpgrade from "../common/ProUpgrade";
 import type { ProfileFormData } from "../../types";
 
 interface GoalsContextPanelProps {
@@ -91,25 +92,31 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           <div className='mt-2 flex items-center gap-2 w-full'>
             {[2, 3, 4, 5, 6].map((days) => {
               const isLocked = !isPro && days > FREE_MAX_DAYS;
+
+              if (isLocked) {
+                return (
+                  <ProUpgrade
+                    key={days}
+                    mini
+                    context='routine_generation'
+                    buttonText={days.toString()}
+                    className='flex-1 justify-center py-2 h-10 border-slate-800 bg-slate-950/50 text-slate-500 opacity-60'
+                  />
+                );
+              }
+
               return (
                 <button
                   key={days}
                   type='button'
-                  disabled={isLocked}
-                  onClick={() => (isLocked ? onUpgrade?.() : onChange("availableDays", days))}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors relative ${
-                    isLocked
-                      ? "bg-slate-950/50 border-slate-800 text-slate-600 cursor-pointer hover:border-amber-600/50"
-                      : formData.availableDays === days
-                        ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                        : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500 hover:bg-slate-900"
+                  onClick={() => onChange("availableDays", days)}
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors relative h-10 ${
+                    formData.availableDays === days
+                      ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
+                      : "bg-slate-950 border-slate-700 text-slate-500 hover:border-slate-500 hover:bg-slate-900"
                   }`}
-                  title={isLocked ? "Desbloquea más días con Pro" : undefined}
                 >
                   {days}
-                  {isLocked && (
-                    <Crown className='absolute -top-1 -right-1 w-3 h-3 text-amber-500' />
-                  )}
                 </button>
               );
             })}

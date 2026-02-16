@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Camera, X } from "lucide-react";
+import ProUpgrade from "../common/ProUpgrade";
 
 interface NutritionPhotoCaptureProps {
   disabled?: boolean;
@@ -61,15 +62,24 @@ const NutritionPhotoCapture: React.FC<NutritionPhotoCaptureProps> = ({
       />
 
       {!imagePreview ? (
-        <button
-          type='button'
-          onClick={handleClick}
-          disabled={disabled}
-          className='inline-flex items-center gap-2 rounded-lg border border-indigo-500/40 bg-indigo-950/30 px-3 py-2 text-xs font-bold text-indigo-200 hover:bg-indigo-900/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-        >
-          <Camera size={14} />
-          {isPro ? "Foto al plato" : "Foto al plato (Pro)"}
-        </button>
+        isPro ? (
+          <button
+            type='button'
+            onClick={handleClick}
+            disabled={disabled}
+            className='inline-flex items-center gap-2 rounded-lg border border-indigo-500/40 bg-indigo-950/30 px-3 py-2 text-xs font-bold text-indigo-200 hover:bg-indigo-900/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            <Camera size={14} />
+            Foto al plato
+          </button>
+        ) : (
+          <ProUpgrade
+            mini
+            context='nutrition_photo'
+            buttonText='Foto al plato (Pro)'
+            className='border-indigo-500/30 bg-indigo-900/10 text-indigo-300 hover:from-indigo-500/20 hover:to-purple-500/20'
+          />
+        )
       ) : (
         <div className='relative w-full max-w-[220px] rounded-xl overflow-hidden border border-indigo-500/30'>
           <img

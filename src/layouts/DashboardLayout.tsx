@@ -15,6 +15,8 @@ import TimerOverlay from "../components/layout/TimerOverlay";
 import AuthModal from "../components/auth/AuthModal";
 import CookieBanner from "../components/legal/CookieBanner";
 import CookieSettings from "../components/legal/CookieSettings";
+import ProUpgradeModal from "../components/common/ProUpgradeModal";
+import { ProUpgradeProvider, useProUpgrade } from "../components/common/ProUpgradeContext";
 
 // Utils
 import { initGA, logPageView } from "../utils/analytics";
@@ -26,7 +28,7 @@ export interface DashboardContext {
   onUpgrade: () => void;
 }
 
-export default function DashboardLayout() {
+function DashboardLayoutContent() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCookieSettings, setShowCookieSettings] = useState(false);
 
@@ -36,9 +38,10 @@ export default function DashboardLayout() {
   const { plan } = useEntitlement(user);
   const isPro = plan === "pro";
   const navigate = useNavigate();
+  const { openProUpgradeModal, closeProUpgradeModal, showProModal } = useProUpgrade();
 
   const handleRequireAuth = () => setShowAuthModal(true);
-  const handleUpgrade = () => navigate("/app/profile");
+  const handleUpgrade = () => openProUpgradeModal("general");
   const handleLogout = async () => {
     await logout();
     navigate("/");
@@ -92,6 +95,11 @@ export default function DashboardLayout() {
         />
       )}
 
+      <ProUpgradeModal
+        isOpen={showProModal}
+        onClose={closeProUpgradeModal}
+      />
+
       <Header
         user={user}
         isPro={isPro}
@@ -114,5 +122,13 @@ export default function DashboardLayout() {
         onToggle={toggleTimer}
       />
     </div>
+  );
+}
+
+export default function DashboardLayout() {
+  return (
+    <ProUpgradeProvider>
+      <DashboardLayoutContent />
+    </ProUpgradeProvider>
   );
 }
