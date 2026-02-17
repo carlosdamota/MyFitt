@@ -150,6 +150,7 @@ export interface ProfileFormData {
   dailyTimeMinutes: number;
   equipment: EquipmentOption[];
   injuries: string;
+  onboardingCompleted?: boolean;
 }
 
 export interface UserProfile extends ProfileFormData {

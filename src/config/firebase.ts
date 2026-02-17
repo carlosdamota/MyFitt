@@ -2,11 +2,13 @@ import type { FirebaseApp } from "firebase/app";
 import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import type { Analytics } from "firebase/analytics";
+import type { Messaging } from "firebase/messaging";
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { getMessaging } from "firebase/messaging";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Type for Firebase configuration
@@ -51,6 +53,7 @@ let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 let analytics: Analytics | null = null;
+let messaging: Messaging | null = null;
 
 if (firebaseConfig) {
   app = initializeApp(firebaseConfig);
@@ -82,6 +85,17 @@ if (firebaseConfig) {
       }
     }
   });
+
+  // Initialize Messaging (only in browser)
+  if (typeof window !== "undefined") {
+    // isSupported() for messaging is distinct from analytics, but commonly available.
+    // We'll wrap in try-catch or just allow it to fail silently if not supported
+    try {
+      messaging = getMessaging(app);
+    } catch (e) {
+      console.debug("Firebase Messaging not supported in this environment");
+    }
+  }
 }
 
-export { app, auth, db, analytics };
+export { app, auth, db, analytics, messaging };

@@ -80,3 +80,21 @@ export const stripeWebhook = createStripeWebhookFunction({
   stripe,
   stripeWebhookSecret,
 });
+
+// --- Subagent Functions ---
+
+import { createEmailAgentFunctions } from "./email-agent.js";
+import { createPushAgentFunctions } from "./push-agent.js";
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
+const EMAIL_FROM = process.env.EMAIL_FROM ?? "onboarding@resend.dev"; // Default Resend testing email
+
+export const emailAgent = createEmailAgentFunctions({
+  geminiApiKey: GEMINI_API_KEY,
+  resendApiKey: RESEND_API_KEY,
+  fromEmail: EMAIL_FROM,
+});
+
+export const pushAgent = createPushAgentFunctions({
+  db,
+});

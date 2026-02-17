@@ -16,6 +16,7 @@ export interface UserProfile {
   equipment: EquipmentOption[];
   dietType: "balanced" | "keto" | "paleo" | "high_protein" | "low_carb";
   injuries: string;
+  onboardingCompleted?: boolean;
   activeRoutineId?: string;
   updatedAt?: string;
 }
@@ -39,6 +40,7 @@ const defaultProfile: UserProfile = {
   equipment: ["gym_full"],
   dietType: "balanced",
   injuries: "",
+  onboardingCompleted: false,
   activeRoutineId: undefined,
 };
 

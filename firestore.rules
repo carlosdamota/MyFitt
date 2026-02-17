@@ -41,6 +41,7 @@ service cloud.firestore {
               "dietType",
               "injuries",
               "activeRoutineId",
+              "onboardingCompleted",
               "updatedAt"
             ])
           : false;
