@@ -19,6 +19,9 @@ interface MealHistoryProps {
   selectedDate: Date;
   onDateChange: (days: number) => void;
   onDeleteLog: (id: string) => Promise<boolean>;
+  onDuplicate: (log: Meal) => Promise<boolean>;
+  onEdit: (log: Meal) => void;
+  onRefine: (log: Meal) => void;
   loading: boolean;
 }
 
@@ -27,6 +30,9 @@ const MealHistory: React.FC<MealHistoryProps> = ({
   selectedDate,
   onDateChange,
   onDeleteLog,
+  onDuplicate,
+  onEdit,
+  onRefine,
   loading,
 }) => {
   const isToday = selectedDate.toDateString() === new Date().toDateString();
@@ -102,6 +108,9 @@ const MealHistory: React.FC<MealHistoryProps> = ({
               ingredients={log.ingredients}
               canDelete={isToday && !!log.id}
               onDelete={onDeleteLog}
+              onDuplicate={() => onDuplicate(log)}
+              onEdit={() => onEdit(log)}
+              onRefine={() => onRefine(log)}
             />
           ))}
         </div>

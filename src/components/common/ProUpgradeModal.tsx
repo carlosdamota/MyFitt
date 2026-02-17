@@ -32,18 +32,18 @@ interface ProUpgradeModalProps {
 const PRO_BENEFITS = [
   {
     icon: Sparkles,
-    title: "100+ generaciones IA/mes",
-    description: "Crea rutinas y analiza tu progreso sin preocupaciones",
+    title: "IA Ilimitada",
+    description: "Chat con Coach y Análisis Nutricional sin restricciones",
   },
   {
     icon: ChefHat,
-    title: "Foto al plato",
-    description: "Escanea tus comidas para calcular macros automáticamente",
+    title: "Foto a Macro (500/mes)",
+    description: "Registra tus comidas al instante con una foto",
   },
   {
-    icon: BarChart3,
-    title: "Estadísticas avanzadas",
-    description: "Gráficos detallados y análisis profundo de tu evolución",
+    icon: Zap,
+    title: "Rutinas Pro (5/mes)",
+    description: "Genera 5 programas mensuales de hasta 6 días",
   },
 ];
 
@@ -85,18 +85,18 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
     switch (context) {
       case "nutrition_photo":
         return {
-          title: "Foto al plato es exclusivo Pro",
-          description: "Sube una foto de tu comida y la IA calculará los macros automáticamente.",
+          title: "Foto a Macro es exclusivo Pro",
+          description: "Sube hasta 500 fotos al mes para calcular macros automáticamente.",
         };
       case "routine_generation":
         return {
-          title: "Generación de rutinas avanzada",
-          description: "Crea rutinas de más días y personalizadas al máximo con IA.",
+          title: "Generación de rutinas Pro",
+          description: "Crea rutinas de hasta 6 días y 5 programas nuevos cada mes.",
         };
       case "unlimited_usage":
         return {
-          title: "Sin límites de uso",
-          description: "100+ generaciones de IA al mes para rutinas, análisis y más.",
+          title: "Elimina los límites",
+          description: "Disfruta de Coach y Análisis Nutricional ilimitados.",
         };
       case "stats":
         return {
@@ -105,8 +105,8 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
         };
       case "ai_coach":
         return {
-          title: "Tu AI Coach personal",
-          description: "Análisis inteligente de tu progreso y recomendaciones únicas.",
+          title: "Tu Coach AI Personal",
+          description: "Chat ilimitado para análisis de progreso y recomendaciones.",
         };
       default:
         return { title: title, description: description };

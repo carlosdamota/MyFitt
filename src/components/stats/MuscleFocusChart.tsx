@@ -13,16 +13,33 @@ interface MuscleVolume {
   [muscle: string]: number;
 }
 
+const MUSCLE_COLORS: Record<string, string> = {
+  Pecho: "#3b82f6",
+  Espalda: "#8b5cf6",
+  Hombro: "#f59e0b",
+  Piernas: "#10b981",
+  Bíceps: "#ef4444",
+  Tríceps: "#ec4899",
+  Core: "#06b6d4",
+  Glúteo: "#f97316",
+  Otros: "#64748b",
+};
+
+const getBarColor = (muscle: string): string => {
+  for (const [key, color] of Object.entries(MUSCLE_COLORS)) {
+    if (muscle.toLowerCase().includes(key.toLowerCase())) return color;
+  }
+  return MUSCLE_COLORS.Otros;
+};
+
 const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) => {
   const muscleVol: MuscleVolume = {};
   let totalVol = 0;
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // Crear mapa de ejercicio -> musculo combinando datos estáticos y del usuario
   const exerciseToMuscle: Record<string, string> = {};
 
-  // Primero procesar rutinas estáticas (defaults)
   Object.values(defaultRoutines).forEach((day: Routine) => {
     day.blocks.forEach((block) => {
       block.exercises.forEach((ex) => {
@@ -31,7 +48,6 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
     });
   });
 
-  // Luego procesar rutinas del usuario (sobrescribe o añade)
   Object.values(routines).forEach((day: Routine) => {
     day.blocks.forEach((block) => {
       block.exercises.forEach((ex) => {
@@ -59,11 +75,15 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
 
   if (sortedMuscles.length === 0) {
     return (
-      <div className='bg-slate-900 rounded-2xl border border-slate-800 p-4'>
-        <h3 className='text-sm text-slate-400 font-bold uppercase flex items-center gap-2 mb-4'>
-          <Dumbbell size={14} /> Enfoque Muscular (Últimos 30 días)
+      <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 p-4'>
+        <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider mb-3'>
+          <Dumbbell
+            size={14}
+            className='text-purple-400'
+          />{" "}
+          Enfoque Muscular
         </h3>
-        <p className='text-xs text-slate-500 italic text-center py-4'>
+        <p className='text-xs text-slate-500 italic text-center py-6'>
           Registra entrenamientos para ver tu enfoque.
         </p>
       </div>
@@ -71,26 +91,49 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
   }
 
   return (
-    <div className='bg-slate-900 rounded-2xl border border-slate-800 p-4'>
-      <h3 className='text-sm text-slate-400 font-bold uppercase flex items-center gap-2 mb-4'>
-        <Dumbbell size={14} /> Enfoque Muscular (Últimos 30 días)
+    <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 p-4'>
+      <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider mb-4'>
+        <Dumbbell
+          size={14}
+          className='text-purple-400'
+        />{" "}
+        Enfoque Muscular
+        <span className='text-[9px] text-slate-600 font-normal normal-case ml-auto'>
+          Últimos 30d
+        </span>
       </h3>
-      <div className='space-y-4'>
+      <div className='space-y-3'>
         {sortedMuscles.map(([muscle, vol]) => {
           const percentage = Math.round((vol / totalVol) * 100);
+          const color = getBarColor(muscle);
           return (
             <div
               key={muscle}
-              className='space-y-1.5'
+              className='space-y-1'
             >
-              <div className='flex justify-between text-xs'>
-                <span className='text-slate-200 font-bold tracking-wide'>{muscle}</span>
-                <span className='text-blue-400 font-mono font-bold'>{percentage}%</span>
+              <div className='flex justify-between items-center text-xs'>
+                <span className='text-slate-200 font-semibold tracking-wide flex items-center gap-2'>
+                  <span
+                    className='w-2 h-2 rounded-full shrink-0'
+                    style={{ backgroundColor: color }}
+                  />
+                  {muscle}
+                </span>
+                <span
+                  className='font-mono font-bold text-sm'
+                  style={{ color }}
+                >
+                  {percentage}%
+                </span>
               </div>
-              <div className='h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800/50 shadow-inner'>
+              <div className='h-1.5 bg-slate-950/60 rounded-full overflow-hidden'>
                 <div
-                  className='h-full bg-linear-to-r from-blue-600 via-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)]'
-                  style={{ width: `${percentage}%` }}
+                  className='h-full rounded-full transition-all duration-1000 ease-out'
+                  style={{
+                    width: `${percentage}%`,
+                    backgroundColor: color,
+                    boxShadow: `0 0 8px ${color}40`,
+                  }}
                 />
               </div>
             </div>

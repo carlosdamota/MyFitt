@@ -3,10 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import Stripe from "stripe";
 import { createAiGenerateFunction } from "./ai-function.js";
-import {
-  createCheckoutSessionFunction,
-  createBillingPortalFunction,
-} from "./billing-functions.js";
+import { createCheckoutSessionFunction, createBillingPortalFunction } from "./billing-functions.js";
 import { createStripeWebhookFunction } from "./webhook-function.js";
 
 initializeApp();
@@ -16,13 +13,11 @@ const auth = getAuth();
 
 const APP_ID = process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
-const GEMINI_MODEL_DEFAULT = process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
-const GEMINI_MODEL_NUTRITION_FREE =
-  process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
+const GEMINI_MODEL_DEFAULT =
+  process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_NUTRITION_FREE = process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
 const GEMINI_MODEL_NUTRITION_PRO =
   process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
-const PRO_AI_MONTHLY_QUOTA = Number(process.env.PRO_AI_MONTHLY_QUOTA ?? "100");
-const FREE_AI_MONTHLY_QUOTA = Number(process.env.FREE_AI_MONTHLY_QUOTA ?? "5");
 const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
 
@@ -39,8 +34,24 @@ export const aiGenerate = createAiGenerateFunction({
   geminiDefaultModel: GEMINI_MODEL_DEFAULT,
   geminiNutritionModelFree: GEMINI_MODEL_NUTRITION_FREE,
   geminiNutritionModelPro: GEMINI_MODEL_NUTRITION_PRO,
-  proAiMonthlyQuota: PRO_AI_MONTHLY_QUOTA,
-  freeAiMonthlyQuota: FREE_AI_MONTHLY_QUOTA,
+  quotas: {
+    routine: {
+      free: Number(process.env.QUOTAS_ROUTINE_FREE ?? "1"),
+      pro: Number(process.env.QUOTAS_ROUTINE_PRO ?? "5"),
+    },
+    nutrition: {
+      free: Number(process.env.QUOTAS_NUTRITION_FREE ?? "100"),
+      pro: Number(process.env.QUOTAS_NUTRITION_PRO ?? "1000"),
+    },
+    coach: {
+      free: Number(process.env.QUOTAS_COACH_FREE ?? "5"),
+      pro: Number(process.env.QUOTAS_COACH_PRO ?? "1000"),
+    },
+    analysis: {
+      free: Number(process.env.QUOTAS_ANALYSIS_FREE ?? "5"),
+      pro: Number(process.env.QUOTAS_ANALYSIS_PRO ?? "1000"),
+    },
+  },
   freeMaxDays: FREE_MAX_DAYS,
   webOrigin: WEB_ORIGIN,
 });

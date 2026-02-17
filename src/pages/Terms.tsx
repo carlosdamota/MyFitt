@@ -72,13 +72,33 @@ const Terms = () => {
             <h2 className='text-xl font-bold text-white mb-4'>4. Cuentas de Usuario</h2>
             <p>
               Al crear una cuenta con nosotros, garantizas que la información que proporcionas es
-              precisa, completa y actual. El desarrollador se reserva el derecho de terminar cuentas
               que violen estos términos.
             </p>
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>5. Limitación de Responsabilidad</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>5. Planes y Límites de Uso</h2>
+            <p>FITTWIZ ofrece un plan gratuito y un plan Pro de pago.</p>
+            <ul className='list-disc pl-5 space-y-2 mt-2'>
+              <li>
+                <strong>Plan Gratuito:</strong> Incluye acceso limitado a la generación de rutinas
+                con IA (1/mes, max 3 días), registro de nutrición (100 logs/mes) y uso básico del
+                Coach.
+              </li>
+              <li>
+                <strong>Plan Pro:</strong> Ofrece límites ampliados o ilimitados para rutinas,
+                nutrición y chat con coach IA, según se detalla en la oferta vigente.
+              </li>
+            </ul>
+            <p className='mt-2'>
+              Los límites se restablecen mensualmente o semanalmente según el caso. FITTWIZ se
+              reserva el derecho de modificar estos límites para garantizar la sostenibilidad del
+              servicio.
+            </p>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-white mb-4'>6. Limitación de Responsabilidad</h2>
             <p>
               En ningún caso el desarrollador de FITTWIZ será responsable por daños indirectos,
               incidentales, especiales, consecuentes o punitivos, incluyendo sin limitación, pérdida
@@ -88,7 +108,7 @@ const Terms = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>6. Cambios</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>7. Cambios</h2>
             <p>
               El desarrollador se reserva el derecho, a su sola discreción, de modificar o
               reemplazar estos Términos en cualquier momento. Intentaremos proporcionar un aviso de

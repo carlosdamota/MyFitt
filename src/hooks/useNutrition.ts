@@ -8,6 +8,7 @@ import {
   onSnapshot,
   limit,
   orderBy,
+  updateDoc,
 } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
@@ -21,6 +22,11 @@ export interface UseNutritionReturn {
   deleteFoodLog: (logId: string) => Promise<boolean>;
   todayTotals: MacroTotals;
   getDayTotals: (date: Date | string) => MacroTotals;
+  updateFoodLog: (
+    logId: string,
+    data: Partial<Omit<NutritionLogEntry, "id" | "date">>,
+  ) => Promise<boolean>;
+  duplicateLog: (log: NutritionLogEntry) => Promise<boolean>; // Add duplicateLog to interface
 }
 
 export const useNutrition = (user: User | null): UseNutritionReturn => {
@@ -124,5 +130,45 @@ export const useNutrition = (user: User | null): UseNutritionReturn => {
     );
   };
 
-  return { logs, loading, error, addFoodLog, deleteFoodLog, todayTotals, getDayTotals };
+  const updateFoodLog = async (
+    logId: string,
+    data: Partial<Omit<NutritionLogEntry, "id" | "date">>,
+  ): Promise<boolean> => {
+    if (!user || !db) return false;
+    try {
+      const logRef = doc(db, "artifacts", appId, "users", user.uid, "nutrition_logs", logId);
+      // @ts-ignore - Firestore update types can be tricky with partials
+      await updateDoc(logRef, data);
+      return true;
+    } catch (err) {
+      console.error("Error updating food log:", err);
+      setError("Error actualizando comida");
+      return false;
+    }
+  };
+
+  const duplicateLog = async (log: NutritionLogEntry): Promise<boolean> => {
+    if (!user || !db) return false;
+    try {
+      const { id, date, ...logData } = log;
+      await addFoodLog(logData);
+      return true;
+    } catch (err) {
+      console.error("Error duplicating food log:", err);
+      setError("Error duplicando comida");
+      return false;
+    }
+  };
+
+  return {
+    logs,
+    loading,
+    error,
+    addFoodLog,
+    deleteFoodLog,
+    updateFoodLog,
+    duplicateLog,
+    todayTotals,
+    getDayTotals,
+  };
 };

@@ -491,10 +491,10 @@ const Landing: React.FC = () => {
               price='0 €'
               desc='Prueba el sistema y crea tus primeras rutinas.'
               features={[
-                "Rutinas de 1-2 días",
-                "5 generaciones IA/mes",
+                "1 Rutina IA al mes (2 días max)",
+                "100 Logs de nutrición/mes",
+                "Chat Coach (5 mensajes/mes)",
                 "Seguimiento de progresos",
-                "Tracking de nutrición",
               ]}
               cta='Comenzar gratis'
               onClick={onLogin}
@@ -511,10 +511,10 @@ const Landing: React.FC = () => {
               }
               desc='Programas completos con IA avanzada y análisis (Precio reducido por tiempo limitado).'
               features={[
-                "Rutinas de hasta 6 días",
-                "100 generaciones IA/mes",
-                "Programas multi-semana",
-                "Portal de suscripción",
+                "5 Rutinas IA al mes (6 días)",
+                "Nutrición Ilimitada + Fotos",
+                "Chat Coach Ilimitado",
+                "Análisis de progreso avanzado",
               ]}
               cta='Desbloquear Oferta Pro'
               onClick={onLogin}

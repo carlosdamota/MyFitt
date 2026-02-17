@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { TrendingUp, X, Trophy, Dumbbell } from "lucide-react";
+import { TrendingUp, ArrowLeft, Trophy, Dumbbell, Flame } from "lucide-react";
 import LogViewer from "./LogViewer";
-import Modal from "../common/Modal";
 import { isBodyweightExercise } from "../../utils/stats";
 import type { WorkoutLogs, RoutineData } from "../../types";
 
@@ -57,49 +56,102 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
 
   const totalSessions = aggregatedData.length;
   const totalVolumeAllTime = aggregatedData.reduce((acc, curr) => acc + curr.val, 0);
+  const totalExercises = Object.keys(logs).length;
+
+  const tabs = [
+    { key: "charts" as const, label: "Gráficas", color: "blue" },
+    { key: "weekly" as const, label: "Coach IA", color: "purple" },
+    { key: "logs" as const, label: "Diario", color: "emerald" },
+  ];
 
   return (
     <div className='fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col'>
       {/* Header */}
-      <div className='bg-slate-900 p-4 flex justify-between items-center border-b border-slate-800 shadow-lg'>
-        <h2 className='text-lg font-bold text-white flex items-center gap-2'>
-          <TrendingUp
-            size={20}
-            className='text-blue-400'
-          />{" "}
-          Rendimiento
-        </h2>
+      <div className='bg-slate-900/80 backdrop-blur-xl px-4 py-3 flex items-center gap-3 border-b border-slate-800/50'>
         <button
           onClick={onClose}
-          className='p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors'
+          className='p-2 rounded-xl bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors active:scale-95'
         >
-          <X size={20} />
+          <ArrowLeft size={18} />
         </button>
+        <div className='flex-1 min-w-0'>
+          <h2 className='text-base font-bold text-white flex items-center gap-2'>
+            <TrendingUp
+              size={18}
+              className='text-blue-400'
+            />
+            Rendimiento
+          </h2>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className='px-4 py-3 border-b border-slate-800/50'>
+        <div className='bg-slate-800/40 rounded-2xl border border-slate-700/30 flex divide-x divide-slate-700/30'>
+          <div className='flex-1 py-3 px-2 text-center'>
+            <Trophy
+              size={14}
+              className='text-amber-400 mx-auto mb-1'
+            />
+            <p className='text-lg font-bold text-white font-mono leading-none'>{totalSessions}</p>
+            <span className='text-[9px] text-slate-500 font-bold uppercase'>Sesiones</span>
+          </div>
+          <div className='flex-1 py-3 px-2 text-center'>
+            <Dumbbell
+              size={14}
+              className='text-blue-400 mx-auto mb-1'
+            />
+            <p className='text-lg font-bold text-white font-mono leading-none'>
+              {totalVolumeAllTime >= 1000
+                ? `${(totalVolumeAllTime / 1000).toFixed(1)}k`
+                : totalVolumeAllTime}
+            </p>
+            <span className='text-[9px] text-slate-500 font-bold uppercase'>Tonelaje</span>
+          </div>
+          <div className='flex-1 py-3 px-2 text-center'>
+            <Flame
+              size={14}
+              className='text-orange-400 mx-auto mb-1'
+            />
+            <p className='text-lg font-bold text-white font-mono leading-none'>{totalExercises}</p>
+            <span className='text-[9px] text-slate-500 font-bold uppercase'>Ejercicios</span>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className='flex p-2 bg-slate-900 gap-2 border-b border-slate-800'>
-        <button
-          onClick={() => setViewMode("charts")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${viewMode === "charts" ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40" : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300"}`}
-        >
-          GRÁFICAS
-        </button>
-        <button
-          onClick={() => setViewMode("weekly")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${viewMode === "weekly" ? "bg-purple-600 text-white shadow-lg shadow-purple-900/40" : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300"}`}
-        >
-          COACH SEMANAL
-        </button>
-        <button
-          onClick={() => setViewMode("logs")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${viewMode === "logs" ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40" : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300"}`}
-        >
-          DIARIO
-        </button>
+      <div className='flex px-4 py-2 bg-slate-900/40 gap-1.5 border-b border-slate-800/50'>
+        {tabs.map(({ key, label, color }) => (
+          <button
+            key={key}
+            onClick={() => setViewMode(key)}
+            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.97] ${
+              viewMode === key
+                ? `bg-${color}-600 text-white shadow-lg shadow-${color}-900/40`
+                : "bg-slate-800/60 text-slate-400 hover:bg-slate-700/80 hover:text-slate-300"
+            }`}
+            style={
+              viewMode === key
+                ? {
+                    backgroundColor:
+                      color === "blue" ? "#2563eb" : color === "purple" ? "#9333ea" : "#059669",
+                    boxShadow:
+                      color === "blue"
+                        ? "0 10px 15px -3px rgba(37,99,235,0.3)"
+                        : color === "purple"
+                          ? "0 10px 15px -3px rgba(147,51,234,0.3)"
+                          : "0 10px 15px -3px rgba(5,150,105,0.3)",
+                  }
+                : {}
+            }
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      <div className='flex-1 overflow-y-auto p-4 space-y-6 bg-linear-to-b from-slate-900 to-slate-950'>
+      {/* Content */}
+      <div className='flex-1 overflow-y-auto p-4 space-y-4 bg-linear-to-b from-slate-900/50 to-slate-950'>
         {viewMode === "charts" ? (
           <>
             <DailyVolumeChart
@@ -110,25 +162,6 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
               logs={logs}
               routines={routines}
             />
-
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-sm'>
-                <div className='flex items-center gap-2 text-blue-400 mb-2'>
-                  <Trophy size={18} />
-                  <span className='text-[10px] font-bold uppercase tracking-wider'>Sesiones</span>
-                </div>
-                <p className='text-3xl font-mono font-bold text-white'>{totalSessions}</p>
-              </div>
-              <div className='bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-sm'>
-                <div className='flex items-center gap-2 text-purple-400 mb-2'>
-                  <Dumbbell size={18} />
-                  <span className='text-[10px] font-bold uppercase tracking-wider'>Tonelaje</span>
-                </div>
-                <p className='text-2xl font-mono font-bold text-white'>
-                  {(totalVolumeAllTime / 1000).toFixed(1)}k
-                </p>
-              </div>
-            </div>
           </>
         ) : viewMode === "weekly" ? (
           <WeeklyCoach

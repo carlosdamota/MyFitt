@@ -7,6 +7,9 @@ import type { User } from "firebase/auth";
 import MacroSummary from "./MacroSummary";
 import NutritionAILogger from "./NutritionAILogger";
 import MealHistory from "./MealHistory";
+import EditMealModal from "./EditMealModal";
+import RefineMealModal from "./RefineMealModal";
+import type { NutritionLogEntry } from "../../types";
 
 interface NutritionDashboardProps {
   user: User | null;
@@ -26,9 +29,12 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
   onRequireAuth,
   onUpgrade,
 }) => {
-  const { logs, loading, addFoodLog, deleteFoodLog, getDayTotals } = useNutrition(user);
+  const { logs, loading, addFoodLog, deleteFoodLog, updateFoodLog, duplicateLog, getDayTotals } =
+    useNutrition(user);
   const { profile, saveProfile } = useProfile(user);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [editingMeal, setEditingMeal] = useState<NutritionLogEntry | null>(null);
+  const [refiningMeal, setRefiningMeal] = useState<NutritionLogEntry | null>(null);
 
   // Calcular objetivos basados en el perfil
   const targets = useMemo<MacroTargets>(() => {
@@ -100,7 +106,7 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
   };
 
   return (
-    <div className='space-y-6 pb-20 overflow-y-auto max-h-[85vh] px-1 relative'>
+    <div className='space-y-6 pb-20 px-1 relative'>
       <div className='grid grid-cols-2 gap-4 bg-slate-900/50 p-3 rounded-xl border border-slate-800'>
         <div>
           <label className='text-[10px] uppercase font-bold text-slate-500 mb-1 block'>
@@ -152,7 +158,33 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
         selectedDate={selectedDate}
         onDateChange={changeDate}
         onDeleteLog={deleteFoodLog}
+        onDuplicate={(log) => (duplicateLog ? duplicateLog(log) : Promise.resolve(false))}
+        onEdit={(log) => setEditingMeal(log)}
+        onRefine={(log) => setRefiningMeal(log)}
         loading={loading}
+      />
+
+      {/* Modals */}
+      <EditMealModal
+        isOpen={!!editingMeal}
+        meal={editingMeal}
+        onClose={() => setEditingMeal(null)}
+        onSave={async (id, data) => {
+          // Remove id and date if present in data to match updateFoodLog type
+          const { id: _, date: __, ...updateData } = data as any;
+          return await updateFoodLog(id, updateData);
+        }}
+      />
+
+      <RefineMealModal
+        isOpen={!!refiningMeal}
+        meal={refiningMeal}
+        onClose={() => setRefiningMeal(null)}
+        onSave={async (id, data) => {
+          // Remove id and date if present in data to match updateFoodLog type
+          const { id: _, date: __, ...updateData } = data as any;
+          return await updateFoodLog(id, updateData);
+        }}
       />
     </div>
   );

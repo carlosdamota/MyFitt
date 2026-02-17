@@ -200,6 +200,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
           onUpgrade={onUpgrade}
+          upgradeContext='routine_generation'
         />
       )}
 

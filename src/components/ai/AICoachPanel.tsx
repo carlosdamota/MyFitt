@@ -16,6 +16,76 @@ interface AICoachPanelProps {
   isPro?: boolean;
 }
 
+const GeneratedRoutinesHistory: React.FC<{
+  user: FirebaseUser | null;
+  onShowRoutines?: () => void;
+}> = ({ user, onShowRoutines }) => {
+  const { routines } = useRoutines(user);
+
+  // Group routines by programId to count "generated programs"
+  const programs = React.useMemo(() => {
+    const groups: Record<string, { title: string; date: string; count: number; focus: string }> =
+      {};
+
+    Object.values(routines).forEach((routine) => {
+      if (routine.programId && !routine.isDefault) {
+        if (!groups[routine.programId]) {
+          groups[routine.programId] = {
+            title: routine.title.split(":")[0].trim(),
+            date: routine.createdAt || new Date().toISOString(),
+            count: 0,
+            focus: routine.focus || routine.goal || "General",
+          };
+        }
+        groups[routine.programId].count++;
+      }
+    });
+
+    return Object.values(groups).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+  }, [routines]);
+
+  if (programs.length === 0) return null;
+
+  return (
+    <div className='space-y-3 animate-in slide-in-from-bottom-2 duration-500'>
+      <div className='flex items-center justify-between px-1'>
+        <h3 className='text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2'>
+          <span className='w-1.5 h-1.5 rounded-full bg-blue-500' />
+          Historial Generado ({programs.length})
+        </h3>
+      </div>
+
+      <div className='grid gap-2'>
+        {programs.slice(0, 3).map((prog, idx) => (
+          <div
+            key={idx}
+            className='bg-slate-900/30 border border-slate-800 rounded-xl p-3 flex items-center justify-between'
+          >
+            <div>
+              <h4 className='text-sm font-bold text-slate-300'>{prog.title}</h4>
+              <div className='flex gap-2 text-[10px] text-slate-500 mt-0.5'>
+                <span>{new Date(prog.date).toLocaleDateString()}</span>
+                <span>•</span>
+                <span>{prog.count} Días</span>
+                <span>•</span>
+                <span>{prog.focus}</span>
+              </div>
+            </div>
+            <button
+              onClick={onShowRoutines}
+              className='text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-900/10 hover:bg-blue-900/20 px-3 py-1.5 rounded-lg transition-colors'
+            >
+              Ver
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const AICoachPanel: React.FC<AICoachPanelProps> = ({
   user,
   onRequireAuth,
@@ -24,6 +94,75 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
   onUpgrade,
   isPro,
 }) => {
+  const GeneratedRoutinesHistory: React.FC<{
+    user: FirebaseUser | null;
+    onShowRoutines?: () => void;
+  }> = ({ user, onShowRoutines }) => {
+    const { routines } = useRoutines(user);
+
+    // Group routines by programId to count "generated programs"
+    const programs = React.useMemo(() => {
+      const groups: Record<string, { title: string; date: string; count: number; focus: string }> =
+        {};
+
+      Object.values(routines).forEach((routine) => {
+        if (routine.programId && !routine.isDefault) {
+          if (!groups[routine.programId]) {
+            groups[routine.programId] = {
+              title: routine.title.split(":")[0].trim(),
+              date: routine.createdAt || new Date().toISOString(),
+              count: 0,
+              focus: routine.goal || "General",
+            };
+          }
+          groups[routine.programId].count++;
+        }
+      });
+
+      return Object.values(groups).sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    }, [routines]);
+
+    if (programs.length === 0) return null;
+
+    return (
+      <div className='space-y-3 animate-in slide-in-from-bottom-2 duration-500'>
+        <div className='flex items-center justify-between px-1'>
+          <h3 className='text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2'>
+            <span className='w-1.5 h-1.5 rounded-full bg-blue-500' />
+            Historial Generado ({programs.length})
+          </h3>
+        </div>
+
+        <div className='grid gap-2'>
+          {programs.slice(0, 3).map((prog, idx) => (
+            <div
+              key={idx}
+              className='bg-slate-900/30 border border-slate-800 rounded-xl p-3 flex items-center justify-between'
+            >
+              <div>
+                <h4 className='text-sm font-bold text-slate-300'>{prog.title}</h4>
+                <div className='flex gap-2 text-[10px] text-slate-500 mt-0.5'>
+                  <span>{new Date(prog.date).toLocaleDateString()}</span>
+                  <span>•</span>
+                  <span>{prog.count} Días</span>
+                  <span>•</span>
+                  <span>{prog.focus}</span>
+                </div>
+              </div>
+              <button
+                onClick={onShowRoutines}
+                className='text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-900/10 hover:bg-blue-900/20 px-3 py-1.5 rounded-lg transition-colors'
+              >
+                Ver
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
   const { profile, loading, saveProfile } = useProfile(user);
   const { createRoutine } = useRoutines(user);
   const [formData, setFormData] = useState<ProfileFormData | null>(null);
@@ -85,6 +224,12 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
           Editar perfil
         </button>
       </div>
+
+      {/* Generated Routines Summary */}
+      <GeneratedRoutinesHistory
+        user={user}
+        onShowRoutines={onShowRoutines}
+      />
 
       <GoalsContextPanel
         formData={formData}

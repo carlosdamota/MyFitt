@@ -7,6 +7,13 @@ interface RateLimitErrorProps {
   resetAt: string | null;
   onClose: () => void;
   onUpgrade?: () => void;
+  upgradeContext?:
+    | "nutrition_photo"
+    | "routine_generation"
+    | "unlimited_usage"
+    | "stats"
+    | "ai_coach"
+    | "general";
 }
 
 const RateLimitError: React.FC<RateLimitErrorProps> = ({
@@ -14,6 +21,7 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
   resetAt,
   onClose,
   onUpgrade,
+  upgradeContext = "unlimited_usage",
 }) => {
   const [timeUntilReset, setTimeUntilReset] = useState<string>("");
 
@@ -95,7 +103,7 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
           {onUpgrade && (
             <ProUpgrade
               mini
-              context='unlimited_usage'
+              context={upgradeContext}
               buttonText='Pasar a Pro'
               onClick={onClose}
               className='flex-1 justify-center py-2.5 h-auto bg-blue-600 text-white hover:bg-blue-500 border-none'

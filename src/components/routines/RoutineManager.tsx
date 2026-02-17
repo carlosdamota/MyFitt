@@ -191,35 +191,11 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
             </div>
           ) : (
             <>
-              {/* Default Programs */}
-              {groupedRoutines.defaults.length > 0 && (
-                <div className='space-y-4'>
-                  <h3 className='flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1'>
-                    <Zap size={14} /> Rutinas FITTWIZ
-                  </h3>
-                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                    {groupedRoutines.defaults.map(([programId, group]) => (
-                      <ProgramCard
-                        key={programId}
-                        programId={programId}
-                        title={group.title}
-                        routines={group.routines}
-                        activeRoutineId={activeRoutineId}
-                        onActivate={handleSetActive}
-                        onDeleteProgram={() => {}}
-                        onDeleteRoutine={() => {}}
-                        isDefault={true}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* User Programs & Standalone */}
+              {/* User Programs & Standalone — shown FIRST */}
               {(groupedRoutines.customGroups.length > 0 ||
                 groupedRoutines.standalone.length > 0) && (
                 <div className='space-y-4'>
-                  <div className='flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1 pt-4 border-t border-slate-800/50'>
+                  <div className='flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1'>
                     <Calendar size={14} /> Mis Planes
                   </div>
 
@@ -303,8 +279,32 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
 
-                    {/* Add New Routine Card (could be added here in future) */}
+              {/* Default Programs — shown AFTER user plans */}
+              {groupedRoutines.defaults.length > 0 && (
+                <div className='space-y-4'>
+                  <h3
+                    className={`flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1 ${groupedRoutines.customGroups.length > 0 || groupedRoutines.standalone.length > 0 ? "pt-4 border-t border-slate-800/50" : ""}`}
+                  >
+                    <Zap size={14} /> Rutinas FITTWIZ
+                  </h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                    {groupedRoutines.defaults.map(([programId, group]) => (
+                      <ProgramCard
+                        key={programId}
+                        programId={programId}
+                        title={group.title}
+                        routines={group.routines}
+                        activeRoutineId={activeRoutineId}
+                        onActivate={handleSetActive}
+                        onDeleteProgram={() => {}}
+                        onDeleteRoutine={() => {}}
+                        isDefault={true}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
