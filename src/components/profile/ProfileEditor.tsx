@@ -60,7 +60,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
     return <div className='p-8 text-center text-slate-500'>Cargando perfil...</div>;
 
   return (
-    <div className='space-y-6 pb-20 overflow-y-auto max-h-[80vh] px-1'>
+    <div className='space-y-6 pb-20 px-1'>
       <ProfileForm
         formData={formData}
         handleChange={handleChange}
