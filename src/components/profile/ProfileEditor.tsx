@@ -5,6 +5,7 @@ import { useEntitlement } from "../../hooks/useEntitlement";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
+import NotificationSettings from "./NotificationSettings";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
 
@@ -98,6 +99,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
         user={user}
         onRequireAuth={onRequireAuth}
       />
+
+      <NotificationSettings user={user} />
 
       <div className='mt-4 pt-4 border-t border-slate-800 text-center'>
         <button

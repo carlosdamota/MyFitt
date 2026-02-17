@@ -87,13 +87,22 @@ import { createEmailAgentFunctions } from "./email-agent.js";
 import { createPushAgentFunctions } from "./push-agent.js";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
-const EMAIL_FROM = process.env.EMAIL_FROM ?? "onboarding@resend.dev"; // Default Resend testing email
+const EMAIL_FROM = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
 
-export const emailAgent = createEmailAgentFunctions({
+const emailAgentFns = createEmailAgentFunctions({
   geminiApiKey: GEMINI_API_KEY,
   resendApiKey: RESEND_API_KEY,
   fromEmail: EMAIL_FROM,
+  webOrigin: WEB_ORIGIN,
 });
+
+// Cloud Functions (auto-deployed)
+export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
+export const weeklyReengagement = emailAgentFns.weeklyReengagement;
+export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
+
+// Callable helper (used by webhook internally)
+export const sendProSubscriptionEmail = emailAgentFns.sendProSubscriptionEmail;
 
 export const pushAgent = createPushAgentFunctions({
   db,

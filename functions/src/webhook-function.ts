@@ -22,7 +22,11 @@ export const createStripeWebhookFunction = ({
   stripe,
   stripeWebhookSecret,
 }: WebhookDeps) => {
-  const updatePlanForCustomer = async (customerId: string, isPro: boolean, subscriptionId?: string) => {
+  const updatePlanForCustomer = async (
+    customerId: string,
+    isPro: boolean,
+    subscriptionId?: string,
+  ) => {
     const userQuery = await db
       .collectionGroup("billing")
       .where("stripeCustomerId", "==", customerId)
@@ -47,49 +51,67 @@ export const createStripeWebhookFunction = ({
         },
         { merge: true },
       );
+
+    // --- Send commercial email on plan change ---
+    try {
+      const { sendProSubscriptionEmail } = await import("./index.js");
+      if (typeof sendProSubscriptionEmail === "function") {
+        await sendProSubscriptionEmail(uid, isPro);
+      }
+    } catch (err) {
+      // Non-critical: log and continue
+      console.error("Failed to send Pro email:", err);
+    }
   };
 
-  return onRequest({ timeoutSeconds: 60, invoker: "public" }, async (req: Request, res: Response) => {
-    const sig = req.headers["stripe-signature"] as string | undefined;
-    if (!sig || !stripeWebhookSecret) {
-      res.status(400).send("missing_signature");
-      return;
-    }
-
-    let event: Stripe.Event;
-    try {
-      const payload = (req as any).rawBody;
-      event = stripe.webhooks.constructEvent(payload, sig, stripeWebhookSecret);
-    } catch {
-      res.status(400).send("invalid_signature");
-      return;
-    }
-
-    try {
-      switch (event.type) {
-        case "checkout.session.completed": {
-          const session = event.data.object as Stripe.Checkout.Session;
-          if (session.customer) {
-            await updatePlanForCustomer(String(session.customer), true, String(session.subscription));
-          }
-          break;
-        }
-        case "customer.subscription.created":
-        case "customer.subscription.updated":
-        case "customer.subscription.deleted": {
-          const subscription = event.data.object as Stripe.Subscription;
-          const isActive = subscription.status === "active" || subscription.status === "trialing";
-          await updatePlanForCustomer(String(subscription.customer), isActive, subscription.id);
-          break;
-        }
-        default:
-          break;
+  return onRequest(
+    { timeoutSeconds: 60, invoker: "public" },
+    async (req: Request, res: Response) => {
+      const sig = req.headers["stripe-signature"] as string | undefined;
+      if (!sig || !stripeWebhookSecret) {
+        res.status(400).send("missing_signature");
+        return;
       }
-    } catch {
-      res.status(500).send("webhook_failed");
-      return;
-    }
 
-    res.status(200).send("ok");
-  });
+      let event: Stripe.Event;
+      try {
+        const payload = (req as any).rawBody;
+        event = stripe.webhooks.constructEvent(payload, sig, stripeWebhookSecret);
+      } catch {
+        res.status(400).send("invalid_signature");
+        return;
+      }
+
+      try {
+        switch (event.type) {
+          case "checkout.session.completed": {
+            const session = event.data.object as Stripe.Checkout.Session;
+            if (session.customer) {
+              await updatePlanForCustomer(
+                String(session.customer),
+                true,
+                String(session.subscription),
+              );
+            }
+            break;
+          }
+          case "customer.subscription.created":
+          case "customer.subscription.updated":
+          case "customer.subscription.deleted": {
+            const subscription = event.data.object as Stripe.Subscription;
+            const isActive = subscription.status === "active" || subscription.status === "trialing";
+            await updatePlanForCustomer(String(subscription.customer), isActive, subscription.id);
+            break;
+          }
+          default:
+            break;
+        }
+      } catch {
+        res.status(500).send("webhook_failed");
+        return;
+      }
+
+      res.status(200).send("ok");
+    },
+  );
 };
