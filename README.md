@@ -1,135 +1,121 @@
-# MyFitt (Fittwiz)
+# MyFitt
 
-MyFitt is a comprehensive fitness tracking application designed to help users achieve their health goals through personalized workout routines, nutrition tracking, and AI-powered coaching.
+**Tu Entrenador Personal, Nutricionista y Coach de Vida en tu Bolsillo.**
+
+MyFitt no es solo otra aplicación de fitness; es un ecosistema completo diseñado para transformar tu salud y bienestar físico. Utilizando la última tecnología en Inteligencia Artificial, MyFitt crea una experiencia totalmente personalizada que se adapta a ti, a tus objetivos y a tu estilo de vida.
 
 ![MyFitt Logo](public/pwa-192x192.png)
 
-## Features
+## 🚀 ¿Por qué elegir MyFitt?
 
-- **Personalized Workouts**: Create and manage custom workout routines.
-- **AI Coach**: Get AI-generated workout plans and advice tailored to your goals.
-- **Nutrition Tracking**: Log meals, track macros, and monitor your daily intake.
-- **Progress Statistics**: Visualize your progress with detailed charts and stats.
-- **Social Sharing**: Share your workout achievements with friends.
-- **Pro Membership**: Unlock advanced features like unlimited AI generations and deep analytics.
-- **PWA Support**: Install the app on your device for a native-like experience.
+En un mundo lleno de aplicaciones genéricas, MyFitt destaca por ofrecer una experiencia **Premium**, intuitiva y profundamente personalizada. Olvídate de las hojas de cálculo aburridas y los planes estáticos.
 
-## Tech Stack
+### ✨ Características Principales
 
-### Frontend
+#### 🤖 AI Personal Trainer (Tu Entrenador Inteligente)
 
-- **Framework**: React 19 with Vite
-- **Styling**: Tailwind CSS, PostCSS
-- **State Management**: React Context / Hooks
-- **Routing**: React Router v7
-- **UI Components**:
-  - Lucide React (Icons)
-  - @dnd-kit (Drag and Drop)
-  - clsx / tailwind-merge (Utility classes)
-- **PWA**: vite-plugin-pwa
+- **Rutinas Generadas por IA:** Dile adiós a la parálisis por análisis. Nuestra IA diseña rutinas de entrenamiento específicas para ti, basadas en tu nivel, equipo disponible y objetivos.
+- **Adaptabilidad Total:** ¿Solo tienes 20 minutos? ¿Te duele la rodilla? La IA ajusta tu entrenamiento al instante.
+- **Progresión Inteligente:** El sistema aprende de tu rendimiento y ajusta la dificultad para garantizar que siempre estés progresando sin estancarte.
 
-### Backend / Services
+#### 🥗 Smart Nutrition (Nutrición sin Complicaciones)
 
-- **Firebase**: Authentication, Firestore Database, Cloud Functions
-- **AI Integration**: Custom AI functions (located in `functions/`)
+- **Escaneo de Comidas con IA:** Simplemente toma una foto de tu plato y deja que nuestra IA identifique los alimentos y calcule los macros por ti. ¡Magia!
+- **Seguimiento de Macros y Calorías:** Visualiza fácilmente tu ingesta diaria de proteínas, carbohidratos y grasas para mantenerte en el camino correcto.
+- **Planes de Comidas:** Recibe sugerencias de comidas que se ajustan a tus necesidades calóricas.
 
-## Getting Started
+#### 📈 Progress Analytics (Visualiza tu Éxito)
 
-Follow these steps to set up the project locally.
+- **Estadísticas Detalladas:** Gráficos hermosos e interactivos que te muestran tu evolución en fuerza, peso corporal, consistencia y más.
+- **Gamificación:** Sube de nivel, desbloquea logros y mantente motivado viendo cómo tus estadísticas mejoran día a día.
+- **Historial Completo:** Guarda un registro de cada levantamiento, cada comida y cada hito alcanzado.
 
-### Prerequisites
+#### 👟 Gestión de Equipo (Shoe Tracker)
 
-- Node.js (v18 or higher recommended)
-- [pnpm](https://pnpm.io/) (Package manager)
+- **Control de Kilometraje:** Registra tus zapatillas de correr y lleva un control preciso de su vida útil para evitar lesiones.
 
-### Installation
+#### 👥 Comunidad y Social
 
-1. Clone the repository:
+- **Comparte tus Logros:** Genera imágenes atractivas con el resumen de tu entrenamiento para compartir en Instagram o con tus amigos.
 
-   ```bash
-   git clone <repository-url>
-   cd MyFitt
-   ```
+#### 💎 Experiencia Premium (Pro)
 
-2. Install dependencies:
+- Suscripción opcional para usuarios exigentes.
+- Generaciones de IA ilimitadas.
+- Análisis de datos avanzado y tendencias a largo plazo.
 
-   ```bash
-   pnpm install
-   ```
+---
 
-   Also install dependencies for Firebase Functions if you plan to work on the backend:
+## 🛠️ Información Técnica para Desarrolladores
 
-   ```bash
-   cd functions
-   pnpm install
-   cd ..
-   ```
+Si eres desarrollador y quieres contribuir o desplegar tu propia instancia de MyFitt, aquí tienes los detalles técnicos.
 
-### Environment Variables
+### Tech Stack
 
-#### Frontend (.env)
+#### Frontend
 
-Create a `.env` file in the root directory.
+- **Core:** React 19, TypeScript, Vite
+- **Estilos:** Tailwind CSS v4, PostCSS, Diseño Responsivo Mobile-First
+- **Estado & Routing:** React Context, React Router v7
+- **UX/UI:** Lucide React (Íconos), @dnd-kit (Drag & Drop), Framer Motion (Animaciones)
+- **PWA:** Totalmente instalable y offline-capable con `vite-plugin-pwa`
 
-```bash
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_APPCHECK_KEY=your_recaptcha_site_key  # Optional, for App Check
-```
+#### Backend & Servicios
 
-#### Backend (functions/.env)
+- **Plataforma:** Firebase (Google Cloud)
+  - **Auth:** Gestión de usuarios segura.
+  - **Firestore:** Base de datos NoSQL en tiempo real.
+  - **Functions:** Serverless computing para la lógica de negocio y la IA.
+  - **Storage:** Almacenamiento de imágenes de usuarios y comidas.
+- **Inteligencia Artificial:** Integración con modelos LLM (Gemini/OpenAI) a través de Firebase Functions.
+- **Pagos:** Integración completa con Stripe para suscripciones.
 
-Create a `.env` file in the `functions` directory.
+### Configuración del Proyecto
 
-```bash
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRICE_PRO_MONTHLY=price_...
-GEMINI_API_KEY=your_gemini_api_key
-PRO_AI_MONTHLY_QUOTA=100
-FREE_AI_WEEKLY_QUOTA=5
-FITMANUAL_APP_ID=fitmanual-default
-WEB_ORIGIN=http://localhost:5173
-```
+1.  **Clonar el repositorio:**
 
-### Running the App
+    ```bash
+    git clone <url-del-repo>
+    cd MyFitt
+    ```
 
-Start the development server:
+2.  **Instalar dependencias:**
 
-```bash
-pnpm dev
-```
+    ```bash
+    pnpm install
+    ```
 
-The app will be available at `http://localhost:5173`.
+    _Para el backend (Functions):_
 
-### Building for Production
+    ```bash
+    cd functions && pnpm install && cd ..
+    ```
 
-To build the application for production:
+3.  **Variables de Entorno:**
+    Crea un archivo `.env` en la raíz con tus credenciales de Firebase:
 
-```bash
-pnpm build
-```
+    ```bash
+    VITE_FIREBASE_API_KEY=...
+    VITE_FIREBASE_AUTH_DOMAIN=...
+    VITE_FIREBASE_PROJECT_ID=...
+    # ... otras variables de Firebase
+    ```
 
-To preview the production build:
+    Crea un archivo `.env` en `functions/` para el backend:
 
-```bash
-pnpm preview
-```
+    ```bash
+    STRIPE_SECRET_KEY=...
+    GEMINI_API_KEY=...
+    # ... otras variables de servidor
+    ```
 
-### Linting & Type Checking
+4.  **Ejecutar en desarrollo:**
 
-Run ESLint:
+    ```bash
+    pnpm dev
+    ```
 
-```bash
-pnpm lint
-```
-
-Run TypeScript type checking:
-
-```bash
-pnpm typecheck
-```
+5.  **Build de producción:**
+    ```bash
+    pnpm build
+    ```
