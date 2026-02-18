@@ -26,7 +26,6 @@ interface WorkoutDayProps {
   workoutLogs: WorkoutLogs;
   user: User | null;
   onRequireAuth?: () => void;
-  onShowSubscription?: () => void;
   isPro?: boolean;
 }
 
@@ -42,7 +41,6 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   workoutLogs,
   user,
   onRequireAuth,
-  onShowSubscription,
   isPro,
 }) => {
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
@@ -138,12 +136,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         className='mb-8'
       />
 
-      {showProCta && (
-        <ProUpgradeCta
-          onRequireAuth={onRequireAuth}
-          onShowSubscription={onShowSubscription}
-        />
-      )}
+      {showProCta && <ProUpgradeCta />}
 
       {/* Warmup Section */}
       {routine.warmup && (
@@ -175,7 +168,6 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               onDeleteLog={onDeleteLog}
               onResetTimer={handleStartRest}
               onRequireAuth={onRequireAuth}
-              onShowSubscription={onShowSubscription}
             />
           ))
         ) : (

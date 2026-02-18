@@ -14,7 +14,7 @@ import type { DashboardContext } from "../layouts/DashboardLayout";
 import WeeklyProgress from "../components/dashboard/WeeklyProgress";
 
 export default function WorkoutDashboard() {
-  const { user, isPro, onRequireAuth, onUpgrade } = useOutletContext<DashboardContext>();
+  const { user, isPro, onRequireAuth } = useOutletContext<DashboardContext>();
 
   const [activeTab, setActiveTab] = useState<string>("day1");
   const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
@@ -105,7 +105,6 @@ export default function WorkoutDashboard() {
         workoutLogs={workoutLogs}
         user={user}
         onRequireAuth={onRequireAuth}
-        onShowSubscription={onUpgrade}
       />
 
       {showRoutineEditor && (

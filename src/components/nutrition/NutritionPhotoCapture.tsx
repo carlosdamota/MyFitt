@@ -8,7 +8,6 @@ interface NutritionPhotoCaptureProps {
   imagePreview: string | null;
   onPhotoSelected: (dataUrl: string, mimeType: string) => void;
   onClearPhoto: () => void;
-  onUpgrade?: () => void;
 }
 
 const fileToDataUrl = (file: File): Promise<string> =>
@@ -25,13 +24,11 @@ const NutritionPhotoCapture: React.FC<NutritionPhotoCaptureProps> = ({
   imagePreview,
   onPhotoSelected,
   onClearPhoto,
-  onUpgrade,
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleClick = () => {
     if (!isPro) {
-      onUpgrade?.();
       return;
     }
     inputRef.current?.click();

@@ -4,7 +4,7 @@ import AICoachPanel from "../components/ai/AICoachPanel";
 import type { DashboardContext } from "../layouts/DashboardLayout";
 
 export default function CoachPage() {
-  const { user, isPro, onRequireAuth, onUpgrade } = useOutletContext<DashboardContext>();
+  const { user, isPro, onRequireAuth } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
   return (
@@ -13,7 +13,6 @@ export default function CoachPage() {
       onRequireAuth={onRequireAuth}
       onShowProfile={() => navigate("/app/profile")}
       onShowRoutines={() => navigate("/app")}
-      onUpgrade={onUpgrade}
       isPro={isPro}
     />
   );

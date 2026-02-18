@@ -1,12 +1,10 @@
 import React from "react";
 import { Crown } from "lucide-react";
+import { useProUpgrade } from "../common/ProUpgradeContext";
 
-interface ProUpgradeCtaProps {
-  onRequireAuth?: () => void;
-  onShowSubscription?: () => void;
-}
+const ProUpgradeCta: React.FC = () => {
+  const { openProUpgradeModal } = useProUpgrade();
 
-const ProUpgradeCta: React.FC<ProUpgradeCtaProps> = ({ onRequireAuth, onShowSubscription }) => {
   return (
     <div className='mb-6 p-1 rounded-2xl bg-linear-to-r from-amber-500/20 via-orange-500/20 to-red-500/20'>
       <div className='bg-slate-900/90 backdrop-blur-sm rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
@@ -22,13 +20,7 @@ const ProUpgradeCta: React.FC<ProUpgradeCtaProps> = ({ onRequireAuth, onShowSubs
           </div>
         </div>
         <button
-          onClick={() => {
-            if (onShowSubscription) {
-              onShowSubscription();
-            } else {
-              onRequireAuth?.();
-            }
-          }}
+          onClick={() => openProUpgradeModal("general")}
           className='px-6 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-0.5'
         >
           Mejorar Plan

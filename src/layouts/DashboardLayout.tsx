@@ -29,7 +29,6 @@ export interface DashboardContext {
   user: ReturnType<typeof useAuth>["user"];
   isPro: boolean;
   onRequireAuth: () => void;
-  onUpgrade: () => void;
 }
 
 function DashboardLayoutContent() {
@@ -122,7 +121,6 @@ function DashboardLayoutContent() {
     user,
     isPro,
     onRequireAuth: handleRequireAuth,
-    onUpgrade: handleUpgrade,
   };
 
   // Show loading while we determine if onboarding is needed
