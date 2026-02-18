@@ -14,6 +14,7 @@ interface RateLimitErrorProps {
     | "stats"
     | "ai_coach"
     | "general";
+  isPro?: boolean;
 }
 
 const RateLimitError: React.FC<RateLimitErrorProps> = ({
@@ -22,6 +23,7 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
   onClose,
   onUpgrade,
   upgradeContext = "unlimited_usage",
+  isPro = false,
 }) => {
   const [timeUntilReset, setTimeUntilReset] = useState<string>("");
 
@@ -86,21 +88,43 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
                 size={16}
                 className='text-blue-400'
               />
-              <span>Próximo reset:</span>
+              <span>{isPro ? "Renovación de cupo:" : "Próximo reset:"}</span>
             </div>
             <div className='text-2xl font-bold text-white font-mono'>{timeUntilReset}</div>
+            <div className='text-xs text-slate-500 mt-1 font-mono'>
+              {new Date(resetAt).toLocaleDateString(undefined, {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
           </div>
         )}
 
-        <div className='bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-4'>
-          <p className='text-xs text-blue-200'>
-            💡 <strong>¿Por qué hay límites?</strong> Para mantener la app estable y cubrir costos
-            de API. Los límites se resetean según tu plan (semanal o mensual).
+        {/* Message about limits */}
+        <div
+          className={`rounded-lg p-3 mb-4 ${isPro ? "bg-slate-800/50 border border-slate-700" : "bg-blue-900/20 border border-blue-500/30"}`}
+        >
+          <p className={`text-xs ${isPro ? "text-slate-300" : "text-blue-200"}`}>
+            {isPro ? (
+              <>
+                💡 <strong>Límite del Plan Pro:</strong> Has alcanzado el máximo de generaciones
+                permitidas por tu plan. Tu cupo se renovará automáticamente en la fecha indicada.
+              </>
+            ) : (
+              <>
+                💡 <strong>¿Por qué hay límites?</strong> Para mantener la app estable y cubrir
+                costos de API. Los límites se resetean según tu plan (semanal o mensual).
+              </>
+            )}
           </p>
         </div>
 
         <div className='flex gap-3'>
-          {onUpgrade && (
+          {!isPro && onUpgrade && (
             <ProUpgrade
               mini
               context={upgradeContext}

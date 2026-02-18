@@ -5,6 +5,7 @@ import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { WorkoutLogEntry } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
+import { useEntitlement } from "../../hooks/useEntitlement";
 
 interface ExerciseAIAssistantProps {
   user: FirebaseUser | null;
@@ -31,6 +32,8 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
+  const { plan } = useEntitlement(user);
+  const isPro = plan === "pro";
 
   const handleShowInstructions = useCallback(async (): Promise<void> => {
     setLoading(true);
@@ -142,6 +145,7 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
           resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
           onUpgrade={onUpgrade}
+          isPro={isPro}
         />
       )}
 

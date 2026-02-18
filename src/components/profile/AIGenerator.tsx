@@ -201,6 +201,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           onClose={() => setShowRateLimitError(false)}
           onUpgrade={onUpgrade}
           upgradeContext='routine_generation'
+          isPro={effectiveIsPro}
         />
       )}
 
@@ -232,7 +233,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
             {/* Progress Bar */}
             <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
               <div
-                className='h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse'
+                className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full animate-pulse'
                 style={{ width: "100%" }}
               />
             </div>

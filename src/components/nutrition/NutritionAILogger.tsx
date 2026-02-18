@@ -91,6 +91,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
           onClose={() => setShowRateLimitError(false)}
           onUpgrade={onUpgrade}
           upgradeContext='nutrition_photo'
+          isPro={isPro}
         />
       )}
 
