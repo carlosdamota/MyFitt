@@ -1,5 +1,5 @@
 import { getToken } from "firebase/messaging";
-import { messaging, db, appId } from "../config/firebase";
+import { messaging, db, appId, firebaseConfig } from "../config/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
 export async function requestNotificationPermission(userId: string) {
@@ -17,8 +17,12 @@ export async function requestNotificationPermission(userId: string) {
         return null;
       }
 
+      const swUrl = `/firebase-messaging-sw.js?${new URLSearchParams(firebaseConfig as any).toString()}`; // Pass config via URL
+      const registration = await navigator.serviceWorker.register(swUrl);
+
       const token = await getToken(messaging, {
         vapidKey: vapidKey,
+        serviceWorkerRegistration: registration,
       });
 
       if (token) {

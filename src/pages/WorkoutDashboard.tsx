@@ -11,6 +11,7 @@ import WorkoutDay from "../components/routines/WorkoutDay";
 import RoutineEditor from "../components/routines/RoutineEditor";
 
 import type { DashboardContext } from "../layouts/DashboardLayout";
+import WeeklyProgress from "../components/dashboard/WeeklyProgress";
 
 export default function WorkoutDashboard() {
   const { user, isPro, onRequireAuth, onUpgrade } = useOutletContext<DashboardContext>();
@@ -79,6 +80,10 @@ export default function WorkoutDashboard() {
 
   return (
     <>
+      <WeeklyProgress
+        streak={streak}
+        workoutLogs={workoutLogs}
+      />
       <RoutineTabs
         routines={programRoutines}
         activeTab={activeTab}

@@ -9,6 +9,7 @@ interface SocialShareModalProps {
   onClose: () => void;
   date: string;
   logs: (WorkoutLogEntry & { exercise: string; volume: number })[];
+  duration: string;
 }
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
@@ -16,6 +17,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   onClose,
   date,
   logs,
+  duration,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -65,7 +67,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
         if (navigator.share && navigator.canShare({ files: [file] })) {
           await navigator.share({
             title: "Mi Entrenamiento en FITTWIZ",
-            text: `He completado un entrenamiento de ${totalExercises} ejercicios con ${totalVolume}kg de volumen!`,
+            text: `He completado un entrenamiento de ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg de volumen!`,
             files: [file],
           });
         } else {
@@ -115,6 +117,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             logs={logs}
             totalVolume={totalVolume}
             totalExercises={totalExercises}
+            duration={duration}
           />
         </div>
         {/* End Hidden Card Container */}
@@ -140,6 +143,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
                 logs={logs}
                 totalVolume={totalVolume}
                 totalExercises={totalExercises}
+                duration={duration}
               />
             </div>
           </div>

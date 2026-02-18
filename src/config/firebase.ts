@@ -98,4 +98,4 @@ if (firebaseConfig) {
   }
 }
 
-export { app, auth, db, analytics, messaging };
+export { app, auth, db, analytics, messaging, firebaseConfig };
