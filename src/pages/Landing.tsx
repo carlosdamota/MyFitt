@@ -50,27 +50,31 @@ const Landing: React.FC = () => {
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const onLogin = async () => {
+  const onLogin = () => {
     if (user) {
-      if (document.referrer.includes("checkout")) {
-        // Simple redirect if already logged in and just browsing
-        navigate("/app");
-        return;
-      }
-      // If user clicks "Unlock Pro" while logged in, go to checkout with coupon
-      try {
-        const origin = window.location.origin;
-        // Hardcoded Founders Coupon
-        const url = await createCheckoutSession(origin, origin, "OmyEug7I");
-        window.location.assign(url);
-      } catch (error) {
-        console.error("Checkout error:", error);
-        navigate("/app");
-      }
+      navigate("/app");
     } else {
       setShowAuthModal(true);
     }
   };
+
+  const handleUpgrade = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    try {
+      const origin = window.location.origin;
+      // Hardcoded Founders Coupon
+      const url = await createCheckoutSession(origin, origin, "OmyEug7I");
+      window.location.assign(url);
+    } catch (error) {
+      console.error("Checkout error:", error);
+      navigate("/app");
+    }
+  };
+
   const onExplore = () => navigate("/app");
 
   const structuredData = {
@@ -517,7 +521,7 @@ const Landing: React.FC = () => {
                 "Análisis de progreso avanzado",
               ]}
               cta='Desbloquear Oferta Pro'
-              onClick={onLogin}
+              onClick={handleUpgrade}
               tone='accent'
             />
           </div>

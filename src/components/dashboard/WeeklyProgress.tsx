@@ -145,7 +145,7 @@ export default function WeeklyProgress({ streak, workoutLogs }: WeeklyProgressPr
                       w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 relative shrink-0
                       ${
                         hasWorkout
-                          ? "bg-gradient-to-br from-white to-slate-200 text-slate-900 shadow-[0_0_12px_rgba(255,255,255,0.3)] scale-110 border-none"
+                          ? "bg-linear-to-br from-white to-slate-200 text-slate-900 shadow-[0_0_12px_rgba(255,255,255,0.3)] scale-110 border-none"
                           : isToday
                             ? "bg-slate-800 text-cyan-400 border border-cyan-500/50 shadow-[0_0_10px_rgba(34,211,238,0.2)]"
                             : "bg-slate-800/50 text-slate-500 border border-slate-700 hover:border-slate-500 hover:bg-slate-800"

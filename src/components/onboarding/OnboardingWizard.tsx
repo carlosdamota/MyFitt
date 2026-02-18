@@ -259,7 +259,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             i < step
               ? "bg-cyan-400"
               : i === step
-                ? "bg-gradient-to-r from-cyan-400 to-purple-400"
+                ? "bg-linear-to-r from-cyan-400 to-purple-400"
                 : "bg-slate-800"
           }`}
         />
@@ -274,7 +274,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   const renderStepPersonalData = () => (
     <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
       <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4'>
+        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4'>
           <User
             size={32}
             className='text-cyan-400'
@@ -358,7 +358,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   const renderStepGoals = () => (
     <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
       <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-4'>
+        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-4'>
           <Target
             size={32}
             className='text-amber-400'
@@ -423,7 +423,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   const renderStepEquipment = () => (
     <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
       <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4'>
+        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4'>
           <Dumbbell
             size={32}
             className='text-blue-400'
@@ -556,7 +556,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
       {isGenerating && (
         <>
           <div className='relative mb-8'>
-            <div className='w-24 h-24 rounded-full bg-gradient-to-br from-blue-600/30 to-purple-600/30 flex items-center justify-center'>
+            <div className='w-24 h-24 rounded-full bg-linear-to-br from-blue-600/30 to-purple-600/30 flex items-center justify-center'>
               <Dumbbell
                 size={40}
                 className='text-blue-400 animate-pulse'
@@ -565,7 +565,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin' />
           </div>
 
-          <p className='text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-4 min-h-12 transition-all duration-500'>
+          <p className='text-xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400 mb-4 min-h-12 transition-all duration-500'>
             {MOTIVATIONAL_PHRASES[phraseIndex]}
           </p>
 
@@ -574,7 +574,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
           </p>
 
           <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse w-full' />
+            <div className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full animate-pulse w-full' />
           </div>
 
           <p className='text-xs text-slate-500 mt-6'>Esto puede tardar hasta 30 segundos</p>
@@ -584,7 +584,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
       {/* Success State */}
       {generationComplete && !isGenerating && (
         <>
-          <div className='w-24 h-24 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mb-6'>
+          <div className='w-24 h-24 rounded-full bg-linear-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mb-6'>
             <Check
               size={48}
               className='text-green-400'
@@ -599,7 +599,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
 
           <button
             onClick={onComplete}
-            className='px-8 py-4 rounded-2xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/30 transition-all transform active:scale-95 flex items-center gap-2'
+            className='px-8 py-4 rounded-2xl font-bold text-sm bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/30 transition-all transform active:scale-95 flex items-center gap-2'
           >
             Empezar a entrenar <ArrowRight size={18} />
           </button>
@@ -609,7 +609,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
       {/* Error State */}
       {generationError && !isGenerating && !generationComplete && (
         <>
-          <div className='w-24 h-24 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6'>
+          <div className='w-24 h-24 rounded-full bg-linear-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6'>
             <AlertCircle
               size={48}
               className='text-amber-400'
@@ -634,7 +634,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             </button>
             <button
               onClick={onComplete}
-              className='px-6 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg transition-all'
+              className='px-6 py-3 rounded-xl font-bold text-sm bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-lg transition-all'
             >
               Continuar
             </button>
@@ -664,7 +664,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   };
 
   return (
-    <div className='min-h-screen bg-[var(--bg-0)] text-slate-200 font-sans selection:bg-cyan-500/30'>
+    <div className='min-h-screen bg-(--bg-0) text-slate-200 font-sans selection:bg-cyan-500/30'>
       {/* Background effects */}
       <div className='fixed inset-0 z-0 pointer-events-none'>
         <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[110px]' />
@@ -676,10 +676,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
         <div className='flex items-center justify-between mb-6'>
           <div />
           <h1 className='text-lg font-black tracking-tight'>
-            <span className='text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400'>
+            <span className='text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-400'>
               FITT
             </span>
-            <span className='text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-400'>
+            <span className='text-transparent bg-clip-text bg-linear-to-r from-amber-300 to-orange-400'>
               WIZ
             </span>
           </h1>
@@ -720,8 +720,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               className={`flex-1 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg transform active:scale-95 ${
                 canProceed()
                   ? step === TOTAL_STEPS - 2
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-purple-900/40"
-                    : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-900/30"
+                    ? "bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-purple-900/40"
+                    : "bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-900/30"
                   : "bg-slate-800 text-slate-500 cursor-not-allowed shadow-none"
               }`}
             >

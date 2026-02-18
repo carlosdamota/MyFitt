@@ -128,7 +128,7 @@ function DashboardLayoutContent() {
   // Show loading while we determine if onboarding is needed
   if (user && profileLoading) {
     return (
-      <div className='min-h-screen bg-[var(--bg-0)] flex items-center justify-center'>
+      <div className='min-h-screen bg-(--bg-0) flex items-center justify-center'>
         <Loader
           className='animate-spin text-cyan-400'
           size={32}
@@ -149,7 +149,7 @@ function DashboardLayoutContent() {
   }
 
   return (
-    <div className='min-h-screen bg-[var(--bg-0)] text-slate-200 pb-24 font-sans selection:bg-cyan-500/30'>
+    <div className='min-h-screen bg-(--bg-0) text-slate-200 pb-24 font-sans selection:bg-cyan-500/30'>
       <div className='fixed inset-0 z-0 pointer-events-none'>
         <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[110px]' />
         <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-amber-500/10 blur-[110px]' />
