@@ -7,7 +7,6 @@ interface GoalsContextPanelProps {
   formData: ProfileFormData;
   onChange: (field: keyof ProfileFormData, value: string | number | string[]) => void;
   isPro?: boolean;
-  onUpgrade?: () => void;
 }
 
 type EquipmentOption = ProfileFormData["equipment"][number];
@@ -34,7 +33,6 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
   formData,
   onChange,
   isPro = false,
-  onUpgrade,
 }) => {
   const equipmentSelection = formData.equipment;
   const toggleEquipment = (value: EquipmentOption): void => {
@@ -228,13 +226,13 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                 })}
               </div>
               {!isPro && (
-                <div
-                  className='mt-2'
-                  onClick={onUpgrade}
-                >
-                  <p className='text-[10px] text-slate-400 text-center cursor-pointer hover:text-white transition-colors underline decoration-dashed'>
-                    Desbloquear personalización avanzada
-                  </p>
+                <div className='mt-2'>
+                  <ProUpgrade
+                    mini
+                    context='routine_generation'
+                    buttonText='Desbloquear personalización avanzada'
+                    className='w-full justify-center text-[10px] py-1.5'
+                  />
                 </div>
               )}
             </div>

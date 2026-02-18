@@ -26,7 +26,6 @@ interface ExerciseTrackerProps {
   onMarkComplete?: () => void;
   onUnmarkComplete?: () => void;
   onRequireAuth?: () => void;
-  onUpgrade?: () => void;
 }
 
 interface SuggestionData {
@@ -50,7 +49,6 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   onMarkComplete,
   onUnmarkComplete,
   onRequireAuth,
-  onUpgrade,
 }) => {
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
@@ -236,7 +234,6 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         history={history}
         instructions={instructions}
         onRequireAuth={onRequireAuth}
-        onUpgrade={onUpgrade}
         actionSlot={
           <div className='p-2 sm:p-1.5 bg-slate-900/60 rounded-xl border border-white/5 flex items-center justify-between gap-2 h-full'>
             <div className='hidden sm:flex items-center gap-1 pl-1'>

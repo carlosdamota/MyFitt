@@ -6,7 +6,6 @@ interface RateLimitErrorProps {
   message: string;
   resetAt: string | null;
   onClose: () => void;
-  onUpgrade?: () => void;
   upgradeContext?:
     | "nutrition_photo"
     | "routine_generation"
@@ -21,7 +20,6 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
   message,
   resetAt,
   onClose,
-  onUpgrade,
   upgradeContext = "unlimited_usage",
   isPro = false,
 }) => {
@@ -124,7 +122,7 @@ const RateLimitError: React.FC<RateLimitErrorProps> = ({
         </div>
 
         <div className='flex gap-3'>
-          {!isPro && onUpgrade && (
+          {!isPro && (
             <ProUpgrade
               mini
               context={upgradeContext}

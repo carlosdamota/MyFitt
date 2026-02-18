@@ -13,7 +13,6 @@ interface ExerciseAIAssistantProps {
   history: WorkoutLogEntry[];
   instructions?: string[];
   onRequireAuth?: () => void;
-  onUpgrade?: () => void;
   actionSlot?: React.ReactNode;
 }
 
@@ -23,7 +22,6 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   history,
   instructions,
   onRequireAuth,
-  onUpgrade,
   actionSlot,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -144,7 +142,6 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
           message={quotaMessage}
           resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
-          onUpgrade={onUpgrade}
           isPro={isPro}
         />
       )}

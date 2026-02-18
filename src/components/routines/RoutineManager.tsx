@@ -12,7 +12,6 @@ interface RoutineManagerProps {
   onClose: () => void;
   onSelectRoutine?: (routineId: string) => void;
   isPro?: boolean;
-  onRequireAuth?: () => void;
   viewMode?: "modal" | "page";
 }
 
@@ -21,7 +20,6 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
   onClose,
   onSelectRoutine,
   isPro = false,
-  onRequireAuth,
   viewMode = "modal",
 }) => {
   const { routines, deleteRoutine, loading: loadingRoutines } = useRoutines(user);
@@ -330,13 +328,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
         {/* Footer (only for modal) */}
         {viewMode === "modal" && (
           <div className='p-4 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl space-y-3'>
-            {!isPro && onRequireAuth && (
-              <ProBanner
-                isPro={isPro}
-                onUpgrade={onRequireAuth}
-                variant='subtle'
-              />
-            )}
+            {!isPro && <ProBanner isPro={isPro} variant='subtle' />}
             <div className='flex justify-end'>
               <button
                 onClick={onClose}
