@@ -66,6 +66,11 @@ export const useProfile = (user: User | null): UseProfileReturn => {
       return;
     }
 
+    // Reset loading state when user changes to avoid a micro-frame
+    // where loading=false + profile=null causes onboarding to flash
+    setLoading(true);
+    setProfile(null);
+
     const profileRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "profile");
 
     const unsubscribe = onSnapshot(
