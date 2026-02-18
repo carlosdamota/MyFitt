@@ -5,8 +5,22 @@ type PlanType = "free" | "pro";
 
 const normalizeOrigin = (value: string) => value.trim().replace(/\/$/, "");
 
-export const getAllowedOrigins = (webOrigin: string) =>
-  webOrigin.split(",").map(normalizeOrigin).filter(Boolean);
+export const getAllowedOrigins = (webOrigin: string) => {
+  const origins = webOrigin.split(",").map(normalizeOrigin).filter(Boolean);
+  const allOrigins = new Set<string>();
+
+  origins.forEach((origin) => {
+    allOrigins.add(origin);
+    // Auto-allow both www and non-www versions
+    if (origin.includes("://www.")) {
+      allOrigins.add(origin.replace("://www.", "://"));
+    } else if (origin.includes("://")) {
+      allOrigins.add(origin.replace("://", "://www."));
+    }
+  });
+
+  return Array.from(allOrigins);
+};
 
 export const isOriginAllowed = (origin: string | undefined, allowedOrigins: string[]) => {
   if (!origin) return true;
@@ -27,11 +41,7 @@ export const sanitizeReturnUrl = (value: unknown, allowedOrigins: string[]) => {
   }
 };
 
-export const setCors = (
-  origin: string | undefined,
-  res: Response,
-  allowedOrigins: string[],
-) => {
+export const setCors = (origin: string | undefined, res: Response, allowedOrigins: string[]) => {
   const requestOrigin = origin ? normalizeOrigin(origin) : "";
 
   if (allowedOrigins.length > 0) {
