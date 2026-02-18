@@ -9,8 +9,10 @@ import type { User } from "firebase/auth";
 import type { Routine, WorkoutLogs, WorkoutLogEntry } from "../../types";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import { useStopwatch } from "../../hooks/useStopwatch";
+import { useTimer } from "../../hooks/useTimer";
 import RoutineTimer from "./RoutineTimer";
 import { SocialShareModal } from "../common/SocialShareModal";
+import RestTimer from "../common/RestTimer";
 
 interface WorkoutDayProps {
   routine: Routine;
@@ -49,6 +51,27 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const { plan } = useEntitlement(user);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
   const [showSocialShare, setShowSocialShare] = useState(false);
+
+  // Rest Timer Logic
+  const {
+    timer: restTimer,
+    isTimerRunning: isRestTimerRunning,
+    resetTimer: resetRestTimer,
+    toggleTimer: toggleRestTimer,
+    setTimer: setRestTimer,
+  } = useTimer(0);
+  const [showRestTimer, setShowRestTimer] = useState(false);
+
+  const handleStartRest = (duration: number = 60) => {
+    const validDuration = duration || 60;
+    resetRestTimer(validDuration);
+    setShowRestTimer(true);
+  };
+
+  const handleCloseRestTimer = () => {
+    setShowRestTimer(false);
+    resetRestTimer(0);
+  };
 
   // Validation: Can only stop if at least one exercise is done
   const handleStopTimer = () => {
@@ -150,7 +173,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               onToggleComplete={onToggleComplete}
               onSaveLog={onSaveLog}
               onDeleteLog={onDeleteLog}
-              onResetTimer={onResetTimer}
+              onResetTimer={handleStartRest}
               onRequireAuth={onRequireAuth}
               onShowSubscription={onShowSubscription}
             />
@@ -182,16 +205,10 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         isRunning={isRunning}
         onToggle={toggle}
         onStop={handleStopTimer}
-        className='mt-8'
+        className='mb-8'
       />
 
-      <RoutineTimer
-        timeFormatted={formatTime(time)}
-        isRunning={isRunning}
-        onToggle={toggle}
-        onStop={handleStopTimer}
-        className='mt-8'
-      />
+      {/* Rest Timer Overlay */}
 
       {/* Confirmation Dialog */}
       {showConfirmFinish && (
@@ -253,7 +270,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                   entries.push({
                     ...log,
                     exercise: ex.name,
-                    volume: log.weight * log.sets * log.reps,
+                    volume: (log.weight || 0) * (log.sets || 0) * (log.reps || 0),
                   });
                 });
               });
@@ -279,6 +296,19 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
           return Array.from(uniqueEntriesMap.values());
         })()}
       />
+
+      {/* Rest Timer Overlay */}
+      {showRestTimer && restTimer > 0 && (
+        <RestTimer
+          timeLeft={restTimer}
+          isRunning={isRestTimerRunning}
+          onToggle={toggleRestTimer}
+          onAdd={(secs) => setRestTimer((prev) => Math.max(0, prev + secs))}
+          onSkip={handleCloseRestTimer}
+          onClose={handleCloseRestTimer}
+          timeFormatted={formatTime(restTimer)} // Reusing formatTime from stopwatch
+        />
+      )}
     </>
   );
 };

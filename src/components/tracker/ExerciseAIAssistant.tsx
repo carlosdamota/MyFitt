@@ -13,6 +13,7 @@ interface ExerciseAIAssistantProps {
   instructions?: string[];
   onRequireAuth?: () => void;
   onUpgrade?: () => void;
+  actionSlot?: React.ReactNode;
 }
 
 const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
@@ -22,6 +23,7 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   instructions,
   onRequireAuth,
   onUpgrade,
+  actionSlot,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<string | string[] | null>(null);
@@ -143,11 +145,12 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
         />
       )}
 
-      <div className='flex gap-2 pt-4 border-t border-slate-700'>
+      <div className='flex flex-col sm:flex-row gap-3 pt-4 items-stretch'>
+        <div className='flex-1 min-w-0'>{actionSlot}</div>
         <button
           onClick={handleShowInstructions}
           disabled={loading}
-          className='flex-1 bg-slate-700/80 hover:bg-slate-600 disabled:opacity-50 text-slate-200 text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-600'
+          className='flex-1 bg-slate-700/80 hover:bg-slate-600 disabled:opacity-50 text-slate-200 text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-600 shadow-sm'
         >
           {loading && responseType === "instructions" ? (
             <Loader
@@ -157,22 +160,6 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
           ) : (
             <>
               <BookOpen size={14} /> Instrucciones
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleAnalyzeHistory}
-          disabled={loading || history.length === 0}
-          className='flex-1 bg-amber-600/90 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20'
-        >
-          {loading && responseType === "analysis" ? (
-            <Loader
-              size={14}
-              className='animate-spin'
-            />
-          ) : (
-            <>
-              <Trophy size={14} /> Analizar
             </>
           )}
         </button>

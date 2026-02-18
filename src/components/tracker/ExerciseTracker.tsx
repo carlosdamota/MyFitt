@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { History, Trophy } from "lucide-react";
-import SimpleChart from "../stats/SimpleChart";
+
 import { calculatePersonalBests, isNewRecord, isBodyweightExercise } from "../../utils/stats";
 import { useProfile } from "../../hooks/useProfile";
 import type { User } from "firebase/auth";
@@ -166,6 +166,13 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
     return 60;
   };
 
+  const [customRestTime, setCustomRestTime] = useState(getSuggestedRestTime());
+
+  // Sync state if props change significantly, but allows user override
+  React.useEffect(() => {
+    setCustomRestTime(getSuggestedRestTime());
+  }, [restTime, configuredReps, isLastInBlock]);
+
   return (
     <div className='mt-4 bg-slate-900/40 backdrop-blur-md p-4 rounded-2xl border border-white/5 shadow-xl'>
       <div className='flex items-center justify-between mb-3'>
@@ -223,11 +230,6 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         isSaving={isSaving}
       />
 
-      <div className='mt-4 p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between'>
-        <span className='text-[10px] text-slate-400 font-bold uppercase'>Descanso Sugerido</span>
-        <span className='text-xs font-bold text-blue-400'>{getSuggestedRestTime()}s</span>
-      </div>
-
       <ExerciseAIAssistant
         user={user}
         exerciseName={exerciseName}
@@ -235,6 +237,45 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         instructions={instructions}
         onRequireAuth={onRequireAuth}
         onUpgrade={onUpgrade}
+        actionSlot={
+          <div className='p-2 sm:p-1.5 bg-slate-900/60 rounded-xl border border-white/5 flex items-center justify-between gap-2 h-full'>
+            <div className='hidden sm:flex items-center gap-1 pl-1'>
+              <History
+                size={12}
+                className='text-blue-400'
+              />
+            </div>
+
+            <div className='flex items-center gap-2 sm:gap-1 flex-1 justify-center sm:justify-end w-full'>
+              <button
+                onClick={() => setCustomRestTime((prev) => Math.max(0, prev - 10))}
+                className='w-8 h-8 sm:w-6 sm:h-6 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors text-xs sm:text-[10px]'
+              >
+                -10
+              </button>
+
+              <div className='text-sm sm:text-xs font-mono font-bold text-white w-8 text-center'>
+                {customRestTime}
+              </div>
+
+              <button
+                onClick={() => setCustomRestTime((prev) => prev + 10)}
+                className='w-8 h-8 sm:w-6 sm:h-6 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors text-xs sm:text-[10px]'
+              >
+                +10
+              </button>
+
+              <div className='h-4 w-px bg-white/10 mx-1 hidden sm:block'></div>
+
+              <button
+                onClick={() => onTimerReset(customRestTime)}
+                className='flex-1 sm:flex-none sm:ml-1 px-3 py-1.5 sm:px-2 sm:py-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white text-xs sm:text-[10px] font-bold uppercase rounded-lg border border-blue-500/30 transition-all active:scale-95 text-center'
+              >
+                Inicio
+              </button>
+            </div>
+          </div>
+        }
       />
 
       <RecentLogsList
@@ -242,16 +283,6 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         exerciseName={exerciseName}
         onDelete={wrappedOnDelete}
       />
-
-      {chartData.length > 0 && (
-        <div className='mt-4 h-24 bg-slate-900/50 rounded-xl border border-slate-800 p-2'>
-          <SimpleChart
-            points={chartData}
-            height={80}
-            width={300}
-          />
-        </div>
-      )}
     </div>
   );
 };
