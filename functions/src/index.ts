@@ -109,3 +109,18 @@ export const pushAgent = createPushAgentFunctions({
   db,
   appId: APP_ID,
 });
+
+// --- Account Deletion ---
+
+import { createAccountDeletionFunctions } from "./account-deletion.js";
+
+const accountDeletionFns = createAccountDeletionFunctions({
+  db,
+  auth,
+  appId: APP_ID,
+  stripe,
+  webOrigin: WEB_ORIGIN,
+});
+
+export const onAccountDeleted = accountDeletionFns.onAccountDeleted;
+export const submitDeletionFeedback = accountDeletionFns.submitDeletionFeedback;

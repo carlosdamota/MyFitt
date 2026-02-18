@@ -1,11 +1,13 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { Dumbbell, Loader, Check } from "lucide-react";
+import { Dumbbell, Loader, Check, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router";
 import { useProfile } from "../../hooks/useProfile";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
 import NotificationSettings from "./NotificationSettings";
+import DeleteAccountModal from "./DeleteAccountModal";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
 
@@ -22,6 +24,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (profile) {
@@ -138,6 +142,35 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           v1.0.0
         </p>
       </div>
+
+      {/* Danger Zone — Delete Account */}
+      {user && (
+        <div className='mt-6 pt-6 border-t border-red-500/20'>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-red-400 hover:text-white hover:bg-red-600/20 border border-red-500/30 hover:border-red-500/50 transition-all'
+          >
+            <Trash2 size={16} />
+            Eliminar mi cuenta
+          </button>
+          <p className='text-[11px] text-slate-600 text-center mt-2'>
+            Se eliminarán todos tus datos de forma irreversible.
+          </p>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {user && (
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          user={user}
+          onClose={() => setShowDeleteModal(false)}
+          onAccountDeleted={() => {
+            setShowDeleteModal(false);
+            navigate("/");
+          }}
+        />
+      )}
     </div>
   );
 };
