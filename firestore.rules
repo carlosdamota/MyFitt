@@ -90,10 +90,10 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // FCM Tokens (PRIVATE - user can create/read/delete their own tokens)
+    // FCM Tokens (PRIVATE - user can create/read/delete/update their own tokens)
     match /artifacts/{appId}/users/{userId}/fcm_tokens/{tokenId} {
       allow read, delete: if isOwner(userId);
-      allow create: if isOwner(userId)
+      allow create, update: if isOwner(userId)
         && request.resource.data.keys().hasOnly(["token", "createdAt", "device"]);
     }
 
