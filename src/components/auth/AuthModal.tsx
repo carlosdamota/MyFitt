@@ -27,6 +27,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleEmailAuth = async (): Promise<void> => {
     if (!email || !password) {
@@ -251,6 +252,41 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
+            {/* Checkbox for Signup Mode */}
+            {mode === "signup" && (
+              <div className='flex items-start gap-2 mt-2'>
+                <input
+                  type='checkbox'
+                  id='terms'
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className='mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/50'
+                />
+                <label
+                  htmlFor='terms'
+                  className='text-xs text-slate-400 leading-tight'
+                >
+                  He leído y acepto la{" "}
+                  <a
+                    href='/privacy'
+                    target='_blank'
+                    className='text-cyan-400 hover:underline'
+                  >
+                    Política de Privacidad
+                  </a>{" "}
+                  y los{" "}
+                  <a
+                    href='/terms'
+                    target='_blank'
+                    className='text-cyan-400 hover:underline'
+                  >
+                    Términos de Uso
+                  </a>
+                  . Confirmo que tengo más de 16 años.
+                </label>
+              </div>
+            )}
+
             {/* Forgot password link (only in login mode) */}
             {mode === "login" && (
               <button
@@ -268,8 +304,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
             <button
               onClick={handleEmailAuth}
-              disabled={loading}
-              className='w-full py-3 rounded-xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-900 flex items-center justify-center gap-2 transition-all'
+              disabled={loading || (mode === "signup" && !acceptedTerms)}
+              className='w-full py-3 rounded-xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-900 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
               {mode === "login" ? "Entrar con email" : "Crear cuenta"}

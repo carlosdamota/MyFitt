@@ -21,6 +21,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
   const { plan, currentPeriodEnd, loading } = useEntitlement(user);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<"checkout" | "portal" | "refresh" | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const planLabel = plan === "pro" ? "Pro" : "Free";
   const renewalLabel = useMemo(
@@ -122,30 +123,60 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
 
       {error && <p className='text-sm text-red-400'>{error}</p>}
 
-      <div className='flex flex-col sm:flex-row gap-3'>
-        {plan === "pro" ? (
-          <button
-            type='button'
-            onClick={handlePortal}
-            disabled={processing === "portal"}
-            className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-700 transition disabled:opacity-60'
-          >
-            <CreditCard size={16} /> Gestionar suscripcion
-          </button>
-        ) : (
-          <button
-            type='button'
-            onClick={handleCheckout}
-            disabled={processing === "checkout"}
-            className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60 relative overflow-hidden group'
-          >
-            <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000' />
-            <CreditCard size={16} /> Desbloquear Oferta Pro (2.99€)
-          </button>
+      <div className='flex flex-col gap-3'>
+        {/* Terms Checkbox for PRO purchase */}
+        {plan !== "pro" && (
+          <div className='flex items-start gap-2 bg-blue-500/10 p-3 rounded-lg border border-blue-500/20'>
+            <input
+              type='checkbox'
+              id='sub-terms'
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className='mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500/50 shrink-0'
+            />
+            <label
+              htmlFor='sub-terms'
+              className='text-[11px] text-slate-300 leading-tight'
+            >
+              Acepto las{" "}
+              <a
+                href='/terms'
+                target='_blank'
+                className='text-blue-400 hover:underline'
+              >
+                Condiciones de Suscripción
+              </a>{" "}
+              y entiendo que al ser un servicio digital inmediato, renuncio a mi derecho de
+              desistimiento una vez iniciado el servicio.
+            </label>
+          </div>
         )}
-        <p className='text-xs text-slate-500 sm:self-center'>
-          Los cambios pueden tardar unos segundos tras el pago.
-        </p>
+
+        <div className='flex flex-col sm:flex-row gap-3'>
+          {plan === "pro" ? (
+            <button
+              type='button'
+              onClick={handlePortal}
+              disabled={processing === "portal"}
+              className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-700 transition disabled:opacity-60'
+            >
+              <CreditCard size={16} /> Gestionar suscripcion
+            </button>
+          ) : (
+            <button
+              type='button'
+              onClick={handleCheckout}
+              disabled={processing === "checkout" || !acceptedTerms}
+              className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60 relative overflow-hidden group disabled:cursor-not-allowed'
+            >
+              <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000' />
+              <CreditCard size={16} /> Desbloquear Oferta Pro (2.99€)
+            </button>
+          )}
+          <p className='text-xs text-slate-500 sm:self-center'>
+            Los cambios pueden tardar unos segundos tras el pago.
+          </p>
+        </div>
       </div>
     </div>
   );

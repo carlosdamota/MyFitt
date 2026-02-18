@@ -24,15 +24,30 @@ const Privacy = () => {
 
         <div className='space-y-8 text-slate-300 leading-relaxed'>
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>1. Introducción</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>1. Responsable del Tratamiento</h2>
             <p>
-              En FITTWIZ, la privacidad es una prioridad. Esta política describe cómo se recopila,
-              usa y protege tu información personal cuando utilizas la aplicación.
+              El responsable del tratamiento de sus datos personales es:
+              <br />
+              <strong>Identidad:</strong> Carlos Damota Gracia
+              <br />
+              <strong>Domicilio:</strong> España
+              <br />
+              <strong>Email:</strong> daymondoomdev@duck.com
             </p>
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>2. Información que Recopilamos</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>2. Introducción</h2>
+            <p>
+              En FITTWIZ, la privacidad es una prioridad. Esta política describe cómo se recopila,
+              usa y protege tu información personal cuando utilizas la aplicación, en cumplimiento
+              con el Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018
+              (LOPDGDD).
+            </p>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-white mb-4'>3. Información que Recopilamos</h2>
             <ul className='list-disc pl-5 space-y-2'>
               <li>
                 <strong>Información de Cuenta:</strong> Tu dirección de correo electrónico y ID de
@@ -55,49 +70,78 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>3. Cómo Usamos tu Información</h2>
-            <p>Se utilizan tus datos exclusivamente para:</p>
+            <h2 className='text-xl font-bold text-white mb-4'>4. Base Legal y Finalidad</h2>
+            <p>Tratamos sus datos basándonos en:</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>
-                Proporcionarte las funcionalidades de la aplicación (guardar tus rutinas, mostrar tu
-                progreso).
+                <strong>Ejecución del contrato:</strong> Para gestionar su cuenta, proporcionarle
+                los servicios de la app y procesar sus pagos.
               </li>
-              <li>Generar rutinas personalizadas mediante Inteligencia Artificial (Gemini API).</li>
-              <li>Mejorar la aplicación basándonos en patrones de uso anónimos.</li>
+              <li>
+                <strong>Consentimiento:</strong> Para el uso de cookies analíticas y envío de
+                comunicaciones comerciales (si procede).
+              </li>
+              <li>
+                <strong>Interés Legítimo:</strong> Para mejorar nuestros servicios y garantizar la
+                seguridad de la app.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>4. Almacenamiento y Seguridad</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>5. Almacenamiento y Conservación</h2>
             <p>
-              Tus datos se almacenan de forma segura en Google Firebase (Firestore). Se implementan
-              reglas de seguridad estrictas para asegurar que solo tú puedas acceder y modificar tus
-              datos personales.
+              Tus datos se almacenan de forma segura en los servidores de{" "}
+              <strong>Google Cloud Platform (Firebase)</strong> en regiones habilitadas.
+            </p>
+            <p className='mt-2'>
+              <strong>Conservación:</strong> Mantendremos sus datos mientras dure la relación
+              contractual (su cuenta esté activa). Tras la baja, se bloquearán durante el plazo
+              necesario para cumplir con obligaciones legales (fiscales, etc.) y posteriormente se
+              eliminarán definitivamente.
             </p>
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>5. Compartir Datos</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>6. Destinatarios de los Datos</h2>
             <p>
-              No se vende ni comparte tu información personal con terceros. Los datos enviados a la
-              API de Gemini para generar rutinas son anónimos y no se utilizan para entrenar sus
-              modelos.
+              Para prestar nuestros servicios, compartimos datos estrictamente necesarios con los
+              siguientes proveedores (Encargados del Tratamiento):
             </p>
-          </section>
-
-          <section>
-            <h2 className='text-xl font-bold text-white mb-4'>6. Tus Derechos</h2>
-            <p>Tienes derecho a:</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
-              <li>Acceder a tus datos personales.</li>
-              <li>Corregir cualquier dato inexacto.</li>
-              <li>Solicitar la eliminación completa de tu cuenta y todos tus datos.</li>
-              <li>Exportar tus datos en un formato legible.</li>
+              <li>
+                <strong>Google Ireland Ltd. (Firebase):</strong> Infraestructura, autenticación y
+                base de datos.
+              </li>
+              <li>
+                <strong>Stripe, Inc.:</strong> Procesamiento de pagos y suscripciones.
+              </li>
+              <li>
+                <strong>Google LLC (Gemini API):</strong> Generación de contenido IA (datos
+                anonimizados).
+              </li>
             </ul>
+            <p className='mt-2'>No se cederán datos a otros terceros salvo obligación legal.</p>
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>7. Contacto</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>7. Tus Derechos</h2>
+            <p>Como usuario, tiene derecho a:</p>
+            <ul className='list-disc pl-5 space-y-2 mt-2'>
+              <li>Acceder, rectificar o suprimir sus datos.</li>
+              <li>Limitar el tratamiento u oponerse al mismo.</li>
+              <li>Portabilidad de sus datos.</li>
+              <li>Retirar el consentimiento prestado en cualquier momento.</li>
+            </ul>
+            <p className='mt-3'>
+              Puede ejercer estos derechos escribiendo a daymondoomdev@duck.com. Si considera que no
+              hemos tratado sus datos correctamente, tiene derecho a presentar una reclamación ante
+              la <strong>Agencia Española de Protección de Datos (AEPD)</strong>.
+            </p>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-white mb-4'>8. Contacto</h2>
             <p className='mb-4'>
               Si tienes preguntas sobre esta política o quieres ejercer tus derechos, contáctanos
               en:

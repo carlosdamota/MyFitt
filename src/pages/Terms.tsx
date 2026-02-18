@@ -39,10 +39,11 @@ const Terms = () => {
           </div>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>1. Aceptación de los Términos</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>1. Aceptación y Edad Mínima</h2>
             <p>
-              Al acceder y utilizar FITTWIZ, aceptas estar sujeto a estos Términos de Uso. Si no
-              estás de acuerdo con alguna parte de los términos, no podrás acceder al servicio.
+              Al acceder y utilizar FITTWIZ, aceptas estar sujeto a estos Términos de Uso. Debes
+              tener al menos <strong>16 años</strong> para utilizar este servicio. Si eres menor,
+              necesitas autorización de tus padres o tutores legales.
             </p>
           </section>
 
@@ -77,24 +78,28 @@ const Terms = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>5. Planes y Límites de Uso</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>5. Condiciones de Suscripción</h2>
             <p>FITTWIZ ofrece un plan gratuito y un plan Pro de pago.</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>
-                <strong>Plan Gratuito:</strong> Incluye acceso limitado a la generación de rutinas
-                con IA (1/mes, max 3 días), registro de nutrición (100 logs/mes) y uso básico del
-                Coach.
+                <strong>Pagos:</strong> Se procesan de forma segura a través de Stripe.
               </li>
               <li>
-                <strong>Plan Pro:</strong> Ofrece límites ampliados o ilimitados para rutinas,
-                nutrición y chat con coach IA, según se detalla en la oferta vigente.
+                <strong>Renovación:</strong> Las suscripciones se renuevan automáticamente salvo que
+                las canceles antes del fin del periodo actual.
+              </li>
+              <li>
+                <strong>Cancelación:</strong> Puedes cancelar tu suscripción en cualquier momento
+                desde tu perfil. Mantendrás el acceso Pro hasta el final del ciclo de facturación
+                pagado.
+              </li>
+              <li>
+                <strong>Derecho de Desistimiento:</strong> De acuerdo con la normativa de consumo,
+                tienes derecho a desistir de la compra en un plazo de 14 días naturales desde la
+                suscripción inicial, siempre que no hayas hecho un uso sustancial del servicio
+                digital. Para ejercerlo, contáctanos.
               </li>
             </ul>
-            <p className='mt-2'>
-              Los límites se restablecen mensualmente o semanalmente según el caso. FITTWIZ se
-              reserva el derecho de modificar estos límites para garantizar la sostenibilidad del
-              servicio.
-            </p>
           </section>
 
           <section>
@@ -108,11 +113,22 @@ const Terms = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>7. Cambios</h2>
+            <h2 className='text-xl font-bold text-white mb-4'>7. Ley Aplicable y Jurisdicción</h2>
             <p>
-              El desarrollador se reserva el derecho, a su sola discreción, de modificar o
-              reemplazar estos Términos en cualquier momento. Intentaremos proporcionar un aviso de
-              al menos 30 días antes de que cualquier término nuevo entre en vigor.
+              Estos Términos se regirán e interpretarán de acuerdo con las leyes de{" "}
+              <strong>España</strong>.
+            </p>
+            <p className='mt-2'>
+              Para cualquier controversia, ambas partes se someten a los Juzgados y Tribunales del
+              domicilio del usuario (si es consumidor) o de España (en otros casos).
+            </p>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-white mb-4'>8. Cambios</h2>
+            <p>
+              El desarrollador se reserva el derecho de modificar estos Términos. Notificaremos los
+              cambios sustanciales con al menos 30 días de antelación.
             </p>
           </section>
 

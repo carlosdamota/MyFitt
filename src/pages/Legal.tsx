@@ -33,16 +33,19 @@ const Legal = () => {
             </h2>
             <div className='bg-slate-900 p-6 rounded-xl border border-slate-800 space-y-3'>
               <p>
-                <span className='text-slate-500 w-32 inline-block'>Titular:</span> Carlos D.
-                (Desarrollador Independiente)
+                <span className='text-slate-500 w-32 inline-block'>Titular:</span> Carlos Damota
+                Gracia
+              </p>
+              <p>
+                <span className='text-slate-500 w-32 inline-block'>Domicilio:</span> España
               </p>
               <p>
                 <span className='text-slate-500 w-32 inline-block'>Contacto:</span>{" "}
                 daymondoomdev@duck.com
               </p>
               <p>
-                <span className='text-slate-500 w-32 inline-block'>Actividad:</span> Aplicación de
-                fitness y salud
+                <span className='text-slate-500 w-32 inline-block'>Actividad:</span> Desarrollo de
+                Software / App Fitness
               </p>
             </div>
           </section>
