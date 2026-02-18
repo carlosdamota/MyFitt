@@ -41,6 +41,11 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        sourcemap: false,
+      },
     }),
   ],
 });
