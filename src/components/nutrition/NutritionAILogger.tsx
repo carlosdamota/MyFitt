@@ -12,14 +12,12 @@ interface NutritionAILoggerProps {
   user: FirebaseUser | null;
   onAddLog: (data: any) => Promise<boolean>;
   onRequireAuth?: () => void;
-  onUpgrade?: () => void;
 }
 
 const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
   user,
   onAddLog,
   onRequireAuth,
-  onUpgrade,
 }) => {
   const [input, setInput] = useState<string>("");
   const [analyzing, setAnalyzing] = useState<boolean>(false);
@@ -89,7 +87,6 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
           message={quotaMessage}
           resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
-          onUpgrade={onUpgrade}
           upgradeContext='nutrition_photo'
           isPro={isPro}
         />
@@ -143,7 +140,6 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
           setImageData(null);
           setImageMimeType(null);
         }}
-        onUpgrade={onUpgrade}
       />
 
       {error && (

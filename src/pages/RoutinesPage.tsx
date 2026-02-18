@@ -4,7 +4,7 @@ import RoutineManager from "../components/routines/RoutineManager";
 import type { DashboardContext } from "../layouts/DashboardLayout";
 
 export default function RoutinesPage() {
-  const { user, isPro, onRequireAuth } = useOutletContext<DashboardContext>();
+  const { user, isPro } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
   return (
@@ -13,7 +13,6 @@ export default function RoutinesPage() {
       isPro={isPro}
       onClose={() => navigate("/app")}
       onSelectRoutine={(id) => navigate(`/app?routine=${id}`)}
-      onRequireAuth={onRequireAuth}
       viewMode='page'
     />
   );

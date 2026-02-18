@@ -1,20 +1,23 @@
 import React from "react";
 import { Sparkles, Zap } from "lucide-react";
+import { useProUpgrade } from "./ProUpgradeContext";
 
 interface ProBannerProps {
   isPro: boolean;
   remaining?: number;
-  onUpgrade: () => void;
   variant?: "subtle" | "prominent";
 }
 
 const ProBanner: React.FC<ProBannerProps> = ({
   isPro,
   remaining,
-  onUpgrade,
   variant = "subtle",
 }) => {
+  const { openProUpgradeModal } = useProUpgrade();
+
   if (isPro) return null;
+
+  const handleUpgrade = () => openProUpgradeModal("routine_generation");
 
   if (variant === "prominent") {
     return (
@@ -31,7 +34,7 @@ const ProBanner: React.FC<ProBannerProps> = ({
             <p className='text-xs text-slate-400'>20 rutinas de IA al mes</p>
           </div>
           <button
-            onClick={onUpgrade}
+            onClick={handleUpgrade}
             className='px-4 py-2 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-sm font-bold transition-all'
           >
             Pasar a Pro
@@ -43,7 +46,7 @@ const ProBanner: React.FC<ProBannerProps> = ({
 
   return (
     <button
-      onClick={onUpgrade}
+      onClick={handleUpgrade}
       className='w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-linear-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 hover:border-blue-500/40 transition-colors group'
     >
       <Zap

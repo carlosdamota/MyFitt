@@ -38,7 +38,6 @@ interface AIGeneratorProps {
   savedSuccess: boolean;
   handleSubmit: (e: any) => Promise<void>;
   onRequireAuth?: () => void;
-  onUpgrade?: () => void;
   showSaveButton?: boolean;
   isPro?: boolean;
 }
@@ -72,7 +71,6 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   savedSuccess,
   handleSubmit,
   onRequireAuth,
-  onUpgrade,
   showSaveButton = true,
   isPro,
 }) => {
@@ -201,7 +199,6 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           message={quotaMessage}
           resetAt={quotaResetAt}
           onClose={() => setShowRateLimitError(false)}
-          onUpgrade={onUpgrade}
           upgradeContext='routine_generation'
           isPro={effectiveIsPro}
         />

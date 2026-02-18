@@ -1,27 +1,16 @@
 import React from "react";
 import { ChevronLeft, ChevronRight, Calendar, Loader } from "lucide-react";
 import MealDetailCard from "./MealDetailCard";
-import type { Ingredient } from "../../types";
-
-interface Meal {
-  id?: string;
-  food: string;
-  date: string;
-  protein: number;
-  carbs: number;
-  fats: number;
-  calories: number;
-  ingredients?: Ingredient[];
-}
+import type { NutritionLogEntry, Ingredient } from "../../types";
 
 interface MealHistoryProps {
-  logs: Meal[];
+  logs: NutritionLogEntry[];
   selectedDate: Date;
   onDateChange: (days: number) => void;
   onDeleteLog: (id: string) => Promise<boolean>;
-  onDuplicate: (log: Meal) => Promise<boolean>;
-  onEdit: (log: Meal) => void;
-  onRefine: (log: Meal) => void;
+  onDuplicate: (log: NutritionLogEntry) => Promise<boolean>;
+  onEdit: (log: NutritionLogEntry) => void;
+  onRefine: (log: NutritionLogEntry) => void;
   loading: boolean;
 }
 

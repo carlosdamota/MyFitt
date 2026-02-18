@@ -7,11 +7,11 @@ interface SocialShareCardProps {
   logs: (WorkoutLogEntry & { exercise: string; volume: number })[];
   totalVolume: number;
   totalExercises: number;
-  duration: string;
+  duration?: string;
 }
 
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
-  ({ date, logs, totalVolume, totalExercises, duration }, ref) => {
+  ({ date, logs, totalVolume, totalExercises, duration = "N/A" }, ref) => {
     // Helper to format date like "Monday, 12 Oct"
     const formatDate = (dateString: string) => {
       try {

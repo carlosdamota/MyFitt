@@ -14,7 +14,6 @@ import type { NutritionLogEntry } from "../../types";
 interface NutritionDashboardProps {
   user: User | null;
   onRequireAuth?: () => void;
-  onUpgrade?: () => void;
 }
 
 interface MacroTargets {
@@ -27,7 +26,6 @@ interface MacroTargets {
 const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
   user,
   onRequireAuth,
-  onUpgrade,
 }) => {
   const { logs, loading, addFoodLog, deleteFoodLog, updateFoodLog, duplicateLog, getDayTotals } =
     useNutrition(user);
@@ -149,7 +147,6 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({
           user={user}
           onAddLog={addFoodLog}
           onRequireAuth={onRequireAuth}
-          onUpgrade={onUpgrade}
         />
       )}
 

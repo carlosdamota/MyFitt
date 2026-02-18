@@ -18,7 +18,6 @@ interface WorkoutBlockProps {
   onDeleteLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   onResetTimer: (duration?: number) => void;
   onRequireAuth?: () => void;
-  onShowSubscription?: () => void;
 }
 
 const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
@@ -35,7 +34,6 @@ const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
   onDeleteLog,
   onResetTimer,
   onRequireAuth,
-  onShowSubscription,
 }) => {
   return (
     <div className='relative'>
@@ -72,7 +70,6 @@ const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
               onDeleteLog={onDeleteLog}
               onResetTimer={onResetTimer}
               onRequireAuth={onRequireAuth}
-              onShowSubscription={onShowSubscription}
             />
           );
         })}
