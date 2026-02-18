@@ -12,7 +12,7 @@ export default defineConfig({
       srcDir: "src",
       filename: "sw.js",
       strategies: "injectManifest",
-      registerType: "autoUpdate",
+      registerType: "prompt",
       includeAssets: ["favicon.svg", "apple-touch-icon.png", "robots.txt"],
       manifest: {
         name: "FITTWIZ",

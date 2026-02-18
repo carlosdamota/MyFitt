@@ -42,8 +42,8 @@ const PRO_BENEFITS = [
   },
   {
     icon: Zap,
-    title: "Rutinas Pro (5/mes)",
-    description: "Genera 5 programas mensuales de hasta 6 días",
+    title: "Rutinas Pro (20/mes)",
+    description: "Genera 20 programas mensuales de hasta 6 días",
   },
 ];
 
@@ -91,7 +91,7 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
       case "routine_generation":
         return {
           title: "Generación de rutinas Pro",
-          description: "Crea rutinas de hasta 6 días y 5 programas nuevos cada mes.",
+          description: "Crea rutinas de hasta 6 días y 20 programas nuevos cada mes.",
         };
       case "unlimited_usage":
         return {

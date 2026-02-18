@@ -28,7 +28,7 @@ const ProBanner: React.FC<ProBannerProps> = ({
           </div>
           <div className='flex-1'>
             <p className='text-sm font-bold text-white'>Desbloquea más generaciones con Pro</p>
-            <p className='text-xs text-slate-400'>50 generaciones IA al mes, sin límites</p>
+            <p className='text-xs text-slate-400'>20 rutinas de IA al mes</p>
           </div>
           <button
             onClick={onUpgrade}
@@ -54,7 +54,7 @@ const ProBanner: React.FC<ProBannerProps> = ({
         {remaining !== undefined && remaining <= 3
           ? `Solo ${remaining} generaciones restantes. `
           : ""}
-        Hazte Pro para +50/mes
+        Hazte Pro para +20/mes
       </span>
     </button>
   );

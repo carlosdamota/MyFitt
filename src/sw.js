@@ -6,7 +6,11 @@ import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 // 1. Precache standard PWA assets
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
-self.skipWaiting();
+addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 clientsClaim();
 
 // 2. Initialize Firebase (using env vars injected at build time)
