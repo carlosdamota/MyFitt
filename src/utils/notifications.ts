@@ -17,8 +17,7 @@ export async function requestNotificationPermission(userId: string) {
         return null;
       }
 
-      const swUrl = `/firebase-messaging-sw.js?${new URLSearchParams(firebaseConfig as any).toString()}`; // Pass config via URL
-      const registration = await navigator.serviceWorker.register(swUrl);
+      const registration = await navigator.serviceWorker.ready;
 
       const token = await getToken(messaging, {
         vapidKey: vapidKey,

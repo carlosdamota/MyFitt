@@ -45,6 +45,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         sourcemap: false,
+        importScripts: ["/firebase-messaging-sw.js"],
       },
     }),
   ],

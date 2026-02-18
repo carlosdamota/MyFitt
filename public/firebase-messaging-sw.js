@@ -6,27 +6,18 @@
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
 
-// Parse the configuration from the URL query parameters
-const configParams = new URLSearchParams(self.location.search);
+// Firebase configuration hardcoded for SW unification
 const config = {
-  apiKey: configParams.get("apiKey"),
-  authDomain: configParams.get("authDomain"),
-  projectId: configParams.get("projectId"),
-  storageBucket: configParams.get("storageBucket"),
-  messagingSenderId: configParams.get("messagingSenderId"),
-  appId: configParams.get("appId"),
+  apiKey: "AIzaSyArsich1Ld5MVHM7IWYOU-M3U1bIRV44RE",
+  authDomain: "myfitt-5ddf6.firebaseapp.com",
+  projectId: "myfitt-5ddf6",
+  storageBucket: "myfitt-5ddf6.firebasestorage.app",
+  messagingSenderId: "239682748812",
+  appId: "1:239682748812:web:163ac20dba1d6727ff56a9",
 };
 
-// Initialize Firebase app in the service worker with the passed configuration
-// Fallback to empty strings if needed, though they should be present if passed correctly
-firebase.initializeApp({
-  apiKey: config.apiKey || self.__FIREBASE_CONFIG__?.apiKey || "",
-  authDomain: config.authDomain || self.__FIREBASE_CONFIG__?.authDomain || "",
-  projectId: config.projectId || self.__FIREBASE_CONFIG__?.projectId || "",
-  storageBucket: config.storageBucket || self.__FIREBASE_CONFIG__?.storageBucket || "",
-  messagingSenderId: config.messagingSenderId || self.__FIREBASE_CONFIG__?.messagingSenderId || "",
-  appId: config.appId || self.__FIREBASE_CONFIG__?.appId || "",
-});
+// Initialize Firebase app in the service worker
+firebase.initializeApp(config);
 
 const messaging = firebase.messaging();
 
