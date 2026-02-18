@@ -61,10 +61,11 @@ Reglas importantes:
 1. Debes generar EXACTAMENTE ${totalDays} dias.
 2. Distribuye los grupos musculares logicamente durante la semana.
 3. VOLUMEN Y DURACION: La sesion debe durar ${dailyTime} minutos. 
-   - Para 15-30 min: 3-4 bloques.
+   - Para 15-30 min: 3-4 bloques (series simples o superseries cortas).
    - Para 45-60 min: 5-7 bloques.
-   - Para 90 min: 8-10 bloques.
-   - Ajusta el numero de ejercicios y series para cumplir el tiempo.
+   - Para 90 min: 10-14 bloques (prioriza volumen alto).
+   - AJUSTE CRITICO: Si es >60min, DEBES incluir superseries (2+ ejercicios por bloque) para aumentar densidad.
+   - Ajusta el numero de ejercicios y series para cumplir el tiempo REAL.
 4. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
 5. Elige el valor "svg" mas apropiado segun el ejercicio:
    - pullup: dominadas, chin-ups

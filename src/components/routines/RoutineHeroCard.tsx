@@ -37,7 +37,7 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
                 size={14}
                 className='text-purple-300'
               />
-              <span>~{totalExercises * 5} min</span>
+              <span>~{totalExercises * 7} min</span>
             </div>
           </div>
         </div>
