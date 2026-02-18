@@ -20,7 +20,10 @@ Reglas:
     case "routine_program": {
       const profile = payload.profile ?? {};
       const totalDays = Number(payload.totalDays ?? 3);
+      const dailyTime = Number((payload as any).profile?.dailyTimeMinutes ?? 45);
+
       const system = `Eres un entrenador personal de elite. Tu tarea es generar un PROGRAMA DE ENTRENAMIENTO COMPLETO de ${totalDays} dias para la semana.
+Cada sesion debe estar diseñada para durar aproximadamente ${dailyTime} minutos.
 Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
 {
   "programName": "Nombre epico del programa",
@@ -57,7 +60,11 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
 Reglas importantes:
 1. Debes generar EXACTAMENTE ${totalDays} dias.
 2. Distribuye los grupos musculares logicamente durante la semana.
-3. Cada dia debe tener al menos 3 bloques de ejercicios.
+3. VOLUMEN Y DURACION: La sesion debe durar ${dailyTime} minutos. 
+   - Para 15-30 min: 3-4 bloques.
+   - Para 45-60 min: 5-7 bloques.
+   - Para 90 min: 8-10 bloques.
+   - Ajusta el numero de ejercicios y series para cumplir el tiempo.
 4. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
 5. Elige el valor "svg" mas apropiado segun el ejercicio:
    - pullup: dominadas, chin-ups
@@ -78,11 +85,16 @@ Reglas importantes:
    - dumbbell: ejercicios generales con mancuernas
    - barbell: ejercicios generales con barra
    - bodyweight: ejercicios de peso corporal generales
-6. **SEGURIDAD Y LESIONES (CRÍTICO)**: 
+6. **EQUIPAMIENTO (ESTRICTO)**: 
+   - Revisa el campo "equipment": ${JSON.stringify((profile as any).equipment ?? [])}.
+   - Si el usuario indica "calistenia" o "peso corporal", NO incluyas ejercicios con pesas, mancuernas o maquinas.
+   - Si solo tiene "mancuernas", usa solo ejercicios de mancuernas y peso corporal.
+   - NUNCA sugieras equipamiento que el usuario no tiene.
+7. **SEGURIDAD Y LESIONES (CRÍTICO)**: 
    - Analiza el campo "injuries" del perfil del usuario.
    - Si se menciona una lesión (ej: "dolor hombro", "rodilla mal"), DEBES EVITAR ejercicios que estresen esa zona o sustituirlos por variantes seguras.
    - Si no puedes evitar el grupo muscular, añade una nota en el campo "note" del ejercicio indicando por qué es seguro o cómo adaptarlo.
-7. No incluyas campos adicionales ni texto fuera del JSON.`;
+8. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,
