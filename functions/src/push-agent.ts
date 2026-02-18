@@ -1,19 +1,20 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
 import { getMessaging } from "firebase-admin/messaging";
-import { getFirestore, FieldValue, type Firestore } from "firebase-admin/firestore";
+import { FieldValue, type Firestore } from "firebase-admin/firestore";
 
 interface PushAgentDeps {
   db: Firestore;
+  appId: string;
 }
 
-export const createPushAgentFunctions = ({ db }: PushAgentDeps) => {
+export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
   const messaging = getMessaging();
 
   // --- Trigger: Send Push on Notification Document Creation ---
-  // Listens to: users/{userId}/notifications/{notificationId}
+  // Listens to: artifacts/{appId}/users/{userId}/notifications/{notificationId}
   const sendPushOnNotification = onDocumentCreated(
-    "users/{userId}/notifications/{notificationId}",
+    `artifacts/${appId}/users/{userId}/notifications/{notificationId}`,
     async (event) => {
       const snapshot = event.data;
       if (!snapshot) return;
@@ -27,15 +28,30 @@ export const createPushAgentFunctions = ({ db }: PushAgentDeps) => {
         return;
       }
 
-      // specific field check if needed
-      // const userData = (await db.collection("users").doc(userId).get()).data();
-      // if (userData?.pushOptOut) return;
+      // Check if user has push disabled
+      const profileSnap = await db
+        .collection("artifacts")
+        .doc(appId)
+        .collection("users")
+        .doc(userId)
+        .collection("app_data")
+        .doc("profile")
+        .get();
+      const profile = profileSnap.data();
+      if (profile?.pushEnabled === false) {
+        logger.info(`User ${userId} has push disabled, skipping`);
+        return;
+      }
 
-      // Get user's FCM tokens
-      // Assuming structure: users/{userId}/fcmTokens/{tokenId} or array in users/{userId}
-      // Let's assume a subcollection 'fcm_tokens' for scalability
-      const tokensSnapshot = await db.collection(`users/${userId}/fcm_tokens`).get();
-      const tokens = tokensSnapshot.docs.map((doc: { id: string }) => doc.id); // Assuming ID is the token, or doc.data().token
+      // Get user's FCM tokens from the correct path
+      const tokensSnapshot = await db
+        .collection("artifacts")
+        .doc(appId)
+        .collection("users")
+        .doc(userId)
+        .collection("fcm_tokens")
+        .get();
+      const tokens = tokensSnapshot.docs.map((d) => d.id);
 
       if (tokens.length === 0) {
         logger.info(`No FCM tokens found for user ${userId}`);
@@ -49,7 +65,7 @@ export const createPushAgentFunctions = ({ db }: PushAgentDeps) => {
         },
         webpush: {
           notification: {
-            icon: "/icon-192x192.png", // Adjust path as needed
+            icon: "/icon-192x192.png",
             click_action: url || "/",
           },
           fcmOptions: {
@@ -65,14 +81,26 @@ export const createPushAgentFunctions = ({ db }: PushAgentDeps) => {
 
         // Cleanup invalid tokens
         if (response.failureCount > 0) {
-          // Logic to remove failed tokens would go here
+          const batch = db.batch();
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              const tokenDocRef = db
+                .collection("artifacts")
+                .doc(appId)
+                .collection("users")
+                .doc(userId)
+                .collection("fcm_tokens")
+                .doc(tokens[idx]);
+              batch.delete(tokenDocRef);
+            }
+          });
+          await batch.commit();
+          logger.info(`Cleaned up ${response.failureCount} invalid FCM tokens`);
         }
 
-        // Update notification status to 'sent'
         await snapshot.ref.update({ status: "sent", sentAt: FieldValue.serverTimestamp() });
       } catch (err) {
         logger.error(`Error sending push to user ${userId}`, err);
-        // await snapshot.ref.update({ status: 'error', error: err.message });
       }
     },
   );

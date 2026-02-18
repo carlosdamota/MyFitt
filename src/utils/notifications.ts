@@ -1,5 +1,5 @@
 import { getToken } from "firebase/messaging";
-import { messaging, db } from "../config/firebase";
+import { messaging, db, appId } from "../config/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
 export async function requestNotificationPermission(userId: string) {
@@ -10,7 +10,6 @@ export async function requestNotificationPermission(userId: string) {
   try {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      // Get FCM Token
       const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
       if (!vapidKey) {
@@ -23,8 +22,8 @@ export async function requestNotificationPermission(userId: string) {
       });
 
       if (token) {
-        // Save token to user profile
-        const tokenRef = doc(db as any, "users", userId, "fcm_tokens", token);
+        // Save token under the correct path: artifacts/{appId}/users/{uid}/fcm_tokens/{token}
+        const tokenRef = doc(db as any, "artifacts", appId, "users", userId, "fcm_tokens", token);
 
         await setDoc(tokenRef, {
           token: token,

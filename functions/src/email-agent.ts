@@ -13,6 +13,7 @@ interface EmailAgentDeps {
   resendApiKey: string;
   fromEmail: string;
   webOrigin: string;
+  appId: string;
 }
 
 interface EmailContent {
@@ -26,17 +27,46 @@ export const createEmailAgentFunctions = ({
   resendApiKey,
   fromEmail,
   webOrigin,
+  appId,
 }: EmailAgentDeps) => {
   const db = getFirestore();
   const auth = getAuth();
-  const resend = new Resend(resendApiKey);
+  // Lazy init: Resend throws if key is empty, but during deploy analysis env vars aren't loaded
+  let _resend: Resend | null = null;
+  const getResend = () => {
+    if (!_resend) _resend = new Resend(resendApiKey);
+    return _resend;
+  };
 
   // ── Helpers ───────────────────────────────────────────────────────
 
   /** Check if user opted out of emails */
   const isEmailOptedOut = async (userId: string): Promise<boolean> => {
-    const snap = await db.collection("users").doc(userId).get();
-    return snap.data()?.emailOptOut === true;
+    const profileSnap = await db
+      .collection("artifacts")
+      .doc(appId)
+      .collection("users")
+      .doc(userId)
+      .collection("app_data")
+      .doc("profile")
+      .get();
+    return profileSnap.data()?.emailOptOut === true;
+  };
+
+  /** Wrap body with an unsubscribe footer (for commercial emails only) */
+  const wrapWithFooter = (bodyHtml: string, isSecurity: boolean): string => {
+    if (isSecurity) return bodyHtml;
+
+    const settingsUrl = `${webOrigin}/#/profile`;
+    return `${bodyHtml}
+<br><hr style="border:none;border-top:1px solid #334155;margin:24px 0 12px">
+<p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">
+  ¿No quieres recibir estos emails?
+  <a href="${settingsUrl}" style="color:#22d3ee;text-decoration:underline">Gestionar preferencias</a>
+</p>
+<p style="font-size:10px;color:#64748b;text-align:center;margin:4px 0 0">
+  FitManual — Tu compañero de entrenamiento
+</p>`;
   };
 
   /** Send an email via Resend (with opt-out guard) */
@@ -46,7 +76,6 @@ export const createEmailAgentFunctions = ({
     userId?: string,
     skipOptOutCheck = false,
   ) => {
-    // Always send security emails (skipOptOutCheck = true)
     if (!skipOptOutCheck && userId) {
       const optedOut = await isEmailOptedOut(userId);
       if (optedOut) {
@@ -55,11 +84,21 @@ export const createEmailAgentFunctions = ({
       }
     }
 
-    await resend.emails.send({
+    const settingsUrl = `${webOrigin}/#/profile`;
+    const headers: Record<string, string> = {};
+
+    // Add List-Unsubscribe header for commercial emails (email clients use this natively)
+    if (!skipOptOutCheck) {
+      headers["List-Unsubscribe"] = `<${settingsUrl}>`;
+      headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+    }
+
+    await getResend().emails.send({
       from: fromEmail,
       to,
       subject: content.subject,
-      html: content.body_html,
+      html: wrapWithFooter(content.body_html, skipOptOutCheck),
+      headers,
     });
   };
 
@@ -112,28 +151,32 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     }
   };
 
-  // ─── 1. WELCOME EMAIL (Firestore trigger) ────────────────────────
-  const sendWelcomeEmail = onDocumentCreated("users/{userId}", async (event) => {
-    const snapshot = event.data;
-    if (!snapshot) return;
+  // ─── 1. WELCOME EMAIL (Firestore trigger on profile creation) ─────
+  // Triggers when a user completes onboarding and their profile is created
+  const sendWelcomeEmail = onDocumentCreated(
+    `artifacts/${appId}/users/{userId}/app_data/profile`,
+    async (event) => {
+      const snapshot = event.data;
+      if (!snapshot) return;
 
-    const userData = snapshot.data();
-    const email = userData.email;
-    const name = userData.displayName || "Athlete";
-    if (!email) return;
+      const profileData = snapshot.data();
+      const email = profileData?.email as string | undefined;
+      const name = (profileData?.displayName as string) || "Athlete";
+      if (!email) return;
 
-    const content = await generateEmailContent(
-      `New user: ${name}`,
-      "Write a warm welcome email. Introduce FitManual as their ultimate training companion. Include a CTA to open the app.",
-    );
+      const content = await generateEmailContent(
+        `New user: ${name}`,
+        "Write a warm welcome email. Introduce FitManual as their ultimate training companion. Include a CTA to open the app.",
+      );
 
-    try {
-      await sendEmail(email, content); // No userId check needed – first email
-      logger.info(`Welcome email sent to ${email}`);
-    } catch (err) {
-      logger.error(`Failed welcome email to ${email}`, err);
-    }
-  });
+      try {
+        await sendEmail(email, content);
+        logger.info(`Welcome email sent to ${email}`);
+      } catch (err) {
+        logger.error(`Failed welcome email to ${email}`, err);
+      }
+    },
+  );
 
   // ─── 2. WEEKLY RE-ENGAGEMENT (Scheduled) ──────────────────────────
   const weeklyReengagement = onSchedule("every sunday 10:00", async () => {
@@ -142,33 +185,42 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const snapshot = await db
-      .collection("users")
-      .where("lastWorkoutDate", "<", sevenDaysAgo)
-      .where("emailOptOut", "!=", true)
-      .limit(50)
-      .get();
+    const usersRef = db.collection("artifacts").doc(appId).collection("users");
+    const usersSnap = await usersRef.listDocuments();
 
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-      if (!data.email) continue;
+    const candidates: { uid: string; email: string; displayName: string }[] = [];
+    for (const userDocRef of usersSnap.slice(0, 100)) {
+      const profileSnap = await userDocRef.collection("app_data").doc("profile").get();
+      const profile = profileSnap.data();
+      if (!profile || !profile.email || profile.emailOptOut) continue;
 
+      const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
+      if (lastWorkout && lastWorkout < sevenDaysAgo) {
+        candidates.push({
+          uid: userDocRef.id,
+          email: profile.email,
+          displayName: profile.displayName || "Athlete",
+        });
+      }
+      if (candidates.length >= 50) break;
+    }
+
+    for (const candidate of candidates) {
       const content = await generateEmailContent(
-        `User: ${data.displayName || "Athlete"}. Last workout over 7 days ago.`,
+        `User: ${candidate.displayName}. Last workout over 7 days ago.`,
         "Write a short motivational 'We miss you' email. Include a CTA to open the app.",
       );
 
       try {
-        await sendEmail(data.email, content, doc.id);
-        logger.info(`Re-engagement email sent to ${data.email}`);
+        await sendEmail(candidate.email, content, candidate.uid);
+        logger.info(`Re-engagement email sent to ${candidate.email}`);
       } catch (err) {
-        logger.error(`Failed re-engagement to ${data.email}`, err);
+        logger.error(`Failed re-engagement to ${candidate.email}`, err);
       }
     }
   });
 
-  // ─── 3. SECURITY: New Login Alert (HTTP callable) ─────────────────
-  // Called from the webhook or from the frontend after login detection
+  // ─── 3. SECURITY ALERT (HTTP endpoint) ────────────────────────────
   const sendSecurityAlert = onRequest(
     { timeoutSeconds: 30, invoker: "public" },
     async (req: Request, res: Response) => {
@@ -229,7 +281,6 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
   );
 
   // ─── 4. COMMERCIAL: Pro Subscription/Cancellation ─────────────────
-  // These are called from updatePlanForCustomer in webhook-function.ts
   const sendProSubscriptionEmail = async (userId: string, isSubscribing: boolean) => {
     try {
       const userRecord = await auth.getUser(userId);
@@ -243,7 +294,7 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
       if (isSubscribing) {
         content = await generateEmailContent(
           `User: ${name} just subscribed to FitManual Pro.`,
-          "Write a congratulatory email welcoming them to Pro. Highlight unlimited routines, advanced AI coach, nutrition analysis. Keep it exciting.",
+          "Write a congratulatory email welcoming them to Pro. Highlight unlimited routines, advanced AI coach, nutrition analysis.",
         );
       } else {
         content = await generateEmailContent(
@@ -263,6 +314,6 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     sendWelcomeEmail,
     weeklyReengagement,
     sendSecurityAlert,
-    sendProSubscriptionEmail, // Exported as a callable, not a Cloud Function
+    sendProSubscriptionEmail,
   };
 };

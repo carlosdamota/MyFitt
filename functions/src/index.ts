@@ -94,6 +94,7 @@ const emailAgentFns = createEmailAgentFunctions({
   resendApiKey: RESEND_API_KEY,
   fromEmail: EMAIL_FROM,
   webOrigin: WEB_ORIGIN,
+  appId: APP_ID,
 });
 
 // Cloud Functions (auto-deployed)
@@ -106,4 +107,5 @@ export const sendProSubscriptionEmail = emailAgentFns.sendProSubscriptionEmail;
 
 export const pushAgent = createPushAgentFunctions({
   db,
+  appId: APP_ID,
 });

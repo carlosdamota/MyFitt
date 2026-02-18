@@ -7,17 +7,14 @@ service cloud.firestore {
     // HELPER FUNCTIONS
     // ==========================================
     
-    // Verificar si el usuario está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Verificar si el usuario es el dueño de los datos
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Validadores de escritura
     function isValidRoutine() {
       return request.resource.data.title is string
         && request.resource.data.blocks is list
@@ -42,7 +39,12 @@ service cloud.firestore {
               "injuries",
               "activeRoutineId",
               "onboardingCompleted",
-              "updatedAt"
+              "updatedAt",
+              "email",
+              "displayName",
+              "emailOptOut",
+              "pushEnabled",
+              "lastWorkoutDate"
             ])
           : false;
     }
@@ -61,42 +63,54 @@ service cloud.firestore {
     // REGLAS DE SEGURIDAD
     // ==========================================
     
-    // Datos de usuarios (PRIVADO - Solo el owner puede acceder)
+    // Routines (PRIVATE)
     match /artifacts/{appId}/users/{userId}/routines/{routineId} {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidRoutine();
       allow delete: if isOwner(userId);
     }
 
+    // App data: profile + logs (PRIVATE)
     match /artifacts/{appId}/users/{userId}/app_data/{docId} {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidAppData(docId);
       allow delete: if isOwner(userId);
     }
 
+    // Nutrition logs (PRIVATE)
     match /artifacts/{appId}/users/{userId}/nutrition_logs/{logId} {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidNutritionLog();
       allow delete: if isOwner(userId);
     }
 
+    // Billing (READ-ONLY for client, server writes)
     match /artifacts/{appId}/users/{userId}/billing/{docId} {
       allow read: if isOwner(userId);
       allow write: if false;
     }
+
+    // FCM Tokens (PRIVATE - user can create/read/delete their own tokens)
+    match /artifacts/{appId}/users/{userId}/fcm_tokens/{tokenId} {
+      allow read, delete: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(["token", "createdAt", "device"]);
+    }
+
+    // Notifications (PRIVATE - server writes, user reads)
+    match /artifacts/{appId}/users/{userId}/notifications/{notificationId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+    }
     
-    // Rutinas compartidas (PÚBLICO para lectura, AUTENTICADO para escritura)
+    // Shared routines (PUBLIC read, AUTHENTICATED write with ownership)
     match /artifacts/{appId}/shared_routines/{routineId} {
-      // Cualquiera puede leer rutinas compartidas
       allow read: if true;
       
-      // Solo usuarios autenticados pueden crear rutinas compartidas, 
-      // y deben marcarse a sí mismos como autores
       allow create: if isAuthenticated() && 
         request.resource.data.originalAuthor == request.auth.uid &&
         isValidRoutine();
       
-      // Solo el autor original puede modificar o eliminar su rutina compartida
       allow update: if isAuthenticated() && 
         resource.data.originalAuthor == request.auth.uid &&
         isValidRoutine();
@@ -109,7 +123,7 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
-    // Denegar acceso a cualquier otra colección no especificada
+    // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

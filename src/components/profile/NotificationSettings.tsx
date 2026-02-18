@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Bell, BellOff, Mail, MailX } from "lucide-react";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
+import { db, appId } from "../../config/firebase";
 import { requestNotificationPermission } from "../../utils/notifications";
 import type { User as FirebaseUser } from "firebase/auth";
 
 interface NotificationSettingsProps {
   user: FirebaseUser | null;
 }
+
+// Helper to get the correct profile doc ref
+const getProfileRef = (userId: string) =>
+  doc(db as any, "artifacts", appId, "users", userId, "app_data", "profile");
 
 const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => {
   const [emailOptOut, setEmailOptOut] = useState(false);
@@ -17,10 +21,9 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
 
   useEffect(() => {
     if (!user || !db) return;
-    const firestore = db;
 
     const loadPrefs = async () => {
-      const snap = await getDoc(doc(firestore, "users", user.uid));
+      const snap = await getDoc(getProfileRef(user.uid));
       const data = snap.data();
       setEmailOptOut(data?.emailOptOut === true);
       setPushEnabled(!!data?.pushEnabled);
@@ -29,7 +32,6 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
 
     loadPrefs();
 
-    // Check current push permission state
     if ("Notification" in window) {
       setPushPermission(Notification.permission);
     }
@@ -39,14 +41,13 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
     if (!user || !db) return;
     const newValue = !emailOptOut;
     setEmailOptOut(newValue);
-    await updateDoc(doc(db!, "users", user.uid), { emailOptOut: newValue });
+    await updateDoc(getProfileRef(user.uid), { emailOptOut: newValue, updatedAt: new Date() });
   };
 
   const handlePushToggle = async () => {
     if (!user) return;
 
     if (pushPermission === "denied") {
-      // Can't re-request, user blocked it in browser
       alert(
         "Las notificaciones push están bloqueadas en tu navegador. Actívalas desde la configuración del navegador.",
       );
@@ -54,20 +55,18 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
     }
 
     if (!pushEnabled) {
-      // Enable: request permission + register token
       const token = await requestNotificationPermission(user.uid);
       if (token) {
         setPushEnabled(true);
         setPushPermission("granted");
         if (db) {
-          await updateDoc(doc(db!, "users", user.uid), { pushEnabled: true });
+          await updateDoc(getProfileRef(user.uid), { pushEnabled: true, updatedAt: new Date() });
         }
       }
     } else {
-      // Disable: just flag it (token stays but we check flag server-side)
       setPushEnabled(false);
       if (db) {
-        await updateDoc(doc(db!, "users", user.uid), { pushEnabled: false });
+        await updateDoc(getProfileRef(user.uid), { pushEnabled: false, updatedAt: new Date() });
       }
     }
   };
