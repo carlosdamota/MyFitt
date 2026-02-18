@@ -80,6 +80,9 @@ export type NutritionLog = z.infer<typeof NutritionLogSchema>;
 export const ExerciseSchema = z.object({
   name: z.string(),
   reps: RepsSchema.describe('Rep range, e.g., "10-12"'),
+  sets: z.number().optional().describe("Number of sets"),
+  intensity: z.string().optional().describe('Intensity, e.g., "RPE 8"'),
+  estimatedKcal: z.number().optional().describe("Est. calories burned for this exercise"),
   note: z.string().optional(),
   svg: z
     .enum([
@@ -140,6 +143,7 @@ export const GeneratedRoutineSchema = z.object({
     })
     .optional(),
   blocks: z.array(RoutineBlockSchema).min(1),
+  estimatedCalories: z.number().optional().describe("Est. total calories for the session"),
 });
 export type GeneratedRoutine = z.infer<typeof GeneratedRoutineSchema>;
 
@@ -159,6 +163,8 @@ export const UserProfileSchema = z.object({
   dayNumber: z.number().optional(),
   dailyTimeMinutes: z.number().optional(),
   equipment: z.union([z.string(), z.array(z.string())]),
+  trainingSplit: z.string().optional(),
+  focusAreas: z.array(z.string()).optional(),
   injuries: z.string().optional(),
   weight: z.number(),
   height: z.number(),

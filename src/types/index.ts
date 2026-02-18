@@ -11,6 +11,9 @@ export type { User } from "firebase/auth";
 export interface Exercise {
   name: string;
   reps: string;
+  sets?: number;
+  intensity?: string; // e.g., "RPE 8"
+  estimatedKcal?: number;
   note?: string;
   svg?: string;
   svg_icon?: string;
@@ -51,6 +54,7 @@ export interface Routine {
   totalDays?: number;
   dayNumber?: number;
   isDefault?: boolean;
+  estimatedCalories?: number;
 }
 
 export type RoutineData = Record<string, Routine>;
@@ -138,6 +142,9 @@ export type EquipmentOption =
   | "bench"
   | "kettlebells";
 
+export type TrainingSplit = "full_body" | "push_pull_legs" | "upper_lower" | "body_part";
+export type FocusArea = "chest" | "back" | "legs" | "shoulders" | "arms" | "core";
+
 export interface ProfileFormData {
   weight: string;
   height: string;
@@ -149,6 +156,8 @@ export interface ProfileFormData {
   availableDays: number;
   dailyTimeMinutes: number;
   equipment: EquipmentOption[];
+  trainingSplit?: TrainingSplit;
+  focusAreas?: FocusArea[];
   injuries: string;
   onboardingCompleted?: boolean;
 }

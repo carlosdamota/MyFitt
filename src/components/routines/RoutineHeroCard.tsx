@@ -37,8 +37,20 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
                 size={14}
                 className='text-purple-300'
               />
-              <span>~{totalExercises * 7} min</span>
+              <span>~{totalExercises * 5} min</span>
             </div>
+            {routine.estimatedCalories && (
+              <>
+                <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-400/50' />
+                <div className='flex items-center gap-1.5'>
+                  <Flame
+                    size={14}
+                    className='text-orange-400'
+                  />
+                  <span>~{routine.estimatedCalories} kcal</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -16,9 +16,10 @@ import {
   ArrowRight,
   Crown,
   X,
+  Zap,
 } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
-import type { ProfileFormData, EquipmentOption } from "../../types";
+import { ProfileFormData, EquipmentOption, TrainingSplit, FocusArea } from "../../types";
 import { useProfile } from "../../hooks/useProfile";
 import { useRoutines } from "../../hooks/useRoutines";
 import { generateFullProgram } from "../../api/gemini";
@@ -29,7 +30,7 @@ import { AiError } from "../../api/ai";
 // Constants
 // ——————————————————————————————————————————
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 const FREE_MAX_DAYS = 2;
 
 const goalOptions: {
@@ -66,6 +67,22 @@ const equipmentOptions: { value: EquipmentOption; label: string; description: st
 const equipmentLabels: Record<string, string> = Object.fromEntries(
   equipmentOptions.map((o) => [o.value, o.label]),
 );
+
+const splitOptions: { value: ProfileFormData["trainingSplit"]; label: string; desc: string }[] = [
+  { value: "full_body", label: "Cuerpo Completo", desc: "Todo el cuerpo en cada sesión" },
+  { value: "push_pull_legs", label: "Push / Pull / Legs", desc: "Empuje, Tracción y Piernas" },
+  { value: "upper_lower", label: "Tren Superior / Inferior", desc: "Divide arriba y abajo" },
+  { value: "body_part", label: "Por Zonas", desc: "Enfoque en grupos específicos" },
+];
+
+const focusAreaOptions: { value: FocusArea; label: string; emoji: string }[] = [
+  { value: "chest", label: "Pecho", emoji: "👕" },
+  { value: "back", label: "Espalda", emoji: "🦅" },
+  { value: "legs", label: "Piernas", emoji: "🦵" },
+  { value: "shoulders", label: "Hombros", emoji: "🛡️" },
+  { value: "arms", label: "Brazos", emoji: "💪" },
+  { value: "core", label: "Core", emoji: "🦾" },
+];
 
 const formatEquipment = (equipment: EquipmentOption[]): string => {
   if (!equipment || equipment.length === 0) return "Peso corporal";
@@ -110,8 +127,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
     experienceLevel: "intermediate",
     goal: "muscle_gain",
     availableDays: FREE_MAX_DAYS,
-    dailyTimeMinutes: 60,
+    dailyTimeMinutes: 45,
     equipment: ["gym_full"],
+    trainingSplit: "full_body",
+    focusAreas: [],
     dietType: "balanced",
     injuries: "",
   });
@@ -132,7 +151,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
     return () => clearInterval(interval);
   }, [isGenerating]);
 
-  const handleChange = (field: keyof ProfileFormData, value: string | number | string[]) => {
+  const handleChange = (field: keyof ProfileFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -202,6 +221,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
         availableDays: daysToGenerate,
         dayNumber: 1,
         totalDays: daysToGenerate,
+        trainingSplit: formData.trainingSplit,
+        focusAreas: formData.focusAreas,
       });
 
       // 3. Save each day as a routine
@@ -511,18 +532,19 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             <Clock size={12} /> Minutos por sesión
           </label>
           <div className='flex items-center gap-2'>
-            {[30, 45, 60, 75, 90].map((time) => (
+            {[20, 30, 45, 60].map((t) => (
               <button
-                key={time}
+                key={t}
                 type='button'
-                onClick={() => handleChange("dailyTimeMinutes", time)}
+                onClick={() => handleChange("dailyTimeMinutes", t)}
                 className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${
-                  formData.dailyTimeMinutes === time
+                  formData.dailyTimeMinutes === t
                     ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                    : "bg-slate-900/50 border-slate-700 text-slate-500 hover:border-slate-500"
-                }`}
+                    : "bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600"
+                } shadow-sm`}
               >
-                {time}
+                <span className='block text-lg font-black'>{t}</span>
+                <span className='text-[10px] opacity-60 uppercase'>min</span>
               </button>
             ))}
           </div>
@@ -547,7 +569,100 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   );
 
   // ——————————————————
-  // Step 3: Generation
+  // Step 3: Training Structure (Split & Focus)
+  // ——————————————————
+
+  const renderStepStructure = () => (
+    <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
+      <div className='text-center mb-8'>
+        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4'>
+          <Zap
+            size={32}
+            className='text-indigo-400'
+          />
+        </div>
+        <h2 className='text-2xl font-bold text-white mb-2'>Arquitectura del Plan</h2>
+        <p className='text-sm text-slate-400'>¿Cómo quieres estructurar tu progreso?</p>
+      </div>
+
+      <div className='space-y-6'>
+        {/* Training Split */}
+        <div>
+          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
+            División de Entrenamiento (Split)
+          </label>
+          <div className='grid grid-cols-1 gap-2'>
+            {splitOptions.map((option) => (
+              <button
+                key={option.value}
+                type='button'
+                onClick={() => handleChange("trainingSplit", option.value)}
+                className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
+                  formData.trainingSplit === option.value
+                    ? "border-indigo-400/70 bg-indigo-500/10 text-white"
+                    : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-700"
+                }`}
+              >
+                <div>
+                  <div className='font-bold text-sm'>{option.label}</div>
+                  <div className='text-[10px] text-slate-500'>{option.desc}</div>
+                </div>
+                {formData.trainingSplit === option.value && (
+                  <Check
+                    size={16}
+                    className='text-indigo-400'
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Focus Areas */}
+        <div>
+          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
+            Zonas de Enfoque (Opcional)
+          </label>
+          <div className='grid grid-cols-3 gap-2'>
+            {focusAreaOptions.map((option) => {
+              const isSelected = formData.focusAreas?.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type='button'
+                  onClick={() => {
+                    const current = formData.focusAreas || [];
+                    if (isSelected) {
+                      handleChange(
+                        "focusAreas",
+                        current.filter((f) => f !== option.value),
+                      );
+                    } else if (current.length < 3) {
+                      handleChange("focusAreas", [...current, option.value]);
+                    }
+                  }}
+                  className={`py-3 rounded-xl border text-center transition-all ${
+                    isSelected
+                      ? "border-purple-400/70 bg-purple-500/10 text-white"
+                      : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-700"
+                  }`}
+                >
+                  <span className='text-xl block mb-1'>{option.emoji}</span>
+                  <span className='text-[10px] font-bold block leading-tight'>{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className='text-[10px] text-slate-500 mt-2 text-center italic'>
+            Selecciona hasta 3 zonas para darles prioridad
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ——————————————————
+  // Step 4: Generation
   // ——————————————————
 
   const renderStepGeneration = () => (
@@ -648,7 +763,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   // Render
   // ——————————————————
 
-  const renderCurrentStep = () => {
+  const renderStep = () => {
     switch (step) {
       case 0:
         return renderStepPersonalData();
@@ -657,6 +772,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
       case 2:
         return renderStepEquipment();
       case 3:
+        return renderStepStructure();
+      case 4:
         return renderStepGeneration();
       default:
         return null;
@@ -700,7 +817,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
         {step < TOTAL_STEPS - 1 && renderProgressBar()}
 
         {/* Step content */}
-        {renderCurrentStep()}
+        {renderStep()}
 
         {/* Navigation buttons (not shown on generation step) */}
         {step < TOTAL_STEPS - 1 && (

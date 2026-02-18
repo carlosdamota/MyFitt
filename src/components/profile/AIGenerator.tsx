@@ -133,6 +133,8 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
         goal: formData.goal,
         equipment: formatEquipment(formData.equipment),
         injuries: formData.injuries,
+        trainingSplit: formData.trainingSplit,
+        focusAreas: formData.focusAreas,
         dailyTimeMinutes:
           typeof formData.dailyTimeMinutes === "string"
             ? parseInt(formData.dailyTimeMinutes)

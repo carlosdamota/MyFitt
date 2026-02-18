@@ -34,9 +34,10 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
       "focus": "Enfoque",
       "mode": "heavy" | "metabolic",
       "weight": "Carga Alta" | "Carga Media",
+      "estimatedCalories": 300,
       "bg": "bg-slate-900",
       "border": "border-slate-800",
-      "warmup": { "type": "push" | "pull" | "legs" | "full", "text": "Descripcion breve calentamiento" },
+      "warmup": { "type": "push" | "pull" | "legs" | "full", "text": "Descripcion especifica al tipo de sesion" },
       "cooldown": { "text": "Descripcion breve vuelta a la calma" },
       "blocks": [
         {
@@ -45,7 +46,10 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
           "exercises": [
              {
                "name": "Nombre Ejercicio",
+               "sets": 3,
                "reps": "10-12",
+               "intensity": "RPE 8",
+               "estimatedKcal": 40,
                "note": "Nota opcional",
                "svg": "pullup" | "floor_press" | "pushup_feet_elevated" | "one_arm_row" | "plank" | "deadbug" | "glute_bridge" | "side_squat" | "goblet_squat" | "rdl" | "calf_raise_bilateral" | "face_pull" | "bicep_curl" | "tricep_extension" | "shoulder_press" | "leg_raise" | "dumbbell" | "barbell" | "bodyweight",
                "muscleGroup": "Pecho" | "Espalda" | "Pierna" | "Hombro" | "Abdomen" | "Brazos" | "Glúteo",
@@ -58,16 +62,28 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
   ]
 }
 Reglas importantes:
-1. Debes generar EXACTAMENTE ${totalDays} dias.
-2. Distribuye los grupos musculares logicamente durante la semana.
-3. VOLUMEN Y DURACION: La sesion debe durar ${dailyTime} minutos. 
-   - Para 15-30 min: 3-4 bloques (series simples o superseries cortas).
-   - Para 45-60 min: 5-7 bloques.
-   - Para 90 min: 10-14 bloques (prioriza volumen alto).
-   - AJUSTE CRITICO: Si es >60min, DEBES incluir superseries (2+ ejercicios por bloque) para aumentar densidad.
-   - Ajusta el numero de ejercicios y series para cumplir el tiempo REAL.
-4. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
-5. Elige el valor "svg" mas apropiado segun el ejercicio:
+1. **ARQUITECTURA (ESTRICTO)**: Debes generar EXACTAMENTE ${totalDays} dias siguiendo el split: ${(profile as any).trainingSplit ?? "full_body"}.
+   - full_body: Todo el cuerpo en cada sesion.
+   - push_pull_legs: Dia 1: Empuje (Push), Dia 2: Traccion (Pull), Dia 3: Pierna (Legs).
+   - upper_lower: Alterna Tren Superior y Tren Inferior.
+   - body_part: Distribucion clasica por grupos musculares.
+2. **ENFOQUE**: Prioriza las siguientes áreas: ${JSON.stringify((profile as any).focusAreas ?? [])}. Añade mas ejercicios o volumen a estas zonas.
+3. **VOLUMEN, DURACION Y SERIES**: La sesion debe durar ${dailyTime} minutos.
+   - **TIEMPO vs VOLUMEN**: Calcula que cada serie + descanso toma ~2 minutos de media.
+     - Suma total: (Total Series * 2 min) no debe exceder ${dailyTime} min (+5% margen).
+   - **SESIONES CORTAS (<= 20 min)**:
+     - Prioriza ejercicios compuestos (multiarticulares).
+     - Reduce descansos a 30-45s para aumentar densidad.
+     - Maximo 6-8 series TOTALES en toda la sesion.
+   - **SESIONES LARGAS (>= 60 min)**:
+     - DEBES usar superseries (2+ ejercicios por bloque) para maximizar volumen.
+     - Rango de series: 3-4 series por ejercicio compuesto, 2-3 por aislamiento.
+4. **INTENSIDAD Y CALORIAS**:
+   - "intensity": Usa RPE (6-10) o RIR. Ej: "RPE 8" o "RIR 2". Ajusta segun el objetivo (Fuerza=RPE alto, Metabolico=RPE medio).
+   - "estimatedCalories": Calcula calorias totales del dia basandote en duracion y modo (Metabolic vs Heavy), usando MET promedio 3.5 a 6.
+5. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
+6. **WARMUP**: El texto del calentamiento debe ser ESPECIFICO al "type" de la sesion (ej: si es "legs", no sugieras rotaciones de hombro, enfocate en cadera/rodillas).
+7. Elige el valor "svg" mas apropiado segun el ejercicio:
    - pullup: dominadas, chin-ups
    - floor_press: press de pecho, press de suelo
    - pushup_feet_elevated: flexiones, push-ups
@@ -86,16 +102,13 @@ Reglas importantes:
    - dumbbell: ejercicios generales con mancuernas
    - barbell: ejercicios generales con barra
    - bodyweight: ejercicios de peso corporal generales
-6. **EQUIPAMIENTO (ESTRICTO)**: 
+8. **EQUIPAMIENTO (ESTRICTO)**:
    - Revisa el campo "equipment": ${JSON.stringify((profile as any).equipment ?? [])}.
-   - Si el usuario indica "calistenia" o "peso corporal", NO incluyas ejercicios con pesas, mancuernas o maquinas.
-   - Si solo tiene "mancuernas", usa solo ejercicios de mancuernas y peso corporal.
    - NUNCA sugieras equipamiento que el usuario no tiene.
-7. **SEGURIDAD Y LESIONES (CRÍTICO)**: 
+9. **SEGURIDAD Y LESIONES (CRÍTICO)**:
    - Analiza el campo "injuries" del perfil del usuario.
-   - Si se menciona una lesión (ej: "dolor hombro", "rodilla mal"), DEBES EVITAR ejercicios que estresen esa zona o sustituirlos por variantes seguras.
-   - Si no puedes evitar el grupo muscular, añade una nota en el campo "note" del ejercicio indicando por qué es seguro o cómo adaptarlo.
-8. No incluyas campos adicionales ni texto fuera del JSON.`;
+   - Evita ejercicios que agraven las lesiones indicadas.
+10. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,

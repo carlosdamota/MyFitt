@@ -33,7 +33,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
     }
   }, [profile]);
 
-  const handleChange = (field: keyof ProfileFormData, value: string | number | string[]): void => {
+  const handleChange = (field: keyof ProfileFormData, value: any): void => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
     setSavedSuccess(false);
   };

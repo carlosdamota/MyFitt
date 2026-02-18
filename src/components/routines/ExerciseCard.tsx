@@ -89,10 +89,20 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 >
                   {exercise.name}
                 </h3>
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm font-mono text-blue-400 bg-blue-900/20 px-1.5 rounded border border-blue-500/20'>
-                    {exercise.reps}
+                <div className='flex items-center gap-2 mt-1'>
+                  {exercise.sets && (
+                    <span className='text-xs font-bold text-slate-300 bg-slate-800/50 px-2 py-0.5 rounded border border-slate-700'>
+                      {exercise.sets} SERIES
+                    </span>
+                  )}
+                  <span className='text-xs font-mono text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded border border-blue-500/20'>
+                    {exercise.reps} REPS
                   </span>
+                  {exercise.intensity && (
+                    <span className='text-[10px] font-bold text-amber-500/80 bg-amber-900/10 px-1.5 py-0.5 rounded border border-amber-500/20'>
+                      {exercise.intensity}
+                    </span>
+                  )}
                 </div>
               </div>
               <div

@@ -39,6 +39,9 @@ const RepsSchema = z.union([z.string(), z.number()]).transform((value) => String
 export const ExerciseSchema = z.object({
   name: z.string(),
   reps: RepsSchema.describe('Rep range, e.g., "10-12"'),
+  sets: z.number().optional().describe("Number of sets"),
+  intensity: z.string().optional().describe('Intensity, e.g., "RPE 8"'),
+  estimatedKcal: z.number().optional().describe("Est. calories burned for this exercise"),
   note: z.string().optional(),
   muscleGroup: z.string().optional(),
   svg: z
@@ -105,6 +108,7 @@ export const GeneratedRoutineSchema = z.object({
     })
     .optional(),
   blocks: z.array(RoutineBlockSchema).min(1),
+  estimatedCalories: z.number().optional().describe("Est. total calories for the session"),
 });
 export type GeneratedRoutine = z.infer<typeof GeneratedRoutineSchema>;
 

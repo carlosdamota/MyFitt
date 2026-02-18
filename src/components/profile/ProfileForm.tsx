@@ -4,7 +4,7 @@ import type { ProfileFormData } from "../../types";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
-  handleChange: (field: keyof ProfileFormData, value: string | number | string[]) => void;
+  handleChange: (field: keyof ProfileFormData, value: any) => void;
   handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   isSaving: boolean;
   isGenerating: boolean;
