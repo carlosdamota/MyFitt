@@ -110,27 +110,27 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
             </div>
           )}
 
-          <div className='absolute right-2 top-2 flex flex-col gap-2'>
+          <div className='absolute right-3 top-3 flex flex-col gap-2.5'>
             <button
               onClick={() => setActiveMenu((prev) => (prev === "format" ? null : "format"))}
-              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              className='rounded-full border border-white/20 bg-black/45 p-3 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/60'
               title='Formato'
             >
-              <Layers size={16} />
+              <Layers size={20} />
             </button>
             <button
               onClick={() => setActiveMenu((prev) => (prev === "theme" ? null : "theme"))}
-              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              className='rounded-full border border-white/20 bg-black/45 p-3 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/60'
               title='Tema'
             >
-              <Palette size={16} />
+              <Palette size={20} />
             </button>
             <button
               onClick={() => setActiveMenu((prev) => (prev === "sticker" ? null : "sticker"))}
-              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              className='rounded-full border border-white/20 bg-black/45 p-3 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/60'
               title='Sticker'
             >
-              <Smile size={16} />
+              <Smile size={20} />
             </button>
           </div>
 
