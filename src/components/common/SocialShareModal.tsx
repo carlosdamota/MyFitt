@@ -34,7 +34,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   }, [duration, totalExercises, totalVolume]);
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
+    <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
       <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900'>
         <div className='flex items-center justify-between border-b border-slate-800 p-4'>
           <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
