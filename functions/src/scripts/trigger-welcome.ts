@@ -28,7 +28,7 @@ async function triggerWelcome() {
       .doc("profile")
       .set({
         email: testEmail,
-        displayName: "Test User",
+        displayName: "FITTWIZ Warrior",
         onboardingCompleted: true,
         createdAt: new Date(),
         // Add other required fields if necessary to avoid validation errors?

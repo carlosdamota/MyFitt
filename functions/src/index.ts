@@ -12,7 +12,7 @@ initializeApp();
 const db = getFirestore();
 const auth = getAuth();
 
-const APP_ID = process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
+const APP_ID = process.env.FITTWIZ_APP_ID ?? process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL_DEFAULT =
   process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
@@ -125,7 +125,6 @@ const accountDeletionFns = createAccountDeletionFunctions({
 
 export const onAccountDeleted = accountDeletionFns.onAccountDeleted;
 export const submitDeletionFeedback = accountDeletionFns.submitDeletionFeedback;
-
 
 export const createShareImage = createShareImageFunction({
   auth,
