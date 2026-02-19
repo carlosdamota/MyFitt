@@ -198,7 +198,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
     try {
       // 1. Save the profile initially (without completion flag yet)
       setGenerationProgress("Guardando tu perfil...");
-      await saveProfile(formData);
+      const saved = await saveProfile(formData);
+      if (!saved) throw new Error("No se pudo guardar el perfil inicial");
 
       // 2. Generate the routine
       setGenerationProgress("Generando programa con IA...");
@@ -249,7 +250,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
 
       // 4. Mark onboarding as completed ONLY after everything else succeeded
       setGenerationProgress("Finalizando...");
-      await saveProfile({ ...formData, onboardingCompleted: true });
+      const completed = await saveProfile({ ...formData, onboardingCompleted: true });
+      if (!completed) throw new Error("Error guardando estado de completado");
 
       logEvent("Onboarding", "Completed", `${daysToGenerate} days`);
       setGenerationComplete(true);
@@ -259,7 +261,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
       if (error instanceof AiError && error.code === "quota_exceeded") {
         setGenerationError("Límite de IA alcanzado. Tu perfil se ha guardado correctamente.");
       } else {
-        setGenerationError("Error generando la rutina. Tu perfil se ha guardado.");
+        const msg = error instanceof Error ? error.message : "Error desconocido";
+        setGenerationError(`Error: ${msg}. Tu perfil se ha guardado.`);
       }
       // Profile was saved at least
     } finally {

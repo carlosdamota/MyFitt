@@ -37,6 +37,8 @@ service cloud.firestore {
               "equipment",
               "dietType",
               "injuries",
+              "trainingSplit",
+              "focusAreas",
               "activeRoutineId",
               "onboardingCompleted",
               "updatedAt",
