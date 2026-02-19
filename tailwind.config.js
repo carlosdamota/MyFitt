@@ -99,6 +99,13 @@ export default {
           "100%": { transform: "translateX(0)", opacity: "1" },
         },
       },
+      zIndex: {
+        60: "60",
+        70: "70",
+        80: "80",
+        90: "90",
+        100: "100",
+      },
     },
   },
   plugins: [],

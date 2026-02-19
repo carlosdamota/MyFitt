@@ -3,6 +3,7 @@ import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, KeyRound } from "lucide
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import Modal from "../common/Modal";
+import { mainLogo } from "../../branding/logoConfig";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -104,6 +105,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
       className='max-w-md mx-auto'
     >
       <div className='space-y-4 text-slate-200'>
+        <div className='flex justify-center'>
+          <img
+            src={mainLogo.src}
+            alt={mainLogo.alt}
+            className='h-12 w-12 rounded-2xl border border-slate-700/70 bg-slate-900/80 p-1.5 object-contain'
+          />
+        </div>
         {/* ─── Forgot Password View ─── */}
         {mode === "forgot" ? (
           <>
@@ -205,110 +213,130 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </button>
             </div>
 
-            <button
-              onClick={handleGoogle}
-              disabled={loading}
-              className='w-full py-3 rounded-xl font-bold text-sm bg-white text-slate-900 hover:bg-slate-100 flex items-center justify-center gap-2 transition-all'
-            >
-              <Chrome size={16} /> Continuar con Google
-            </button>
-
-            <div className='relative flex items-center'>
-              <div className='flex-1 h-px bg-slate-800' />
-              <span className='px-3 text-[10px] text-slate-400 uppercase tracking-widest'>o</span>
-              <div className='flex-1 h-px bg-slate-800' />
-            </div>
-
-            <div className='space-y-3'>
-              <label className='block text-xs text-slate-300 font-semibold'>Email</label>
-              <div className='flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 focus-within:border-cyan-400/60'>
-                <Mail
-                  size={14}
-                  className='text-slate-400'
-                />
-                <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
-                  placeholder='tu@email.com'
-                />
+            <div className='space-y-4'>
+              <div className='space-y-1.5'>
+                <label className='block text-xs text-slate-300 font-bold ml-1 uppercase tracking-wider'>
+                  Email
+                </label>
+                <div className='flex items-center gap-2 bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-inner'>
+                  <Mail
+                    size={16}
+                    className='text-slate-500'
+                  />
+                  <input
+                    type='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
+                    placeholder='tu@email.com'
+                  />
+                </div>
               </div>
 
-              <label className='block text-xs text-slate-300 font-semibold'>Contraseña</label>
-              <div className='flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 focus-within:border-cyan-400/60'>
-                <Lock
-                  size={14}
-                  className='text-slate-400'
-                />
-                <input
-                  type='password'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
-                  placeholder='••••••••'
-                  onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
-                />
+              <div className='space-y-1.5'>
+                <label className='block text-xs text-slate-300 font-bold ml-1 uppercase tracking-wider'>
+                  Contraseña
+                </label>
+                <div className='flex items-center gap-2 bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-inner'>
+                  <Lock
+                    size={16}
+                    className='text-slate-500'
+                  />
+                  <input
+                    type='password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
+                    placeholder='••••••••'
+                    onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
+                  />
+                </div>
               </div>
             </div>
+
+            {/* Forgot password link (only in login mode) */}
+            {mode === "login" && (
+              <div className='flex justify-end'>
+                <button
+                  onClick={() => {
+                    setMode("forgot");
+                    setError(null);
+                  }}
+                  className='text-[11px] text-slate-400 hover:text-cyan-400 transition-colors font-semibold'
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+            )}
 
             {/* Checkbox for Signup Mode */}
             {mode === "signup" && (
-              <div className='flex items-start gap-2 mt-2'>
+              <div className='flex items-start gap-2 bg-slate-950/50 p-3 rounded-xl border border-slate-800/50'>
                 <input
                   type='checkbox'
                   id='terms'
                   checked={acceptedTerms}
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className='mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/50'
+                  className='mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/50 cursor-pointer'
                 />
                 <label
                   htmlFor='terms'
-                  className='text-xs text-slate-400 leading-tight'
+                  className='text-[10px] text-slate-400 leading-normal cursor-pointer'
                 >
-                  He leído y acepto la{" "}
+                  Al crear una cuenta, acepto la{" "}
                   <a
                     href='/privacy'
                     target='_blank'
-                    className='text-cyan-400 hover:underline'
+                    className='text-cyan-400 hover:text-cyan-300 transition-colors'
                   >
-                    Política de Privacidad
+                    Pol. de Privacidad
                   </a>{" "}
-                  y los{" "}
+                  y{" "}
                   <a
                     href='/terms'
                     target='_blank'
-                    className='text-cyan-400 hover:underline'
+                    className='text-cyan-400 hover:text-cyan-300 transition-colors'
                   >
                     Términos de Uso
                   </a>
-                  . Confirmo que tengo más de 16 años.
+                  .
                 </label>
               </div>
             )}
 
-            {/* Forgot password link (only in login mode) */}
-            {mode === "login" && (
-              <button
-                onClick={() => {
-                  setMode("forgot");
-                  setError(null);
-                }}
-                className='text-xs text-slate-400 hover:text-cyan-400 transition-colors font-medium'
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
+            {error && (
+              <div className='p-3 rounded-xl bg-red-500/10 border border-red-500/20'>
+                <p className='text-[11px] text-red-300 text-center font-bold'>{error}</p>
+              </div>
             )}
-
-            {error && <p className='text-xs text-red-300 font-semibold'>{error}</p>}
 
             <button
               onClick={handleEmailAuth}
               disabled={loading || (mode === "signup" && !acceptedTerms)}
-              className='w-full py-3 rounded-xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-900 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98] shadow-lg shadow-cyan-900/20 disabled:opacity-50 disabled:scale-100'
             >
-              {mode === "login" ? <LogIn size={16} /> : <UserPlus size={16} />}
-              {mode === "login" ? "Entrar con email" : "Crear cuenta"}
+              {mode === "login" ? <LogIn size={18} /> : <UserPlus size={18} />}
+              {mode === "login" ? "Entrar con email" : "Crear mi cuenta"}
+            </button>
+
+            <div className='relative flex items-center py-4'>
+              <div className='flex-1 h-px bg-slate-800/60' />
+              <span className='px-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-slate-900 relative z-10'>
+                O accede con
+              </span>
+              <div className='flex-1 h-px bg-slate-800/60' />
+            </div>
+
+            <button
+              onClick={handleGoogle}
+              disabled={loading}
+              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-slate-800 text-white hover:bg-slate-700 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.98] border border-slate-700/50'
+            >
+              <Chrome
+                size={18}
+                className='text-white'
+              />
+              Continuar con Google
             </button>
           </>
         )}

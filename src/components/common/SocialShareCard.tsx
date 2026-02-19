@@ -1,6 +1,7 @@
 import React from "react";
 import { Dumbbell, Activity } from "lucide-react";
 import type { WorkoutLogEntry } from "../../types";
+import { iconLogo } from "../../branding/logoConfig";
 
 export interface ShareCardTheme {
   backgroundColor: string;
@@ -347,7 +348,20 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
             }}
           ></div>
 
-          <div style={{ textAlign: "right" }}>
+          <div style={{ textAlign: "right", display: "flex", alignItems: "center", gap: "12px" }}>
+            <img
+              src={iconLogo.src}
+              alt={iconLogo.alt}
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                objectFit: "contain",
+                backgroundColor: "#020617",
+                border: "1px solid #334155",
+                padding: "6px",
+              }}
+            />
             <h3
               className='text-3xl font-black italic uppercase tracking-tighter'
               style={{ color: theme.primaryTextColor }}
