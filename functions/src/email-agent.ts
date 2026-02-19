@@ -76,6 +76,10 @@ export const createEmailAgentFunctions = ({
     userId?: string,
     skipOptOutCheck = false,
   ) => {
+    if (!resendApiKey) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
     if (!skipOptOutCheck && userId) {
       const optedOut = await isEmailOptedOut(userId);
       if (optedOut) {
@@ -159,10 +163,32 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
       const snapshot = event.data;
       if (!snapshot) return;
 
+      const userId = event.params.userId;
       const profileData = snapshot.data();
-      const email = profileData?.email as string | undefined;
-      const name = (profileData?.displayName as string) || "Athlete";
-      if (!email) return;
+      let email = profileData?.email as string | undefined;
+      let name = (profileData?.displayName as string) || "Athlete";
+
+      logger.info("Welcome email trigger fired", {
+        userId,
+        hasProfileEmail: Boolean(email),
+      });
+
+      // Frontend profile docs do not always persist email/displayName.
+      // Fallback to Firebase Auth so welcome email can still be delivered.
+      if (!email || !profileData?.displayName) {
+        try {
+          const userRecord = await auth.getUser(userId);
+          email = email || userRecord.email || undefined;
+          name = profileData?.displayName || userRecord.displayName || "Athlete";
+        } catch (err) {
+          logger.error(`Failed to load auth user ${userId} for welcome email`, err);
+        }
+      }
+
+      if (!email) {
+        logger.warn(`Welcome email skipped for user ${userId}: no email available`);
+        return;
+      }
 
       const content = await generateEmailContent(
         `New user: ${name}`,
