@@ -33,6 +33,12 @@ const THEME_PRESETS: Record<string, ShareCardTheme> = {
   },
 };
 
+const THEME_OPTIONS = [
+  { key: "default", label: "Default" },
+  { key: "cobalt", label: "Cobalt" },
+  { key: "sunset", label: "Sunset" },
+];
+
 const STICKERS = ["", "🔥", "💪", "⚡", "🏆", "🚀", "😤"];
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
@@ -94,47 +100,17 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
         </div>
 
         <div className='flex-1 space-y-4 overflow-y-auto bg-slate-950/50 p-6'>
-          <div className='rounded-xl border border-slate-800 bg-slate-900/50 p-4'>
-            <p className='mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400'>Apariencia</p>
-            <div className='grid grid-cols-2 gap-3'>
-              <label className='space-y-1'>
-                <span className='text-xs text-slate-400'>Preset</span>
-                <select
-                  value={presetKey}
-                  onChange={(event) => setPresetKey(event.target.value as keyof typeof THEME_PRESETS)}
-                  className='w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white'
-                >
-                  <option value='default'>Default Dark</option>
-                  <option value='cobalt'>Cobalt Night</option>
-                  <option value='sunset'>Sunset Punch</option>
-                </select>
-              </label>
-
-              <label className='space-y-1'>
-                <span className='text-xs text-slate-400'>Sticker/Emoji</span>
-                <select
-                  value={sticker}
-                  onChange={(event) => setSticker(event.target.value)}
-                  className='w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white'
-                >
-                  {STICKERS.map((item) => (
-                    <option
-                      key={item || "none"}
-                      value={item}
-                    >
-                      {item || "Sin sticker"}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
-
           <WorkoutShareButton
             captureRef={cardRef}
             shareTitle='Mi Entrenamiento en FITTWIZ'
             shareText={shareText}
             previewToken={previewToken}
+            themeOptions={THEME_OPTIONS}
+            selectedThemeKey={presetKey}
+            onThemeChange={(key) => setPresetKey(key as keyof typeof THEME_PRESETS)}
+            stickerOptions={STICKERS}
+            selectedSticker={sticker}
+            onStickerChange={setSticker}
           />
         </div>
       </div>

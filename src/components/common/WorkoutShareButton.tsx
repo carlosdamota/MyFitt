@@ -1,13 +1,35 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Download, Facebook, Instagram, Loader2, Share2, Smartphone, Twitter } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  Download,
+  Facebook,
+  Instagram,
+  Layers,
+  Loader2,
+  Palette,
+  Share2,
+  Smile,
+  Smartphone,
+  Twitter,
+} from "lucide-react";
 import { useShareWorkout } from "../../hooks/useShareWorkout";
 import type { WorkoutImageAsset, WorkoutImageFormat } from "../../utils/generateWorkoutImage";
+
+interface ThemeOption {
+  key: string;
+  label: string;
+}
 
 interface WorkoutShareButtonProps {
   captureRef: React.RefObject<HTMLElement | null>;
   shareTitle: string;
   shareText: string;
   previewToken?: string;
+  themeOptions: ThemeOption[];
+  selectedThemeKey: string;
+  onThemeChange: (key: string) => void;
+  stickerOptions: string[];
+  selectedSticker: string;
+  onStickerChange: (sticker: string) => void;
 }
 
 export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
@@ -15,19 +37,18 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   shareTitle,
   shareText,
   previewToken,
+  themeOptions,
+  selectedThemeKey,
+  onThemeChange,
+  stickerOptions,
+  selectedSticker,
+  onStickerChange,
 }) => {
   const { isGenerating, previewImage, error, capabilities, generate, share, download } =
     useShareWorkout();
   const [format, setFormat] = useState<WorkoutImageFormat>("feed");
   const [cachedAsset, setCachedAsset] = useState<WorkoutImageAsset | null>(null);
-
-  const formatLabel = useMemo(
-    () => ({
-      feed: "Instagram Feed (1080x1350)",
-      story: "Stories / TikTok (1080x1920)",
-    }),
-    [],
-  );
+  const [activeMenu, setActiveMenu] = useState<"format" | "theme" | "sticker" | null>(null);
 
   const ensureAsset = async () => {
     if (!captureRef.current) return null;
@@ -59,7 +80,6 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
     const message = `${shareTitle}\n${shareText}`;
 
     if (platform === "instagram") {
-      // Instagram web doesn't accept direct prefilled post text/images.
       alert("Instagram no permite publicar directo desde web. Usa el icono de descarga y sube la imagen en la app.");
       return;
     }
@@ -75,30 +95,111 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   return (
     <div className='space-y-4'>
       <div className='space-y-2'>
-        <label className='text-sm text-slate-300'>Formato</label>
-        <select
-          value={format}
-          onChange={(event) => {
-            setCachedAsset(null);
-            setFormat(event.target.value as WorkoutImageFormat);
-          }}
-          className='w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white'
-        >
-          <option value='feed'>{formatLabel.feed}</option>
-          <option value='story'>{formatLabel.story}</option>
-        </select>
-      </div>
+        <p className='text-xs text-slate-400'>Vista previa editable</p>
 
-      {previewImage && (
-        <div className='space-y-2'>
-          <p className='text-xs text-slate-400'>Vista previa de la card seleccionada</p>
-          <img
-            src={previewImage}
-            alt='Workout share preview'
-            className='w-full rounded-xl border border-slate-800'
-          />
+        <div className='relative overflow-hidden rounded-xl border border-slate-800'>
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt='Workout share preview'
+              className='w-full'
+            />
+          ) : (
+            <div className='flex h-64 items-center justify-center bg-slate-900 text-sm text-slate-500'>
+              Generando vista previa...
+            </div>
+          )}
+
+          <div className='absolute right-2 top-2 flex flex-col gap-2'>
+            <button
+              onClick={() => setActiveMenu((prev) => (prev === "format" ? null : "format"))}
+              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              title='Formato'
+            >
+              <Layers size={16} />
+            </button>
+            <button
+              onClick={() => setActiveMenu((prev) => (prev === "theme" ? null : "theme"))}
+              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              title='Tema'
+            >
+              <Palette size={16} />
+            </button>
+            <button
+              onClick={() => setActiveMenu((prev) => (prev === "sticker" ? null : "sticker"))}
+              className='rounded-full bg-black/70 p-2 text-white backdrop-blur'
+              title='Sticker'
+            >
+              <Smile size={16} />
+            </button>
+          </div>
+
+          {activeMenu && (
+            <div className='absolute inset-x-2 bottom-2 rounded-xl border border-slate-700 bg-black/75 p-2 backdrop-blur'>
+              {activeMenu === "format" && (
+                <div className='flex gap-2'>
+                  <button
+                    onClick={() => {
+                      setCachedAsset(null);
+                      setFormat("feed");
+                    }}
+                    className={`flex-1 rounded-lg px-3 py-2 text-xs ${
+                      format === "feed" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300"
+                    }`}
+                  >
+                    Feed
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCachedAsset(null);
+                      setFormat("story");
+                    }}
+                    className={`flex-1 rounded-lg px-3 py-2 text-xs ${
+                      format === "story" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300"
+                    }`}
+                  >
+                    Story
+                  </button>
+                </div>
+              )}
+
+              {activeMenu === "theme" && (
+                <div className='flex gap-2 overflow-x-auto'>
+                  {themeOptions.map((theme) => (
+                    <button
+                      key={theme.key}
+                      onClick={() => onThemeChange(theme.key)}
+                      className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs ${
+                        selectedThemeKey === theme.key
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-800 text-slate-300"
+                      }`}
+                    >
+                      {theme.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {activeMenu === "sticker" && (
+                <div className='flex gap-2 overflow-x-auto'>
+                  {stickerOptions.map((item) => (
+                    <button
+                      key={item || "none"}
+                      onClick={() => onStickerChange(item)}
+                      className={`rounded-lg px-3 py-2 text-xs ${
+                        selectedSticker === item ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300"
+                      }`}
+                    >
+                      {item || "Sin"}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {error && <p className='text-xs text-red-400'>{error}</p>}
 
