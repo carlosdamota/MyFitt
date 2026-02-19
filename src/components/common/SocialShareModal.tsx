@@ -1,7 +1,7 @@
-import React, { useRef, useState } from "react";
-import { X, Download, Share2, Loader2, Dumbbell } from "lucide-react";
-import html2canvas from "html2canvas";
-import { SocialShareCard } from "./SocialShareCard";
+import React, { useMemo, useRef, useState } from "react";
+import { X, Share2 } from "lucide-react";
+import { SocialShareCard, type ShareCardTheme } from "./SocialShareCard";
+import { WorkoutShareButton } from "./WorkoutShareButton";
 import type { WorkoutLogEntry } from "../../types";
 
 interface SocialShareModalProps {
@@ -12,6 +12,29 @@ interface SocialShareModalProps {
   duration?: string;
 }
 
+const THEME_PRESETS: Record<string, ShareCardTheme> = {
+  default: {
+    backgroundColor: "#121212",
+    primaryTextColor: "#ffffff",
+    secondaryTextColor: "#71717a",
+    accentColor: "#3b82f6",
+  },
+  cobalt: {
+    backgroundColor: "#0a1023",
+    primaryTextColor: "#f8fafc",
+    secondaryTextColor: "#93c5fd",
+    accentColor: "#38bdf8",
+  },
+  sunset: {
+    backgroundColor: "#2b0a0f",
+    primaryTextColor: "#fff7ed",
+    secondaryTextColor: "#fdba74",
+    accentColor: "#fb7185",
+  },
+};
+
+const STICKERS = ["", "🔥", "💪", "⚡", "🏆", "🚀", "😤"];
+
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   isOpen,
   onClose,
@@ -20,87 +43,33 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   duration = "N/A",
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [presetKey, setPresetKey] = useState<keyof typeof THEME_PRESETS>("default");
+  const [sticker, setSticker] = useState<string>("");
 
   if (!isOpen) return null;
 
+  const theme = THEME_PRESETS[presetKey];
   const totalVolume = logs.reduce((acc, log) => acc + (log.volume || 0), 0);
   const totalExercises = logs.length;
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    setIsGenerating(true);
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 1, // 1080px width already
-        useCORS: true,
-        backgroundColor: "#121212",
-        allowTaint: true,
-      });
-
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `workout-${date.replace(/\//g, "-")}.png`;
-      link.click();
-    } catch (err) {
-      console.error("Error generating image:", err);
-    } finally {
-      setIsGenerating(false);
+  const shareText = useMemo(() => {
+    if (duration !== "N/A") {
+      return `He completado un entrenamiento de ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg de volumen.`;
     }
-  };
+    return `He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen total.`;
+  }, [duration, totalExercises, totalVolume]);
 
-  const handleShare = async () => {
-    if (!cardRef.current) return;
-    setIsGenerating(true);
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 1,
-        useCORS: true,
-        backgroundColor: "#121212",
-      });
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        const file = new File([blob], "workout-share.png", { type: "image/png" });
-
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: "Mi Entrenamiento en FITTWIZ",
-            text:
-              duration !== "N/A"
-                ? `He completado un entrenamiento de ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg de volumen!`
-                : `He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen total!`,
-            files: [file],
-          });
-        } else {
-          // Fallback to download if web share not supported
-          const link = document.createElement("a");
-          link.href = canvas.toDataURL("image/png");
-          link.download = "workout-share.png";
-          link.click();
-          alert(
-            "Tu navegador no soporta compartir archivos directamente. Se ha descargado la imagen.",
-          );
-        }
-      });
-    } catch (err) {
-      console.error("Error sharing:", err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  const previewToken = `${presetKey}-${sticker || "none"}`;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm'>
-      <div className='bg-slate-900 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col border border-slate-800'>
-        {/* Header */}
-        <div className='flex justify-between items-center p-4 border-b border-slate-800'>
-          <h2 className='text-lg font-bold text-white flex items-center gap-2'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
+      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900'>
+        <div className='flex items-center justify-between border-b border-slate-800 p-4'>
+          <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
             <Share2
               size={18}
               className='text-blue-400'
-            />{" "}
+            />
             Compartir Entrenamiento
           </h2>
           <button
@@ -111,9 +80,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
           </button>
         </div>
 
-        {/* Start Hidden Card Container */}
-        {/* This is rendered off-screen or hidden but accessible to html2canvas */}
-        <div className='absolute top-0 left-0 -z-50 opacity-0 pointer-events-none overflow-hidden h-0 w-0'>
+        <div className='absolute left-0 top-0 -z-50 h-0 w-0 overflow-hidden opacity-0 pointer-events-none'>
           <SocialShareCard
             ref={cardRef}
             date={date}
@@ -121,73 +88,54 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             totalVolume={totalVolume}
             totalExercises={totalExercises}
             duration={duration}
+            theme={theme}
+            sticker={sticker || null}
           />
         </div>
-        {/* End Hidden Card Container */}
 
-        {/* Live Preview */}
-        <div className='p-6 flex-1 overflow-y-auto flex flex-col items-center justify-center bg-slate-950/50'>
-          <p className='text-sm text-slate-400 mb-4'>Vista previa:</p>
+        <div className='flex-1 space-y-4 overflow-y-auto bg-slate-950/50 p-6'>
+          <div className='rounded-xl border border-slate-800 bg-slate-900/50 p-4'>
+            <p className='mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400'>Apariencia</p>
+            <div className='grid grid-cols-2 gap-3'>
+              <label className='space-y-1'>
+                <span className='text-xs text-slate-400'>Preset</span>
+                <select
+                  value={presetKey}
+                  onChange={(event) => setPresetKey(event.target.value as keyof typeof THEME_PRESETS)}
+                  className='w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white'
+                >
+                  <option value='default'>Default Dark</option>
+                  <option value='cobalt'>Cobalt Night</option>
+                  <option value='sunset'>Sunset Punch</option>
+                </select>
+              </label>
 
-          <div
-            className='relative overflow-hidden rounded-lg shadow-2xl border border-slate-800'
-            style={{ width: "280px", height: "350px" }}
-          >
-            <div
-              style={{
-                transform: "scale(0.259)", // 280 / 1080 ≈ 0.259
-                transformOrigin: "top left",
-                width: "1080px",
-                height: "1350px",
-              }}
-            >
-              <SocialShareCard
-                date={date}
-                logs={logs}
-                totalVolume={totalVolume}
-                totalExercises={totalExercises}
-                duration={duration}
-              />
+              <label className='space-y-1'>
+                <span className='text-xs text-slate-400'>Sticker/Emoji</span>
+                <select
+                  value={sticker}
+                  onChange={(event) => setSticker(event.target.value)}
+                  className='w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white'
+                >
+                  {STICKERS.map((item) => (
+                    <option
+                      key={item || "none"}
+                      value={item}
+                    >
+                      {item || "Sin sticker"}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
           </div>
 
-          <p className='text-xs text-slate-500 mt-4 text-center px-4'>
-            Se generará una imagen de alta calidad (1080x1350) optimizada para Stories y Posts.
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className='p-4 border-t border-slate-800 grid grid-cols-2 gap-3'>
-          <button
-            onClick={handleDownload}
-            disabled={isGenerating}
-            className='flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-50'
-          >
-            {isGenerating ? (
-              <Loader2
-                size={18}
-                className='animate-spin'
-              />
-            ) : (
-              <Download size={18} />
-            )}
-            Descargar
-          </button>
-          <button
-            onClick={handleShare}
-            disabled={isGenerating}
-            className='flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-50'
-          >
-            {isGenerating ? (
-              <Loader2
-                size={18}
-                className='animate-spin'
-              />
-            ) : (
-              <Share2 size={18} />
-            )}
-            Compartir
-          </button>
+          <WorkoutShareButton
+            captureRef={cardRef}
+            shareTitle='Mi Entrenamiento en FITTWIZ'
+            shareText={shareText}
+            previewToken={previewToken}
+          />
         </div>
       </div>
     </div>
