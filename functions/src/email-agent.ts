@@ -65,7 +65,7 @@ export const createEmailAgentFunctions = ({
   <a href="${settingsUrl}" style="color:#22d3ee;text-decoration:underline">Gestionar preferencias</a>
 </p>
 <p style="font-size:10px;color:#64748b;text-align:center;margin:4px 0 0">
-  FitManual — Tu compañero de entrenamiento
+  FITTWIZ — Tu compañero de entrenamiento
 </p>`;
   };
 
@@ -110,7 +110,14 @@ export const createEmailAgentFunctions = ({
   const generateEmailContent = async (context: string, prompt: string): Promise<EmailContent> => {
     if (!geminiApiKey) {
       logger.error("Gemini API Key missing, using fallback");
-      return { subject: "FitManual", body_html: "<p>Check your app.</p>" };
+      return {
+        subject: "¡Bienvenido a FITTWIZ! 🚀 Tu transformación empieza hoy",
+        body_html: `
+          <p>¡Hola! Te damos la bienvenida a <strong>FITTWIZ</strong>.</p>
+          <p>Gracias por confiar en nosotros para alcanzar tus objetivos de fitness. Estamos preparando todo para que tu experiencia sea increíble.</p>
+          <p>Entra en la app ahora para descubrir tu plan personalizado.</p>
+        `,
+      };
     }
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
@@ -120,11 +127,11 @@ export const createEmailAgentFunctions = ({
         {
           parts: [
             {
-              text: `You are an AI copywriter for a fitness app called 'FitManual'.
+              text: `You are an AI copywriter for a fitness app called 'FITTWIZ'.
 Context: ${context}
 Task: ${prompt}
 Return ONLY valid JSON: {"subject":"...","body_html":"..."}
-Tone: professional, encouraging, concise.
+Tone: professional, high-energy, motivating, and personal.
 Format body_html with <p>, <strong>, <br>. Max 150 words.`,
             },
           ],
@@ -149,8 +156,9 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     } catch (error) {
       logger.error("Gemini email generation failed:", error);
       return {
-        subject: "Update from FitManual",
-        body_html: "<p>You have a pending update in FitManual.</p>",
+        subject: "Novedades importantes en FITTWIZ",
+        body_html:
+          "<p>Tienes una actualización pendiente en FITTWIZ. Entra para ver los detalles.</p>",
       };
     }
   };
@@ -206,7 +214,7 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
 
         const content = await generateEmailContent(
           `New user: ${name}`,
-          "Write a warm welcome email. Introduce FitManual as their ultimate training companion. Include a CTA to open the app.",
+          "Write a high-energy welcome email. Introduce FITTWIZ as the most advanced AI-powered workout companion. Emphasize that we're going to transform their fitness journey together. Include a clear and motivating CTA to open the app and start their first session.",
         );
 
         await sendEmail(email, content);
@@ -247,7 +255,7 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     for (const candidate of candidates) {
       const content = await generateEmailContent(
         `User: ${candidate.displayName}. Last workout over 7 days ago.`,
-        "Write a short motivational 'We miss you' email. Include a CTA to open the app.",
+        "Write a short, powerful 'We miss you' email. Remind them why they started and how good they feel after a workout. Include a strong CTA to jump back into FITTWIZ.",
       );
 
       try {
@@ -288,25 +296,25 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
 
         switch (alertType) {
           case "new_login":
-            subject = "🔐 New sign-in to your FitManual account";
-            body = `<p>Hi <strong>${name}</strong>,</p>
-              <p>We detected a new sign-in to your FitManual account.</p>
-              <p><strong>Device:</strong> ${metadata?.device || "Unknown"}<br>
-              <strong>Time:</strong> ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}</p>
-              <p>If this wasn't you, please change your password immediately.</p>`;
+            subject = "🔐 Nuevo inicio de sesión en tu cuenta de FITTWIZ";
+            body = `<p>Hola <strong>${name}</strong>,</p>
+              <p>Hemos detectado un nuevo inicio de sesión en tu cuenta de FITTWIZ.</p>
+              <p><strong>Dispositivo:</strong> ${metadata?.device || "Desconocido"}<br>
+              <strong>Hora:</strong> ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}</p>
+              <p>Si no has sido tú, te recomendamos cambiar tu contraseña inmediatamente para proteger tu progreso.</p>`;
             break;
 
           case "password_changed":
-            subject = "🔑 Password changed on your FitManual account";
-            body = `<p>Hi <strong>${name}</strong>,</p>
-              <p>Your password was successfully changed.</p>
-              <p>If you didn't make this change, contact support immediately.</p>`;
+            subject = "🔑 Contraseña actualizada en FITTWIZ";
+            body = `<p>Hola <strong>${name}</strong>,</p>
+              <p>Tu contraseña se ha cambiado correctamente.</p>
+              <p>Si no has realizado este cambio, contacta con nosotros de inmediato.</p>`;
             break;
 
           default:
-            subject = "🔔 Security alert from FitManual";
-            body = `<p>Hi <strong>${name}</strong>,</p>
-              <p>There was a security event on your account. If you didn't initiate this, please contact support.</p>`;
+            subject = "🔔 Alerta de seguridad de FITTWIZ";
+            body = `<p>Hola <strong>${name}</strong>,</p>
+              <p>Se ha producido un evento de seguridad en tu cuenta. Si no has sido tú, ponte en contacto con soporte.</p>`;
         }
 
         // Security emails ALWAYS skip opt-out
@@ -332,13 +340,13 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
 
       if (isSubscribing) {
         content = await generateEmailContent(
-          `User: ${name} just subscribed to FitManual Pro.`,
-          "Write a congratulatory email welcoming them to Pro. Highlight unlimited routines, advanced AI coach, nutrition analysis.",
+          `User: ${name} just subscribed to FITTWIZ Pro.`,
+          "Write an enthusiastic congratulatory email welcoming them to the FITTWIZ Pro elite squad. Highlight that they now have full power: unlimited AI routines, deep nutrition analysis, and the full capability of the AI Coach. Use high-performance language.",
         );
       } else {
         content = await generateEmailContent(
-          `User: ${name} cancelled their FitManual Pro subscription.`,
-          "Write a respectful cancellation confirmation. Mention they can still use free features. Include a subtle CTA to re-subscribe.",
+          `User: ${name} cancelled their FITTWIZ Pro subscription.`,
+          "Write a respectful cancellation confirmation. Remind them they can still reach their goals with the free version, and their progress is safe. Briefly mention the Pro features they'll miss. Include a subtle CTA to come back anytime.",
         );
       }
 
