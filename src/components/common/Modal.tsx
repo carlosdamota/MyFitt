@@ -47,30 +47,38 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-50 bg-slate-950/95 animate-in slide-in-from-bottom duration-300 flex flex-col'
+      className='fixed inset-0 z-100 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300 flex items-center justify-center p-4'
       role='dialog'
       aria-modal='true'
       aria-labelledby='modal-title'
       ref={modalRef}
       tabIndex={-1}
     >
-      <div className='bg-slate-900 p-4 flex justify-between items-center border-b border-slate-800'>
-        <h2
-          id='modal-title'
-          className='text-lg font-bold text-white flex items-center gap-2'
-        >
-          {icon}
-          {title}
-        </h2>
-        <button
-          onClick={onClose}
-          className='p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors'
-          aria-label='Cerrar'
-        >
-          <X size={20} />
-        </button>
+      <div
+        className='absolute inset-0'
+        onClick={onClose}
+      />
+      <div
+        className={`relative w-full max-w-lg bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col max-h-[90vh] ${className}`}
+      >
+        <div className='bg-slate-900/50 p-4 pl-6 flex justify-between items-center border-b border-slate-800/50 backdrop-blur-sm'>
+          <h2
+            id='modal-title'
+            className='text-lg font-bold text-white flex items-center gap-2'
+          >
+            {icon}
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className='p-2 bg-slate-800/50 rounded-full text-slate-400 hover:text-white transition-colors active:scale-90'
+            aria-label='Cerrar'
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className='flex-1 overflow-y-auto p-6 text-slate-200'>{children}</div>
       </div>
-      <div className={`flex-1 overflow-y-auto p-4 text-slate-200 ${className}`}>{children}</div>
     </div>
   );
 };
