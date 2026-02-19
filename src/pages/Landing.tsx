@@ -11,6 +11,7 @@ import {
   Utensils,
   Dumbbell,
   Target,
+  Chrome,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/auth/AuthModal";
@@ -177,15 +178,54 @@ const Landing: React.FC = () => {
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(30,41,59,0.6),transparent_55%)]' />
       </div>
 
-      <main className='relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-20'>
-        <div className='mb-10 flex items-center gap-3'>
-          <img
-            src={iconLogo.src}
-            alt={iconLogo.alt}
-            className='h-10 w-10 rounded-2xl border border-slate-700/80 bg-slate-900/70 p-1.5 object-contain'
-          />
-          <span className='text-2xl font-black italic tracking-tighter text-white'>FITTWIZ</span>
-        </div>
+      <header className='fixed top-0 left-0 right-0 z-50 px-6 py-4'>
+        <nav className='max-w-6xl mx-auto flex items-center justify-between px-6 py-3 rounded-2xl bg-slate-950/50 border border-slate-800 backdrop-blur-xl shadow-2xl'>
+          {/* Logo */}
+          <div className='flex items-center gap-2'>
+            <div className='w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center'>
+              <Activity
+                size={18}
+                className='text-slate-950'
+              />
+            </div>
+            <span className='text-lg font-black tracking-tighter text-white'>FITTWIZ</span>
+          </div>
+
+          {/* Auth Actions */}
+          <div className='flex items-center gap-3'>
+            {!user ? (
+              <>
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className='hidden sm:flex px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors'
+                >
+                  Entrar
+                </button>
+                <div className='h-4 w-px bg-slate-800 hidden sm:block' />
+                <button
+                  onClick={async () => {
+                    await loginWithGoogle();
+                    navigate("/app");
+                  }}
+                  className='flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-slate-900 font-bold text-sm hover:bg-slate-100 transition-all active:scale-95 shadow-lg shadow-white/5'
+                >
+                  <Chrome size={16} />
+                  <span className='hidden xs:inline'>Con Google</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate("/app")}
+                className='px-5 py-2 rounded-xl bg-slate-800 text-white font-bold text-sm hover:bg-slate-700 transition-all active:scale-95 border border-slate-700'
+              >
+                Ir al panel
+              </button>
+            )}
+          </div>
+        </nav>
+      </header>
+
+      <main className='relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-24'>
         <section
           className='grid lg:grid-cols-[1.15fr,0.85fr] gap-10 items-center mb-20'
           aria-label='Introducción'
@@ -300,7 +340,7 @@ const Landing: React.FC = () => {
           className='mb-20'
           aria-labelledby='how-it-works-title'
         >
-          <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
+          <div className='flex items-end justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Cómo funciona</p>
               <h2
@@ -338,7 +378,7 @@ const Landing: React.FC = () => {
           className='mb-20'
           aria-labelledby='features-title'
         >
-          <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
+          <div className='flex items-end justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Opciones</p>
               <h2
@@ -484,7 +524,7 @@ const Landing: React.FC = () => {
           className='mb-20'
           aria-labelledby='pricing-title'
         >
-          <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
+          <div className='flex items-end justify-between mb-8 flex-wrap gap-4'>
             <div>
               <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Planes</p>
               <h2
@@ -616,7 +656,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
   tone = "neutral",
 }) => (
   <div
-    className={`rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
+    className={`flex flex-col justify-between rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
       tone === "accent" ? "border-cyan-400/40 bg-cyan-500/10" : "border-slate-800 bg-slate-900/60"
     }`}
   >
