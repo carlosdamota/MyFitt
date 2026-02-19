@@ -43,7 +43,9 @@ export interface WeeklyStats {
  */
 export const isBodyweightExercise = (name: string): boolean => {
   const bodyweightKeywords = [
+    // Español
     "flexion",
+    "flexión",
     "dominada",
     "fondo",
     "zancada",
@@ -55,6 +57,7 @@ export const isBodyweightExercise = (name: string): boolean => {
     "pino",
     "crunch",
     "leg raise",
+    "elevación de pierna",
     "sentadilla",
     "gluteo",
     "glúteo",
@@ -65,6 +68,37 @@ export const isBodyweightExercise = (name: string): boolean => {
     "salto",
     "hollow",
     "superman",
+    "escalador",
+    "mountain climber",
+    "v-sit",
+    "tuck",
+    "muscle up",
+    "front lever",
+    "back lever",
+    "planche",
+    "v-sit",
+    "straddle",
+    "skating",
+    "correr",
+    "prowler",
+    "sprint",
+    "climb",
+    // Inglés
+    "push up",
+    "push-up",
+    "pull up",
+    "pull-up",
+    "chin up",
+    "chin-up",
+    "dip",
+    "lunge",
+    "squat",
+    "plank",
+    "sit up",
+    "sit-up",
+    "leg lift",
+    "box jump",
+    "jump",
   ];
   const lowerName = name.toLowerCase();
   return bodyweightKeywords.some((keyword) => lowerName.includes(keyword));
@@ -208,8 +242,9 @@ export const getWeeklyStats = (
       const sets = parseInt(String(log.sets ?? 1)) || 1;
 
       // Cálculo estricto de volumen: Peso * Reps * Series
-      // Para calistenia sin lastre (0kg), el volumen es 0.
-      const volume = weight * reps * sets;
+      // Para calistenia sin lastre (0kg), el volumen es simbólico (1kg) para que cuente en gráficas
+      const effectiveWeight = weight === 0 && isBodyweightExercise(exName) ? 1 : weight;
+      const volume = effectiveWeight * reps * sets;
 
       if (logDate >= oneWeekAgo) {
         // Esta semana
