@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import { createAiGenerateFunction } from "./ai-function.js";
 import { createCheckoutSessionFunction, createBillingPortalFunction } from "./billing-functions.js";
 import { createStripeWebhookFunction } from "./webhook-function.js";
+import { createShareImageFunction } from "./share-image-function.js";
 
 initializeApp();
 
@@ -124,3 +125,10 @@ const accountDeletionFns = createAccountDeletionFunctions({
 
 export const onAccountDeleted = accountDeletionFns.onAccountDeleted;
 export const submitDeletionFeedback = accountDeletionFns.submitDeletionFeedback;
+
+
+export const createShareImage = createShareImageFunction({
+  auth,
+  appId: APP_ID,
+  webOrigin: WEB_ORIGIN,
+});
