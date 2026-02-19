@@ -30,6 +30,9 @@ interface WorkoutShareButtonProps {
   stickerOptions: string[];
   selectedSticker: string;
   onStickerChange: (sticker: string) => void;
+  stickerPositionOptions: string[];
+  selectedStickerPosition: string;
+  onStickerPositionChange: (position: string) => void;
 }
 
 export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
@@ -43,6 +46,9 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   stickerOptions,
   selectedSticker,
   onStickerChange,
+  stickerPositionOptions,
+  selectedStickerPosition,
+  onStickerPositionChange,
 }) => {
   const { isGenerating, previewImage, error, capabilities, generate, share, download } =
     useShareWorkout();
@@ -182,18 +188,40 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
               )}
 
               {activeMenu === "sticker" && (
-                <div className='flex gap-2 overflow-x-auto'>
-                  {stickerOptions.map((item) => (
-                    <button
-                      key={item || "none"}
-                      onClick={() => onStickerChange(item)}
-                      className={`rounded-lg px-3 py-2 text-xs ${
-                        selectedSticker === item ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300"
-                      }`}
-                    >
-                      {item || "Sin"}
-                    </button>
-                  ))}
+                <div className='space-y-2'>
+                  <div className='flex gap-2 overflow-x-auto'>
+                    {stickerOptions.map((item) => (
+                      <button
+                        key={item || "none"}
+                        onClick={() => onStickerChange(item)}
+                        className={`rounded-lg px-3 py-2 text-xs ${
+                          selectedSticker === item
+                            ? "bg-blue-600 text-white"
+                            : "bg-slate-800 text-slate-300"
+                        }`}
+                      >
+                        {item || "Sin"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {selectedSticker && (
+                    <div className='flex gap-2 overflow-x-auto'>
+                      {stickerPositionOptions.map((position) => (
+                        <button
+                          key={position}
+                          onClick={() => onStickerPositionChange(position)}
+                          className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs ${
+                            selectedStickerPosition === position
+                              ? "bg-emerald-600 text-white"
+                              : "bg-slate-800 text-slate-300"
+                          }`}
+                        >
+                          {position}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

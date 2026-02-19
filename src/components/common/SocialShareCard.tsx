@@ -17,6 +17,7 @@ interface SocialShareCardProps {
   duration?: string;
   theme?: ShareCardTheme;
   sticker?: string | null;
+  stickerPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 }
 
 const DEFAULT_THEME: ShareCardTheme = {
@@ -27,7 +28,27 @@ const DEFAULT_THEME: ShareCardTheme = {
 };
 
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
-  ({ date, logs, totalVolume, totalExercises, theme = DEFAULT_THEME, sticker }, ref) => {
+  (
+    {
+      date,
+      logs,
+      totalVolume,
+      totalExercises,
+      theme = DEFAULT_THEME,
+      sticker,
+      stickerPosition = "top-left",
+    },
+    ref,
+  ) => {
+    const stickerPositionStyles: Record<
+      NonNullable<SocialShareCardProps["stickerPosition"]>,
+      Record<string, string>
+    > = {
+      "top-left": { top: "40px", left: "46px" },
+      "top-right": { top: "40px", right: "46px" },
+      "bottom-left": { bottom: "180px", left: "46px" },
+      "bottom-right": { bottom: "180px", right: "46px" },
+    };
     const formatDate = (dateString: string) => {
       try {
         if (!dateString) return "";
@@ -67,8 +88,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           <div
             style={{
               position: "absolute",
-              top: "40px",
-              right: "46px",
+              ...stickerPositionStyles[stickerPosition],
               fontSize: "72px",
               lineHeight: 1,
             }}

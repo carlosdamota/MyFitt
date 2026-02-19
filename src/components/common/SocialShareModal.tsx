@@ -40,6 +40,7 @@ const THEME_OPTIONS = [
 ];
 
 const STICKERS = ["", "🔥", "💪", "⚡", "🏆", "🚀", "😤"];
+const STICKER_POSITIONS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   isOpen,
@@ -51,6 +52,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const [presetKey, setPresetKey] = useState<keyof typeof THEME_PRESETS>("default");
   const [sticker, setSticker] = useState<string>("");
+  const [stickerPosition, setStickerPosition] = useState<(typeof STICKER_POSITIONS)[number]>(
+    "top-left",
+  );
 
   if (!isOpen) return null;
 
@@ -65,7 +69,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     return `He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen total.`;
   }, [duration, totalExercises, totalVolume]);
 
-  const previewToken = `${presetKey}-${sticker || "none"}`;
+  const previewToken = `${presetKey}-${sticker || "none"}-${stickerPosition}`;
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
@@ -96,6 +100,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             duration={duration}
             theme={theme}
             sticker={sticker || null}
+            stickerPosition={stickerPosition}
           />
         </div>
 
@@ -111,6 +116,11 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             stickerOptions={STICKERS}
             selectedSticker={sticker}
             onStickerChange={setSticker}
+            stickerPositionOptions={Array.from(STICKER_POSITIONS)}
+            selectedStickerPosition={stickerPosition}
+            onStickerPositionChange={(position) =>
+              setStickerPosition(position as (typeof STICKER_POSITIONS)[number])
+            }
           />
         </div>
       </div>
