@@ -13,7 +13,7 @@ export default defineConfig({
       filename: "sw.js",
       strategies: "injectManifest",
       registerType: "prompt",
-      includeAssets: ["favicon.svg", "apple-touch-icon.png", "robots.txt"],
+      includeAssets: ["favicon.svg", "pwa-192x192.png", "pwa-512x512.png", "robots.txt"],
       manifest: {
         name: "FITTWIZ",
         short_name: "FITTWIZ",
@@ -30,11 +30,13 @@ export default defineConfig({
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "pwa-512x512.png",

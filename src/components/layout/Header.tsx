@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import { useEntitlement } from "../../hooks/useEntitlement";
+import { iconLogo } from "../../branding/logoConfig";
 
 interface HeaderProps {
   user: FirebaseUser | null;
@@ -137,8 +138,8 @@ const Header: React.FC<HeaderProps> = ({
               >
                 <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
                 <img
-                  src='/favicon.svg'
-                  alt='FITTWIZ Logo'
+                  src={iconLogo.src}
+                  alt={iconLogo.alt}
                   className='w-5 h-5 md:w-6 md:h-6'
                 />
                 <span className='text-white hidden sm:inline font-black italic tracking-tighter text-xl'>
@@ -263,8 +264,8 @@ const Header: React.FC<HeaderProps> = ({
         <div className='p-4 border-b border-slate-800 flex justify-between items-center'>
           <div className='flex items-center gap-2'>
             <img
-              src='/favicon.svg'
-              alt='FITTWIZ Logo'
+              src={iconLogo.src}
+              alt={iconLogo.alt}
               className='w-6 h-6'
             />
             <span className='text-lg font-black italic tracking-tighter text-white'>FITTWIZ</span>

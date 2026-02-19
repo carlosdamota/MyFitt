@@ -83,6 +83,7 @@ export default function WorkoutDashboard() {
       <WeeklyProgress
         streak={streak}
         workoutLogs={workoutLogs}
+        targetDays={currentRoutine?.totalDays || profile?.availableDays || 3}
       />
       <RoutineTabs
         routines={programRoutines}
