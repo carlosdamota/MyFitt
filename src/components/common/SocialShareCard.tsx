@@ -1,7 +1,14 @@
 import React from "react";
-import { Dumbbell, Trophy, Timer, Activity } from "lucide-react";
+import { Dumbbell, Activity } from "lucide-react";
 import type { WorkoutLogEntry } from "../../types";
 import { iconLogo } from "../../branding/logoConfig";
+
+export interface ShareCardTheme {
+  backgroundColor: string;
+  primaryTextColor: string;
+  secondaryTextColor: string;
+  accentColor: string;
+}
 
 interface SocialShareCardProps {
   date: string;
@@ -9,23 +16,52 @@ interface SocialShareCardProps {
   totalVolume: number;
   totalExercises: number;
   duration?: string;
+  theme?: ShareCardTheme;
+  sticker?: string | null;
+  stickerPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 }
 
+const DEFAULT_THEME: ShareCardTheme = {
+  backgroundColor: "#121212",
+  primaryTextColor: "#ffffff",
+  secondaryTextColor: "#71717a",
+  accentColor: "#3b82f6",
+};
+
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
-  ({ date, logs, totalVolume, totalExercises, duration = "N/A" }, ref) => {
-    // Helper to format date like "Monday, 12 Oct"
+  (
+    {
+      date,
+      logs,
+      totalVolume,
+      totalExercises,
+      theme = DEFAULT_THEME,
+      sticker,
+      stickerPosition = "top-left",
+    },
+    ref,
+  ) => {
+    const stickerPositionStyles: Record<
+      NonNullable<SocialShareCardProps["stickerPosition"]>,
+      Record<string, string>
+    > = {
+      "top-left": { top: "40px", left: "46px" },
+      "top-right": { top: "40px", right: "46px" },
+      "bottom-left": { bottom: "180px", left: "46px" },
+      "bottom-right": { bottom: "180px", right: "46px" },
+    };
     const formatDate = (dateString: string) => {
       try {
         if (!dateString) return "";
         const d = new Date(dateString);
-        if (isNaN(d.getTime())) return dateString;
+        if (Number.isNaN(d.getTime())) return dateString;
         return d.toLocaleDateString("es-ES", {
           weekday: "long",
           day: "numeric",
           month: "short",
           year: "numeric",
         });
-      } catch (e) {
+      } catch {
         return dateString;
       }
     };
@@ -35,8 +71,8 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
         ref={ref}
         id='social-share-card'
         style={{
-          backgroundColor: "#121212",
-          color: "#ffffff",
+          backgroundColor: theme.backgroundColor,
+          color: theme.primaryTextColor,
           fontFamily: "'Inter', sans-serif",
           width: "1080px",
           height: "1350px",
@@ -47,13 +83,22 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           position: "relative",
           overflow: "hidden",
         }}
-        // Using explicit styles + tailwind for basic text
         className='font-sans'
       >
-        {/* Header Section */}
-        <div
-          style={{ marginBottom: "50px", borderBottom: "1px solid #27272a", paddingBottom: "30px" }}
-        >
+        {sticker && (
+          <div
+            style={{
+              position: "absolute",
+              ...stickerPositionStyles[stickerPosition],
+              fontSize: "72px",
+              lineHeight: 1,
+            }}
+          >
+            {sticker}
+          </div>
+        )}
+
+        <div style={{ marginBottom: "50px", borderBottom: "1px solid #27272a", paddingBottom: "30px" }}>
           <div
             style={{
               display: "flex",
@@ -65,7 +110,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
             <div>
               <h2
                 style={{
-                  color: "#71717a",
+                  color: theme.secondaryTextColor,
                   marginBottom: "8px",
                   fontSize: "24px",
                   fontWeight: "bold",
@@ -77,7 +122,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               </h2>
               <h1
                 style={{
-                  color: "#e4e4e7",
+                  color: theme.primaryTextColor,
                   lineHeight: 1.1,
                   fontSize: "48px",
                   fontWeight: "bold",
@@ -87,32 +132,33 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 {formatDate(date)}
               </h1>
             </div>
-            <div style={{ color: "#3b82f6" }}>
+            <div style={{ color: theme.accentColor }}>
               <Activity size={56} />
             </div>
           </div>
         </div>
 
-        {/* Big Stats Row */}
         <div style={{ display: "flex", gap: "80px", marginBottom: "50px" }}>
           <div>
             <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
               <h3
                 style={{
-                  color: "#ffffff",
+                  color: theme.primaryTextColor,
                   margin: 0,
                   lineHeight: 1,
                   fontSize: "110px",
                   fontWeight: "900",
                 }}
               >
-                {totalVolume > 0 ? (totalVolume / 1000).toFixed(1) + "k" : "0"}
+                {totalVolume > 0 ? `${(totalVolume / 1000).toFixed(1)}k` : "0"}
               </h3>
-              <span style={{ color: "#71717a", fontSize: "36px", fontWeight: "bold" }}>kg</span>
+              <span style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}>
+                kg
+              </span>
             </div>
             <p
               style={{
-                color: "#52525b",
+                color: theme.secondaryTextColor,
                 fontSize: "24px",
                 fontWeight: "bold",
                 textTransform: "uppercase",
@@ -127,7 +173,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
             <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
               <h3
                 style={{
-                  color: "#ffffff",
+                  color: theme.primaryTextColor,
                   margin: 0,
                   lineHeight: 1,
                   fontSize: "110px",
@@ -136,11 +182,13 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               >
                 {totalExercises}
               </h3>
-              <span style={{ color: "#71717a", fontSize: "36px", fontWeight: "bold" }}>Ex</span>
+              <span style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}>
+                Ex
+              </span>
             </div>
             <p
               style={{
-                color: "#52525b",
+                color: theme.secondaryTextColor,
                 fontSize: "24px",
                 fontWeight: "bold",
                 textTransform: "uppercase",
@@ -153,7 +201,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           </div>
         </div>
 
-        {/* Exercise List */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px" }}>
           {logs.slice(0, 7).map((log, i) => (
             <div
@@ -176,7 +223,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   marginRight: "32px",
                 }}
               >
-                {/* Icon */}
                 <div
                   style={{
                     backgroundColor: "#18181b",
@@ -187,7 +233,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 >
                   <Dumbbell
                     size={32}
-                    color='#a1a1aa'
+                    color={theme.secondaryTextColor}
                   />
                 </div>
 
@@ -203,16 +249,16 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 >
                   <h3
                     style={{
-                      color: "#f4f4f5",
+                      color: theme.primaryTextColor,
                       lineHeight: "1.4",
-                      marginBottom: "0px", // Removed bottom margin since no subtitle
+                      marginBottom: "0px",
                       fontSize: "28px",
                       fontWeight: "bold",
                       textTransform: "uppercase",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      paddingBottom: "2px", // Prevent descender clipping
+                      paddingBottom: "2px",
                     }}
                   >
                     {log.exercise}
@@ -220,7 +266,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 </div>
               </div>
 
-              {/* Stats Columns */}
               <div style={{ display: "flex", gap: "40px", flexShrink: 0, textAlign: "right" }}>
                 <div
                   style={{
@@ -230,12 +275,12 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     minWidth: "90px",
                   }}
                 >
-                  <span style={{ color: "#ffffff", fontSize: "32px", fontWeight: "bold" }}>
+                  <span style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}>
                     {(log.weight ?? 0) > 0 ? log.weight : "BW"}
                   </span>
                   <span
                     style={{
-                      color: "#52525b",
+                      color: theme.secondaryTextColor,
                       fontSize: "14px",
                       fontWeight: "bold",
                       textTransform: "uppercase",
@@ -252,12 +297,12 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     minWidth: "120px",
                   }}
                 >
-                  <span style={{ color: "#ffffff", fontSize: "32px", fontWeight: "bold" }}>
+                  <span style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}>
                     {log.sets} x {log.reps}
                   </span>
                   <span
                     style={{
-                      color: "#52525b",
+                      color: theme.secondaryTextColor,
                       fontSize: "14px",
                       fontWeight: "bold",
                       textTransform: "uppercase",
@@ -273,7 +318,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {logs.length > 7 && (
             <p
               style={{
-                color: "#52525b",
+                color: theme.secondaryTextColor,
                 fontSize: "24px",
                 fontStyle: "italic",
                 marginTop: "8px",
@@ -285,7 +330,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           )}
         </div>
 
-        {/* Footer */}
         <div
           style={{
             marginTop: "auto",
@@ -300,7 +344,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               height: "8px",
               width: "120px",
               borderRadius: "4px",
-              backgroundColor: "#2563eb",
+              backgroundColor: theme.accentColor,
             }}
           ></div>
 
@@ -320,13 +364,13 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
             />
             <h3
               className='text-3xl font-black italic uppercase tracking-tighter'
-              style={{ color: "#ffffff" }}
+              style={{ color: theme.primaryTextColor }}
             >
               FITTWIZ
             </h3>
             <p
               className='text-lg font-medium'
-              style={{ color: "#52525b" }}
+              style={{ color: theme.secondaryTextColor }}
             >
               fittwiz.app
             </p>
