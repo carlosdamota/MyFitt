@@ -37,6 +37,20 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   const totalDays = sortedRoutines.length;
   const isActiveProgram = sortedRoutines.some((r) => r.id === activeRoutineId);
 
+  const cleanRoutineTitle = (routineTitle: string) => {
+    if (!routineTitle) return "";
+
+    // If it starts with the program title followed by a separator, remove it
+    const programPrefixMatch = new RegExp(`^${title}[:\\s-]+`, "i");
+    let cleaned = routineTitle.replace(programPrefixMatch, "").trim();
+
+    // If after removing the program title it starts with "Día X:", keep just the custom part
+    cleaned = cleaned.replace(/^(Día|Day)\s*\d+[:\s-]*/i, "").trim();
+
+    // Fallback if everything was removed (e.g. title was just the program name + Day X)
+    return cleaned || routineTitle;
+  };
+
   return (
     <div
       className={`relative rounded-2xl overflow-hidden mb-4 transition-all duration-300 group ${
@@ -180,7 +194,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                     activeRoutineId === id ? "text-blue-100" : "text-slate-300"
                   }`}
                 >
-                  {data.title || `Día ${data.dayNumber}`}
+                  {cleanRoutineTitle(data.title) || `Día ${data.dayNumber}`}
                 </h4>
                 <p className='text-[10px] text-slate-500 truncate'>
                   {data.focus}
