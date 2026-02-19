@@ -1,0 +1,83 @@
+import { useCallback, useMemo, useState } from "react";
+import {
+  generateWorkoutImage,
+  type WorkoutImageAsset,
+  type WorkoutImageFormat,
+} from "../utils/generateWorkoutImage";
+
+interface SharePayload {
+  title: string;
+  text: string;
+}
+
+export const useShareWorkout = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const capabilities = useMemo(() => {
+    const canUseNavigatorShare = typeof navigator !== "undefined" && !!navigator.share;
+    const canShareFiles =
+      canUseNavigatorShare &&
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({ files: [new File([""], "x.txt", { type: "text/plain" })] });
+
+    return {
+      canUseNavigatorShare,
+      canShareFiles,
+      isMobile:
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(max-width: 768px)").matches,
+    };
+  }, []);
+
+  const generate = useCallback(
+    async (target: HTMLElement, format: WorkoutImageFormat) => {
+      setError(null);
+      setIsGenerating(true);
+      try {
+        const images = await generateWorkoutImage(target, { formats: [format] });
+        const image = images[format];
+        setPreviewImage(image.dataUrl);
+        return image;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "unknown_generation_error");
+        return null;
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [],
+  );
+
+  const download = useCallback((asset: WorkoutImageAsset) => {
+    const link = document.createElement("a");
+    link.href = asset.dataUrl;
+    link.download = asset.file.name;
+    link.click();
+  }, []);
+
+  const share = useCallback(
+    async (asset: WorkoutImageAsset, payload: SharePayload) => {
+      if (capabilities.canShareFiles && navigator.share) {
+        await navigator.share({ ...payload, files: [asset.file] });
+        return "shared" as const;
+      }
+
+      download(asset);
+      return "downloaded" as const;
+    },
+    [capabilities.canShareFiles, download],
+  );
+
+  return {
+    isGenerating,
+    error,
+    previewImage,
+    capabilities,
+    generate,
+    share,
+    download,
+  };
+};
