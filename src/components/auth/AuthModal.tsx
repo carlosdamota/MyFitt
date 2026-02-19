@@ -3,6 +3,7 @@ import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, KeyRound } from "lucide
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import Modal from "../common/Modal";
+import { mainLogo } from "../../branding/logoConfig";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -104,6 +105,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
       className='max-w-md mx-auto'
     >
       <div className='space-y-4 text-slate-200'>
+        <div className='flex justify-center'>
+          <img
+            src={mainLogo.src}
+            alt={mainLogo.alt}
+            className='h-12 w-12 rounded-2xl border border-slate-700/70 bg-slate-900/80 p-1.5 object-contain'
+          />
+        </div>
         {/* ─── Forgot Password View ─── */}
         {mode === "forgot" ? (
           <>

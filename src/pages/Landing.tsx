@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/auth/AuthModal";
 import { createCheckoutSession } from "../api/billing";
+import { iconLogo, socialPreview } from "../branding/logoConfig";
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -49,6 +50,7 @@ const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const socialPreviewUrl = `https://fittwiz.app${socialPreview.src}`;
 
   const onLogin = () => {
     if (user) {
@@ -126,7 +128,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='og:image'
-          content='https://fittwiz.app/og-image.jpg'
+          content={socialPreviewUrl}
         />
 
         {/* Twitter */}
@@ -148,7 +150,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='twitter:image'
-          content='https://fittwiz.app/og-image.jpg'
+          content={socialPreviewUrl}
         />
 
         <script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
@@ -176,6 +178,14 @@ const Landing: React.FC = () => {
       </div>
 
       <main className='relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-20'>
+        <div className='mb-10 flex items-center gap-3'>
+          <img
+            src={iconLogo.src}
+            alt={iconLogo.alt}
+            className='h-10 w-10 rounded-2xl border border-slate-700/80 bg-slate-900/70 p-1.5 object-contain'
+          />
+          <span className='text-2xl font-black italic tracking-tighter text-white'>FITTWIZ</span>
+        </div>
         <section
           className='grid lg:grid-cols-[1.15fr,0.85fr] gap-10 items-center mb-20'
           aria-label='Introducción'
