@@ -16,6 +16,7 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/auth/AuthModal";
 import { createCheckoutSession } from "../api/billing";
+import { iconLogo, socialPreview } from "../branding/logoConfig";
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -50,6 +51,7 @@ const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const socialPreviewUrl = `https://fittwiz.app${socialPreview.src}`;
 
   const onLogin = () => {
     if (user) {
@@ -127,7 +129,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='og:image'
-          content='https://fittwiz.app/og-image.jpg'
+          content={socialPreviewUrl}
         />
 
         {/* Twitter */}
@@ -149,7 +151,7 @@ const Landing: React.FC = () => {
         />
         <meta
           property='twitter:image'
-          content='https://fittwiz.app/og-image.jpg'
+          content={socialPreviewUrl}
         />
 
         <script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
