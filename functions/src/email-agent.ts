@@ -161,45 +161,58 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
     `artifacts/${appId}/users/{userId}/app_data/profile`,
     async (event) => {
       const snapshot = event.data;
-      if (!snapshot) return;
-
       const userId = event.params.userId;
-      const profileData = snapshot.data();
-      let email = profileData?.email as string | undefined;
-      let name = (profileData?.displayName as string) || "Athlete";
 
-      logger.info("Welcome email trigger fired", {
-        userId,
-        hasProfileEmail: Boolean(email),
+      logger.info(`[sendWelcomeEmail] Trigger fired for user: ${userId}`, {
+        eventId: event.id,
+        timestamp: event.time,
       });
 
-      // Frontend profile docs do not always persist email/displayName.
-      // Fallback to Firebase Auth so welcome email can still be delivered.
-      if (!email || !profileData?.displayName) {
-        try {
-          const userRecord = await auth.getUser(userId);
-          email = email || userRecord.email || undefined;
-          name = profileData?.displayName || userRecord.displayName || "Athlete";
-        } catch (err) {
-          logger.error(`Failed to load auth user ${userId} for welcome email`, err);
-        }
-      }
-
-      if (!email) {
-        logger.warn(`Welcome email skipped for user ${userId}: no email available`);
+      if (!snapshot) {
+        logger.warn(`[sendWelcomeEmail] No snapshot data for user ${userId}`);
         return;
       }
 
-      const content = await generateEmailContent(
-        `New user: ${name}`,
-        "Write a warm welcome email. Introduce FitManual as their ultimate training companion. Include a CTA to open the app.",
-      );
-
       try {
+        const profileData = snapshot.data();
+        let email = profileData?.email as string | undefined;
+        let name = (profileData?.displayName as string) || "Athlete";
+
+        logger.info(`[sendWelcomeEmail] Processing profile for ${userId}`, {
+          hasProfileEmail: Boolean(email),
+          profileEmail: email, // cautious logging PII if needed, but helpful for debug
+          displayName: name,
+        });
+
+        // Frontend profile docs do not always persist email/displayName.
+        // Fallback to Firebase Auth so welcome email can still be delivered.
+        if (!email || !profileData?.displayName) {
+          try {
+            const userRecord = await auth.getUser(userId);
+            email = email || userRecord.email || undefined;
+            name = profileData?.displayName || userRecord.displayName || "Athlete";
+            logger.info(`[sendWelcomeEmail] Fetched auth data for ${userId}`, {
+              foundEmail: Boolean(email),
+            });
+          } catch (err) {
+            logger.error(`[sendWelcomeEmail] Failed to load auth user ${userId}`, err);
+          }
+        }
+
+        if (!email) {
+          logger.warn(`[sendWelcomeEmail] Skipped for user ${userId}: no email available`);
+          return;
+        }
+
+        const content = await generateEmailContent(
+          `New user: ${name}`,
+          "Write a warm welcome email. Introduce FitManual as their ultimate training companion. Include a CTA to open the app.",
+        );
+
         await sendEmail(email, content);
-        logger.info(`Welcome email sent to ${email}`);
+        logger.info(`[sendWelcomeEmail] Sent to ${email}`);
       } catch (err) {
-        logger.error(`Failed welcome email to ${email}`, err);
+        logger.error(`[sendWelcomeEmail] CRITICAL FAILURE for user ${userId}`, err);
       }
     },
   );
