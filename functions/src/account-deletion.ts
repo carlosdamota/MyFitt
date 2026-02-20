@@ -1,4 +1,5 @@
 import { onRequest } from "firebase-functions/v2/https";
+import { auth as functionsAuth } from "firebase-functions/v1";
 import type { Firestore } from "firebase-admin/firestore";
 import type { Auth } from "firebase-admin/auth";
 import type Stripe from "stripe";
@@ -69,7 +70,14 @@ const cleanupAccountData = async ({
   }
 
   // Delete all known subcollections
-  const subcollections = ["app_data", "routines", "nutrition_logs", "billing", "fcm_tokens", "notifications"];
+  const subcollections = [
+    "app_data",
+    "routines",
+    "nutrition_logs",
+    "billing",
+    "fcm_tokens",
+    "notifications",
+  ];
 
   for (const sub of subcollections) {
     try {
@@ -98,34 +106,21 @@ export const createAccountDeletionFunctions = ({
   stripe,
   webOrigin,
 }: AccountDeletionDeps) => {
-  // --- 1. HTTP endpoint (Gen2): fully delete account + related data ---
-  const onAccountDeleted = onRequest({ timeoutSeconds: 120, invoker: "public" }, async (req, res) => {
-    const allowedOrigins = getAllowedOrigins(webOrigin);
-    setCors(req.headers.origin, res, allowedOrigins);
-
-    if (!isOriginAllowed(req.headers.origin, allowedOrigins)) {
-      sendJson(res, 403, { error: "origin_not_allowed" });
-      return;
-    }
-    if (req.method === "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
-    if (req.method !== "POST") {
-      sendJson(res, 405, { error: "method_not_allowed" });
-      return;
-    }
+  // --- 1. Background trigger (Gen 1): fully delete related data ---
+  // Note: Using Gen 1 trigger because Gen 2 background triggers for Auth events
+  // are not yet available in the standard SDK, though blocking events are.
+  // This coexists perfectly with Gen 2 functions and supports Node 22.
+  const onAccountDeleted = functionsAuth.user().onDelete(async (user) => {
+    const uid = user.uid;
+    console.log(`[Account Deletion] Triggered for user: ${uid}`);
 
     try {
-      const { uid } = await requireAuth(req, auth);
-
       await cleanupAccountData({ db, appId, stripe, uid });
-      await auth.deleteUser(uid);
-
-      sendJson(res, 200, { ok: true });
+      console.log(`[Account Deletion] Successfully cleaned up data for user: ${uid}`);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "unknown_error";
-      sendJson(res, 500, { error: "account_deletion_failed", message });
+      console.error(`[Account Deletion] Error during cleanup for user ${uid}:`, err);
+      // We don't throw here to avoid infinite retry loops for background triggers
+      // if it's a permanent error, but GCP will retry on crash.
     }
   });
 

@@ -94,24 +94,20 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     setError(null);
 
     try {
-      const token = await user.getIdToken();
-      const baseUrl = getFunctionsUrl();
-      const response = await fetch(`${baseUrl}/onAccountDeleted`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const body = await response.text();
-        console.error("Delete account API error:", response.status, body);
-        throw new Error("delete_failed");
-      }
+      // 1. Delete the user via Client SDK
+      // This will automatically trigger the onAccountDeleted Cloud Function
+      await user.delete();
 
       onAccountDeleted();
-    } catch (err) {
+    } catch (err: any) {
+      console.error("Delete account error:", err);
+      if (err.code === "auth/requires-recent-login") {
+        setError("Por seguridad, debes volver a iniciar sesión para eliminar tu cuenta.");
+      } else {
+        setError("Error al eliminar la cuenta. Inténtalo de nuevo.");
+      }
+      setIsDeleting(false);
+    }
       console.error("Delete account error:", err);
       setError("Error al eliminar la cuenta. Inténtalo de nuevo.");
       setIsDeleting(false);
