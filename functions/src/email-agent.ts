@@ -120,7 +120,7 @@ export const createEmailAgentFunctions = ({
       };
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
 
     const payload = {
       contents: [
@@ -188,7 +188,6 @@ Format body_html with <p>, <strong>, <br>. Max 150 words.`,
 
         logger.info(`[sendWelcomeEmail] Processing profile for ${userId}`, {
           hasProfileEmail: Boolean(email),
-          profileEmail: email, // cautious logging PII if needed, but helpful for debug
           displayName: name,
         });
 

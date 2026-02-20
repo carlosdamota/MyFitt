@@ -36,10 +36,7 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
         });
 
         if (!title || !body) {
-          logger.warn(
-            `[PushAgent] Notification ${notificationId} missing title or body`,
-            notificationData,
-          );
+          logger.warn(`[PushAgent] Notification ${notificationId} missing title or body`);
           return;
         }
 

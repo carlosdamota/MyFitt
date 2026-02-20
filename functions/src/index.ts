@@ -18,10 +18,9 @@ const auth = getAuth();
 const APP_ID = process.env.FITTWIZ_APP_ID ?? process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL_DEFAULT =
-  process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+  process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 const GEMINI_MODEL_NUTRITION_FREE = process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
-const GEMINI_MODEL_NUTRITION_PRO =
-  process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_NUTRITION_PRO = process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-2.5-flash";
 const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
 
