@@ -79,6 +79,12 @@ Si eres desarrollador y quieres contribuir o desplegar tu propia instancia de My
     cd MyFitt
     ```
 
+2.  **Versión de Node.js recomendada:**
+
+    ```bash
+    node -v  # debe ser v22.x
+    ```
+
 2.  **Instalar dependencias:**
 
     ```bash
