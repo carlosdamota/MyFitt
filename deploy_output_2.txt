@@ -1,0 +1,49 @@
+
+[1m[37m===[39m Deploying to 'myfitt-5ddf6'...[22m
+
+[36m[1mi [22m[39m deploying [1mfunctions[22m
+Running command: npm --prefix "$RESOURCE_DIR" run build
+
+> fitmanual-functions@0.1.0 build
+> node --max_old_space_size=4096 ./node_modules/typescript/bin/tsc
+
+[32m[1m+ [22m[39m [32m[1mfunctions:[22m[39m Finished running [1mpredeploy[22m script.
+[36m[1mi  functions:[22m[39m preparing codebase [1mdefault[22m for deployment
+[36m[1mi  functions:[22m[39m ensuring required API [1mcloudfunctions.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m ensuring required API [1mcloudbuild.googleapis.com[22m is enabled...
+[36m[1mi  artifactregistry:[22m[39m ensuring required API [1martifactregistry.googleapis.com[22m is enabled...
+[33m[1m!  functions:[22m[39m Runtime Node.js 20 will be deprecated on 2026-04-30 and will be decommissioned on 2026-10-30, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy
+[36m[1mi  functions:[22m[39m Loading and analyzing source code for codebase default to determine what to deploy
+Serving at port 8213
+
+[36m[1mi  extensions:[22m[39m ensuring required API [1mfirebaseextensions.googleapis.com[22m is enabled...
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.
+[36m[1mi  functions:[22m[39m preparing [1mfunctions[22m directory for uploading...
+[36m[1mi [22m[39m [36m[1mfunctions:[22m[39m packaged [1mC:\Users\cdamo\OneDrive\Escritorio\Programacion\MyFitt\functions[22m (93.17 KB) for uploading
+[36m[1mi [22m[39m [36m[1mfunctions:[22m[39m packaged [1mC:\Users\cdamo\OneDrive\Escritorio\Programacion\MyFitt\functions[22m (93.38 KB) for uploading
+[36m[1mi  functions:[22m[39m ensuring required API [1mcloudscheduler.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m ensuring required API [1mrun.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m ensuring required API [1meventarc.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m ensuring required API [1mpubsub.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m ensuring required API [1mstorage.googleapis.com[22m is enabled...
+[36m[1mi  functions:[22m[39m generating the service identity for [1mpubsub.googleapis.com[22m...
+[36m[1mi  functions:[22m[39m generating the service identity for [1meventarc.googleapis.com[22m...
+[32m[1m+  functions:[22m[39m [1mfunctions[22m source uploaded successfully
+[36m[1mi  functions:[22m[39m Skipping the deploy of unchanged functions.
+[32m[1m+ [22m[39m [1m[35mfunctions[aiGenerate(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[createBillingPortal(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[createCheckoutSession(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[pushAgent(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[sendSecurityAlert(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[sendWelcomeEmail(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[stripeWebhook(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[submitDeletionFeedback(us-central1)][39m[22m Skipped (No changes detected)
+[32m[1m+ [22m[39m [1m[35mfunctions[weeklyReengagement(us-central1)][39m[22m Skipped (No changes detected)
+[36m[1mi  functions:[22m[39m updating Node.js 20 (1st Gen) function [1monAccountDeleted(us-central1)[22m...
+[32m[1m+ [22m[39m [1m[35mfunctions[createShareImage(us-central1)][39m[22m Skipped (No changes detected)
+
+
+Functions deploy had errors with the following functions:
+	onAccountDeleted(us-central1)
+
+[1m[31mError:[39m[22m There was an error deploying functions

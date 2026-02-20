@@ -6,6 +6,9 @@ import { createAiGenerateFunction } from "./ai-function.js";
 import { createCheckoutSessionFunction, createBillingPortalFunction } from "./billing-functions.js";
 import { createStripeWebhookFunction } from "./webhook-function.js";
 import { createShareImageFunction } from "./share-image-function.js";
+import { createEmailAgentFunctions } from "./email-agent.js";
+import { createPushAgentFunctions } from "./push-agent.js";
+import { createAccountDeletionFunctions } from "./account-deletion.js";
 
 initializeApp();
 
@@ -27,6 +30,34 @@ const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 const stripePricePro = process.env.STRIPE_PRICE_PRO_MONTHLY ?? "";
 const stripe = new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
 
+const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
+const EMAIL_FROM = process.env.EMAIL_FROM ?? "onboarding@fittwiz.app";
+
+// --- Subagent Initializations ---
+
+const emailAgentFns = createEmailAgentFunctions({
+  geminiApiKey: GEMINI_API_KEY,
+  resendApiKey: RESEND_API_KEY,
+  fromEmail: EMAIL_FROM,
+  webOrigin: WEB_ORIGIN,
+  appId: APP_ID,
+});
+
+const pushAgentFns = createPushAgentFunctions({
+  db,
+  appId: APP_ID,
+});
+
+const accountDeletionFns = createAccountDeletionFunctions({
+  db,
+  auth,
+  appId: APP_ID,
+  stripe,
+  webOrigin: WEB_ORIGIN,
+});
+
+// --- Cloud Functions ---
+
 export const aiGenerate = createAiGenerateFunction({
   db,
   auth,
@@ -38,7 +69,7 @@ export const aiGenerate = createAiGenerateFunction({
   quotas: {
     routine: {
       free: Number(process.env.QUOTAS_ROUTINE_FREE ?? "1"),
-      pro: Number(process.env.QUOTAS_ROUTINE_PRO ?? "5"),
+      pro: Number(process.env.QUOTAS_ROUTINE_PRO ?? "20"),
     },
     nutrition: {
       free: Number(process.env.QUOTAS_NUTRITION_FREE ?? "100"),
@@ -80,48 +111,14 @@ export const stripeWebhook = createStripeWebhookFunction({
   appId: APP_ID,
   stripe,
   stripeWebhookSecret,
+  sendProSubscriptionEmail: emailAgentFns.sendProSubscriptionEmail,
 });
 
-// --- Subagent Functions ---
-
-import { createEmailAgentFunctions } from "./email-agent.js";
-import { createPushAgentFunctions } from "./push-agent.js";
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
-const EMAIL_FROM = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
-
-const emailAgentFns = createEmailAgentFunctions({
-  geminiApiKey: GEMINI_API_KEY,
-  resendApiKey: RESEND_API_KEY,
-  fromEmail: EMAIL_FROM,
-  webOrigin: WEB_ORIGIN,
-  appId: APP_ID,
-});
-
-// Cloud Functions (auto-deployed)
 export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
 export const weeklyReengagement = emailAgentFns.weeklyReengagement;
 export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
 
-// Callable helper (used by webhook internally)
-export const sendProSubscriptionEmail = emailAgentFns.sendProSubscriptionEmail;
-
-export const pushAgent = createPushAgentFunctions({
-  db,
-  appId: APP_ID,
-});
-
-// --- Account Deletion ---
-
-import { createAccountDeletionFunctions } from "./account-deletion.js";
-
-const accountDeletionFns = createAccountDeletionFunctions({
-  db,
-  auth,
-  appId: APP_ID,
-  stripe,
-  webOrigin: WEB_ORIGIN,
-});
+export const pushAgent = pushAgentFns.sendPushOnNotification;
 
 export const onAccountDeleted = accountDeletionFns.onAccountDeleted;
 export const submitDeletionFeedback = accountDeletionFns.submitDeletionFeedback;
