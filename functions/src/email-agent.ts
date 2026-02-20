@@ -53,20 +53,69 @@ export const createEmailAgentFunctions = ({
     return profileSnap.data()?.emailOptOut === true;
   };
 
-  /** Wrap body with an unsubscribe footer (for commercial emails only) */
-  const wrapWithFooter = (bodyHtml: string, isSecurity: boolean): string => {
-    if (isSecurity) return bodyHtml;
+  /** Wrap body with a professional, branded HTML template */
+  const wrapWithFittwizTemplate = (
+    bodyHtml: string,
+    isSecurity: boolean,
+    title: string,
+    ctaText: string = "ABRIR FITTWIZ",
+  ): string => {
+    const appUrl = `${webOrigin}/#/dashboard`;
 
-    const settingsUrl = `${webOrigin}/#/profile`;
-    return `${bodyHtml}
-<br><hr style="border:none;border-top:1px solid #334155;margin:24px 0 12px">
-<p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">
-  ¿No quieres recibir estos emails?
-  <a href="${settingsUrl}" style="color:#22d3ee;text-decoration:underline">Gestionar preferencias</a>
-</p>
-<p style="font-size:10px;color:#64748b;text-align:center;margin:4px 0 0">
-  FITTWIZ — Tu compañero de entrenamiento
-</p>`;
+    // A dark, high-performance aesthetic matching the app
+    const template = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #1e293b; border-radius: 12px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .header { background-color: #0f172a; padding: 24px; text-align: center; border-bottom: 1px solid #334155; }
+    .logo { color: #f8fafc; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; margin: 0; display: inline-flex; align-items: center; gap: 8px; }
+    .logo span { color: #ef4444; }
+    .content { padding: 32px 24px; font-size: 16px; line-height: 1.6; color: #cbd5e1; }
+    h1 { color: #f8fafc; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 20px; }
+    p { margin-top: 0; margin-bottom: 16px; }
+    strong, b { color: #f8fafc; font-weight: 600; }
+    .cta-container { text-align: center; margin-top: 32px; margin-bottom: 16px; }
+    .cta-button { display: inline-block; background-color: #dc2626; color: #ffffff; font-weight: 600; font-size: 16px; text-decoration: none; padding: 14px 28px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .footer { text-align: center; padding: 24px; font-size: 12px; color: #64748b; border-top: 1px solid #334155; }
+    .footer a { color: #94a3b8; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p class="logo">FITT<span>WIZ</span></p>
+    </div>
+    <div class="content">
+      <h1>${title}</h1>
+      ${bodyHtml}
+      
+      ${
+        !isSecurity
+          ? `
+      <div class="cta-container">
+        <a href="${appUrl}" class="cta-button">${ctaText}</a>
+      </div>`
+          : ""
+      }
+    </div>
+    <div class="footer">
+      <p>FittWiz &copy; ${new Date().getFullYear()} — Tu compañero de entrenamiento IA</p>
+      ${
+        !isSecurity
+          ? `<p>¿No quieres recibir estos correos? <a href="{{unsubscribe_url}}">Darse de baja</a></p>`
+          : ""
+      }
+    </div>
+  </div>
+</body>
+</html>`;
+
+    return template;
   };
 
   /** Send an email via Resend (with opt-out guard) */
@@ -88,21 +137,12 @@ export const createEmailAgentFunctions = ({
       }
     }
 
-    const settingsUrl = `${webOrigin}/#/profile`;
-    const headers: Record<string, string> = {};
-
-    // Add List-Unsubscribe header for commercial emails (email clients use this natively)
-    if (!skipOptOutCheck) {
-      headers["List-Unsubscribe"] = `<${settingsUrl}>`;
-      headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
-    }
-
+    // Resend automatically handles List-Unsubscribe headers when {{unsubscribe_url}} is present
     await getResend().emails.send({
       from: fromEmail,
       to,
       subject: content.subject,
-      html: wrapWithFooter(content.body_html, skipOptOutCheck),
-      headers,
+      html: wrapWithFittwizTemplate(content.body_html, skipOptOutCheck, content.subject),
     });
   };
 
@@ -127,12 +167,16 @@ export const createEmailAgentFunctions = ({
         {
           parts: [
             {
-              text: `You are an AI copywriter for a fitness app called 'FITTWIZ'.
+              text: `You are an expert AI copywriter for an elite fitness app called 'FITTWIZ'.
 Context: ${context}
 Task: ${prompt}
 Return ONLY valid JSON: {"subject":"...","body_html":"..."}
-Tone: professional, high-energy, motivating, and personal.
-Format body_html with <p>, <strong>, <br>. Max 150 words.`,
+Tone: professional, high-energy, motivating, personal, and concise.
+CRITICAL INSTRUCTIONS FOR 'body_html':
+- Return pure, clean HTML paragraphs (<p>).
+- Use <b> or <strong> for emphasis.
+- DO NOT wrap the text in full HTML documents, body tags, or boilerplate. Just the raw paragraphs.
+- Keep it under 100 words. Make every word count.`,
             },
           ],
         },
