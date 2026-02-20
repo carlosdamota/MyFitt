@@ -1,6 +1,8 @@
 import React from "react";
 import { Activity, Clock, Dumbbell, Edit, Flame, Zap } from "lucide-react";
 import type { Routine } from "../../types";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
 
 interface RoutineHeroCardProps {
   routine: Routine;
@@ -14,34 +16,39 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
   onEditRoutine,
 }) => {
   return (
-    <div
-      className={`p-6 rounded-3xl border mb-6 ${routine.bg} ${routine.border} relative overflow-hidden group`}
-    >
-      <div className='absolute -right-4 -top-4 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-700'>
+    <div className='p-6 rounded-3xl border mb-6 bg-surface-900 border-surface-800 relative overflow-hidden group shadow-xl'>
+      {/* Background Glows */}
+      <div className='absolute -top-24 -right-24 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none' />
+      <div className='absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none' />
+
+      <div className='absolute -right-4 -top-4 p-4 text-white/5 group-hover:text-white/10 transition-colors duration-700 pointer-events-none'>
         <Dumbbell size={120} />
       </div>
+
       <div className='flex justify-between items-start mb-4 relative z-10'>
         <div>
-          <h2 className='text-3xl font-black text-white mb-2 leading-tight'>{routine.title}</h2>
-          <div className='flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-200/80'>
+          <h2 className='text-3xl font-black text-white mb-2 leading-tight tracking-tight'>
+            {routine.title}
+          </h2>
+          <div className='flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-400 font-medium'>
             <div className='flex items-center gap-1.5'>
               <Activity
                 size={14}
-                className='text-blue-300'
+                className='text-blue-400'
               />
               <span>{routine.focus}</span>
             </div>
-            <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-400/50' />
+            <span className='hidden sm:block w-1 h-1 rounded-full bg-surface-700' />
             <div className='flex items-center gap-1.5'>
               <Clock
                 size={14}
-                className='text-purple-300'
+                className='text-purple-400'
               />
               <span>~{totalExercises * 5} min</span>
             </div>
             {routine.estimatedCalories && (
               <>
-                <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-400/50' />
+                <span className='hidden sm:block w-1 h-1 rounded-full bg-surface-700' />
                 <div className='flex items-center gap-1.5'>
                   <Flame
                     size={14}
@@ -55,25 +62,36 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
         </div>
       </div>
 
-      <div
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border bg-slate-950/20 backdrop-blur-sm ${
-          routine.mode === "heavy"
-            ? "border-red-500/30 text-red-200"
-            : "border-green-500/30 text-green-200"
-        }`}
-      >
-        {routine.mode === "heavy" ? (
-          <Flame
-            size={14}
-            className='text-red-400'
-          />
-        ) : (
-          <Zap
-            size={14}
-            className='text-green-400'
-          />
-        )}
-        {routine.weight}
+      <div className='flex items-center gap-2 relative z-10'>
+        <Badge
+          variant={routine.mode === "heavy" ? "danger" : "default"}
+          className='bg-surface-800/80 border-surface-700/50 backdrop-blur-md shadow-inner'
+        >
+          {routine.mode === "heavy" ? (
+            <Flame
+              size={12}
+              className='mr-1 text-red-400'
+            />
+          ) : (
+            <Zap
+              size={12}
+              className='mr-1 text-primary-400'
+            />
+          )}
+          {routine.weight}
+        </Badge>
+
+        {/* 
+        <Button
+          variant='secondary'
+          size='sm'
+          onClick={onEditRoutine}
+          leftIcon={<Edit size={14} />}
+          className='bg-surface-800/80 backdrop-blur-md border-surface-700/50 text-slate-300 hover:bg-surface-700 hover:text-white transition-colors shadow-inner'
+        >
+          Editar
+        </Button>
+        */}
       </div>
     </div>
   );

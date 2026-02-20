@@ -3,6 +3,7 @@ import { Sparkles, Loader, BrainCircuit } from "lucide-react";
 import { getWeeklyStats } from "../../utils/stats";
 import { callAI, AiError } from "../../api/ai";
 import type { WorkoutLogs, RoutineData } from "../../types";
+import { Button } from "../ui/Button";
 
 interface WeeklyCoachProps {
   logs: WorkoutLogs;
@@ -61,7 +62,7 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
   return (
     <div className='space-y-4'>
       {/* CTA Card */}
-      <div className='relative overflow-hidden bg-slate-900/80 border border-purple-500/20 rounded-2xl p-6 text-center'>
+      <div className='relative overflow-hidden bg-surface-900/80 border border-purple-500/20 rounded-2xl p-6 text-center'>
         {/* Background decoration */}
         <div className='absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none' />
         <div className='absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none' />
@@ -80,10 +81,12 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
           </p>
 
           {!report && (
-            <button
+            <Button
+              variant='primary'
+              size='md'
               onClick={handleGenerateReport}
               disabled={loading}
-              className='inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-purple-900/30'
+              className='inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-purple-900/30 from-transparent to-transparent'
             >
               {loading ? (
                 <Loader
@@ -95,14 +98,14 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
                   <Sparkles size={18} /> Analizar mi Semana
                 </>
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {/* Report */}
       {report && (
-        <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 p-5 animate-in fade-in slide-in-from-bottom-4 duration-300'>
+        <div className='bg-surface-900/80 rounded-2xl border border-surface-800/50 p-5 animate-in fade-in slide-in-from-bottom-4 duration-300'>
           <div className='flex items-center gap-2 mb-4'>
             <Sparkles
               size={14}
@@ -113,7 +116,7 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
             </span>
           </div>
           <div className='text-sm text-slate-200 whitespace-pre-wrap leading-relaxed'>{report}</div>
-          <div className='mt-5 pt-3 border-t border-slate-800/50 flex justify-between text-[9px] text-slate-600 font-bold uppercase tracking-wider'>
+          <div className='mt-5 pt-3 border-t border-surface-800/50 flex justify-between text-[9px] text-slate-600 font-bold uppercase tracking-wider'>
             <span>Gemini AI</span>
             <span>{new Date().toLocaleDateString()}</span>
           </div>

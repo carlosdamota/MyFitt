@@ -12,16 +12,18 @@ import RoutineEditor from "../components/routines/RoutineEditor";
 
 import type { DashboardContext } from "../layouts/DashboardLayout";
 import WeeklyProgress from "../components/dashboard/WeeklyProgress";
+import { useToast } from "../hooks/useToast";
 
 export default function WorkoutDashboard() {
   const { user, isPro, onRequireAuth } = useOutletContext<DashboardContext>();
 
   const [activeTab, setActiveTab] = useState<string>("day1");
-  const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
   const [showRoutineEditor, setShowRoutineEditor] = useState(false);
 
+  const { success } = useToast();
+
   const { profile } = useProfile(user);
-  const { workoutLogs, saveLog, deleteLog, streak } = useWorkoutLogs(user);
+  const { workoutLogs, saveLog, deleteLog, dayStreak, weekStreak } = useWorkoutLogs(user);
   const {
     routines,
     loading: routinesLoading,
@@ -37,9 +39,9 @@ export default function WorkoutDashboard() {
     const shareId = searchParams.get("shareId");
     if (shareId && user && !routinesLoading) {
       if (window.confirm("¿Quieres importar esta rutina compartida?")) {
-        importSharedRoutine(shareId, activeTab).then((success) => {
-          if (success) {
-            alert("¡Rutina importada!");
+        importSharedRoutine(shareId, activeTab).then((successResult) => {
+          if (successResult) {
+            success("¡Rutina importada!");
             window.history.replaceState({}, document.title, "/app");
           }
         });
@@ -67,7 +69,7 @@ export default function WorkoutDashboard() {
 
   if (routinesLoading) {
     return (
-      <div className='flex items-center justify-center py-20 text-blue-500'>
+      <div className='flex items-center justify-center py-20 text-primary-500'>
         <Loader
           className='animate-spin'
           size={32}
@@ -81,7 +83,7 @@ export default function WorkoutDashboard() {
   return (
     <>
       <WeeklyProgress
-        streak={streak}
+        streak={weekStreak}
         workoutLogs={workoutLogs}
         targetDays={currentRoutine?.totalDays || profile?.availableDays || 3}
       />
@@ -94,11 +96,6 @@ export default function WorkoutDashboard() {
         routine={currentRoutine}
         dayKey={activeTab}
         isPro={isPro}
-        completedExercises={completedExercises}
-        onToggleComplete={(day, ex) => {
-          const key = `${day}-${ex}`;
-          setCompletedExercises((prev) => ({ ...prev, [key]: !prev[key] }));
-        }}
         onEditRoutine={() => setShowRoutineEditor(true)}
         onResetTimer={() => {}}
         onSaveLog={saveLog}

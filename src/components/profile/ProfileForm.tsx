@@ -28,7 +28,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       onSubmit={handleSubmit}
       className='space-y-6'
     >
-      <div className='bg-slate-900/50 p-4 rounded-2xl border border-slate-800'>
+      <div className='bg-surface-900/50 p-4 rounded-2xl border border-surface-800'>
         <h3 className='text-sm font-bold text-slate-400 uppercase mb-4 flex items-center gap-2'>
           <User size={16} /> Datos Personales
         </h3>
@@ -44,7 +44,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("weight", e.target.value)
               }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
+              className='w-full bg-surface-950 border border-surface-700 rounded-lg p-2 text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 75'
             />
           </div>
@@ -58,7 +58,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("height", e.target.value)
               }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
+              className='w-full bg-surface-950 border border-surface-700 rounded-lg p-2 text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 180'
             />
           </div>
@@ -71,7 +71,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               type='number'
               value={formData.age}
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
+              className='w-full bg-surface-950 border border-surface-700 rounded-lg p-2 text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 30'
             />
           </div>
@@ -82,7 +82,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("gender", e.target.value)
               }
-              className='w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
+              className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
             >
               <option value='male'>Hombre</option>
               <option value='female'>Mujer</option>

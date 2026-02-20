@@ -38,18 +38,20 @@ const RestTimer: React.FC<RestTimerProps> = ({
   if (timeLeft <= 0 && !isRunning) return null; // Don't show if done/inactive? Or let parent control visibility.
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 z-50 p-4 pb-8 bg-slate-900/95 border-t border-slate-800 backdrop-blur-xl animate-in slide-in-from-bottom duration-300'>
+    <div className='fixed bottom-0 left-0 right-0 z-50 p-4 pb-8 bg-surface-950/95 border-t border-surface-800 backdrop-blur-xl animate-in slide-in-from-bottom duration-300 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]'>
       <div className='max-w-md mx-auto flex items-center justify-between gap-4'>
         {/* Time Display */}
         <div className='flex items-center gap-3'>
-          <div className='w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-blue-400'>
+          <div className='w-12 h-12 rounded-full bg-primary-500/10 border border-primary-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]'>
             <Clock
               size={24}
               className={isRunning ? "animate-pulse" : ""}
             />
           </div>
           <div>
-            <p className='text-xs text-slate-400 font-bold uppercase tracking-wider'>Descanso</p>
+            <p className='text-xs text-primary-400/80 font-bold uppercase tracking-widest'>
+              Descanso
+            </p>
             <h3 className='text-3xl font-black text-white font-mono leading-none'>
               {formatTime(timeLeft)}
             </h3>
@@ -60,17 +62,17 @@ const RestTimer: React.FC<RestTimerProps> = ({
         <div className='flex items-center gap-2'>
           <button
             onClick={() => onAdd(-10)}
-            className='w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors'
+            className='w-10 h-10 rounded-full bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 flex items-center justify-center transition-all shadow-sm'
           >
             <Minus size={18} />
           </button>
 
           <button
             onClick={onToggle}
-            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95 ${
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95 ${
               isRunning
-                ? "bg-slate-700 text-white hover:bg-slate-600"
-                : "bg-blue-600 text-white hover:bg-blue-500"
+                ? "bg-surface-800 text-white border border-surface-700 shadow-md hover:bg-surface-700"
+                : "bg-linear-to-br from-primary-500 to-indigo-500 border-none text-white hover:from-primary-400 hover:to-indigo-400 shadow-[0_0_20px_rgba(139,92,246,0.3)]"
             }`}
           >
             {isRunning ? (
@@ -89,14 +91,14 @@ const RestTimer: React.FC<RestTimerProps> = ({
 
           <button
             onClick={() => onAdd(10)}
-            className='w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors'
+            className='w-10 h-10 rounded-full bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 flex items-center justify-center transition-all shadow-sm'
           >
             <Plus size={18} />
           </button>
 
           <button
             onClick={onSkip}
-            className='w-10 h-10 rounded-full bg-slate-800 text-amber-500/80 hover:text-amber-500 hover:bg-slate-700 flex items-center justify-center transition-colors ml-2'
+            className='w-10 h-10 rounded-full bg-surface-900 border border-surface-800 text-amber-500/80 hover:text-amber-400 hover:bg-surface-800 flex items-center justify-center transition-all ml-2 shadow-sm'
             title='Saltar descanso'
           >
             <SkipForward size={18} />

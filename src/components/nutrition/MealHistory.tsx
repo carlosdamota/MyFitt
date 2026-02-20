@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronLeft, ChevronRight, Calendar, Loader } from "lucide-react";
 import MealDetailCard from "./MealDetailCard";
 import type { NutritionLogEntry, Ingredient } from "../../types";
+import { Button } from "../ui/Button";
 
 interface MealHistoryProps {
   logs: NutritionLogEntry[];
@@ -32,13 +33,15 @@ const MealHistory: React.FC<MealHistoryProps> = ({
   return (
     <div className='space-y-4'>
       {/* Date Navigator */}
-      <div className='bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg'>
-        <button
+      <div className='bg-surface-900/50 p-4 rounded-2xl border border-surface-800 flex items-center justify-between shadow-lg'>
+        <Button
+          variant='ghost'
+          size='sm'
           onClick={() => onDateChange(-1)}
-          className='p-2 hover:bg-slate-800 rounded-xl transition-all active:scale-90 text-slate-400 hover:text-white'
+          className='p-2 h-auto text-slate-400 hover:text-white'
         >
           <ChevronLeft size={20} />
-        </button>
+        </Button>
         <div className='flex items-center gap-3'>
           <div className='bg-blue-500/10 p-2 rounded-lg border border-blue-500/20'>
             <Calendar
@@ -54,13 +57,15 @@ const MealHistory: React.FC<MealHistoryProps> = ({
                   .toUpperCase()}
           </span>
         </div>
-        <button
+        <Button
+          variant='ghost'
+          size='sm'
           onClick={() => onDateChange(1)}
           disabled={isToday}
-          className='p-2 hover:bg-slate-800 rounded-xl transition-all active:scale-90 disabled:opacity-20 text-slate-400 hover:text-white'
+          className='p-2 h-auto text-slate-400 hover:text-white'
         >
           <ChevronRight size={20} />
-        </button>
+        </Button>
       </div>
 
       {/* Meal List */}
@@ -77,7 +82,7 @@ const MealHistory: React.FC<MealHistoryProps> = ({
           <span className='text-xs font-medium'>Sincronizando diario...</span>
         </div>
       ) : dayLogs.length === 0 ? (
-        <div className='bg-slate-900/30 rounded-2xl border border-dashed border-slate-800 py-10 flex flex-col items-center justify-center gap-2'>
+        <div className='bg-surface-900/30 rounded-2xl border border-dashed border-surface-800 py-10 flex flex-col items-center justify-center gap-2'>
           <p className='text-slate-600 text-sm font-medium italic'>Nada registrado para este día</p>
           <p className='text-[10px] text-slate-700 uppercase font-bold tracking-tighter'>
             FITTWIZ Nutrición

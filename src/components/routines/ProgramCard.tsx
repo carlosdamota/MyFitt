@@ -55,8 +55,8 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
     <div
       className={`relative rounded-2xl overflow-hidden mb-4 transition-all duration-300 group ${
         isActiveProgram
-          ? "bg-slate-900 border border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.15)]"
-          : "bg-slate-900/40 border border-slate-800 hover:border-slate-700 hover:bg-slate-900/60"
+          ? "bg-surface-900 border border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+          : "bg-surface-900/40 border border-surface-800 hover:border-surface-700 hover:bg-surface-900/60"
       }`}
     >
       {/* Active glow */}
@@ -75,7 +75,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg ${
               isActiveProgram
                 ? "bg-linear-to-br from-blue-600 to-purple-600 text-white shadow-blue-900/30"
-                : "bg-slate-800 text-slate-400"
+                : "bg-surface-800 text-slate-400"
             }`}
           >
             <Calendar size={20} />
@@ -98,7 +98,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                   Oficial
                 </span>
               )}
-              <span className='inline-flex items-center gap-1.5 text-[11px] text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded-md border border-slate-700/50'>
+              <span className='inline-flex items-center gap-1.5 text-[11px] text-slate-400 bg-surface-800/60 px-2 py-0.5 rounded-md border border-surface-700/50'>
                 <span className='w-1.5 h-1.5 rounded-full bg-slate-400' />
                 {totalDays} Días
               </span>
@@ -117,7 +117,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Chevron (top-right, always visible) */}
           <button
             className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-              isExpanded ? "bg-slate-800 text-slate-300" : "text-slate-500"
+              isExpanded ? "bg-surface-800 text-slate-300" : "text-slate-500"
             }`}
           >
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -136,7 +136,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.97] ${
               isActiveProgram
                 ? "bg-blue-600 text-white shadow-blue-900/30 hover:bg-blue-500"
-                : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white"
+                : "bg-surface-800 text-slate-300 border border-surface-700 hover:bg-surface-700 hover:text-white"
             }`}
           >
             {isActiveProgram ? (
@@ -154,7 +154,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                 e.stopPropagation();
                 if (confirm("¿Borrar todo el programa y sus rutinas?")) onDeleteProgram(programId);
               }}
-              className='shrink-0 p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded-xl transition-colors border border-slate-800'
+              className='shrink-0 p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded-xl transition-colors border border-surface-800'
               title='Borrar Programa'
             >
               <Trash2 size={16} />
@@ -165,7 +165,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
 
       {/* Day List */}
       {isExpanded && (
-        <div className='border-t border-slate-800/50 bg-slate-950/30 p-2 space-y-1'>
+        <div className='border-t border-surface-800/50 bg-surface-950/30 p-2 space-y-1'>
           {sortedRoutines.map(({ id, data }) => (
             <div
               key={id}
@@ -173,7 +173,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
               className={`group/day flex items-center gap-3 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer ${
                 activeRoutineId === id
                   ? "bg-blue-500/10 border-blue-500/50"
-                  : "bg-transparent border-transparent hover:bg-slate-800/40 hover:border-slate-700/50"
+                  : "bg-transparent border-transparent hover:bg-surface-800/40 hover:border-surface-700/50"
               }`}
             >
               {/* Day number */}
@@ -181,7 +181,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                 className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border transition-colors ${
                   activeRoutineId === id
                     ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/40"
-                    : "bg-slate-800/80 border-slate-700 text-slate-400"
+                    : "bg-surface-800/80 border-surface-700 text-slate-400"
                 }`}
               >
                 {data.dayNumber || 0}

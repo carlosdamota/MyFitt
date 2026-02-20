@@ -64,7 +64,7 @@ const NutritionPhotoCapture: React.FC<NutritionPhotoCaptureProps> = ({
             type='button'
             onClick={handleClick}
             disabled={disabled}
-            className='inline-flex items-center gap-2 rounded-lg border border-indigo-500/40 bg-indigo-950/30 px-3 py-2 text-xs font-bold text-indigo-200 hover:bg-indigo-900/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            className='inline-flex items-center gap-2 rounded-xl border border-surface-700 bg-surface-800 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-surface-700 hover:border-surface-600 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xs'
           >
             <Camera size={14} />
             Foto al plato
@@ -74,11 +74,11 @@ const NutritionPhotoCapture: React.FC<NutritionPhotoCaptureProps> = ({
             mini
             context='nutrition_photo'
             buttonText='Foto al plato (Pro)'
-            className='border-indigo-500/30 bg-indigo-900/10 text-indigo-300 hover:from-indigo-500/20 hover:to-purple-500/20'
+            className='border-surface-700 bg-surface-800 text-slate-300 hover:border-surface-600 hover:bg-surface-700 hover:text-white shadow-xs'
           />
         )
       ) : (
-        <div className='relative w-full max-w-[220px] rounded-xl overflow-hidden border border-indigo-500/30'>
+        <div className='relative w-full max-w-[220px] rounded-2xl overflow-hidden border border-surface-700 shadow-xs'>
           <img
             src={imagePreview}
             alt='Foto del plato'
@@ -87,7 +87,7 @@ const NutritionPhotoCapture: React.FC<NutritionPhotoCaptureProps> = ({
           <button
             type='button'
             onClick={onClearPhoto}
-            className='absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 text-white hover:bg-slate-800 transition-colors'
+            className='absolute top-2 right-2 p-1.5 rounded-full bg-surface-900/80 text-white hover:bg-surface-800 transition-colors'
             aria-label='Quitar foto'
           >
             <X size={14} />

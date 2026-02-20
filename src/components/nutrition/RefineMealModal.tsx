@@ -52,9 +52,9 @@ const RefineMealModal: React.FC<RefineMealModalProps> = ({ isOpen, onClose, meal
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs'>
-      <div className='bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl'>
-        <div className='p-4 border-b border-slate-800 flex justify-between items-center bg-indigo-900/10'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/95 backdrop-blur-sm'>
+      <div className='bg-surface-900 border border-surface-800 rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl'>
+        <div className='p-4 border-b border-surface-800 flex justify-between items-center bg-indigo-900/10'>
           <h3 className='font-bold text-indigo-300 flex items-center gap-2'>
             <Sparkles
               size={18}
@@ -71,7 +71,7 @@ const RefineMealModal: React.FC<RefineMealModalProps> = ({ isOpen, onClose, meal
         </div>
 
         <div className='p-5'>
-          <div className='bg-slate-950/50 p-3 rounded-xl border border-slate-800/50 mb-4'>
+          <div className='bg-surface-950/50 p-3 rounded-xl border border-surface-800/50 mb-4'>
             <p className='text-[10px] text-slate-500 uppercase font-bold mb-1'>Comida Actual</p>
             <p className='text-slate-300 text-sm font-medium'>{meal.food}</p>
             <div className='flex gap-3 mt-2 text-xs font-mono text-slate-400'>
@@ -94,7 +94,7 @@ const RefineMealModal: React.FC<RefineMealModalProps> = ({ isOpen, onClose, meal
                 value={instruction}
                 onChange={(e) => setInstruction(e.target.value)}
                 placeholder='Ej: Añade 50g más de arroz, quita el queso, cambia a 2 huevos...'
-                className='w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white text-sm focus:border-indigo-500 outline-none h-24 resize-none placeholder-slate-600 focus:ring-1 focus:ring-indigo-500/50 transition-all'
+                className='w-full bg-surface-950 border border-surface-700 rounded-xl p-3 text-white text-sm focus:border-indigo-500 outline-none h-24 resize-none placeholder-slate-600 focus:ring-1 focus:ring-indigo-500/50 transition-all'
                 autoFocus
               />
             </div>

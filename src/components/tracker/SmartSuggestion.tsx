@@ -1,5 +1,5 @@
 import React from "react";
-import { ZapOff } from "lucide-react";
+import { Zap } from "lucide-react";
 
 interface SmartSuggestionData {
   weight: number;
@@ -19,31 +19,31 @@ const SmartSuggestion: React.FC<SmartSuggestionProps> = ({ suggestion, onApply }
   return (
     <button
       onClick={onApply}
-      className='mb-4 w-full group relative overflow-hidden bg-linear-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:border-blue-400/60 transition-all active:scale-[0.98]'
+      className='mb-4 w-full group relative overflow-hidden bg-surface-950/80 border border-primary-500/30 p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:border-primary-400/50 transition-all active:scale-[0.98] shadow-lg shadow-primary-950/20'
       title='Toca para aplicar esta sugerencia automáticamente'
     >
       <div className='flex items-start gap-3 flex-1 min-w-0'>
-        <div className='bg-blue-500/20 p-2 rounded-lg group-hover:bg-blue-500/30 transition-colors shrink-0 mt-0.5 sm:mt-0'>
-          <ZapOff
+        <div className='bg-primary-500/20 p-2 rounded-lg group-hover:bg-primary-500/30 transition-colors shrink-0 mt-0.5 sm:mt-0'>
+          <Zap
             size={16}
-            className='text-blue-400'
+            className='text-primary-400 fill-primary-400/20'
           />
         </div>
         <div className='flex flex-col items-start min-w-0 flex-1'>
-          <span className='text-[10px] text-blue-300 font-bold uppercase tracking-wider mb-0.5'>
+          <span className='text-[10px] text-primary-300 font-bold uppercase tracking-wider mb-0.5'>
             Siguiente Paso Sugerido
           </span>
-          <span className='text-sm text-white font-medium text-left leading-tight text-balance'>
+          <span className='text-sm text-slate-100 font-medium text-left leading-tight text-balance'>
             {suggestion.text}
           </span>
         </div>
       </div>
 
-      <div className='flex items-center justify-center w-full sm:w-auto bg-blue-500/20 px-3 py-1.5 rounded-lg border border-blue-500/30 text-[10px] font-bold text-blue-300 group-hover:bg-blue-500/40 transition-colors uppercase tracking-wide'>
+      <div className='flex items-center justify-center w-full sm:w-auto bg-primary-500/20 px-3 py-1.5 rounded-lg border border-primary-500/30 text-[10px] font-bold text-primary-300 group-hover:bg-primary-500/40 transition-colors uppercase tracking-wide'>
         Auto-Llenar
       </div>
 
-      <div className='absolute inset-0 bg-linear-to-r from-transparent via-blue-400/5 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none' />
+      <div className='absolute inset-0 bg-linear-to-r from-transparent via-primary-400/5 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none' />
     </button>
   );
 };

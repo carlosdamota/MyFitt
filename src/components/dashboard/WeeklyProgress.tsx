@@ -111,7 +111,7 @@ export default function WeeklyProgress({
   const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
 
   return (
-    <div className='bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 mb-6 shadow-xl relative overflow-hidden'>
+    <div className='bg-surface-900 border border-surface-800 rounded-2xl p-5 mb-6 shadow-xl relative overflow-hidden'>
       {/* Background decoration */}
       <div className='absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none' />
 
@@ -125,7 +125,7 @@ export default function WeeklyProgress({
         </div>
         <Link
           to='/app/stats'
-          className='text-cyan-400 text-xs sm:text-sm font-medium flex items-center hover:text-cyan-300 transition-colors bg-cyan-950/30 px-3 py-1.5 rounded-full border border-cyan-500/20'
+          className='text-cyan-400 text-xs sm:text-sm font-medium flex items-center hover:text-cyan-300 transition-colors bg-surface-800 px-3 py-1.5 rounded-xl border border-surface-700'
         >
           Ver estadísticas{" "}
           <ChevronRight
@@ -146,7 +146,7 @@ export default function WeeklyProgress({
             >
               {/* Background circle */}
               <circle
-                className='text-slate-800'
+                className='text-surface-800'
                 strokeWidth='6'
                 stroke='currentColor'
                 fill='transparent'
@@ -192,7 +192,7 @@ export default function WeeklyProgress({
             </div>
             <div className='flex flex-col'>
               <span className='text-xs text-slate-400 uppercase tracking-wider font-bold'>
-                Racha Actual
+                Racha Actual Semanas
               </span>
               <span className='text-sm text-white font-medium flex items-center gap-1.5'>
                 <Flame
@@ -200,17 +200,17 @@ export default function WeeklyProgress({
                   className='text-orange-500'
                   fill='currentColor'
                 />
-                {streak} Días
+                {streak} {streak === 1 ? "Semana" : "Semanas"}
               </span>
             </div>
           </div>
         </div>
 
         {/* Days Grid */}
-        <div className='flex-1 w-full bg-slate-950/50 rounded-2xl p-2 sm:p-3 border border-slate-800 flex items-center gap-1 sm:gap-2 justify-between'>
+        <div className='flex-1 w-full bg-surface-950 rounded-2xl p-2 sm:p-3 border border-surface-800 flex items-center gap-1 sm:gap-2 justify-between'>
           <button
             onClick={() => changeWeek(-1)}
-            className='p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all active:scale-95 shrink-0'
+            className='p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-surface-800 transition-all active:scale-95 shrink-0'
             aria-label='Semana anterior'
           >
             <ChevronLeft size={18} />
@@ -243,8 +243,8 @@ export default function WeeklyProgress({
                         hasWorkout
                           ? "bg-linear-to-br from-cyan-400 to-blue-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.4)] scale-105 border-none"
                           : isToday
-                            ? "bg-slate-800 text-cyan-400 border border-cyan-500/50"
-                            : "bg-slate-800/30 text-slate-600 border border-slate-800"
+                            ? "bg-surface-800 text-cyan-400 border border-cyan-500/50"
+                            : "bg-surface-800/30 text-slate-600 border border-surface-800"
                       }
                       ${isFuture ? "opacity-30" : "opacity-100"}
                     `}
@@ -268,7 +268,7 @@ export default function WeeklyProgress({
             className={`p-1.5 sm:p-2 rounded-xl transition-all active:scale-95 shrink-0 ${
               isCurrentWeek
                 ? "text-slate-700 cursor-not-allowed opacity-50"
-                : "text-slate-400 hover:text-white hover:bg-slate-800"
+                : "text-slate-400 hover:text-white hover:bg-surface-800"
             }`}
             aria-label='Semana siguiente'
           >

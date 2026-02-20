@@ -60,54 +60,65 @@ export const createEmailAgentFunctions = ({
     title: string,
     ctaText: string = "ABRIR FITTWIZ",
   ): string => {
-    const appUrl = `${webOrigin}/#/dashboard`;
+    // Ensure webOrigin doesn't have a trailing slash
+    const cleanOrigin = webOrigin.replace(/\/$/, "");
+    const appUrl = `${cleanOrigin}/#/dashboard`;
 
-    // A dark, high-performance aesthetic matching the app
+    // Email clients often strip <style> tags when translating. All styles must be inline.
+    const containerStyle =
+      "max-width: 600px; margin: 40px auto; background-color: #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;";
+    const headerStyle =
+      "background-color: #0f172a; padding: 24px; text-align: center; border-bottom: 1px solid #334155;";
+    const logoStyle =
+      "color: #f8fafc; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; margin: 0;";
+    const logoSpanStyle = "color: #ef4444;";
+    const contentStyle =
+      "padding: 32px 24px; font-size: 16px; line-height: 1.6; color: #cbd5e1; background-color: #1e293b;";
+    const titleStyle =
+      "color: #f8fafc; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 20px;";
+    const ctaContainerStyle = "text-align: center; margin-top: 32px; margin-bottom: 16px;";
+    const ctaButtonStyle =
+      "display: inline-block; background-color: #dc2626; color: #ffffff; font-weight: 600; font-size: 16px; text-decoration: none; padding: 14px 28px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;";
+    const footerStyle =
+      "text-align: center; padding: 24px; font-size: 12px; color: #64748b; border-top: 1px solid #334155; background-color: #1e293b;";
+    const footerLinkStyle = "color: #94a3b8; text-decoration: underline;";
+
+    // We inject inline styles directly into the bodyHtml paragraphs
+    const styledBodyHtml = bodyHtml
+      .replace(/<p>/g, '<p style="margin-top: 0; margin-bottom: 16px;">')
+      .replace(/<strong>/g, '<strong style="color: #f8fafc; font-weight: 600;">')
+      .replace(/<b>/g, '<b style="color: #f8fafc; font-weight: 600;">');
+
     const template = `
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; background-color: #1e293b; border-radius: 12px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-    .header { background-color: #0f172a; padding: 24px; text-align: center; border-bottom: 1px solid #334155; }
-    .logo { color: #f8fafc; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; margin: 0; display: inline-flex; align-items: center; gap: 8px; }
-    .logo span { color: #ef4444; }
-    .content { padding: 32px 24px; font-size: 16px; line-height: 1.6; color: #cbd5e1; }
-    h1 { color: #f8fafc; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 20px; }
-    p { margin-top: 0; margin-bottom: 16px; }
-    strong, b { color: #f8fafc; font-weight: 600; }
-    .cta-container { text-align: center; margin-top: 32px; margin-bottom: 16px; }
-    .cta-button { display: inline-block; background-color: #dc2626; color: #ffffff; font-weight: 600; font-size: 16px; text-decoration: none; padding: 14px 28px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .footer { text-align: center; padding: 24px; font-size: 12px; color: #64748b; border-top: 1px solid #334155; }
-    .footer a { color: #94a3b8; text-decoration: underline; }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <p class="logo">FITT<span>WIZ</span></p>
+<body style="background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+  <div style="${containerStyle}">
+    <div style="${headerStyle}">
+      <p style="${logoStyle}">FITT<span style="${logoSpanStyle}">WIZ</span></p>
     </div>
-    <div class="content">
-      <h1>${title}</h1>
-      ${bodyHtml}
+    <div style="${contentStyle}">
+      <h1 style="${titleStyle}">${title}</h1>
+      ${styledBodyHtml}
       
       ${
         !isSecurity
           ? `
-      <div class="cta-container">
-        <a href="${appUrl}" class="cta-button">${ctaText}</a>
+      <div style="${ctaContainerStyle}">
+        <a href="${appUrl}" style="${ctaButtonStyle}">${ctaText}</a>
       </div>`
           : ""
       }
     </div>
-    <div class="footer">
-      <p>FittWiz &copy; ${new Date().getFullYear()} — Tu compañero de entrenamiento IA</p>
+    <div style="${footerStyle}">
+      <p style="margin: 0; margin-bottom: 8px;">FittWiz &copy; ${new Date().getFullYear()} — Tu compañero de entrenamiento IA</p>
       ${
         !isSecurity
-          ? `<p>¿No quieres recibir estos correos? <a href="{{unsubscribe_url}}">Darse de baja</a></p>`
+          ? `<p style="margin: 0;">¿No quieres recibir estos correos? <a href="{{unsubscribe_url}}" style="${footerLinkStyle}">Darse de baja</a></p>`
           : ""
       }
     </div>

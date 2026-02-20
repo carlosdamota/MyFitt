@@ -67,7 +67,7 @@ const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className='bg-slate-950 p-3 rounded-lg border border-slate-800 relative group flex gap-2'
+      className='bg-surface-950 p-3 rounded-lg border border-surface-800 relative group flex gap-2'
     >
       <div
         {...attributes}
@@ -158,8 +158,8 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
       focus: "Full Body",
       mode: "heavy",
       weight: "Carga Alta",
-      bg: "bg-slate-900",
-      border: "border-slate-800",
+      bg: "bg-surface-900",
+      border: "border-surface-800",
       blocks: [],
     },
   );
@@ -273,8 +273,8 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 bg-slate-950 z-50 overflow-y-auto pb-20'>
-      <div className='sticky top-0 bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 flex justify-between items-center z-10'>
+    <div className='fixed inset-0 bg-surface-950 z-50 overflow-y-auto pb-20'>
+      <div className='sticky top-0 bg-surface-900/90 backdrop-blur border-b border-surface-800 p-4 flex justify-between items-center z-10'>
         <h2 className='text-lg font-bold text-white'>Editar Rutina</h2>
         <div className='flex gap-2'>
           {onShare && (
@@ -316,7 +316,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
               <input
                 readOnly
                 value={shareUrl}
-                className='flex-1 bg-slate-950 border border-blue-800 rounded px-3 py-2 text-xs text-blue-200 outline-none'
+                className='flex-1 bg-surface-950 border border-blue-800 rounded px-3 py-2 text-xs text-blue-200 outline-none'
               />
               <button
                 onClick={copyToClipboard}
@@ -331,7 +331,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
 
       <div className='p-4 space-y-6 max-w-md mx-auto'>
         {/* Configuración General */}
-        <div className='bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4'>
+        <div className='bg-surface-900 p-4 rounded-xl border border-surface-800 space-y-4'>
           <h3 className='text-sm font-bold text-slate-400 uppercase tracking-wider mb-2'>
             Configuración General
           </h3>
@@ -341,7 +341,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
               type='text'
               value={routine.title}
               onChange={(e) => handleChange("title", e.target.value)}
-              className='w-full bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm'
+              className='w-full bg-surface-950 border border-surface-700 rounded p-2 text-white text-sm'
             />
           </div>
           <div className='grid grid-cols-2 gap-4'>
@@ -351,7 +351,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
                 type='text'
                 value={routine.focus}
                 onChange={(e) => handleChange("focus", e.target.value)}
-                className='w-full bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm'
+                className='w-full bg-surface-950 border border-surface-700 rounded p-2 text-white text-sm'
               />
             </div>
             <div>
@@ -359,7 +359,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
               <select
                 value={routine.mode}
                 onChange={(e) => handleChange("mode", e.target.value)}
-                className='w-full bg-slate-950 border border-slate-700 rounded p-2 text-white text-sm'
+                className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
               >
                 <option value='heavy'>Fuerza (Heavy)</option>
                 <option value='metabolic'>Metabólico</option>
@@ -373,12 +373,12 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
           {routine.blocks.map((block, blockIndex) => (
             <div
               key={blockIndex}
-              className='bg-slate-900 rounded-xl border border-slate-800 overflow-hidden'
+              className='bg-surface-900 rounded-xl border border-surface-800 overflow-hidden'
             >
-              <div className='bg-slate-800/50 p-3 flex justify-between items-center border-b border-slate-800'>
+              <div className='bg-surface-800/50 p-3 flex justify-between items-center border-b border-surface-800'>
                 <div className='flex items-center gap-2'>
                   <span className='text-sm font-bold text-slate-300'>Bloque {blockIndex + 1}</span>
-                  <div className='flex items-center gap-1 bg-slate-950 px-2 py-1 rounded border border-slate-700'>
+                  <div className='flex items-center gap-1 bg-surface-950 px-2 py-1 rounded border border-surface-700'>
                     <Clock
                       size={12}
                       className='text-slate-500'
@@ -424,7 +424,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
                 </DndContext>
                 <button
                   onClick={() => addExercise(blockIndex)}
-                  className='w-full py-2 border border-dashed border-slate-700 rounded-lg text-xs text-slate-500 hover:text-blue-400 hover:border-blue-500/50 transition-colors flex items-center justify-center gap-1'
+                  className='w-full py-2 border border-dashed border-surface-700 rounded-lg text-xs text-slate-500 hover:text-blue-400 hover:border-blue-500/50 transition-colors flex items-center justify-center gap-1'
                 >
                   <Plus size={14} /> Añadir Ejercicio
                 </button>
@@ -434,7 +434,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
 
           <button
             onClick={addBlock}
-            className='w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors border border-slate-700'
+            className='w-full py-3 bg-surface-800 hover:bg-surface-700 text-slate-300 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors border border-surface-700'
           >
             <Plus size={18} /> Añadir Bloque
           </button>

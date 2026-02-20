@@ -25,6 +25,7 @@ import { useRoutines } from "../../hooks/useRoutines";
 import { generateFullProgram } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import { AiError } from "../../api/ai";
+import { Button } from "../ui/Button";
 
 // ——————————————————————————————————————————
 // Constants
@@ -281,10 +282,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
           key={i}
           className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
             i < step
-              ? "bg-cyan-400"
+              ? "bg-primary-400"
               : i === step
-                ? "bg-linear-to-r from-cyan-400 to-purple-400"
-                : "bg-slate-800"
+                ? "bg-linear-to-r from-primary-400 to-indigo-400"
+                : "bg-surface-800"
           }`}
         />
       ))}
@@ -298,10 +299,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   const renderStepPersonalData = () => (
     <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
       <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4'>
+        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-primary-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4'>
           <User
             size={32}
-            className='text-cyan-400'
+            className='text-primary-400'
           />
         </div>
         <h2 className='text-2xl font-bold text-white mb-2'>Cuéntanos de ti</h2>
@@ -323,7 +324,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("weight", e.target.value)
               }
-              className='w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400/60 outline-none transition-colors'
+              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='75'
             />
           </div>
@@ -338,7 +339,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("height", e.target.value)
               }
-              className='w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400/60 outline-none transition-colors'
+              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='180'
             />
           </div>
@@ -352,7 +353,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               inputMode='numeric'
               value={formData.age}
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
-              className='w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400/60 outline-none transition-colors'
+              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='30'
             />
           </div>
@@ -363,7 +364,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("gender", e.target.value)
               }
-              className='w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400/60 outline-none transition-colors'
+              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-colors shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
             >
               <option value='male'>Hombre</option>
               <option value='female'>Mujer</option>
@@ -403,7 +404,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
                 formData.goal === option.value
                   ? "border-amber-400/70 bg-amber-500/10 shadow-lg shadow-amber-900/10 scale-[1.02]"
-                  : "border-slate-800 bg-slate-900/50 hover:border-slate-600"
+                  : "border-surface-800 bg-surface-900/50 hover:border-surface-700"
               }`}
             >
               <span className='text-2xl block mb-2'>{option.emoji}</span>
@@ -427,7 +428,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                 className={`py-3 px-2 rounded-xl border text-center transition-all duration-200 ${
                   formData.experienceLevel === option.value
                     ? "border-amber-400/70 bg-amber-500/10 text-white"
-                    : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-600"
+                    : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
                 }`}
               >
                 <span className='text-xs font-bold block'>{option.label}</span>
@@ -473,14 +474,14 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                   onClick={() => toggleEquipment(option.value)}
                   className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all select-none ${
                     isSelected
-                      ? "border-cyan-400/70 bg-cyan-500/10 text-cyan-100"
-                      : "border-slate-800 bg-slate-900/50 text-slate-300 hover:border-slate-600"
+                      ? "border-primary-400/70 bg-primary-500/10 text-primary-100"
+                      : "border-surface-800 bg-surface-900/50 text-slate-300 hover:border-surface-700"
                   }`}
                 >
                   <span className='flex flex-col gap-0.5 text-left'>
                     <span className='text-xs font-semibold'>{option.label}</span>
                     <span
-                      className={`text-[10px] ${isSelected ? "text-cyan-200/70" : "text-slate-500"}`}
+                      className={`text-[10px] ${isSelected ? "text-primary-200/70" : "text-slate-500"}`}
                     >
                       {option.description}
                     </span>
@@ -507,10 +508,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                   disabled={isLocked}
                   className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all relative ${
                     isLocked
-                      ? "bg-slate-950/50 border-slate-800 text-slate-600 cursor-not-allowed opacity-50"
+                      ? "bg-surface-950/50 border-surface-800 text-slate-600 cursor-not-allowed opacity-50"
                       : formData.availableDays === days
-                        ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                        : "bg-slate-900/50 border-slate-700 text-slate-500 hover:border-slate-500"
+                        ? "bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/20"
+                        : "bg-surface-900/50 border-surface-700 text-slate-500 hover:border-surface-600"
                   }`}
                 >
                   {days}
@@ -542,8 +543,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                 onClick={() => handleChange("dailyTimeMinutes", t)}
                 className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${
                   formData.dailyTimeMinutes === t
-                    ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                    : "bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600"
+                    ? "bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/20"
+                    : "bg-surface-800/50 border-surface-700 text-slate-400 hover:border-surface-600"
                 } shadow-sm`}
               >
                 <span className='block text-lg font-black'>{t}</span>
@@ -563,7 +564,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               handleChange("injuries", e.target.value)
             }
-            className='w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400/60 outline-none h-16 resize-none transition-colors'
+            className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none h-16 resize-none transition-colors'
             placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
           />
         </div>
@@ -603,7 +604,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                 className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
                   formData.trainingSplit === option.value
                     ? "border-indigo-400/70 bg-indigo-500/10 text-white"
-                    : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-700"
+                    : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
                 }`}
               >
                 <div>
@@ -647,7 +648,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                   className={`py-3 rounded-xl border text-center transition-all ${
                     isSelected
                       ? "border-purple-400/70 bg-purple-500/10 text-white"
-                      : "border-slate-800 bg-slate-900/50 text-slate-400 hover:border-slate-700"
+                      : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
                   }`}
                 >
                   <span className='text-xl block mb-1'>{option.emoji}</span>
@@ -715,12 +716,14 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             hora de entrenar!
           </p>
 
-          <button
+          <Button
+            size='lg'
             onClick={onComplete}
-            className='px-8 py-4 rounded-2xl font-bold text-sm bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/30 transition-all transform active:scale-95 flex items-center gap-2'
+            className='px-8 py-4 rounded-2xl font-bold text-sm w-full mx-auto max-w-sm flex items-center justify-center gap-2'
+            rightIcon={<ArrowRight size={18} />}
           >
-            Empezar a entrenar <ArrowRight size={18} />
-          </button>
+            Empezar a entrenar
+          </Button>
         </>
       )}
 
@@ -740,22 +743,23 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
             Puedes generar tu primera rutina desde el Coach IA
           </p>
 
-          <div className='flex gap-3'>
-            <button
+          <div className='flex gap-3 justify-center'>
+            <Button
+              variant='secondary'
               onClick={() => {
                 setGenerationError(null);
                 handleGenerate();
               }}
-              className='px-6 py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
+              className='px-6 py-3 rounded-xl font-bold text-sm'
             >
               Reintentar
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onComplete}
-              className='px-6 py-3 rounded-xl font-bold text-sm bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-lg transition-all'
+              className='px-6 py-3 rounded-xl font-bold text-sm'
             >
               Continuar
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -787,8 +791,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
     <div className='min-h-screen bg-(--bg-0) text-slate-200 font-sans selection:bg-cyan-500/30'>
       {/* Background effects */}
       <div className='fixed inset-0 z-0 pointer-events-none'>
-        <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[110px]' />
-        <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-amber-500/10 blur-[110px]' />
+        <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-500/10 blur-[110px]' />
+        <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-warning-500/10 blur-[110px]' />
       </div>
 
       <div className='relative z-10 max-w-lg mx-auto px-4 py-8'>
@@ -796,7 +800,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
         <div className='flex items-center justify-between mb-6'>
           <div />
           <h1 className='text-lg font-black tracking-tight'>
-            <span className='text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-400'>
+            <span className='text-transparent bg-clip-text bg-linear-to-r from-primary-400 to-blue-400'>
               FITT
             </span>
             <span className='text-transparent bg-clip-text bg-linear-to-r from-amber-300 to-orange-400'>
@@ -826,24 +830,21 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
         {step < TOTAL_STEPS - 1 && (
           <div className='flex gap-3 mt-8'>
             {step > 0 && (
-              <button
+              <Button
+                variant='secondary'
                 onClick={handleBack}
-                className='px-4 py-3.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors flex items-center gap-1'
+                className='px-4 py-3.5 rounded-xl font-bold text-sm flex items-center gap-1'
+                leftIcon={<ChevronLeft size={16} />}
               >
-                <ChevronLeft size={16} /> Atrás
-              </button>
+                Atrás
+              </Button>
             )}
 
-            <button
+            <Button
+              className='flex-1 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2'
               onClick={handleNext}
               disabled={!canProceed()}
-              className={`flex-1 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg transform active:scale-95 ${
-                canProceed()
-                  ? step === TOTAL_STEPS - 2
-                    ? "bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-purple-900/40"
-                    : "bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-900/30"
-                  : "bg-slate-800 text-slate-500 cursor-not-allowed shadow-none"
-              }`}
+              variant={step === TOTAL_STEPS - 2 ? "primary" : "primary"}
             >
               {step === TOTAL_STEPS - 2 ? (
                 <>
@@ -854,7 +855,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
                   Siguiente <ChevronRight size={16} />
                 </>
               )}
-            </button>
+            </Button>
           </div>
         )}
 

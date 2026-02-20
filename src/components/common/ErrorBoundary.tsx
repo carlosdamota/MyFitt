@@ -33,8 +33,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className='min-h-screen bg-slate-950 flex items-center justify-center p-4'>
-          <div className='bg-slate-900 border border-red-900/50 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl'>
+        <div className='min-h-screen bg-surface-950 flex items-center justify-center p-4'>
+          <div className='bg-surface-900 border border-red-900/50 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl'>
             <div className='bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6'>
               <AlertTriangle
                 size={32}
@@ -45,7 +45,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <p className='text-slate-400 mb-6'>Ha ocurrido un error inesperado en la aplicación.</p>
 
             {this.state.error && (
-              <div className='bg-slate-950 p-4 rounded-lg border border-slate-800 text-left mb-6 overflow-auto max-h-40'>
+              <div className='bg-surface-950 p-4 rounded-lg border border-surface-800 text-left mb-6 overflow-auto max-h-40'>
                 <p className='text-red-400 font-mono text-xs'>{this.state.error.toString()}</p>
               </div>
             )}

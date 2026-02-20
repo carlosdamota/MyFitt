@@ -52,11 +52,8 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const [presetKey, setPresetKey] = useState<keyof typeof THEME_PRESETS>("default");
   const [sticker, setSticker] = useState<string>("");
-  const [stickerPosition, setStickerPosition] = useState<(typeof STICKER_POSITIONS)[number]>(
-    "top-left",
-  );
-
-  if (!isOpen) return null;
+  const [stickerPosition, setStickerPosition] =
+    useState<(typeof STICKER_POSITIONS)[number]>("top-left");
 
   const theme = THEME_PRESETS[presetKey];
   const totalVolume = logs.reduce((acc, log) => acc + (log.volume || 0), 0);
@@ -71,10 +68,13 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   const previewToken = `${presetKey}-${sticker || "none"}-${stickerPosition}`;
 
+  if (!isOpen) return null;
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
-      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900'>
-        <div className='flex items-center justify-between border-b border-slate-800 p-4'>
+      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-surface-800 bg-surface-950'>
+        {/* Header */}
+        <div className='flex items-center justify-between border-b border-surface-800 bg-surface-950 px-4 py-3'>
           <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
             <Share2
               size={18}
@@ -104,7 +104,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
           />
         </div>
 
-        <div className='flex-1 space-y-4 overflow-y-auto bg-slate-950/50 p-6'>
+        <div className='flex-1 space-y-4 overflow-y-auto bg-surface-950/50 p-6'>
           <WorkoutShareButton
             captureRef={cardRef}
             shareTitle='Mi Entrenamiento en FITTWIZ'

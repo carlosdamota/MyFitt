@@ -17,6 +17,7 @@ import { useAuth } from "../hooks/useAuth";
 import AuthModal from "../components/auth/AuthModal";
 import { createCheckoutSession } from "../api/billing";
 import { iconLogo, socialPreview } from "../branding/logoConfig";
+import { Button } from "../components/ui/Button";
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -98,7 +99,7 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-(--bg-0) text-white font-sans selection:bg-cyan-500/30'>
+    <div className='min-h-screen bg-surface-950 text-white font-sans selection:bg-primary-500/30'>
       <Helmet>
         <title>FITTWIZ - Tu Entrenador Personal con IA</title>
         <meta
@@ -173,8 +174,8 @@ const Landing: React.FC = () => {
         className='fixed inset-0 z-0 pointer-events-none overflow-hidden'
         aria-hidden='true'
       >
-        <div className='absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-cyan-500/15 blur-[120px]' />
-        <div className='absolute bottom-[-25%] right-[-10%] w-[55%] h-[55%] rounded-full bg-amber-500/15 blur-[140px]' />
+        <div className='absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-primary-500/15 blur-[120px]' />
+        <div className='absolute bottom-[-25%] right-[-10%] w-[55%] h-[55%] rounded-full bg-warning-500/15 blur-[140px]' />
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(30,41,59,0.6),transparent_55%)]' />
       </div>
 
@@ -182,7 +183,7 @@ const Landing: React.FC = () => {
         <nav className='max-w-6xl mx-auto flex items-center justify-between px-6 py-3 rounded-2xl bg-slate-950/50 border border-slate-800 backdrop-blur-xl shadow-2xl'>
           {/* Logo */}
           <div className='flex items-center gap-2'>
-            <div className='w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center'>
+            <div className='w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center'>
               <Activity
                 size={18}
                 className='text-slate-950'
@@ -195,31 +196,33 @@ const Landing: React.FC = () => {
           <div className='flex items-center gap-3'>
             {!user ? (
               <>
-                <button
+                <Button
+                  variant='ghost'
                   onClick={() => setShowAuthModal(true)}
-                  className='hidden sm:flex px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-colors'
+                  className='hidden sm:flex text-slate-300'
                 >
                   Entrar
-                </button>
+                </Button>
                 <div className='h-4 w-px bg-slate-800 hidden sm:block' />
-                <button
+                <Button
+                  variant='secondary'
+                  className='bg-white text-slate-900 border-none hover:bg-slate-100'
                   onClick={async () => {
                     await loginWithGoogle();
                     navigate("/app");
                   }}
-                  className='flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-slate-900 font-bold text-sm hover:bg-slate-100 transition-all active:scale-95 shadow-lg shadow-white/5'
+                  leftIcon={<Chrome size={16} />}
                 >
-                  <Chrome size={16} />
                   <span className='hidden xs:inline'>Con Google</span>
-                </button>
+                </Button>
               </>
             ) : (
-              <button
+              <Button
+                variant='secondary'
                 onClick={() => navigate("/app")}
-                className='px-5 py-2 rounded-xl bg-slate-800 text-white font-bold text-sm hover:bg-slate-700 transition-all active:scale-95 border border-slate-700'
               >
                 Ir al panel
-              </button>
+              </Button>
             )}
           </div>
         </nav>
@@ -231,7 +234,7 @@ const Landing: React.FC = () => {
           aria-label='Introducción'
         >
           <div className='space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700'>
-            <div className='inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/60 border border-slate-800 backdrop-blur-sm'>
+            <div className='inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-900/60 border border-surface-800 backdrop-blur-sm'>
               <span className='relative flex h-3 w-3'>
                 <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
                 <span className='relative inline-flex rounded-full h-3 w-3 bg-emerald-500'></span>
@@ -243,7 +246,7 @@ const Landing: React.FC = () => {
 
             <h1 className='text-4xl md:text-6xl font-extrabold tracking-tight leading-tight'>
               La rutina perfecta,
-              <span className='block text-cyan-400'>con un coach IA que se adapta a ti</span>
+              <span className='block text-primary-400'>con un coach IA que se adapta a ti</span>
             </h1>
 
             <p className='text-lg text-slate-300 max-w-xl leading-relaxed'>
@@ -252,9 +255,13 @@ const Landing: React.FC = () => {
             </p>
 
             <div className='flex flex-col sm:flex-row items-center gap-4'>
-              <button
+              <Button
+                size='lg'
                 onClick={onLogin}
-                className='group relative inline-flex items-center gap-3 px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-900 rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] shadow-xl shadow-cyan-900/20 w-full sm:w-auto'
+                className='group w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl shadow-xl shadow-primary-900/20'
+                rightIcon={
+                  <ArrowRight className='group-hover:translate-x-1 transition-transform' />
+                }
                 aria-label={
                   user
                     ? "Continuar a tu panel de entrenamiento"
@@ -262,28 +269,28 @@ const Landing: React.FC = () => {
                 }
               >
                 {user ? "Continuar Entrenando" : "Crear mi plan gratis"}
-                <ArrowRight className='group-hover:translate-x-1 transition-transform' />
-                <div className='absolute inset-0 rounded-2xl ring-2 ring-white/20 group-hover:ring-white/40 transition-all' />
-              </button>
+              </Button>
 
               {!user && (
-                <button
+                <Button
+                  variant='outline'
+                  size='lg'
                   onClick={onExplore}
-                  className='px-8 py-4 bg-slate-900/60 hover:bg-slate-800 text-slate-200 rounded-2xl font-bold text-lg transition-all border border-slate-800 hover:border-slate-700 w-full sm:w-auto'
+                  className='w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl bg-surface-900/60'
                 >
                   Ver rutinas demo
-                </button>
+                </Button>
               )}
             </div>
 
             <div className='flex flex-wrap gap-3 text-xs text-slate-400'>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+              <span className='px-3 py-1 rounded-full bg-surface-900/60 border border-surface-800'>
                 Sin tarjeta
               </span>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+              <span className='px-3 py-1 rounded-full bg-surface-900/60 border border-surface-800'>
                 Datos privados
               </span>
-              <span className='px-3 py-1 rounded-full bg-slate-900/60 border border-slate-800'>
+              <span className='px-3 py-1 rounded-full bg-surface-900/60 border border-surface-800'>
                 IA con límites claros
               </span>
             </div>
@@ -294,9 +301,9 @@ const Landing: React.FC = () => {
             aria-hidden='true'
           >
             {/* Visual demo cards - hidden from screen readers to reduce noise */}
-            <div className='rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-2xl'>
+            <div className='rounded-3xl border border-surface-800 bg-surface-900/60 p-6 shadow-2xl'>
               <div className='flex items-center gap-3 mb-4'>
-                <div className='w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center'>
+                <div className='w-10 h-10 rounded-xl bg-primary-500/20 text-primary-300 flex items-center justify-center'>
                   <Sparkles size={20} />
                 </div>
                 <div>
@@ -305,27 +312,27 @@ const Landing: React.FC = () => {
                 </div>
               </div>
               <div className='grid grid-cols-2 gap-3 text-sm'>
-                <div className='rounded-xl bg-slate-950/60 border border-slate-800 p-3'>
+                <div className='rounded-xl bg-surface-950/60 border border-surface-800 p-3'>
                   <p className='text-slate-400'>Duración</p>
                   <p className='text-white font-semibold'>45 min</p>
                 </div>
-                <div className='rounded-xl bg-slate-950/60 border border-slate-800 p-3'>
+                <div className='rounded-xl bg-surface-950/60 border border-surface-800 p-3'>
                   <p className='text-slate-400'>Frecuencia</p>
                   <p className='text-white font-semibold'>4 días</p>
                 </div>
-                <div className='rounded-xl bg-slate-950/60 border border-slate-800 p-3'>
+                <div className='rounded-xl bg-surface-950/60 border border-surface-800 p-3'>
                   <p className='text-slate-400'>Enfoque</p>
                   <p className='text-white font-semibold'>Fuerza</p>
                 </div>
-                <div className='rounded-xl bg-slate-950/60 border border-slate-800 p-3'>
+                <div className='rounded-xl bg-surface-950/60 border border-surface-800 p-3'>
                   <p className='text-slate-400'>Progreso</p>
                   <p className='text-white font-semibold'>+12%</p>
                 </div>
               </div>
             </div>
 
-            <div className='rounded-3xl border border-slate-800 bg-slate-900/40 p-5 flex items-center gap-4'>
-              <div className='w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center'>
+            <div className='rounded-3xl border border-surface-800 bg-surface-900/40 p-5 flex items-center gap-4'>
+              <div className='w-12 h-12 rounded-2xl bg-warning-500/20 text-warning-300 flex items-center justify-center'>
                 <Utensils size={22} />
               </div>
               <div>
@@ -397,7 +404,7 @@ const Landing: React.FC = () => {
               icon={
                 <Dumbbell
                   size={20}
-                  className='text-cyan-300'
+                  className='text-primary-300'
                 />
               }
               title='Rutinas dinámicas'
@@ -417,7 +424,7 @@ const Landing: React.FC = () => {
               icon={
                 <Utensils
                   size={20}
-                  className='text-amber-300'
+                  className='text-warning-300'
                 />
               }
               title='Nutrición práctica'
@@ -458,7 +465,7 @@ const Landing: React.FC = () => {
                   icon={
                     <Zap
                       size={20}
-                      className='text-amber-300'
+                      className='text-warning-300'
                     />
                   }
                   title='Sesiones precisas'
@@ -468,7 +475,7 @@ const Landing: React.FC = () => {
                   icon={
                     <Target
                       size={20}
-                      className='text-cyan-300'
+                      className='text-primary-300'
                     />
                   }
                   title='Objetivo claro'
@@ -499,18 +506,18 @@ const Landing: React.FC = () => {
 
             {/* Visual Element - hidden from screen readers */}
             <div
-              className='rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-2xl'
+              className='rounded-3xl border border-surface-800 bg-surface-900/60 p-6 shadow-2xl'
               aria-hidden='true'
             >
               <p className='text-sm text-slate-400'>Vista rápida</p>
               <h3 className='text-2xl font-bold text-white mb-4'>Panel de entrenamiento</h3>
               <div className='space-y-3'>
-                <div className='rounded-2xl border border-slate-800 bg-slate-950/60 p-4'>
+                <div className='rounded-2xl border border-surface-800 bg-surface-950/60 p-4'>
                   <p className='text-xs text-slate-400'>Hoy</p>
                   <p className='text-white font-semibold'>Empuje + Core</p>
                   <p className='text-xs text-slate-500'>6 ejercicios · 42 min</p>
                 </div>
-                <div className='rounded-2xl border border-slate-800 bg-slate-950/60 p-4'>
+                <div className='rounded-2xl border border-surface-800 bg-surface-950/60 p-4'>
                   <p className='text-xs text-slate-400'>IA Coach</p>
                   <p className='text-white font-semibold'>Buen progreso, sube 2.5 kg en press</p>
                   <p className='text-xs text-slate-500'>Consistencia 86%</p>
@@ -577,20 +584,21 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        <section className='rounded-3xl border border-slate-800 bg-slate-900/60 p-8 md:p-10 text-center'>
+        <section className='rounded-3xl border border-surface-800 bg-surface-900/60 p-8 md:p-10 text-center'>
           <h2 className='text-3xl md:text-4xl font-bold text-white mb-4'>
             Listo para entrenar en serio
           </h2>
           <p className='text-slate-300 max-w-2xl mx-auto mb-6'>
             Abre FITTWIZ, crea tu plan y empieza hoy. Menos dudas, más acción.
           </p>
-          <button
+          <Button
+            size='lg'
             onClick={onLogin}
-            className='inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-cyan-500 text-slate-900 font-bold text-lg hover:bg-cyan-400 transition'
+            className='px-8 py-4 h-auto rounded-2xl text-lg'
+            rightIcon={<ArrowRight size={18} />}
           >
             {user ? "Ir al panel" : "Crear mi cuenta"}
-            <ArrowRight size={18} />
-          </button>
+          </Button>
         </section>
       </main>
 
@@ -618,8 +626,8 @@ const Landing: React.FC = () => {
 export default Landing;
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, desc }) => (
-  <div className='p-5 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/60 transition-all text-left'>
-    <div className='w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center mb-4'>
+  <div className='p-5 rounded-2xl bg-surface-900/50 border border-surface-800 hover:border-surface-700 hover:bg-surface-800/60 transition-all text-left'>
+    <div className='w-11 h-11 rounded-xl bg-surface-800 flex items-center justify-center mb-4'>
       {icon}
     </div>
     <h3 className='text-xl font-bold text-white mb-2'>{title}</h3>
@@ -628,7 +636,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, desc }) => (
 );
 
 const StepCard: React.FC<StepCardProps> = ({ step, title, desc }) => (
-  <div className='p-6 rounded-2xl bg-slate-900/50 border border-slate-800 text-left space-y-4'>
+  <div className='p-6 rounded-2xl bg-surface-900/50 border border-surface-800 text-left space-y-4'>
     <div className='text-xs tracking-[0.2em] text-slate-500'>{step}</div>
     <h3 className='text-xl font-bold text-white'>{title}</h3>
     <p className='text-slate-400 text-sm leading-relaxed'>{desc}</p>
@@ -636,8 +644,8 @@ const StepCard: React.FC<StepCardProps> = ({ step, title, desc }) => (
 );
 
 const OptionCard: React.FC<OptionCardProps> = ({ icon, title, desc }) => (
-  <div className='p-5 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/60 transition-all text-left'>
-    <div className='w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center mb-4'>
+  <div className='p-5 rounded-2xl bg-surface-900/50 border border-surface-800 hover:border-surface-700 hover:bg-surface-800/60 transition-all text-left'>
+    <div className='w-11 h-11 rounded-xl bg-surface-800 flex items-center justify-center mb-4'>
       {icon}
     </div>
     <h3 className='text-lg font-semibold text-white mb-2'>{title}</h3>
@@ -657,7 +665,9 @@ const PlanCard: React.FC<PlanCardProps> = ({
 }) => (
   <div
     className={`flex flex-col justify-between rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
-      tone === "accent" ? "border-cyan-400/40 bg-cyan-500/10" : "border-slate-800 bg-slate-900/60"
+      tone === "accent"
+        ? "border-primary-400/40 bg-primary-500/10"
+        : "border-surface-800 bg-surface-900/60"
     }`}
   >
     <div className='flex items-start justify-between'>
@@ -667,7 +677,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
       </div>
       <span
         className={`text-sm font-semibold px-3 py-1 rounded-full ${
-          tone === "accent" ? "bg-cyan-500/20 text-cyan-200" : "bg-slate-800 text-slate-300"
+          tone === "accent" ? "bg-primary-500/20 text-primary-200" : "bg-surface-800 text-slate-300"
         }`}
       >
         {price}
@@ -680,21 +690,20 @@ const PlanCard: React.FC<PlanCardProps> = ({
           key={item}
           className='flex items-center gap-2'
         >
-          <span className='w-1.5 h-1.5 rounded-full bg-cyan-300' />
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${tone === "accent" ? "bg-primary-400" : "bg-primary-500/50"}`}
+          />
           {item}
         </li>
       ))}
     </ul>
-    <button
+    <Button
+      variant={tone === "accent" ? "primary" : "secondary"}
       onClick={onClick}
-      className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-semibold transition ${
-        tone === "accent"
-          ? "bg-cyan-500 text-slate-900 hover:bg-cyan-400"
-          : "bg-slate-800 text-white hover:bg-slate-700"
-      }`}
+      className='w-full h-auto py-3 rounded-2xl'
+      rightIcon={<ArrowRight size={16} />}
     >
       {cta}
-      <ArrowRight size={16} />
-    </button>
+    </Button>
   </div>
 );

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { BarChart2, Cloud, Loader, Sparkles } from "lucide-react";
 import SimpleChart from "./SimpleChart";
 import { callAI, AiError } from "../../api/ai";
+import { Button } from "../ui/Button";
 
 interface DailyVolumeChartProps {
   data: { date: string; val: number; count: number }[];
@@ -42,7 +43,7 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
   }, [data, onRequireAuth]);
 
   return (
-    <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 overflow-hidden'>
+    <div className='bg-surface-900/80 rounded-2xl border border-surface-800/50 overflow-hidden'>
       {/* Header */}
       <div className='flex items-center justify-between p-4 pb-0'>
         <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider'>
@@ -52,10 +53,12 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
           />
           Volumen Diario
         </h3>
-        <button
+        <Button
+          variant='primary'
+          size='sm'
           onClick={handleAnalysis}
           disabled={loading || data.length < 3}
-          className='text-[10px] bg-indigo-600/80 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600/80 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-bold transition-all active:scale-95'
+          className='text-[10px] px-3 py-1.5 h-auto rounded-lg gap-1.5 font-bold bg-indigo-600/80 hover:bg-indigo-500 from-transparent to-transparent'
         >
           {loading ? (
             <Loader
@@ -67,12 +70,12 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
               <Cloud size={12} /> Análisis IA
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Chart */}
       <div className='h-44 w-full p-3'>
-        <div className='h-full w-full bg-slate-950/40 rounded-xl border border-slate-800/30 p-2'>
+        <div className='h-full w-full bg-surface-950/40 rounded-xl border border-surface-800/30 p-2'>
           <SimpleChart
             points={data}
             height={200}
