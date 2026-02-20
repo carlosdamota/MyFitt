@@ -1,11 +1,16 @@
 # Logs
-logs
+logs/
 *.log
+*_debug.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Temporary files
+*.txt
+!public/robots.txt
 
 # Dependency directories
 node_modules/
@@ -39,11 +44,12 @@ Thumbs.db
 .env.*
 !.env.example
 
-# AI Agent metadata
+# AI Agent metadata & Reports
 .agent/
 .agents/
 .agentroles/
-audit_report.md
+*_report.md
+*_REPORT.md
 implementation_plan.md
 walkthrough.md
 business_report.md

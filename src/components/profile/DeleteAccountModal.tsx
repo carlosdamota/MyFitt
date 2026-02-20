@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle, X, Loader, MessageSquare, ChevronRight } from "lucide-react";
 import type { User } from "firebase/auth";
-import {
-  reauthenticateWithPopup,
-  reauthenticateWithCredential,
-  GoogleAuthProvider,
-  EmailAuthProvider,
-} from "firebase/auth";
 import { auth } from "../../config/firebase";
 
 interface DeleteAccountModalProps {
@@ -47,8 +41,6 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [needsReauth, setNeedsReauth] = useState(false);
-  const [reauthPassword, setReauthPassword] = useState("");
 
   if (!isOpen) return null;
 
@@ -59,8 +51,6 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     setConfirmText("");
     setIsDeleting(false);
     setError(null);
-    setNeedsReauth(false);
-    setReauthPassword("");
   };
 
   const handleClose = () => {
@@ -99,48 +89,32 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     setStep("confirm");
   };
 
-  const handleReauthGoogle = async () => {
-    try {
-      setError(null);
-      const provider = new GoogleAuthProvider();
-      await reauthenticateWithPopup(user, provider);
-      setNeedsReauth(false);
-      await performDeletion();
-    } catch (err) {
-      console.error("Reauth error:", err);
-      setError("Error al reautenticar. Inténtalo de nuevo.");
-    }
-  };
-
-  const handleReauthEmail = async () => {
-    if (!reauthPassword) return;
-    try {
-      setError(null);
-      const credential = EmailAuthProvider.credential(user.email || "", reauthPassword);
-      await reauthenticateWithCredential(user, credential);
-      setNeedsReauth(false);
-      await performDeletion();
-    } catch (err) {
-      console.error("Reauth error:", err);
-      setError("Contraseña incorrecta. Inténtalo de nuevo.");
-    }
-  };
-
   const performDeletion = async () => {
     setIsDeleting(true);
     setError(null);
 
     try {
-      await user.delete();
+      const token = await user.getIdToken();
+      const baseUrl = getFunctionsUrl();
+
+      const response = await fetch(`${baseUrl}/deleteUserAccount`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete account");
+      }
+
+      await auth?.signOut();
       onAccountDeleted();
     } catch (err: any) {
-      if (err?.code === "auth/requires-recent-login") {
-        setNeedsReauth(true);
-        setIsDeleting(false);
-        return;
-      }
       console.error("Delete account error:", err);
-      setError("Error al eliminar la cuenta. Inténtalo de nuevo.");
+      setError("Error al comunicar con el servidor. Inténtalo de nuevo.");
       setIsDeleting(false);
     }
   };
@@ -150,20 +124,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     await performDeletion();
   };
 
-  const isGoogleUser = user.providerData.some((p) => p.providerId === "google.com");
-  const isEmailUser = user.providerData.some((p) => p.providerId === "password");
-
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
-      {/* Backdrop */}
       <div
         className='absolute inset-0 bg-black/70 backdrop-blur-sm'
         onClick={handleClose}
       />
 
-      {/* Modal */}
       <div className='relative bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl'>
-        {/* Header */}
         <div className='flex items-center justify-between p-4 border-b border-slate-800'>
           <div className='flex items-center gap-2'>
             {step === "feedback" ? (
@@ -189,9 +157,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
           </button>
         </div>
 
-        {/* Content */}
         <div className='p-4'>
-          {/* Step 1: Feedback */}
           {step === "feedback" && (
             <div className='space-y-4'>
               <p className='text-sm text-slate-400'>
@@ -260,8 +226,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             </div>
           )}
 
-          {/* Step 2: Confirmation */}
-          {step === "confirm" && !needsReauth && (
+          {step === "confirm" && (
             <div className='space-y-4'>
               <div className='bg-red-500/10 border border-red-500/30 rounded-xl p-4'>
                 <div className='flex gap-3'>
@@ -329,63 +294,6 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                   )}
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Re-auth step */}
-          {needsReauth && (
-            <div className='space-y-4'>
-              <div className='bg-amber-500/10 border border-amber-500/30 rounded-xl p-4'>
-                <p className='text-sm text-amber-300'>
-                  Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta.
-                </p>
-              </div>
-
-              {error && (
-                <div className='bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-300'>
-                  {error}
-                </div>
-              )}
-
-              {isGoogleUser && (
-                <button
-                  onClick={handleReauthGoogle}
-                  className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
-                >
-                  <img
-                    src='https://www.google.com/favicon.ico'
-                    alt=''
-                    className='w-4 h-4'
-                  />
-                  Reautenticar con Google
-                </button>
-              )}
-
-              {isEmailUser && (
-                <div className='space-y-3'>
-                  <input
-                    type='password'
-                    value={reauthPassword}
-                    onChange={(e) => setReauthPassword(e.target.value)}
-                    placeholder='Tu contraseña actual'
-                    className='w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-slate-500'
-                  />
-                  <button
-                    onClick={handleReauthEmail}
-                    disabled={!reauthPassword}
-                    className='w-full py-3 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-                  >
-                    Confirmar y eliminar
-                  </button>
-                </div>
-              )}
-
-              <button
-                onClick={handleClose}
-                className='w-full py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors'
-              >
-                Cancelar
-              </button>
             </div>
           )}
         </div>
