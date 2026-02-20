@@ -18,11 +18,11 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
 }) => {
   return (
     <div
-      className={`flex items-center justify-between p-4 bg-slate-900/50 border border-slate-800 rounded-2xl backdrop-blur-sm ${className}`}
+      className={`flex items-center justify-between p-4 bg-surface-950/50 border border-surface-800 rounded-2xl backdrop-blur-sm ${className}`}
     >
       <div className='flex items-center gap-3'>
         <div
-          className={`p-2 rounded-xl ${isRunning ? "bg-green-500/10 text-green-400" : "bg-slate-800 text-slate-400"}`}
+          className={`p-2 rounded-xl ${isRunning ? "bg-green-500/10 text-green-400" : "bg-surface-800 text-slate-400"}`}
         >
           <Timer
             size={20}

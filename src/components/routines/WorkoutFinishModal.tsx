@@ -1,5 +1,6 @@
 import React from "react";
 import { Share2, X, CheckCircle, Clock } from "lucide-react";
+import { useToast } from "../../hooks/useToast";
 
 interface WorkoutFinishModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
   totalTime,
   routineTitle,
 }) => {
+  const { success } = useToast();
+
   if (!isOpen) return null;
 
   const handleShare = async () => {
@@ -30,7 +33,7 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
         await navigator.clipboard.writeText(
           `${shareData.title}\n${shareData.text}\n${shareData.url}`,
         );
-        alert("¡Texto copiado al portapapeles!");
+        success("¡Texto copiado al portapapeles!");
       }
     } catch (err) {
       console.error("Error sharing:", err);
@@ -38,11 +41,11 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200'>
-      <div className='bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full relative shadow-2xl animate-in zoom-in-95 duration-300'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-200'>
+      <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 max-w-sm w-full relative shadow-2xl animate-in zoom-in-95 duration-300'>
         <button
           onClick={onClose}
-          className='absolute top-4 right-4 p-2 text-slate-500 hover:text-white rounded-full hover:bg-slate-800 transition-colors'
+          className='absolute top-4 right-4 p-2 text-slate-500 hover:text-white rounded-full hover:bg-surface-800 transition-colors'
         >
           <X size={20} />
         </button>
@@ -59,7 +62,7 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
             </p>
           </div>
 
-          <div className='flex items-center gap-3 bg-slate-800/50 px-6 py-4 rounded-2xl border border-slate-700/50 w-full justify-center'>
+          <div className='flex items-center gap-3 bg-surface-800/50 px-6 py-4 rounded-2xl border border-surface-700/50 w-full justify-center'>
             <Clock
               size={24}
               className='text-blue-400'

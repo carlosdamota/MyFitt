@@ -17,8 +17,8 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
   };
 
   return (
-    <div className='fixed inset-0 z-400 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
-      <div className='bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-2xl mx-4 animate-in zoom-in-95 duration-200 shadow-2xl max-h-[90vh] overflow-y-auto'>
+    <div className='fixed inset-0 z-400 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
+      <div className='bg-surface-900 border border-surface-800 rounded-2xl p-6 max-w-2xl mx-4 animate-in zoom-in-95 duration-200 shadow-2xl max-h-[90vh] overflow-y-auto'>
         {/* Header */}
         <div className='flex items-start gap-3 mb-6'>
           <div className='p-2 bg-blue-600/20 rounded-lg'>
@@ -42,7 +42,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
         {/* Cookie Types */}
         <div className='space-y-4 mb-6'>
           {/* Essential Cookies */}
-          <div className='bg-slate-950 border border-slate-800 rounded-lg p-4'>
+          <div className='bg-surface-950 border border-surface-800 rounded-lg p-4'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex items-start gap-3 flex-1'>
                 <div className='p-2 bg-green-600/20 rounded-lg'>
@@ -71,7 +71,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
           </div>
 
           {/* Analytics Cookies */}
-          <div className='bg-slate-950 border border-slate-800 rounded-lg p-4'>
+          <div className='bg-surface-950 border border-surface-800 rounded-lg p-4'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex items-start gap-3 flex-1'>
                 <div className='p-2 bg-blue-600/20 rounded-lg'>
@@ -100,7 +100,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
                     onChange={(e) => setAnalytics(e.target.checked)}
                     className='sr-only peer'
                   />
-                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-surface-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
             </div>
@@ -119,7 +119,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
         <div className='flex gap-3'>
           <button
             onClick={onClose}
-            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
+            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-surface-800 hover:bg-surface-700 text-white border border-surface-700 transition-colors'
           >
             Cancelar
           </button>

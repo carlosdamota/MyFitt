@@ -3,6 +3,7 @@ import { TrendingUp, ArrowLeft, Trophy, Dumbbell, Flame } from "lucide-react";
 import LogViewer from "./LogViewer";
 import { isBodyweightExercise } from "../../utils/stats";
 import type { WorkoutLogs, RoutineData } from "../../types";
+import { Button } from "../ui/Button";
 
 // Sub-components
 import DailyVolumeChart from "./DailyVolumeChart";
@@ -59,91 +60,89 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   const totalExercises = Object.keys(logs).length;
 
   const tabs = [
-    { key: "charts" as const, label: "Gráficas", color: "blue" },
-    { key: "weekly" as const, label: "Coach IA", color: "purple" },
-    { key: "logs" as const, label: "Diario", color: "emerald" },
+    {
+      key: "charts" as const,
+      label: "Gráficas",
+      activeClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    },
+    {
+      key: "weekly" as const,
+      label: "Coach IA",
+      activeClass: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    },
+    {
+      key: "logs" as const,
+      label: "Diario",
+      activeClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    },
   ];
 
   return (
-    <div className='fixed inset-0 z-50 bg-slate-950 animate-in slide-in-from-bottom duration-300 flex flex-col'>
-      {/* Header */}
-      <div className='bg-slate-900/80 backdrop-blur-xl px-4 py-3 flex items-center gap-3 border-b border-slate-800/50'>
-        <button
-          onClick={onClose}
-          className='p-2 rounded-xl bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors active:scale-95'
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div className='flex-1 min-w-0'>
-          <h2 className='text-base font-bold text-white flex items-center gap-2'>
-            <TrendingUp
-              size={18}
-              className='text-blue-400'
-            />
-            Rendimiento
-          </h2>
+    <div className='flex flex-col space-y-6 w-full animate-in fade-in duration-300'>
+      {/* Page Title */}
+      <div className='flex items-center gap-3 mb-2'>
+        <div className='p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20'>
+          <TrendingUp
+            size={24}
+            className='text-blue-400'
+          />
+        </div>
+        <div>
+          <h1 className='text-2xl font-bold text-white'>Rendimiento</h1>
+          <p className='text-sm text-slate-400'>Analiza tu progreso y estadísticas históricas</p>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className='px-4 py-3 border-b border-slate-800/50'>
-        <div className='bg-slate-800/40 rounded-2xl border border-slate-700/30 flex divide-x divide-slate-700/30'>
-          <div className='flex-1 py-3 px-2 text-center'>
-            <Trophy
-              size={14}
-              className='text-amber-400 mx-auto mb-1'
-            />
-            <p className='text-lg font-bold text-white font-mono leading-none'>{totalSessions}</p>
-            <span className='text-[9px] text-slate-500 font-bold uppercase'>Sesiones</span>
-          </div>
-          <div className='flex-1 py-3 px-2 text-center'>
-            <Dumbbell
-              size={14}
-              className='text-blue-400 mx-auto mb-1'
-            />
-            <p className='text-lg font-bold text-white font-mono leading-none'>
-              {totalVolumeAllTime >= 1000
-                ? `${(totalVolumeAllTime / 1000).toFixed(1)}k`
-                : totalVolumeAllTime}
-            </p>
-            <span className='text-[9px] text-slate-500 font-bold uppercase'>Tonelaje</span>
-          </div>
-          <div className='flex-1 py-3 px-2 text-center'>
-            <Flame
-              size={14}
-              className='text-orange-400 mx-auto mb-1'
-            />
-            <p className='text-lg font-bold text-white font-mono leading-none'>{totalExercises}</p>
-            <span className='text-[9px] text-slate-500 font-bold uppercase'>Ejercicios</span>
-          </div>
+      <div className='bg-surface-900 rounded-3xl border border-surface-800 flex divide-x divide-surface-800 overflow-hidden shadow-xl relative'>
+        <div className='absolute -left-20 -top-20 w-40 h-40 bg-primary-500/10 rounded-full blur-3xl pointer-events-none' />
+        <div className='flex-1 py-5 px-3 text-center relative z-10'>
+          <Trophy
+            size={20}
+            className='text-amber-400 mx-auto mb-2'
+          />
+          <p className='text-3xl font-black text-white font-mono leading-none'>{totalSessions}</p>
+          <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2 block'>
+            Sesiones
+          </span>
+        </div>
+        <div className='flex-1 py-5 px-3 text-center relative z-10'>
+          <Dumbbell
+            size={20}
+            className='text-blue-400 mx-auto mb-2'
+          />
+          <p className='text-3xl font-black text-white font-mono leading-none'>
+            {totalVolumeAllTime >= 1000
+              ? `${(totalVolumeAllTime / 1000).toFixed(1)}k`
+              : totalVolumeAllTime}
+          </p>
+          <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2 block'>
+            Tonelaje
+          </span>
+        </div>
+        <div className='flex-1 py-5 px-3 text-center relative z-10'>
+          <Flame
+            size={20}
+            className='text-orange-400 mx-auto mb-2'
+          />
+          <p className='text-3xl font-black text-white font-mono leading-none'>{totalExercises}</p>
+          <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2 block'>
+            Ejercicios
+          </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className='flex px-4 py-2 bg-slate-900/40 gap-1.5 border-b border-slate-800/50'>
-        {tabs.map(({ key, label, color }) => (
+      <div className='flex p-1.5 bg-surface-900 rounded-full border border-surface-800 gap-1 overflow-x-auto shadow-xl'>
+        {tabs.map(({ key, label, activeClass }) => (
           <button
             key={key}
             onClick={() => setViewMode(key)}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.97] ${
+            className={`flex-1 min-w-[100px] py-3 rounded-full text-sm font-bold transition-all active:scale-[0.98] border ${
               viewMode === key
-                ? `bg-${color}-600 text-white shadow-lg shadow-${color}-900/40`
-                : "bg-slate-800/60 text-slate-400 hover:bg-slate-700/80 hover:text-slate-300"
+                ? activeClass
+                : "bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-surface-800/50"
             }`}
-            style={
-              viewMode === key
-                ? {
-                    backgroundColor:
-                      color === "blue" ? "#2563eb" : color === "purple" ? "#9333ea" : "#059669",
-                    boxShadow:
-                      color === "blue"
-                        ? "0 10px 15px -3px rgba(37,99,235,0.3)"
-                        : color === "purple"
-                          ? "0 10px 15px -3px rgba(147,51,234,0.3)"
-                          : "0 10px 15px -3px rgba(5,150,105,0.3)",
-                  }
-                : {}
-            }
           >
             {label}
           </button>
@@ -151,7 +150,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
       </div>
 
       {/* Content */}
-      <div className='flex-1 overflow-y-auto p-4 space-y-4 bg-linear-to-b from-slate-900/50 to-slate-950'>
+      <div className='flex flex-col space-y-6'>
         {viewMode === "charts" ? (
           <>
             <DailyVolumeChart
@@ -164,19 +163,23 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
             />
           </>
         ) : viewMode === "weekly" ? (
-          <WeeklyCoach
-            logs={logs}
-            routines={routines}
-            userWeight={userWeight}
-            coachHistory={coachHistory}
-            onSaveAdvice={onSaveAdvice}
-            onRequireAuth={onRequireAuth}
-          />
+          <div className='bg-surface-900 border border-surface-800 rounded-3xl p-4 overflow-hidden'>
+            <WeeklyCoach
+              logs={logs}
+              routines={routines}
+              userWeight={userWeight}
+              coachHistory={coachHistory}
+              onSaveAdvice={onSaveAdvice}
+              onRequireAuth={onRequireAuth}
+            />
+          </div>
         ) : (
-          <LogViewer
-            logs={logs}
-            userWeight={userWeight}
-          />
+          <div className='bg-surface-900 border border-surface-800 rounded-3xl p-4 overflow-hidden'>
+            <LogViewer
+              logs={logs}
+              userWeight={userWeight}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -101,16 +101,16 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
           return (
             <div
               key={date}
-              className='bg-slate-900/80 rounded-2xl border border-slate-800/50 overflow-hidden'
+              className='bg-surface-900 rounded-3xl border border-surface-800 shadow-xl overflow-hidden relative'
             >
               {/* Date Header */}
-              <div className='flex items-center justify-between px-4 py-2.5 bg-slate-800/40 border-b border-slate-800/50'>
+              <div className='flex items-center justify-between px-5 py-3 bg-surface-800/30 border-b border-surface-800'>
                 <div className='flex items-center gap-2'>
                   <Calendar
-                    size={12}
-                    className='text-slate-500'
+                    size={14}
+                    className='text-slate-400'
                   />
-                  <span className='text-slate-200 font-bold text-xs'>{formatDate(date)}</span>
+                  <span className='text-slate-200 font-bold text-sm'>{formatDate(date)}</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <span className='text-[10px] text-slate-500 font-mono'>
@@ -118,7 +118,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
                   </span>
                   <button
                     onClick={() => setShareData({ date, logs: daysLogs })}
-                    className='text-blue-400 hover:text-blue-300 transition-colors p-1 rounded-lg hover:bg-blue-500/10'
+                    className='text-primary-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-primary-500/20'
                     title='Compartir'
                   >
                     <Share2 size={14} />
@@ -127,25 +127,27 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
               </div>
 
               {/* Exercise Rows */}
-              <div className='divide-y divide-slate-800/40'>
+              <div className='divide-y divide-surface-800/50'>
                 {daysLogs.map((log, i) => (
                   <div
                     key={i}
-                    className='flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800/20 transition-colors'
+                    className='flex items-center gap-4 px-5 py-3.5 hover:bg-surface-800/30 transition-colors'
                   >
                     <div className='flex-1 min-w-0'>
-                      <p className='text-xs font-medium text-slate-200 truncate'>{log.exercise}</p>
-                      <p className='text-[10px] text-slate-500'>
+                      <p className='text-sm font-semibold text-slate-200 truncate'>
+                        {log.exercise}
+                      </p>
+                      <p className='text-[11px] text-slate-400 font-medium mt-0.5'>
                         {log.weight}kg × {log.reps} reps × {log.sets} series
                       </p>
                     </div>
                     <div className='shrink-0 text-right'>
                       {log.volume > 0 ? (
-                        <span className='text-xs font-mono font-bold text-blue-400'>
+                        <span className='text-sm font-mono font-bold text-primary-400'>
                           {log.volume >= 1000 ? `${(log.volume / 1000).toFixed(1)}k` : log.volume}
                         </span>
                       ) : (
-                        <span className='text-xs font-mono font-bold text-emerald-400'>
+                        <span className='text-sm font-mono font-bold text-emerald-400'>
                           {log.reps ? log.reps * (log.sets || 1) : 0} reps
                         </span>
                       )}
@@ -155,11 +157,11 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
               </div>
 
               {/* Daily Footer */}
-              <div className='flex items-center justify-between px-4 py-2 bg-slate-950/40 border-t border-slate-800/50'>
-                <span className='text-[9px] text-slate-600 uppercase font-bold tracking-wider'>
+              <div className='flex items-center justify-between px-5 py-3.5 bg-surface-950/50 border-t border-surface-800/50'>
+                <span className='text-[10px] text-slate-500 uppercase font-bold tracking-widest'>
                   Vol. Diario
                 </span>
-                <span className='text-xs font-bold text-white font-mono'>
+                <span className='text-sm font-black text-white font-mono'>
                   {dailyVolume >= 1000 ? `${(dailyVolume / 1000).toFixed(1)}k` : dailyVolume}
                 </span>
               </div>

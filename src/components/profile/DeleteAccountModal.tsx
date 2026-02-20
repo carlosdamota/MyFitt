@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle, X, Loader, MessageSquare, ChevronRight } from "lucide-react";
+import { Button } from "../ui/Button";
 import type { User } from "firebase/auth";
 import { auth } from "../../config/firebase";
 
@@ -131,8 +132,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
         onClick={handleClose}
       />
 
-      <div className='relative bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl'>
-        <div className='flex items-center justify-between p-4 border-b border-slate-800'>
+      <div className='relative bg-surface-900 border border-surface-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl'>
+        <div className='flex items-center justify-between p-4 border-b border-surface-800'>
           <div className='flex items-center gap-2'>
             {step === "feedback" ? (
               <MessageSquare
@@ -142,19 +143,21 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             ) : (
               <AlertTriangle
                 size={20}
-                className='text-red-400'
+                className='text-danger-400'
               />
             )}
             <h2 className='text-lg font-bold text-white'>
               {step === "feedback" ? "¿Por qué te vas?" : "Confirmar eliminación"}
             </h2>
           </div>
-          <button
+          <Button
+            variant='ghost'
             onClick={handleClose}
-            className='p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors'
+            className='p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors'
+            aria-label='Cerrar modal'
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <div className='p-4'>
@@ -170,8 +173,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                     key={reason.id}
                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                       selectedReason === reason.id
-                        ? "border-red-500/50 bg-red-500/10 text-white"
-                        : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600"
+                        ? "border-danger-500/50 bg-danger-500/10 text-white"
+                        : "border-surface-700 bg-surface-800/50 text-slate-300 hover:border-surface-600"
                     }`}
                   >
                     <input
@@ -184,11 +187,11 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                     />
                     <div
                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        selectedReason === reason.id ? "border-red-500" : "border-slate-600"
+                        selectedReason === reason.id ? "border-danger-500" : "border-slate-600"
                       }`}
                     >
                       {selectedReason === reason.id && (
-                        <div className='w-2 h-2 rounded-full bg-red-500' />
+                        <div className='w-2 h-2 rounded-full bg-danger-500' />
                       )}
                     </div>
                     <span className='text-sm font-medium'>{reason.label}</span>
@@ -203,39 +206,41 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                   placeholder='Cuéntanos más (opcional)...'
                   rows={3}
                   maxLength={1000}
-                  className='w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 resize-none'
+                  className='w-full bg-surface-800 border border-surface-700 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 resize-none'
                 />
               )}
 
               <div className='flex flex-col gap-2 pt-2'>
-                <button
+                <Button
+                  variant='danger'
                   onClick={() => handleGoToConfirm(true)}
                   disabled={!selectedReason}
-                  className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all bg-red-600 hover:bg-red-500 text-white disabled:opacity-40 disabled:cursor-not-allowed'
+                  className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2'
+                  rightIcon={<ChevronRight size={16} />}
                 >
                   Enviar y continuar
-                  <ChevronRight size={16} />
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant='ghost'
                   onClick={() => handleGoToConfirm(false)}
-                  className='w-full py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors'
+                  className='w-full py-2.5 rounded-xl font-medium text-sm'
                 >
                   Saltar y continuar
-                </button>
+                </Button>
               </div>
             </div>
           )}
 
           {step === "confirm" && (
             <div className='space-y-4'>
-              <div className='bg-red-500/10 border border-red-500/30 rounded-xl p-4'>
+              <div className='bg-danger-500/10 border border-danger-500/30 rounded-xl p-4'>
                 <div className='flex gap-3'>
                   <AlertTriangle
                     size={20}
-                    className='text-red-400 shrink-0 mt-0.5'
+                    className='text-danger-400 shrink-0 mt-0.5'
                   />
                   <div className='space-y-2'>
-                    <p className='text-sm font-semibold text-red-300'>
+                    <p className='text-sm font-semibold text-danger-300'>
                       Esta acción es irreversible
                     </p>
                     <ul className='text-xs text-red-300/80 space-y-1'>
@@ -250,49 +255,52 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
               <div>
                 <label className='block text-sm font-medium text-slate-300 mb-2'>
-                  Escribe <span className='font-mono text-red-400'>ELIMINAR</span> para confirmar:
+                  Escribe <span className='font-mono text-danger-400'>ELIMINAR</span> para
+                  confirmar:
                 </label>
                 <input
                   type='text'
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
                   placeholder='ELIMINAR'
-                  className='w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-red-500/50 font-mono tracking-wider'
+                  className='w-full bg-surface-800 border border-surface-700 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-danger-500/50 font-mono tracking-wider'
                   autoComplete='off'
                 />
               </div>
 
               {error && (
-                <div className='bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-300'>
+                <div className='bg-danger-500/10 border border-danger-500/30 rounded-xl p-3 text-sm text-danger-300'>
                   {error}
                 </div>
               )}
 
-              <div className='flex gap-3 pt-2'>
-                <button
+              <div className='flex gap-3 pt-2 w-full'>
+                <Button
+                  variant='outline'
                   onClick={handleClose}
                   disabled={isDeleting}
-                  className='flex-1 py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700'
+                  className='flex-1 py-3 rounded-xl font-bold text-sm'
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant='danger'
                   onClick={handleConfirmDelete}
                   disabled={confirmText !== "ELIMINAR" || isDeleting}
-                  className='flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all bg-red-600 hover:bg-red-500 text-white disabled:opacity-40 disabled:cursor-not-allowed'
-                >
-                  {isDeleting ? (
-                    <Loader
-                      size={18}
-                      className='animate-spin'
-                    />
-                  ) : (
-                    <>
+                  className='flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2'
+                  leftIcon={
+                    isDeleting ? (
+                      <Loader
+                        size={18}
+                        className='animate-spin'
+                      />
+                    ) : (
                       <Trash2 size={16} />
-                      Eliminar
-                    </>
-                  )}
-                </button>
+                    )
+                  }
+                >
+                  {isDeleting ? "" : "Eliminar"}
+                </Button>
               </div>
             </div>
           )}

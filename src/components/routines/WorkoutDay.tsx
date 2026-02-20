@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Flame, Dumbbell, Shield } from "lucide-react";
+import React, { useState, useMemo, useEffect } from "react";
+import { Flame, Dumbbell, Shield, Trophy } from "lucide-react";
 import WorkoutProgressHeader from "./WorkoutProgressHeader";
 import RoutineHeroCard from "./RoutineHeroCard";
 import ProUpgradeCta from "./ProUpgradeCta";
@@ -10,15 +10,15 @@ import type { Routine, WorkoutLogs, WorkoutLogEntry } from "../../types";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import { useStopwatch } from "../../hooks/useStopwatch";
 import { useTimer } from "../../hooks/useTimer";
+import { useToast } from "../../hooks/useToast";
 import RoutineTimer from "./RoutineTimer";
 import { SocialShareModal } from "../common/SocialShareModal";
 import RestTimer from "../common/RestTimer";
+import { Button } from "../ui/Button";
 
 interface WorkoutDayProps {
   routine: Routine;
   dayKey: string;
-  completedExercises: Record<string, boolean>;
-  onToggleComplete: (dayKey: string, exerciseName: string) => void;
   onEditRoutine: () => void;
   onResetTimer: (duration?: number) => void;
   onSaveLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
@@ -32,8 +32,6 @@ interface WorkoutDayProps {
 const WorkoutDay: React.FC<WorkoutDayProps> = ({
   routine,
   dayKey,
-  completedExercises,
-  onToggleComplete,
   onEditRoutine,
   onResetTimer,
   onSaveLog,
@@ -44,6 +42,37 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   isPro,
 }) => {
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
+  const { error, info } = useToast();
+
+  // Derivar ejercicios completados desde los logs de hoy
+  const completedExercises = useMemo(() => {
+    const today = new Date().toDateString();
+    const completed: Record<string, boolean> = {};
+
+    if (routine.blocks) {
+      routine.blocks.forEach((block) => {
+        block.exercises.forEach((ex) => {
+          const logs = workoutLogs[ex.name] || [];
+          const hasLogToday = logs.some((l) => new Date(l.date).toDateString() === today);
+          if (hasLogToday) {
+            completed[`${dayKey}-${ex.name}`] = true;
+          }
+        });
+      });
+    }
+    return completed;
+  }, [routine, workoutLogs, dayKey]);
+
+  const handleToggleComplete = (dk: string, exName: string, isManual: boolean = true) => {
+    const isActuallyCompleted = completedExercises[`${dk}-${exName}`];
+    if (isManual) {
+      if (!isActuallyCompleted) {
+        info("Registra al menos una serie para marcar este ejercicio como completado.");
+      } else {
+        info("El ejercicio está completado porque tiene series registradas hoy.");
+      }
+    }
+  };
   // Timer & Sharing Logic
   const { time, isRunning, toggle, stop, formatTime, reset } = useStopwatch();
   const { plan } = useEntitlement(user);
@@ -77,7 +106,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     // Since completedCount is derived below, let's use a ref or just move the derivation up?
     // Better to move the derivation up.
     if (completedCount === 0) {
-      alert("¡Completa al menos un ejercicio antes de terminar!");
+      error("¡Completa al menos un ejercicio antes de terminar!");
       return;
     }
     stop();
@@ -163,7 +192,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               onSetExpandedExerciseId={setExpandedExerciseId}
               workoutLogs={workoutLogs}
               user={user}
-              onToggleComplete={onToggleComplete}
+              onToggleComplete={handleToggleComplete}
               onSaveLog={onSaveLog}
               onDeleteLog={onDeleteLog}
               onResetTimer={handleStartRest}
@@ -171,8 +200,8 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
             />
           ))
         ) : (
-          <div className='p-12 text-center bg-slate-900/20 rounded-3xl border border-slate-800 border-dashed'>
-            <div className='w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-4 text-slate-600'>
+          <div className='p-12 text-center bg-surface-900/20 rounded-3xl border border-surface-800 border-dashed'>
+            <div className='w-16 h-16 rounded-full bg-surface-800/50 flex items-center justify-center mx-auto mb-4 text-slate-600'>
               <Dumbbell size={32} />
             </div>
             <p className='text-slate-500 font-medium'>No hay ejercicios en esta rutina.</p>
@@ -204,27 +233,45 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
 
       {/* Confirmation Dialog */}
       {showConfirmFinish && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200'>
-          <div className='bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4'>
-            <h3 className='text-xl font-bold text-white'>¿Terminar entrenamiento?</h3>
-            <p className='text-slate-400 text-sm'>
-              Has entrenado durante{" "}
-              <span className='text-blue-400 font-bold'>{formatTime(time)}</span>. ¿Quieres
-              finalizar y guardar tu progreso?
-            </p>
-            <div className='flex gap-3 pt-2'>
-              <button
-                onClick={handleCancelFinish}
-                className='flex-1 py-3 text-slate-400 hover:bg-slate-800 rounded-xl font-medium transition-colors'
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmFinish}
-                className='flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-colors'
-              >
-                Terminar
-              </button>
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200'>
+          <div className='relative bg-surface-900 border border-surface-700/50 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl overflow-hidden'>
+            {/* Background Glows */}
+            <div className='absolute -top-24 -right-24 w-48 h-48 bg-primary-500/20 rounded-full blur-3xl pointer-events-none' />
+            <div className='absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none' />
+
+            <div className='relative z-10'>
+              <div className='w-14 h-14 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-6 shadow-inner'>
+                <Trophy
+                  size={28}
+                  className='text-primary-400'
+                />
+              </div>
+              <h3 className='text-2xl font-black text-white mb-3 tracking-tight'>
+                ¿Terminar entrenamiento?
+              </h3>
+              <p className='text-slate-300 text-sm leading-relaxed mb-8'>
+                Has entrenado durante{" "}
+                <span className='inline-block px-2 py-0.5 bg-surface-800 rounded-lg text-primary-400 font-bold border border-surface-700/50'>
+                  {formatTime(time)}
+                </span>
+                . ¿Quieres finalizar y guardar tu progreso?
+              </p>
+
+              <div className='flex gap-3'>
+                <Button
+                  variant='ghost'
+                  onClick={handleCancelFinish}
+                  className='flex-1 py-3 text-slate-300 bg-surface-800/50 hover:bg-surface-700 hover:text-white rounded-xl font-bold transition-all border border-surface-700/50'
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleConfirmFinish}
+                  className='flex-1 py-3 bg-linear-to-r from-primary-500 to-indigo-500 hover:from-primary-400 hover:to-indigo-400 text-white rounded-xl font-bold shadow-lg shadow-primary-500/25 transition-all outline-none border-none'
+                >
+                  Terminar
+                </Button>
+              </div>
             </div>
           </div>
         </div>

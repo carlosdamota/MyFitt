@@ -3,6 +3,7 @@ import { Zap, Loader, Check, Dumbbell } from "lucide-react";
 import { generateFullProgram } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
+import { useToast } from "../../hooks/useToast";
 import type { ProfileFormData } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
@@ -82,6 +83,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState<number>(0);
   const { plan } = useEntitlement(user);
+  const { error: showError } = useToast();
 
   // Determine effective status
   const effectiveIsPro = isPro !== undefined ? isPro : plan === "pro";
@@ -183,7 +185,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
         onRequireAuth?.();
       } else {
         console.error(error);
-        alert("Error generando rutina: " + (error as Error).message);
+        showError("Error generando rutina: " + (error as Error).message);
       }
     } finally {
       setIsGenerating(false);
@@ -206,7 +208,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
 
       {/* Fullscreen Loading Modal with Motivational Phrases */}
       {isGenerating && (
-        <div className='fixed inset-0 z-100 flex flex-col items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300'>
+        <div className='fixed inset-0 z-100 flex flex-col items-center justify-center p-6 bg-surface-950/95 backdrop-blur-md animate-in fade-in duration-300'>
           <div className='flex flex-col items-center max-w-md text-center'>
             {/* Animated Icon */}
             <div className='relative mb-8'>
@@ -230,7 +232,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
             </p>
 
             {/* Progress Bar */}
-            <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
+            <div className='w-full max-w-xs h-2 bg-surface-800 rounded-full overflow-hidden'>
               <div
                 className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full animate-pulse'
                 style={{ width: "100%" }}
@@ -247,8 +249,8 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
-          <div className='bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-md mx-4 animate-in zoom-in-95 duration-200 shadow-2xl'>
+        <div className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
+          <div className='bg-surface-900 border border-surface-700 rounded-2xl p-6 max-w-md mx-4 animate-in zoom-in-95 duration-200 shadow-2xl'>
             <div className='flex items-start gap-3 mb-4'>
               <div className='p-2 bg-blue-600/20 rounded-lg'>
                 <Zap
@@ -267,7 +269,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
             <div className='flex gap-3'>
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors'
+                className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-surface-800 hover:bg-surface-700 text-white border border-surface-700 transition-colors'
               >
                 Cancelar
               </button>
@@ -288,7 +290,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
                   />
                   <span>{generationProgress}</span>
                 </div>
-                <div className='h-1.5 bg-slate-800 rounded-full overflow-hidden'>
+                <div className='h-1.5 bg-surface-800 rounded-full overflow-hidden'>
                   <div className='h-full bg-blue-500 animate-pulse w-full'></div>
                 </div>
               </div>
@@ -306,7 +308,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
             className={`flex-1 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
               savedSuccess
                 ? "bg-green-600 text-white shadow-green-900/20"
-                : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+                : "bg-surface-800 hover:bg-surface-700 text-white border border-surface-700"
             }`}
           >
             {isSaving ? (

@@ -75,11 +75,11 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
 
   if (sortedMuscles.length === 0) {
     return (
-      <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 p-4'>
-        <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider mb-3'>
+      <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-xl relative overflow-hidden'>
+        <h3 className='text-xs text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-4'>
           <Dumbbell
-            size={14}
-            className='text-purple-400'
+            size={16}
+            className='text-primary-400'
           />{" "}
           Enfoque Muscular
         </h3>
@@ -91,14 +91,16 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
   }
 
   return (
-    <div className='bg-slate-900/80 rounded-2xl border border-slate-800/50 p-4'>
-      <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider mb-4'>
+    <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-xl relative overflow-hidden'>
+      {/* Background glow similar to other cards */}
+      <div className='absolute -top-24 -right-24 w-48 h-48 bg-primary-500/5 rounded-full blur-3xl pointer-events-none' />
+      <h3 className='text-xs text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-6'>
         <Dumbbell
-          size={14}
-          className='text-purple-400'
+          size={16}
+          className='text-primary-400'
         />{" "}
         Enfoque Muscular
-        <span className='text-[9px] text-slate-600 font-normal normal-case ml-auto'>
+        <span className='text-[10px] text-slate-500 font-medium normal-case ml-auto'>
           Últimos 30d
         </span>
       </h3>
@@ -112,7 +114,7 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
               className='space-y-1'
             >
               <div className='flex justify-between items-center text-xs'>
-                <span className='text-slate-200 font-semibold tracking-wide flex items-center gap-2'>
+                <span className='text-slate-300 font-medium tracking-wide flex items-center gap-2'>
                   <span
                     className='w-2 h-2 rounded-full shrink-0'
                     style={{ backgroundColor: color }}
@@ -126,7 +128,7 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
                   {percentage}%
                 </span>
               </div>
-              <div className='h-1.5 bg-slate-950/60 rounded-full overflow-hidden'>
+              <div className='h-2 bg-surface-950/50 rounded-full overflow-hidden border border-white/5'>
                 <div
                   className='h-full rounded-full transition-all duration-1000 ease-out'
                   style={{

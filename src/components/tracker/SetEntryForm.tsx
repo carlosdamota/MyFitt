@@ -43,14 +43,14 @@ const InfoTooltip: React.FC<{ text: string }> = ({ text }) => {
           e.stopPropagation();
           setIsVisible(!isVisible);
         }}
-        className='text-slate-600 hover:text-blue-400/80 transition-colors focus:outline-none'
+        className='text-slate-600 hover:text-primary-400/80 transition-colors focus:outline-none'
       >
         <Info size={10} />
       </button>
       {isVisible && (
-        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 text-[10px] text-slate-300 pointer-events-none animate-in fade-in zoom-in-95 duration-200'>
+        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-surface-900/95 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 text-[10px] text-slate-300 pointer-events-none animate-in fade-in zoom-in-95 duration-200'>
           {text}
-          <div className='absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95' />
+          <div className='absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-surface-900/95' />
         </div>
       )}
     </div>
@@ -93,7 +93,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={weight}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setWeight(e.target.value)}
-          className='w-full bg-slate-950/30 border border-white/5 rounded-lg px-1 sm:px-2 py-2 text-[11px] sm:text-xs text-white focus:border-blue-500/40 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-700'
+          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
           placeholder='kg'
         />
       </div>
@@ -106,7 +106,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={reps}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setReps(e.target.value)}
-          className='w-full bg-slate-950/30 border border-white/5 rounded-lg px-1 sm:px-2 py-2 text-[11px] sm:text-xs text-white focus:border-blue-500/40 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-700'
+          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
           placeholder='0'
         />
       </div>
@@ -119,7 +119,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={sets}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setSets(e.target.value)}
-          className='w-full bg-slate-950/30 border border-white/5 rounded-lg px-1 sm:px-2 py-2 text-[11px] sm:text-xs text-white focus:border-blue-500/40 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-700'
+          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
         />
       </div>
       <div className='flex-1 min-w-0'>
@@ -131,7 +131,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={rpe}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setRpe(e.target.value)}
-          className='w-full bg-slate-950/30 border border-white/5 rounded-lg px-1 sm:px-2 py-2 text-[11px] sm:text-xs text-white focus:border-blue-500/40 focus:bg-slate-950/50 outline-none transition-all placeholder:text-slate-700'
+          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
           placeholder='1-10'
         />
       </div>
@@ -139,10 +139,10 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
         <button
           onClick={handleSave}
           disabled={isDisabled}
-          className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed ${
+          className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 active:scale-90 disabled:opacity-20 disabled:cursor-not-allowed ${
             justSaved
-              ? "bg-green-500/20 text-green-400 border border-green-500/30 shadow-lg shadow-green-900/20"
-              : "bg-blue-600/15 text-blue-400/80 border border-blue-500/20 hover:bg-blue-500/30 hover:text-white hover:shadow-lg hover:shadow-blue-900/20"
+              ? "bg-linear-to-br from-success-500 to-emerald-600 text-white shadow-lg shadow-success-500/20 border-none"
+              : "bg-linear-to-br from-primary-500 to-indigo-600 text-white shadow-lg shadow-primary-500/30 hover:from-primary-400 hover:to-indigo-500 hover:shadow-primary-500/40 border-none"
           }`}
           title='Guardar serie'
         >

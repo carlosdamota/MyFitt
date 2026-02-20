@@ -1,5 +1,6 @@
 import React from "react";
 import type { Routine, RoutineData } from "../../types";
+import { Button } from "../ui/Button";
 
 interface RoutineTabsProps {
   routines: RoutineData;
@@ -68,18 +69,17 @@ const RoutineTabs: React.FC<RoutineTabsProps> = ({ routines, activeTab, onTabCha
             (activeRoutine?.dayNumber === routine.dayNumber && !!routine.dayNumber);
 
           return (
-            <button
+            <Button
               key={id}
               onClick={() => onTabChange(id)}
-              className={`shrink-0 snap-start px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 border ${
-                isActive
-                  ? "bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] transform scale-105"
-                  : "bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700"
+              variant={isActive ? "primary" : "secondary"}
+              className={`shrink-0 snap-start rounded-xl text-sm font-bold ${
+                isActive ? "shadow-[0_0_15px_rgba(6,182,212,0.5)] transform scale-105" : ""
               }`}
               aria-current={isActive ? "true" : undefined}
             >
               {label}
-            </button>
+            </Button>
           );
         });
       })()}

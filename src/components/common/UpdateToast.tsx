@@ -11,8 +11,8 @@ const UpdateToast: React.FC = () => {
   if (!needRefresh) return null;
 
   return (
-    <div className='fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[380px] z-[100]'>
-      <div className='rounded-2xl border border-blue-400/20 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-blue-900/20 p-4'>
+    <div className='fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[380px] z-100'>
+      <div className='rounded-2xl border border-blue-400/20 bg-surface-900/95 backdrop-blur-xl shadow-2xl shadow-blue-900/20 p-4'>
         <div className='flex items-start gap-3'>
           <div className='mt-0.5 rounded-xl p-2 bg-blue-500/15 text-blue-300 border border-blue-400/20'>
             <Download size={18} />

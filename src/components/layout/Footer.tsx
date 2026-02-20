@@ -4,7 +4,7 @@ import { Shield, FileText, Scale, Heart } from "lucide-react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className='bg-slate-950 border-t border-slate-900 py-8 px-4 mt-12'>
+    <footer className='bg-surface-950 border-t border-surface-900 py-8 px-4 mt-12 pb-24 md:pb-8'>
       <div className='max-w-4xl mx-auto'>
         <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
           {/* Brand & Copyright */}
@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Disclaimer */}
-        <div className='mt-8 pt-6 border-t border-slate-900 text-center'>
+        <div className='mt-8 pt-6 border-t border-surface-900 text-center'>
           <p className='text-[10px] text-slate-600 max-w-2xl mx-auto leading-relaxed'>
             FITTWIZ es una herramienta de seguimiento de fitness. No ofrecemos consejo médico.
             Consulta siempre a un profesional de la salud antes de comenzar cualquier programa de

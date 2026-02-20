@@ -14,11 +14,7 @@ interface NutritionAILoggerProps {
   onRequireAuth?: () => void;
 }
 
-const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
-  user,
-  onAddLog,
-  onRequireAuth,
-}) => {
+const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog, onRequireAuth }) => {
   const [input, setInput] = useState<string>("");
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +77,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
   };
 
   return (
-    <div className='bg-linear-to-br from-indigo-900/20 to-slate-900 p-5 rounded-2xl border border-indigo-500/30 shadow-xl'>
+    <div className='bg-surface-900 rounded-3xl border border-surface-800 p-5 shadow-sm'>
       {showRateLimitError && (
         <RateLimitError
           message={quotaMessage}
@@ -92,39 +88,41 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
         />
       )}
 
-      <h3 className='text-sm font-bold text-indigo-300 uppercase mb-3 flex items-center gap-2 tracking-widest'>
+      <h3 className='text-xs font-bold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-indigo-400 uppercase mb-3 flex items-center gap-2 tracking-widest'>
         <Sparkles
           size={16}
-          className='animate-pulse'
+          className='text-cyan-400 animate-pulse'
         />{" "}
         Log Rápido con IA
       </h3>
       <form
         onSubmit={handleSubmit}
-        className='relative group'
+        className='relative group flex flex-col gap-3 mb-1'
       >
-        <input
-          type='text'
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder='Ej: 2 huevos revueltos y una manzana'
-          className='w-full bg-slate-950 border border-indigo-900/50 rounded-xl py-3.5 pl-4 pr-12 text-sm text-white focus:border-indigo-500 outline-none placeholder-slate-600 transition-all shadow-inner'
-          disabled={analyzing}
-        />
-        <button
-          type='submit'
-          disabled={analyzing || (!input.trim() && !imageData)}
-          className='absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all disabled:bg-slate-800 disabled:text-slate-600 shadow-lg active:scale-90'
-        >
-          {analyzing ? (
-            <Loader
-              size={18}
-              className='animate-spin'
-            />
-          ) : (
-            <Plus size={18} />
-          )}
-        </button>
+        <div className='relative w-full'>
+          <input
+            type='text'
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder='Ej: 2 huevos revueltos y una manzana'
+            className='w-full bg-surface-950 border border-surface-800 rounded-2xl py-3.5 pl-4 pr-12 text-sm text-slate-200 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 outline-none placeholder-slate-500 transition-all shadow-inner'
+            disabled={analyzing}
+          />
+          <button
+            type='submit'
+            disabled={analyzing || (!input.trim() && !imageData)}
+            className='absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-linear-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white rounded-xl transition-all disabled:opacity-50 disabled:from-surface-800 disabled:to-surface-800 disabled:text-slate-500 shadow-md active:scale-95'
+          >
+            {analyzing ? (
+              <Loader
+                size={18}
+                className='animate-spin'
+              />
+            ) : (
+              <Plus size={18} />
+            )}
+          </button>
+        </div>
       </form>
 
       <NutritionPhotoCapture
@@ -149,7 +147,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({
       )}
 
       {!error && (
-        <p className='text-[10px] text-slate-500 mt-3 italic font-medium'>
+        <p className='text-xs text-slate-500 mt-4 italic'>
           Describe tu comida o sube una foto del plato para que la IA calcule macros.
         </p>
       )}

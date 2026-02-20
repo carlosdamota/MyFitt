@@ -13,6 +13,7 @@ import {
 import { createCheckoutSession } from "../../api/billing";
 import { auth } from "../../config/firebase";
 import { getIdToken } from "firebase/auth";
+import { Button } from "../ui/Button";
 
 interface ProUpgradeModalProps {
   isOpen: boolean;
@@ -117,13 +118,13 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-200'
+      className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-surface-950/95 backdrop-blur-sm animate-in fade-in duration-200'
       role='dialog'
       aria-modal='true'
       onClick={onClose}
     >
       <div
-        className='bg-slate-900 w-full max-w-md rounded-3xl border border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300'
+        className='bg-surface-900 w-full max-w-md rounded-3xl border border-surface-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300'
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with gradient */}
@@ -154,7 +155,7 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
           {PRO_BENEFITS.map((benefit, index) => (
             <div
               key={index}
-              className='flex items-start gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50'
+              className='flex items-start gap-3 p-3 rounded-xl bg-surface-800/50 border border-surface-700/50'
             >
               <div className='p-2 bg-blue-500/20 rounded-lg shrink-0'>
                 <benefit.icon
@@ -179,26 +180,25 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
 
           {error && <p className='text-red-400 text-sm text-center mb-3'>{error}</p>}
 
-          <button
+          <Button
+            variant='primary'
+            size='lg'
             onClick={handleUpgrade}
             disabled={loading}
-            className='w-full py-4 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-blue-900/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-          >
-            {loading ? (
-              <>
+            className='w-full shadow-lg shadow-primary-900/30'
+            leftIcon={
+              loading ? (
                 <Loader
                   size={20}
                   className='animate-spin'
                 />
-                Redirigiendo...
-              </>
-            ) : (
-              <>
+              ) : (
                 <CreditCard size={20} />
-                Desbloquear Pro Ahora
-              </>
-            )}
-          </button>
+              )
+            }
+          >
+            {loading ? "Redirigiendo..." : "Desbloquear Pro Ahora"}
+          </Button>
 
           <p className='text-center text-xs text-slate-500 mt-3'>
             Cancela cuando quieras. Sin compromisos.
@@ -206,7 +206,7 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
         </div>
 
         {/* Trust badges */}
-        <div className='px-6 pb-12 flex justify-center gap-6 text-xs text-slate-500 bg-slate-900'>
+        <div className='px-6 pb-12 flex justify-center gap-6 text-xs text-slate-500 bg-surface-900'>
           <span className='flex items-center gap-1'>
             <Check
               size={14}

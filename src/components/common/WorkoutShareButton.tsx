@@ -12,6 +12,7 @@ import {
   Twitter,
 } from "lucide-react";
 import { useShareWorkout } from "../../hooks/useShareWorkout";
+import { useToast } from "../../hooks/useToast";
 import type { WorkoutImageAsset, WorkoutImageFormat } from "../../utils/generateWorkoutImage";
 
 interface ThemeOption {
@@ -55,6 +56,7 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   const [format, setFormat] = useState<WorkoutImageFormat>("feed");
   const [cachedAsset, setCachedAsset] = useState<WorkoutImageAsset | null>(null);
   const [activeMenu, setActiveMenu] = useState<"format" | "theme" | "sticker" | null>(null);
+  const { info: showInfo } = useToast();
 
   const ensureAsset = async () => {
     if (!captureRef.current) return null;
@@ -86,7 +88,9 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
     const message = `${shareTitle}\n${shareText}`;
 
     if (platform === "instagram") {
-      alert("Instagram no permite publicar directo desde web. Usa el icono de descarga y sube la imagen en la app.");
+      showInfo(
+        "Instagram no permite publicar directo desde web. Usa el icono de descarga y sube la imagen en la app.",
+      );
       return;
     }
 
@@ -238,7 +242,14 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
           title='Descargar'
           className='flex items-center justify-center rounded-xl bg-slate-800 py-3 text-white disabled:opacity-50'
         >
-          {isGenerating ? <Loader2 className='animate-spin' size={16} /> : <Download size={16} />}
+          {isGenerating ? (
+            <Loader2
+              className='animate-spin'
+              size={16}
+            />
+          ) : (
+            <Download size={16} />
+          )}
         </button>
         <button
           onClick={() => openSocialShare("instagram")}
@@ -267,7 +278,14 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
           title='Compartir en otras apps'
           className='flex items-center justify-center rounded-xl bg-blue-600 py-3 text-white disabled:opacity-50'
         >
-          {isGenerating ? <Loader2 className='animate-spin' size={16} /> : <Share2 size={16} />}
+          {isGenerating ? (
+            <Loader2
+              className='animate-spin'
+              size={16}
+            />
+          ) : (
+            <Share2 size={16} />
+          )}
         </button>
       </div>
 

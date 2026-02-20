@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Bell, BellOff, Mail, MailX } from "lucide-react";
 import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
+import { useToast } from "../../hooks/useToast";
 import { db, appId } from "../../config/firebase";
 import { requestNotificationPermission } from "../../utils/notifications";
 import type { User as FirebaseUser } from "firebase/auth";
@@ -18,6 +19,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission>("default");
   const [loading, setLoading] = useState(true);
+  const { info } = useToast();
 
   useEffect(() => {
     if (!user || !db) return;
@@ -48,7 +50,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
     if (!user) return;
 
     if (pushPermission === "denied") {
-      alert(
+      info(
         "Las notificaciones push están bloqueadas en tu navegador. Actívalas desde la configuración del navegador.",
       );
       return;
@@ -74,24 +76,24 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
   if (loading || !user) return null;
 
   return (
-    <div className='bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50 space-y-4'>
+    <div className='bg-surface-800/50 rounded-2xl p-5 border border-surface-700/50 space-y-4'>
       <h3 className='text-sm font-bold text-slate-300 uppercase tracking-wider'>Notificaciones</h3>
 
       {/* Email Toggle */}
       <button
         onClick={toggleEmailOptOut}
-        className='w-full flex items-center justify-between py-3 px-4 rounded-xl bg-slate-800 border border-slate-700 hover:border-slate-600 transition-colors'
+        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-colors'
       >
         <div className='flex items-center gap-3'>
           {emailOptOut ? (
             <MailX
               size={18}
-              className='text-red-400'
+              className='text-danger-400'
             />
           ) : (
             <Mail
               size={18}
-              className='text-emerald-400'
+              className='text-success-400'
             />
           )}
           <div className='text-left'>
@@ -105,7 +107,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
         </div>
         <div
           className={`w-10 h-6 rounded-full transition-colors relative ${
-            emailOptOut ? "bg-slate-600" : "bg-emerald-500"
+            emailOptOut ? "bg-surface-600" : "bg-success-500"
           }`}
         >
           <div
@@ -119,18 +121,18 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
       {/* Push Toggle */}
       <button
         onClick={handlePushToggle}
-        className='w-full flex items-center justify-between py-3 px-4 rounded-xl bg-slate-800 border border-slate-700 hover:border-slate-600 transition-colors'
+        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-colors'
       >
         <div className='flex items-center gap-3'>
           {pushEnabled ? (
             <Bell
               size={18}
-              className='text-emerald-400'
+              className='text-success-400'
             />
           ) : (
             <BellOff
               size={18}
-              className='text-red-400'
+              className='text-danger-400'
             />
           )}
           <div className='text-left'>
@@ -146,7 +148,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
         </div>
         <div
           className={`w-10 h-6 rounded-full transition-colors relative ${
-            pushEnabled && pushPermission !== "denied" ? "bg-emerald-500" : "bg-slate-600"
+            pushEnabled && pushPermission !== "denied" ? "bg-success-500" : "bg-surface-600"
           }`}
         >
           <div

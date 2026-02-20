@@ -1,8 +1,10 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { Dumbbell, Loader, Check, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { Button } from "../ui/Button";
 import { useProfile } from "../../hooks/useProfile";
 import { useEntitlement } from "../../hooks/useEntitlement";
+import { useToast } from "../../hooks/useToast";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
@@ -26,6 +28,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { info } = useToast();
 
   useEffect(() => {
     if (profile) {
@@ -76,28 +79,24 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
         isPro={isPro}
       />
 
-      <button
+      <Button
         onClick={handleSaveClick}
         disabled={isSaving}
-        className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
-          savedSuccess
-            ? "bg-green-600 text-white shadow-green-900/20"
-            : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
-        }`}
+        className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 ${savedSuccess ? "bg-success-600 hover:bg-success-600 text-white shadow-success-900/20" : ""}`}
+        variant='primary'
+        leftIcon={
+          isSaving ? (
+            <Loader
+              size={18}
+              className='animate-spin'
+            />
+          ) : savedSuccess ? (
+            <Check size={18} />
+          ) : undefined
+        }
       >
-        {isSaving ? (
-          <Loader
-            size={18}
-            className='animate-spin'
-          />
-        ) : savedSuccess ? (
-          <>
-            <Check size={18} /> Guardado
-          </>
-        ) : (
-          "Guardar Perfil"
-        )}
-      </button>
+        {savedSuccess ? "Guardado" : "Guardar Perfil"}
+      </Button>
 
       <SubscriptionPanel
         user={user}
@@ -106,14 +105,15 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
 
       <NotificationSettings user={user} />
 
-      <div className='mt-4 pt-4 border-t border-slate-800 text-center'>
-        <button
-          type='button'
+      <div className='mt-4 pt-4 border-t border-surface-800 text-center'>
+        <Button
+          variant='ghost'
           onClick={() => setShowRoutineManager(true)}
-          className='text-slate-400 hover:text-white text-sm font-bold flex items-center justify-center gap-2 mx-auto transition-colors'
+          className='w-full sm:w-auto mx-auto'
+          leftIcon={<Dumbbell size={16} />}
         >
-          <Dumbbell size={16} /> Gestionar Mis Rutinas Guardadas
-        </button>
+          Gestionar Mis Rutinas Guardadas
+        </Button>
       </div>
 
       {showRoutineManager && (
@@ -133,7 +133,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
               const currentOptOut = localStorage.getItem("fittwiz_analytics_optout") === "true";
               const newState = !currentOptOut;
               localStorage.setItem("fittwiz_analytics_optout", String(newState));
-              alert(`Modo Desarrollador: Analytics ${newState ? "DESACTIVADO" : "ACTIVADO"}`);
+              info(`Modo Desarrollador: Analytics ${newState ? "DESACTIVADO" : "ACTIVADO"}`);
               (window as any)._devTapCount = 0;
             }
           }}
@@ -145,14 +145,15 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
 
       {/* Danger Zone — Delete Account */}
       {user && (
-        <div className='mt-6 pt-6 border-t border-red-500/20'>
-          <button
+        <div className='mt-6 pt-6 border-t border-danger-500/20'>
+          <Button
+            variant='danger'
             onClick={() => setShowDeleteModal(true)}
-            className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-red-400 hover:text-white hover:bg-red-600/20 border border-red-500/30 hover:border-red-500/50 transition-all'
+            className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2'
+            leftIcon={<Trash2 size={16} />}
           >
-            <Trash2 size={16} />
             Eliminar mi cuenta
-          </button>
+          </Button>
           <p className='text-[11px] text-slate-600 text-center mt-2'>
             Se eliminarán todos tus datos de forma irreversible.
           </p>

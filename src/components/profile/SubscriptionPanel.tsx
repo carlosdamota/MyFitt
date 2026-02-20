@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { CreditCard, RefreshCw } from "lucide-react";
+import { Button } from "../ui/Button";
+import { Badge } from "../ui/Badge";
 import type { User as FirebaseUser } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import { createBillingPortalSession, createCheckoutSession } from "../../api/billing";
@@ -83,17 +85,13 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
   };
 
   return (
-    <div className='rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4'>
+    <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-5 space-y-4'>
       <div className='flex items-center justify-between gap-3'>
         <div>
           <p className='text-xs text-slate-500 uppercase tracking-wider'>Suscripcion</p>
           <h3 className='text-xl font-bold text-white flex items-center gap-2'>
             {planLabel}
-            {plan === "pro" && (
-              <span className='text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-300'>
-                Activo
-              </span>
-            )}
+            {plan === "pro" && <Badge variant='primary'>Activo</Badge>}
           </h3>
           <p className='text-sm text-slate-400 mt-1'>
             {plan === "pro"
@@ -104,18 +102,21 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
           </p>
         </div>
         <div className='flex items-center gap-2'>
-          <button
-            type='button'
+          <Button
+            variant='outline'
+            size='sm'
             onClick={handleRefreshPlan}
             disabled={!user || processing === "refresh"}
-            className='inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition disabled:opacity-60'
+            className='inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl transition disabled:opacity-60'
+            leftIcon={
+              <RefreshCw
+                size={14}
+                className={processing === "refresh" ? "animate-spin" : ""}
+              />
+            }
           >
-            <RefreshCw
-              size={14}
-              className={processing === "refresh" ? "animate-spin" : ""}
-            />
             Actualizar estado
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -126,13 +127,13 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
       <div className='flex flex-col gap-3'>
         {/* Terms Checkbox for PRO purchase */}
         {plan !== "pro" && (
-          <div className='flex items-start gap-2 bg-blue-500/10 p-3 rounded-lg border border-blue-500/20'>
+          <div className='flex items-start gap-2 bg-primary-500/10 p-3 rounded-lg border border-primary-500/20'>
             <input
               type='checkbox'
               id='sub-terms'
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className='mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500/50 shrink-0'
+              className='mt-1 w-4 h-4 rounded border-surface-700 bg-surface-900 text-primary-500 focus:ring-primary-500/50 shrink-0'
             />
             <label
               htmlFor='sub-terms'
@@ -142,7 +143,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
               <a
                 href='/terms'
                 target='_blank'
-                className='text-blue-400 hover:underline'
+                className='text-primary-400 hover:underline'
               >
                 Condiciones de Suscripción
               </a>{" "}
@@ -154,24 +155,23 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
 
         <div className='flex flex-col sm:flex-row gap-3'>
           {plan === "pro" ? (
-            <button
-              type='button'
+            <Button
+              variant='outline'
               onClick={handlePortal}
               disabled={processing === "portal"}
-              className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-700 transition disabled:opacity-60'
+              leftIcon={<CreditCard size={16} />}
             >
-              <CreditCard size={16} /> Gestionar suscripcion
-            </button>
+              Gestionar suscripcion
+            </Button>
           ) : (
-            <button
-              type='button'
+            <Button
+              variant='primary'
               onClick={handleCheckout}
               disabled={processing === "checkout" || !acceptedTerms}
-              className='inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition disabled:opacity-60 relative overflow-hidden group disabled:cursor-not-allowed'
+              leftIcon={<CreditCard size={16} />}
             >
-              <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000' />
-              <CreditCard size={16} /> Desbloquear Oferta Pro (2.99€)
-            </button>
+              Desbloquear Oferta Pro (2.99€)
+            </Button>
           )}
           <p className='text-xs text-slate-500 sm:self-center'>
             Los cambios pueden tardar unos segundos tras el pago.
