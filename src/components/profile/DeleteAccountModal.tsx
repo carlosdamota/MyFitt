@@ -94,22 +94,27 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     setError(null);
 
     try {
-      // 1. Delete the user via Client SDK
-      // This will automatically trigger the onAccountDeleted Cloud Function
-      await user.delete();
+      const token = await user.getIdToken();
+      const baseUrl = getFunctionsUrl();
 
+      const response = await fetch(`${baseUrl}/deleteUserAccount`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete account");
+      }
+
+      await auth?.signOut();
       onAccountDeleted();
     } catch (err: any) {
       console.error("Delete account error:", err);
-      if (err.code === "auth/requires-recent-login") {
-        setError("Por seguridad, debes volver a iniciar sesión para eliminar tu cuenta.");
-      } else {
-        setError("Error al eliminar la cuenta. Inténtalo de nuevo.");
-      }
-      setIsDeleting(false);
-    }
-      console.error("Delete account error:", err);
-      setError("Error al eliminar la cuenta. Inténtalo de nuevo.");
+      setError("Error al comunicar con el servidor. Inténtalo de nuevo.");
       setIsDeleting(false);
     }
   };
@@ -182,7 +187,9 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                         selectedReason === reason.id ? "border-red-500" : "border-slate-600"
                       }`}
                     >
-                      {selectedReason === reason.id && <div className='w-2 h-2 rounded-full bg-red-500' />}
+                      {selectedReason === reason.id && (
+                        <div className='w-2 h-2 rounded-full bg-red-500' />
+                      )}
                     </div>
                     <span className='text-sm font-medium'>{reason.label}</span>
                   </label>
@@ -228,7 +235,9 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                     className='text-red-400 shrink-0 mt-0.5'
                   />
                   <div className='space-y-2'>
-                    <p className='text-sm font-semibold text-red-300'>Esta acción es irreversible</p>
+                    <p className='text-sm font-semibold text-red-300'>
+                      Esta acción es irreversible
+                    </p>
                     <ul className='text-xs text-red-300/80 space-y-1'>
                       <li>• Se eliminará tu cuenta de autenticación</li>
                       <li>• Se borrarán todas tus rutinas y datos</li>

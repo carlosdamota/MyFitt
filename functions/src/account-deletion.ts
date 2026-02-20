@@ -1,5 +1,5 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { auth as functionsAuth } from "firebase-functions/v1";
+import { onRequest, HttpsError } from "firebase-functions/v2/https";
+// import { auth as functionsAuth } from "firebase-functions/v1";
 import type { Firestore } from "firebase-admin/firestore";
 import type { Auth } from "firebase-admin/auth";
 import type Stripe from "stripe";
@@ -106,23 +106,57 @@ export const createAccountDeletionFunctions = ({
   stripe,
   webOrigin,
 }: AccountDeletionDeps) => {
-  // --- 1. Background trigger (Gen 1): fully delete related data ---
-  // Note: Using Gen 1 trigger because Gen 2 background triggers for Auth events
-  // are not yet available in the standard SDK, though blocking events are.
-  // This coexists perfectly with Gen 2 functions and supports Node 22.
-  const onAccountDeleted = functionsAuth.user().onDelete(async (user) => {
-    const uid = user.uid;
-    console.log(`[Account Deletion] Triggered for user: ${uid}`);
+  // --- 1. HTTPS endpoint (Gen 2): securely delete account and related data ---
+  // A fresh Gen 2 function to avoid GCP locks and Gen 1 compatibility issues.
+  const deleteUserAccount = onRequest(
+    { timeoutSeconds: 60, invoker: "public" }, // Using public invoker with CORS and custom manual auth checks for typical web apps
+    async (req, res) => {
+      const allowedOrigins = getAllowedOrigins(webOrigin);
+      setCors(req.headers.origin, res, allowedOrigins);
 
-    try {
-      await cleanupAccountData({ db, appId, stripe, uid });
-      console.log(`[Account Deletion] Successfully cleaned up data for user: ${uid}`);
-    } catch (err) {
-      console.error(`[Account Deletion] Error during cleanup for user ${uid}:`, err);
-      // We don't throw here to avoid infinite retry loops for background triggers
-      // if it's a permanent error, but GCP will retry on crash.
-    }
-  });
+      if (!isOriginAllowed(req.headers.origin, allowedOrigins)) {
+        sendJson(res, 403, { error: "origin_not_allowed" });
+        return;
+      }
+      if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+      }
+      if (req.method !== "POST") {
+        sendJson(res, 405, { error: "method_not_allowed" });
+        return;
+      }
+
+      try {
+        // Authenticate the user making the request
+        const decodedToken = await requireAuth(req, auth);
+        const uid = decodedToken.uid;
+        console.log(`[Account Deletion] Executing full deletion for user: ${uid}`);
+
+        // 1. Clean up Firestore and Stripe data
+        await cleanupAccountData({ db, appId, stripe, uid });
+
+        // 2. Delete the user from Firebase Auth
+        await auth.deleteUser(uid);
+        console.log(`[Account Deletion] Successfully deleted Auth user: ${uid}`);
+
+        // Return a clean success response
+        sendJson(res, 200, { ok: true, message: "Account deleted successfully" });
+      } catch (err: any) {
+        console.error("[Account Deletion] Error during secure deletion:", err);
+        // Fallback for custom requireAuth error handling format
+        if (err?.status) {
+          sendJson(
+            res,
+            err.status,
+            err.message ? { error: err.message } : err.body || "unauthenticated",
+          );
+          return;
+        }
+        sendJson(res, 500, { error: "deletion_failed", message: err?.message || "Internal error" });
+      }
+    },
+  );
 
   // --- 2. HTTP endpoint: store anonymous deletion feedback ---
   const submitDeletionFeedback = onRequest(
@@ -174,5 +208,5 @@ export const createAccountDeletionFunctions = ({
     },
   );
 
-  return { onAccountDeleted, submitDeletionFeedback };
+  return { deleteUserAccount, submitDeletionFeedback };
 };

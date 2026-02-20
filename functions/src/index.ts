@@ -119,7 +119,7 @@ export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
 
 export const pushAgent = pushAgentFns.sendPushOnNotification;
 
-export const onAccountDeleted = accountDeletionFns.onAccountDeleted;
+export const deleteUserAccount = accountDeletionFns.deleteUserAccount;
 export const submitDeletionFeedback = accountDeletionFns.submitDeletionFeedback;
 
 export const createShareImage = createShareImageFunction({
