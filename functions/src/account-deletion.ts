@@ -1,5 +1,3 @@
-import { user as authUser } from "firebase-functions/v1/auth";
-import type { UserRecord } from "firebase-functions/v1/auth";
 import { onRequest } from "firebase-functions/v2/https";
 import type { Firestore } from "firebase-admin/firestore";
 import type { Auth } from "firebase-admin/auth";
@@ -36,6 +34,63 @@ const deleteSubcollection = async (
   }
 };
 
+const cleanupAccountData = async ({
+  db,
+  appId,
+  stripe,
+  uid,
+}: {
+  db: Firestore;
+  appId: string;
+  stripe: Stripe;
+  uid: string;
+}) => {
+  const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(uid);
+
+  // Cancel Stripe subscription if any
+  try {
+    const customerDoc = await billingCollection(db, appId, uid).doc("customer").get();
+    const stripeCustomerId = customerDoc.data()?.stripeCustomerId as string | undefined;
+
+    if (stripeCustomerId) {
+      const subscriptions = await stripe.subscriptions.list({
+        customer: stripeCustomerId,
+        status: "active",
+      });
+
+      for (const sub of subscriptions.data) {
+        await stripe.subscriptions.cancel(sub.id);
+        console.log(`[Account Deletion] Canceled Stripe subscription: ${sub.id}`);
+      }
+    }
+  } catch (err) {
+    console.error("[Account Deletion] Error canceling Stripe subscription:", err);
+    // Continue with data deletion even if Stripe fails
+  }
+
+  // Delete all known subcollections
+  const subcollections = ["app_data", "routines", "nutrition_logs", "billing", "fcm_tokens", "notifications"];
+
+  for (const sub of subcollections) {
+    try {
+      await deleteSubcollection(db, userDocRef, sub);
+      console.log(`[Account Deletion] Deleted subcollection: ${sub}`);
+    } catch (err) {
+      console.error(`[Account Deletion] Error deleting ${sub}:`, err);
+    }
+  }
+
+  // Delete the user document itself
+  try {
+    await userDocRef.delete();
+    console.log(`[Account Deletion] Deleted user document for: ${uid}`);
+  } catch (err) {
+    console.error("[Account Deletion] Error deleting user document:", err);
+  }
+
+  console.log(`[Account Deletion] Cleanup complete for user: ${uid}`);
+};
+
 export const createAccountDeletionFunctions = ({
   db,
   auth,
@@ -43,55 +98,35 @@ export const createAccountDeletionFunctions = ({
   stripe,
   webOrigin,
 }: AccountDeletionDeps) => {
-  // --- 1. Auth trigger: clean up user data when account is deleted ---
-  const onAccountDeleted = authUser().onDelete(async (userRecord: UserRecord) => {
-    const uid = userRecord.uid;
-    console.log(`[Account Deletion] Cleaning up data for user: ${uid}`);
+  // --- 1. HTTP endpoint (Gen2): fully delete account + related data ---
+  const onAccountDeleted = onRequest({ timeoutSeconds: 120, invoker: "public" }, async (req, res) => {
+    const allowedOrigins = getAllowedOrigins(webOrigin);
+    setCors(req.headers.origin, res, allowedOrigins);
 
-    const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(uid);
+    if (!isOriginAllowed(req.headers.origin, allowedOrigins)) {
+      sendJson(res, 403, { error: "origin_not_allowed" });
+      return;
+    }
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+    if (req.method !== "POST") {
+      sendJson(res, 405, { error: "method_not_allowed" });
+      return;
+    }
 
-    // Cancel Stripe subscription if any
     try {
-      const customerDoc = await billingCollection(db, appId, uid).doc("customer").get();
-      const stripeCustomerId = customerDoc.data()?.stripeCustomerId as string | undefined;
+      const { uid } = await requireAuth(req, auth);
 
-      if (stripeCustomerId) {
-        const subscriptions = await stripe.subscriptions.list({
-          customer: stripeCustomerId,
-          status: "active",
-        });
+      await cleanupAccountData({ db, appId, stripe, uid });
+      await auth.deleteUser(uid);
 
-        for (const sub of subscriptions.data) {
-          await stripe.subscriptions.cancel(sub.id);
-          console.log(`[Account Deletion] Canceled Stripe subscription: ${sub.id}`);
-        }
-      }
+      sendJson(res, 200, { ok: true });
     } catch (err) {
-      console.error("[Account Deletion] Error canceling Stripe subscription:", err);
-      // Continue with data deletion even if Stripe fails
+      const message = err instanceof Error ? err.message : "unknown_error";
+      sendJson(res, 500, { error: "account_deletion_failed", message });
     }
-
-    // Delete all known subcollections
-    const subcollections = ["app_data", "routines", "nutrition_logs", "billing", "fcm_tokens"];
-
-    for (const sub of subcollections) {
-      try {
-        await deleteSubcollection(db, userDocRef, sub);
-        console.log(`[Account Deletion] Deleted subcollection: ${sub}`);
-      } catch (err) {
-        console.error(`[Account Deletion] Error deleting ${sub}:`, err);
-      }
-    }
-
-    // Delete the user document itself
-    try {
-      await userDocRef.delete();
-      console.log(`[Account Deletion] Deleted user document for: ${uid}`);
-    } catch (err) {
-      console.error("[Account Deletion] Error deleting user document:", err);
-    }
-
-    console.log(`[Account Deletion] Cleanup complete for user: ${uid}`);
   });
 
   // --- 2. HTTP endpoint: store anonymous deletion feedback ---
