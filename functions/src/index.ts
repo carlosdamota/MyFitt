@@ -115,6 +115,8 @@ export const stripeWebhook = createStripeWebhookFunction({
 
 export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
 export const weeklyReengagement = emailAgentFns.weeklyReengagement;
+export const queuePushReengagement = emailAgentFns.queuePushReengagement;
+export const queueFirstWorkoutNudge = emailAgentFns.queueFirstWorkoutNudge;
 export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
 
 export const pushAgent = pushAgentFns.sendPushOnNotification;

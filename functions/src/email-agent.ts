@@ -3,7 +3,7 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import { Resend } from "resend";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import type { Request, Response } from "express";
 
@@ -31,6 +31,8 @@ export const createEmailAgentFunctions = ({
 }: EmailAgentDeps) => {
   const db = getFirestore();
   const auth = getAuth();
+  const campaignTimeZone = process.env.CAMPAIGN_TIME_ZONE || "Europe/Madrid";
+
   // Lazy init: Resend throws if key is empty, but during deploy analysis env vars aren't loaded
   let _resend: Resend | null = null;
   const getResend = () => {
@@ -63,6 +65,7 @@ export const createEmailAgentFunctions = ({
     // Ensure webOrigin doesn't have a trailing slash
     const cleanOrigin = webOrigin.replace(/\/$/, "");
     const appUrl = `${cleanOrigin}/#/dashboard`;
+    const settingsUrl = `${cleanOrigin}/#/profile`;
 
     // Email clients often strip <style> tags when translating. All styles must be inline.
     const containerStyle =
@@ -118,7 +121,7 @@ export const createEmailAgentFunctions = ({
       <p style="margin: 0; margin-bottom: 8px;">FittWiz &copy; ${new Date().getFullYear()} — Tu compañero de entrenamiento IA</p>
       ${
         !isSecurity
-          ? `<p style="margin: 0;">¿No quieres recibir estos correos? <a href="{{unsubscribe_url}}" style="${footerLinkStyle}">Darse de baja</a></p>`
+          ? `<p style="margin: 0;">¿No quieres recibir estos correos? <a href="${settingsUrl}" style="${footerLinkStyle}">Gestionar preferencias</a></p>`
           : ""
       }
     </div>
@@ -129,7 +132,143 @@ export const createEmailAgentFunctions = ({
     return template;
   };
 
-  /** Send an email via Resend (with opt-out guard) */
+  const hashString = (value: string): number => {
+    let hash = 0;
+    for (let i = 0; i < value.length; i++) {
+      hash = (hash << 5) - hash + value.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  };
+
+  const pickTemplate = (userId: string, displayName: string): EmailContent => {
+    const safeName = displayName || "Athlete";
+    const templates: EmailContent[] = [
+      {
+        subject: "Te echamos de menos en FittWiz 💪",
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>Hace unos días que no entrenas. Vuelve con una sesión corta de 15 minutos para retomar el ritmo.</p><p><strong>Tu próxima mejora empieza hoy.</strong></p>`,
+      },
+      {
+        subject: "Tu próxima sesión está a un clic 🚀",
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>Sabemos que mantener la constancia cuesta. Abre FittWiz y completa un entrenamiento rápido para recuperar tu progreso.</p><p><strong>Pequeños pasos, grandes resultados.</strong></p>`,
+      },
+      {
+        subject: "No rompas tu progreso 📈",
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>Llevas más de una semana sin entrenar. Haz una sesión ligera hoy para volver a la rutina sin presión.</p><p><strong>Tu yo de mañana te lo agradecerá.</strong></p>`,
+      },
+    ];
+
+    return templates[hashString(userId) % templates.length];
+  };
+
+  const getWeekKey = (date: Date): string => {
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    const dayMs = 24 * 60 * 60 * 1000;
+    const dayOfYear = Math.floor((date.getTime() - yearStart.getTime()) / dayMs) + 1;
+    const week = Math.ceil(dayOfYear / 7);
+    return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+  };
+
+  const outreachLimitPerWeek = 3;
+
+  const acquireOutreachSlot = async (profileRef: any, now: Date): Promise<boolean> => {
+    const currentWeek = getWeekKey(now);
+
+    return db.runTransaction(async (tx) => {
+      const profileSnap: any = await tx.get(profileRef as any);
+      const profile = profileSnap.data?.() || {};
+
+      const weekKey = profile.outreachWeekKey as string | undefined;
+      const weekCount = Number(profile.outreachWeekCount ?? 0);
+
+      if (weekKey === currentWeek && weekCount >= outreachLimitPerWeek) {
+        return false;
+      }
+
+      if (weekKey !== currentWeek) {
+        tx.set(
+          profileRef,
+          {
+            outreachWeekKey: currentWeek,
+            outreachWeekCount: 1,
+            outreachLastSentAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+      } else {
+        tx.set(
+          profileRef,
+          {
+            outreachWeekCount: FieldValue.increment(1),
+            outreachLastSentAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+
+      return true;
+    });
+  };
+
+  const recordCampaignStats = async (
+    campaign: string,
+    payload: Record<string, number>,
+  ): Promise<void> => {
+    const now = new Date();
+    const dateKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+
+    const statsRef = db
+      .collection("artifacts")
+      .doc(appId)
+      .collection("system")
+      .doc("notification_campaign_metrics")
+      .collection("daily")
+      .doc(`${campaign}_${dateKey}`);
+
+    const updates: Record<string, unknown> = {
+      campaign,
+      dateKey,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    for (const [key, value] of Object.entries(payload)) {
+      updates[key] = FieldValue.increment(value);
+    }
+
+    await statsRef.set(updates, { merge: true });
+  };
+
+  const recordCampaignSnapshot = async (
+    campaign: string,
+    payload: Record<string, number>,
+  ): Promise<void> => {
+    const snapshotRef = db
+      .collection("artifacts")
+      .doc(appId)
+      .collection("system")
+      .doc("notification_campaign_metrics")
+      .collection("latest")
+      .doc(campaign);
+
+    await snapshotRef.set(
+      {
+        campaign,
+        ...payload,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+  };
+
+  const persistCampaignMetrics = async (
+    campaign: string,
+    payload: Record<string, number>,
+  ): Promise<void> => {
+    await recordCampaignStats(campaign, payload);
+    await recordCampaignSnapshot(campaign, payload);
+  };
+
+  /** Send an email via Resend (with opt-out guard + List-Unsubscribe header) */
   const sendEmail = async (
     to: string,
     content: EmailContent,
@@ -148,12 +287,22 @@ export const createEmailAgentFunctions = ({
       }
     }
 
-    // Resend automatically handles List-Unsubscribe headers when {{unsubscribe_url}} is present
+    const cleanOrigin = webOrigin.replace(/\/$/, "");
+    const settingsUrl = `${cleanOrigin}/#/profile`;
+    const headers: Record<string, string> = {};
+
+    // Add List-Unsubscribe header for commercial emails (email clients use this natively)
+    if (!skipOptOutCheck) {
+      headers["List-Unsubscribe"] = `<${settingsUrl}>`;
+      headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+    }
+
     await getResend().emails.send({
       from: fromEmail,
       to,
       subject: content.subject,
       html: wrapWithFittwizTemplate(content.body_html, skipOptOutCheck, content.subject),
+      headers,
     });
   };
 
@@ -280,46 +429,269 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
   );
 
   // ─── 2. WEEKLY RE-ENGAGEMENT (Scheduled) ──────────────────────────
-  const weeklyReengagement = onSchedule("every sunday 10:00", async () => {
-    logger.info("Running weekly re-engagement scan...");
+  const weeklyReengagement = onSchedule(
+    { schedule: "every sunday 10:00", timeZone: campaignTimeZone },
+    async () => {
+      logger.info("Running weekly re-engagement scan...", { campaignTimeZone });
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const usersRef = db.collection("artifacts").doc(appId).collection("users");
-    const usersSnap = await usersRef.listDocuments();
+      const cooldownMs = 7 * 24 * 60 * 60 * 1000;
+      const maxEmailsPerRun = 80;
 
-    const candidates: { uid: string; email: string; displayName: string }[] = [];
-    for (const userDocRef of usersSnap.slice(0, 100)) {
-      const profileSnap = await userDocRef.collection("app_data").doc("profile").get();
-      const profile = profileSnap.data();
-      if (!profile || !profile.email || profile.emailOptOut) continue;
+      const usersRef = db.collection("artifacts").doc(appId).collection("users");
+      const usersSnap = await usersRef.listDocuments();
 
-      const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
-      if (lastWorkout && lastWorkout < sevenDaysAgo) {
-        candidates.push({
-          uid: userDocRef.id,
-          email: profile.email,
-          displayName: profile.displayName || "Athlete",
+      let sentCount = 0;
+      let skippedCooldown = 0;
+      let skippedOutreachCap = 0;
+
+      for (const userDocRef of usersSnap) {
+        if (sentCount >= maxEmailsPerRun) break;
+
+        const profileRef = userDocRef.collection("app_data").doc("profile");
+        const profileSnap = await profileRef.get();
+        const profile = profileSnap.data();
+        if (!profile || !profile.email || profile.emailOptOut) continue;
+
+        const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
+        if (!lastWorkout || lastWorkout >= sevenDaysAgo) continue;
+
+        const lastSentAt = profile.reengagementLastSentAt?.toDate?.() ?? null;
+        if (lastSentAt && Date.now() - lastSentAt.getTime() < cooldownMs) {
+          skippedCooldown++;
+          continue;
+        }
+
+        const now = new Date();
+        const hasOutreachSlot = await acquireOutreachSlot(profileRef, now);
+        if (!hasOutreachSlot) {
+          skippedOutreachCap++;
+          continue;
+        }
+
+        const content = pickTemplate(userDocRef.id, profile.displayName || "Athlete");
+
+        try {
+          await sendEmail(profile.email, content, userDocRef.id);
+          await profileRef.set({ reengagementLastSentAt: now }, { merge: true });
+          sentCount++;
+          logger.info(`Re-engagement email sent to ${profile.email}`);
+        } catch (err) {
+          logger.error(`Failed re-engagement to ${profile.email}`, err);
+        }
+      }
+
+      logger.info("Weekly re-engagement completed", {
+        sentCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+        maxEmailsPerRun,
+      });
+
+      if (sentCount === 0) {
+        logger.warn("Weekly re-engagement sent 0 emails", {
+          skippedCooldown,
+          skippedOutreachCap,
+          scannedUsers: usersSnap.length,
         });
       }
-      if (candidates.length >= 50) break;
-    }
 
-    for (const candidate of candidates) {
-      const content = await generateEmailContent(
-        `User: ${candidate.displayName}. Last workout over 7 days ago.`,
-        "Write a short, powerful 'We miss you' email. Remind them why they started and how good they feel after a workout. Include a strong CTA to jump back into FITTWIZ.",
-      );
+      await persistCampaignMetrics("weekly_reengagement_email", {
+        sentCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+      });
+    },
+  );
 
-      try {
-        await sendEmail(candidate.email, content, candidate.uid);
-        logger.info(`Re-engagement email sent to ${candidate.email}`);
-      } catch (err) {
-        logger.error(`Failed re-engagement to ${candidate.email}`, err);
+  // ─── 2b. PUSH RE-ENGAGEMENT QUEUE (Scheduled) ─────────────────────
+  // Creates notification docs for users inactive for 3+ days.
+  // push-agent function delivers these notifications to registered devices.
+  const queuePushReengagement = onSchedule(
+    { schedule: "every day 18:00", timeZone: campaignTimeZone },
+    async () => {
+      logger.info("Running push re-engagement queue...", { campaignTimeZone });
+
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+      const pushCooldownMs = 3 * 24 * 60 * 60 * 1000;
+      const maxPushQueuedPerRun = 120;
+
+      const usersRef = db.collection("artifacts").doc(appId).collection("users");
+      const usersSnap = await usersRef.listDocuments();
+
+      let queuedCount = 0;
+      let skippedCooldown = 0;
+      let skippedOutreachCap = 0;
+
+      for (const userDocRef of usersSnap) {
+        if (queuedCount >= maxPushQueuedPerRun) break;
+
+        const profileRef = userDocRef.collection("app_data").doc("profile");
+        const profileSnap = await profileRef.get();
+        const profile = profileSnap.data();
+        if (!profile || profile.pushEnabled === false) continue;
+
+        const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
+        if (!lastWorkout || lastWorkout >= threeDaysAgo) continue;
+
+        const lastPushAt = profile.reengagementPushLastSentAt?.toDate?.() ?? null;
+        if (lastPushAt && Date.now() - lastPushAt.getTime() < pushCooldownMs) {
+          skippedCooldown++;
+          continue;
+        }
+
+        const now = new Date();
+        const hasOutreachSlot = await acquireOutreachSlot(profileRef, now);
+        if (!hasOutreachSlot) {
+          skippedOutreachCap++;
+          continue;
+        }
+
+        const displayName = profile.displayName || "Athlete";
+        const title = "Vuelve a entrenar hoy 💪";
+        const body = `Hola ${displayName}, haz una sesión rápida y retoma tu progreso.`;
+
+        try {
+          await userDocRef.collection("notifications").add({
+            title,
+            body,
+            url: "/app/workout",
+            status: "pending",
+            createdAt: new Date(),
+            type: "reengagement_push",
+          });
+
+          await profileRef.set({ reengagementPushLastSentAt: now }, { merge: true });
+          queuedCount++;
+        } catch (err) {
+          logger.error(`Failed to queue push re-engagement for user ${userDocRef.id}`, err);
+        }
       }
-    }
-  });
+
+      logger.info("Push re-engagement queue completed", {
+        queuedCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+        maxPushQueuedPerRun,
+      });
+
+      if (queuedCount === 0) {
+        logger.warn("Daily re-engagement push queued 0 notifications", {
+          skippedCooldown,
+          skippedOutreachCap,
+          scannedUsers: usersSnap.length,
+        });
+      }
+
+      await persistCampaignMetrics("daily_reengagement_push", {
+        queuedCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+      });
+    },
+  );
+
+  // ─── 2c. FIRST-WORKOUT NUDGE QUEUE (Scheduled) ────────────────────
+  // Nudges users that completed onboarding but still have no first workout logged.
+  const queueFirstWorkoutNudge = onSchedule(
+    { schedule: "every day 12:00", timeZone: campaignTimeZone },
+    async () => {
+      logger.info("Running first-workout nudge queue...", { campaignTimeZone });
+
+      const onboardingGraceMs = 2 * 24 * 60 * 60 * 1000;
+      const nudgeCooldownMs = 7 * 24 * 60 * 60 * 1000;
+      const maxQueuedPerRun = 80;
+
+      const usersRef = db.collection("artifacts").doc(appId).collection("users");
+      const usersSnap = await usersRef.listDocuments();
+
+      let queuedCount = 0;
+      let skippedCooldown = 0;
+      let skippedOutreachCap = 0;
+
+      for (const userDocRef of usersSnap) {
+        if (queuedCount >= maxQueuedPerRun) break;
+
+        const profileRef = userDocRef.collection("app_data").doc("profile");
+        const profileSnap = await profileRef.get();
+        const profile = profileSnap.data();
+        if (!profile || profile.pushEnabled === false || profile.onboardingCompleted !== true)
+          continue;
+
+        const hasWorkout = Boolean(profile.lastWorkoutDate?.toDate?.());
+        if (hasWorkout) continue;
+
+        const updatedAtRaw = profile.updatedAt;
+        const updatedAt =
+          typeof updatedAtRaw === "string"
+            ? new Date(updatedAtRaw)
+            : (updatedAtRaw?.toDate?.() ?? null);
+        if (!updatedAt || Number.isNaN(updatedAt.getTime())) continue;
+
+        const now = new Date();
+        if (now.getTime() - updatedAt.getTime() < onboardingGraceMs) continue;
+
+        const lastNudgeAt = profile.firstWorkoutNudgeLastSentAt?.toDate?.() ?? null;
+        if (lastNudgeAt && now.getTime() - lastNudgeAt.getTime() < nudgeCooldownMs) {
+          skippedCooldown++;
+          continue;
+        }
+
+        const hasOutreachSlot = await acquireOutreachSlot(profileRef, now);
+        if (!hasOutreachSlot) {
+          skippedOutreachCap++;
+          continue;
+        }
+
+        try {
+          await userDocRef.collection("notifications").add({
+            title: "Tu primer entrenamiento te espera 🏁",
+            body: "Empieza con una sesión corta hoy y activa tu progreso en FittWiz.",
+            url: "/app/workout",
+            status: "pending",
+            createdAt: new Date(),
+            type: "first_workout_nudge",
+          });
+
+          await profileRef.set({ firstWorkoutNudgeLastSentAt: now }, { merge: true });
+          queuedCount++;
+        } catch (err) {
+          logger.error(`Failed to queue first-workout nudge for user ${userDocRef.id}`, err);
+        }
+      }
+
+      logger.info("First-workout nudge queue completed", {
+        queuedCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+        maxQueuedPerRun,
+      });
+
+      if (queuedCount === 0) {
+        logger.warn("First-workout nudge queued 0 notifications", {
+          skippedCooldown,
+          skippedOutreachCap,
+          scannedUsers: usersSnap.length,
+        });
+      }
+
+      await persistCampaignMetrics("first_workout_nudge_push", {
+        queuedCount,
+        skippedCooldown,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+      });
+    },
+  );
 
   // ─── 3. SECURITY ALERT (HTTP endpoint) ────────────────────────────
   const sendSecurityAlert = onRequest(
@@ -414,6 +786,8 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
   return {
     sendWelcomeEmail,
     weeklyReengagement,
+    queuePushReengagement,
+    queueFirstWorkoutNudge,
     sendSecurityAlert,
     sendProSubscriptionEmail,
   };
