@@ -1,25 +1,7 @@
-import React, { useState, useEffect, type ChangeEvent } from "react";
-import {
-  User,
-  Weight,
-  Ruler,
-  Target,
-  Calendar,
-  Clock,
-  Dumbbell,
-  AlertCircle,
-  ChevronRight,
-  ChevronLeft,
-  Sparkles,
-  Loader,
-  Check,
-  ArrowRight,
-  Crown,
-  X,
-  Zap,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ChevronRight, ChevronLeft, Sparkles, X } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
-import { ProfileFormData, EquipmentOption, TrainingSplit, FocusArea } from "../../types";
+import { ProfileFormData, EquipmentOption } from "../../types";
 import { useProfile } from "../../hooks/useProfile";
 import { useRoutines } from "../../hooks/useRoutines";
 import { generateFullProgram } from "../../api/gemini";
@@ -27,79 +9,12 @@ import { logEvent } from "../../utils/analytics";
 import { AiError } from "../../api/ai";
 import { Button } from "../ui/Button";
 
-// ——————————————————————————————————————————
-// Constants
-// ——————————————————————————————————————————
-
-const TOTAL_STEPS = 5;
-const FREE_MAX_DAYS = 2;
-
-const goalOptions: {
-  value: ProfileFormData["goal"];
-  label: string;
-  emoji: string;
-  desc: string;
-}[] = [
-  { value: "muscle_gain", label: "Ganar Músculo", emoji: "💪", desc: "Hipertrofia y volumen" },
-  { value: "strength", label: "Ganar Fuerza", emoji: "🏋️", desc: "Potencia y PRs" },
-  { value: "fat_loss", label: "Perder Grasa", emoji: "🔥", desc: "Definición y recorte" },
-  { value: "endurance", label: "Resistencia", emoji: "🏃", desc: "Salud general y cardio" },
-];
-
-const levelOptions: { value: ProfileFormData["experienceLevel"]; label: string; years: string }[] =
-  [
-    { value: "beginner", label: "Principiante", years: "0-1 años" },
-    { value: "intermediate", label: "Intermedio", years: "1-3 años" },
-    { value: "advanced", label: "Avanzado", years: "3+ años" },
-  ];
-
-const equipmentOptions: { value: EquipmentOption; label: string; description: string }[] = [
-  { value: "gym_full", label: "Gimnasio completo", description: "Máquinas + libres" },
-  { value: "home_gym", label: "Home gym", description: "Barra + jaula" },
-  { value: "dumbbells_only", label: "Solo mancuernas", description: "Ajustables o fijas" },
-  { value: "bodyweight", label: "Peso corporal", description: "Calistenia" },
-  { value: "barbell_plates", label: "Barra y discos", description: "Peso libre" },
-  { value: "pullup_bar", label: "Barra de dominadas", description: "Pared o puerta" },
-  { value: "resistance_bands", label: "Bandas elásticas", description: "Ligeras/medias" },
-  { value: "bench", label: "Banco", description: "Plano/inclinado" },
-  { value: "kettlebells", label: "Kettlebells", description: "Balones rusos" },
-];
-
-const equipmentLabels: Record<string, string> = Object.fromEntries(
-  equipmentOptions.map((o) => [o.value, o.label]),
-);
-
-const splitOptions: { value: ProfileFormData["trainingSplit"]; label: string; desc: string }[] = [
-  { value: "full_body", label: "Cuerpo Completo", desc: "Todo el cuerpo en cada sesión" },
-  { value: "push_pull_legs", label: "Push / Pull / Legs", desc: "Empuje, Tracción y Piernas" },
-  { value: "upper_lower", label: "Tren Superior / Inferior", desc: "Divide arriba y abajo" },
-  { value: "body_part", label: "Por Zonas", desc: "Enfoque en grupos específicos" },
-];
-
-const focusAreaOptions: { value: FocusArea; label: string; emoji: string }[] = [
-  { value: "chest", label: "Pecho", emoji: "👕" },
-  { value: "back", label: "Espalda", emoji: "🦅" },
-  { value: "legs", label: "Piernas", emoji: "🦵" },
-  { value: "shoulders", label: "Hombros", emoji: "🛡️" },
-  { value: "arms", label: "Brazos", emoji: "💪" },
-  { value: "core", label: "Core", emoji: "🦾" },
-];
-
-const formatEquipment = (equipment: EquipmentOption[]): string => {
-  if (!equipment || equipment.length === 0) return "Peso corporal";
-  return equipment.map((v) => equipmentLabels[v] ?? v).join(", ");
-};
-
-const MOTIVATIONAL_PHRASES = [
-  "Preparando tu entrenamiento personalizado... 💪",
-  "Analizando tu perfil de atleta...",
-  "Los campeones se forjan en el gimnasio 🏆",
-  "Diseñando ejercicios perfectos para ti...",
-  "El dolor de hoy es la fuerza del mañana 🔥",
-  "Calculando las mejores series y repeticiones...",
-  "Cada repetición cuenta, cada día suma 📈",
-  "Tu mejor versión está a punto de nacer ⭐",
-];
+import { TOTAL_STEPS, formatEquipment, MOTIVATIONAL_PHRASES, FREE_MAX_DAYS } from "./constants";
+import { StepPersonalData } from "./steps/StepPersonalData";
+import { StepGoals } from "./steps/StepGoals";
+import { StepEquipment } from "./steps/StepEquipment";
+import { StepStructure } from "./steps/StepStructure";
+import { StepGeneration } from "./steps/StepGeneration";
 
 // ——————————————————————————————————————————
 // Component Props
@@ -293,495 +208,53 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   );
 
   // ——————————————————
-  // Step 0: Personal Data
-  // ——————————————————
-
-  const renderStepPersonalData = () => (
-    <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-      <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-primary-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4'>
-          <User
-            size={32}
-            className='text-primary-400'
-          />
-        </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>Cuéntanos de ti</h2>
-        <p className='text-sm text-slate-400'>
-          Necesitamos algunos datos para personalizar tu experiencia
-        </p>
-      </div>
-
-      <div className='space-y-4'>
-        <div className='grid grid-cols-2 gap-4'>
-          <div>
-            <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
-              <Weight size={12} /> Peso (kg)
-            </label>
-            <input
-              type='number'
-              inputMode='decimal'
-              value={formData.weight}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                handleChange("weight", e.target.value)
-              }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
-              placeholder='75'
-            />
-          </div>
-          <div>
-            <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
-              <Ruler size={12} /> Altura (cm)
-            </label>
-            <input
-              type='number'
-              inputMode='decimal'
-              value={formData.height}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                handleChange("height", e.target.value)
-              }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
-              placeholder='180'
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-4'>
-          <div>
-            <label className='text-xs text-slate-400 mb-1.5 block font-medium'>Edad</label>
-            <input
-              type='number'
-              inputMode='numeric'
-              value={formData.age}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
-              placeholder='30'
-            />
-          </div>
-          <div>
-            <label className='text-xs text-slate-400 mb-1.5 block font-medium'>Género</label>
-            <select
-              value={formData.gender}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleChange("gender", e.target.value)
-              }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-colors shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
-            >
-              <option value='male'>Hombre</option>
-              <option value='female'>Mujer</option>
-              <option value='other'>Otro</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ——————————————————
-  // Step 1: Goals
-  // ——————————————————
-
-  const renderStepGoals = () => (
-    <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-      <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mx-auto mb-4'>
-          <Target
-            size={32}
-            className='text-amber-400'
-          />
-        </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>¿Qué quieres conseguir?</h2>
-        <p className='text-sm text-slate-400'>Selecciona tu objetivo principal y tu nivel</p>
-      </div>
-
-      <div className='space-y-6'>
-        {/* Goal selection — big visual cards */}
-        <div className='grid grid-cols-2 gap-3'>
-          {goalOptions.map((option) => (
-            <button
-              key={option.value}
-              type='button'
-              onClick={() => handleChange("goal", option.value)}
-              className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
-                formData.goal === option.value
-                  ? "border-amber-400/70 bg-amber-500/10 shadow-lg shadow-amber-900/10 scale-[1.02]"
-                  : "border-surface-800 bg-surface-900/50 hover:border-surface-700"
-              }`}
-            >
-              <span className='text-2xl block mb-2'>{option.emoji}</span>
-              <span className='text-sm font-bold text-white block'>{option.label}</span>
-              <span className='text-[11px] text-slate-400 block mt-0.5'>{option.desc}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Experience level */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium'>
-            Nivel de experiencia
-          </label>
-          <div className='grid grid-cols-3 gap-2'>
-            {levelOptions.map((option) => (
-              <button
-                key={option.value}
-                type='button'
-                onClick={() => handleChange("experienceLevel", option.value)}
-                className={`py-3 px-2 rounded-xl border text-center transition-all duration-200 ${
-                  formData.experienceLevel === option.value
-                    ? "border-amber-400/70 bg-amber-500/10 text-white"
-                    : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
-                }`}
-              >
-                <span className='text-xs font-bold block'>{option.label}</span>
-                <span className='text-[10px] text-slate-500 block mt-0.5'>{option.years}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ——————————————————
-  // Step 2: Equipment & Schedule
-  // ——————————————————
-
-  const renderStepEquipment = () => (
-    <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-      <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4'>
-          <Dumbbell
-            size={32}
-            className='text-blue-400'
-          />
-        </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>¿Con qué cuentas?</h2>
-        <p className='text-sm text-slate-400'>Tu equipo y disponibilidad semanal</p>
-      </div>
-
-      <div className='space-y-6'>
-        {/* Equipment chips */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium'>
-            Equipamiento disponible
-          </label>
-          <div className='flex flex-wrap gap-2'>
-            {equipmentOptions.map((option) => {
-              const isSelected = formData.equipment.includes(option.value);
-              return (
-                <button
-                  key={option.value}
-                  type='button'
-                  onClick={() => toggleEquipment(option.value)}
-                  className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all select-none ${
-                    isSelected
-                      ? "border-primary-400/70 bg-primary-500/10 text-primary-100"
-                      : "border-surface-800 bg-surface-900/50 text-slate-300 hover:border-surface-700"
-                  }`}
-                >
-                  <span className='flex flex-col gap-0.5 text-left'>
-                    <span className='text-xs font-semibold'>{option.label}</span>
-                    <span
-                      className={`text-[10px] ${isSelected ? "text-primary-200/70" : "text-slate-500"}`}
-                    >
-                      {option.description}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Days available — free users limited to 2 */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
-            <Calendar size={12} /> Días por semana
-          </label>
-          <div className='flex items-center gap-2'>
-            {[2, 3, 4, 5, 6].map((days) => {
-              const isLocked = days > FREE_MAX_DAYS;
-              return (
-                <button
-                  key={days}
-                  type='button'
-                  onClick={() => !isLocked && handleChange("availableDays", days)}
-                  disabled={isLocked}
-                  className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all relative ${
-                    isLocked
-                      ? "bg-surface-950/50 border-surface-800 text-slate-600 cursor-not-allowed opacity-50"
-                      : formData.availableDays === days
-                        ? "bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/20"
-                        : "bg-surface-900/50 border-surface-700 text-slate-500 hover:border-surface-600"
-                  }`}
-                >
-                  {days}
-                  {isLocked && (
-                    <Crown
-                      size={8}
-                      className='absolute top-1 right-1 text-amber-500/70'
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <p className='text-[10px] text-amber-500/70 mt-2 flex items-center gap-1'>
-            <Crown size={10} /> Rutinas de 3+ días disponibles con Pro
-          </p>
-        </div>
-
-        {/* Time per session */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
-            <Clock size={12} /> Minutos por sesión
-          </label>
-          <div className='flex items-center gap-2'>
-            {[20, 30, 45, 60].map((t) => (
-              <button
-                key={t}
-                type='button'
-                onClick={() => handleChange("dailyTimeMinutes", t)}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${
-                  formData.dailyTimeMinutes === t
-                    ? "bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/20"
-                    : "bg-surface-800/50 border-surface-700 text-slate-400 hover:border-surface-600"
-                } shadow-sm`}
-              >
-                <span className='block text-lg font-black'>{t}</span>
-                <span className='text-[10px] opacity-60 uppercase'>min</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Injuries */}
-        <div>
-          <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
-            <AlertCircle size={12} /> Lesiones / Limitaciones (opcional)
-          </label>
-          <textarea
-            value={formData.injuries}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              handleChange("injuries", e.target.value)
-            }
-            className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none h-16 resize-none transition-colors'
-            placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  // ——————————————————
-  // Step 3: Training Structure (Split & Focus)
-  // ——————————————————
-
-  const renderStepStructure = () => (
-    <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-      <div className='text-center mb-8'>
-        <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4'>
-          <Zap
-            size={32}
-            className='text-indigo-400'
-          />
-        </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>Arquitectura del Plan</h2>
-        <p className='text-sm text-slate-400'>¿Cómo quieres estructurar tu progreso?</p>
-      </div>
-
-      <div className='space-y-6'>
-        {/* Training Split */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
-            División de Entrenamiento (Split)
-          </label>
-          <div className='grid grid-cols-1 gap-2'>
-            {splitOptions.map((option) => (
-              <button
-                key={option.value}
-                type='button'
-                onClick={() => handleChange("trainingSplit", option.value)}
-                className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
-                  formData.trainingSplit === option.value
-                    ? "border-indigo-400/70 bg-indigo-500/10 text-white"
-                    : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
-                }`}
-              >
-                <div>
-                  <div className='font-bold text-sm'>{option.label}</div>
-                  <div className='text-[10px] text-slate-500'>{option.desc}</div>
-                </div>
-                {formData.trainingSplit === option.value && (
-                  <Check
-                    size={16}
-                    className='text-indigo-400'
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Focus Areas */}
-        <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
-            Zonas de Enfoque (Opcional)
-          </label>
-          <div className='grid grid-cols-3 gap-2'>
-            {focusAreaOptions.map((option) => {
-              const isSelected = formData.focusAreas?.includes(option.value);
-              return (
-                <button
-                  key={option.value}
-                  type='button'
-                  onClick={() => {
-                    const current = formData.focusAreas || [];
-                    if (isSelected) {
-                      handleChange(
-                        "focusAreas",
-                        current.filter((f) => f !== option.value),
-                      );
-                    } else if (current.length < 3) {
-                      handleChange("focusAreas", [...current, option.value]);
-                    }
-                  }}
-                  className={`py-3 rounded-xl border text-center transition-all ${
-                    isSelected
-                      ? "border-purple-400/70 bg-purple-500/10 text-white"
-                      : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
-                  }`}
-                >
-                  <span className='text-xl block mb-1'>{option.emoji}</span>
-                  <span className='text-[10px] font-bold block leading-tight'>{option.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className='text-[10px] text-slate-500 mt-2 text-center italic'>
-            Selecciona hasta 3 zonas para darles prioridad
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ——————————————————
-  // Step 4: Generation
-  // ——————————————————
-
-  const renderStepGeneration = () => (
-    <div className='animate-in fade-in slide-in-from-right-4 duration-300 flex flex-col items-center justify-center min-h-[400px] text-center'>
-      {/* Generating State */}
-      {isGenerating && (
-        <>
-          <div className='relative mb-8'>
-            <div className='w-24 h-24 rounded-full bg-linear-to-br from-blue-600/30 to-purple-600/30 flex items-center justify-center'>
-              <Dumbbell
-                size={40}
-                className='text-blue-400 animate-pulse'
-              />
-            </div>
-            <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin' />
-          </div>
-
-          <p className='text-xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400 mb-4 min-h-12 transition-all duration-500'>
-            {MOTIVATIONAL_PHRASES[phraseIndex]}
-          </p>
-
-          <p className='text-sm text-slate-400 mb-6'>
-            {generationProgress || "Iniciando generación..."}
-          </p>
-
-          <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full animate-pulse w-full' />
-          </div>
-
-          <p className='text-xs text-slate-500 mt-6'>Esto puede tardar hasta 30 segundos</p>
-        </>
-      )}
-
-      {/* Success State */}
-      {generationComplete && !isGenerating && (
-        <>
-          <div className='w-24 h-24 rounded-full bg-linear-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mb-6'>
-            <Check
-              size={48}
-              className='text-green-400'
-            />
-          </div>
-
-          <h2 className='text-2xl font-bold text-white mb-2'>¡Tu plan está listo! 🎉</h2>
-          <p className='text-sm text-slate-400 mb-8 max-w-sm'>
-            Hemos creado {formData.availableDays} rutinas personalizadas basadas en tu perfil. ¡Es
-            hora de entrenar!
-          </p>
-
-          <Button
-            size='lg'
-            onClick={onComplete}
-            className='px-8 py-4 rounded-2xl font-bold text-sm w-full mx-auto max-w-sm flex items-center justify-center gap-2'
-            rightIcon={<ArrowRight size={18} />}
-          >
-            Empezar a entrenar
-          </Button>
-        </>
-      )}
-
-      {/* Error State */}
-      {generationError && !isGenerating && !generationComplete && (
-        <>
-          <div className='w-24 h-24 rounded-full bg-linear-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6'>
-            <AlertCircle
-              size={48}
-              className='text-amber-400'
-            />
-          </div>
-
-          <h2 className='text-xl font-bold text-white mb-2'>Perfil guardado</h2>
-          <p className='text-sm text-slate-400 mb-2 max-w-sm'>{generationError}</p>
-          <p className='text-xs text-slate-500 mb-8'>
-            Puedes generar tu primera rutina desde el Coach IA
-          </p>
-
-          <div className='flex gap-3 justify-center'>
-            <Button
-              variant='secondary'
-              onClick={() => {
-                setGenerationError(null);
-                handleGenerate();
-              }}
-              className='px-6 py-3 rounded-xl font-bold text-sm'
-            >
-              Reintentar
-            </Button>
-            <Button
-              onClick={onComplete}
-              className='px-6 py-3 rounded-xl font-bold text-sm'
-            >
-              Continuar
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-
-  // ——————————————————
   // Render
   // ——————————————————
 
   const renderStep = () => {
     switch (step) {
       case 0:
-        return renderStepPersonalData();
+        return (
+          <StepPersonalData
+            formData={formData}
+            handleChange={handleChange}
+          />
+        );
       case 1:
-        return renderStepGoals();
+        return (
+          <StepGoals
+            formData={formData}
+            handleChange={handleChange}
+          />
+        );
       case 2:
-        return renderStepEquipment();
+        return (
+          <StepEquipment
+            formData={formData}
+            handleChange={handleChange}
+            toggleEquipment={toggleEquipment}
+          />
+        );
       case 3:
-        return renderStepStructure();
+        return (
+          <StepStructure
+            formData={formData}
+            handleChange={handleChange}
+          />
+        );
       case 4:
-        return renderStepGeneration();
+        return (
+          <StepGeneration
+            formData={formData}
+            isGenerating={isGenerating}
+            generationComplete={generationComplete}
+            generationError={generationError}
+            generationProgress={generationProgress}
+            phraseIndex={phraseIndex}
+            handleGenerate={handleGenerate}
+            onComplete={onComplete}
+          />
+        );
       default:
         return null;
     }

@@ -1,13 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, onSnapshot, collection } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
 import type { WorkoutLogs, WorkoutLogEntry } from "../types";
 
 export interface UseWorkoutLogsReturn {
   workoutLogs: WorkoutLogs;
-  saveLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
-  deleteLog: (exerciseName: string, logToDelete: WorkoutLogEntry) => Promise<void>;
   coachAdvice: string | null;
   saveCoachAdvice: (advice: string) => Promise<void>;
   dbError: string | null;
@@ -16,9 +14,27 @@ export interface UseWorkoutLogsReturn {
 }
 
 export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
-  const [workoutLogs, setWorkoutLogs] = useState<WorkoutLogs>({});
+  const [legacyLogs, setLegacyLogs] = useState<WorkoutLogs>({});
+  const [sessionLogs, setSessionLogs] = useState<WorkoutLogs>({});
   const [coachAdvice, setCoachAdvice] = useState<string | null>(null);
   const [dbError, setDbError] = useState<string | null>(null);
+
+  // ── Merge legacy + session logs into a single WorkoutLogs ──
+  const workoutLogs = useMemo(() => {
+    const merged: WorkoutLogs = {};
+
+    // Add legacy logs
+    Object.entries(legacyLogs).forEach(([exercise, entries]) => {
+      merged[exercise] = [...(merged[exercise] || []), ...entries];
+    });
+
+    // Add session logs
+    Object.entries(sessionLogs).forEach(([exercise, entries]) => {
+      merged[exercise] = [...(merged[exercise] || []), ...entries];
+    });
+
+    return merged;
+  }, [legacyLogs, sessionLogs]);
 
   // Calcular racha diaria (Day Streak) y racha semanal (Week Streak)
   const { dayStreak, weekStreak } = useMemo(() => {
@@ -86,29 +102,12 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     const lastWeekId = getWeekId(lastWeekDate);
 
     let currentWeekStreak = 0;
-    const sortedWeekIds = Array.from(weeksWithWorkouts)
-      .map((d) => new Date(d))
-      .sort((a, b) => b.getTime() - a.getTime())
-      .map((d) => d.toDateString());
 
     const hasWorkoutThisWeek = weeksWithWorkouts.has(currentWeekId);
     const hasWorkoutLastWeek = weeksWithWorkouts.has(lastWeekId);
 
     // La racha se mantiene si entrenó esta semana O si la semana pasada entrenó (y esta sigue en curso)
     if (hasWorkoutThisWeek || hasWorkoutLastWeek) {
-      currentWeekStreak = hasWorkoutThisWeek ? 1 : 0; // Si no ha entrenado esta semana, empezamos desde la racha de semanas pasadas
-
-      // Si entrenó esta semana, empezamos a buscar desde esta semana hacia atrás
-      // Si no, empezamos desde la semana pasada
-      let startIdx = hasWorkoutThisWeek ? 0 : sortedWeekIds.indexOf(lastWeekId);
-      if (startIdx === -1) startIdx = 0;
-
-      if (hasWorkoutThisWeek) currentWeekStreak = 1;
-      else if (hasWorkoutLastWeek) {
-        // No tiene hoy, pero tiene la pasada. La racha es la que traía hasta la pasada.
-        currentWeekStreak = 0;
-      }
-
       // Re-calculamos contando semanas consecutivas reales
       let tempStreak = 0;
       let checkWeek = new Date(hasWorkoutThisWeek ? currentWeekId : lastWeekId);
@@ -123,11 +122,10 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     return { dayStreak: currentDayStreak, weekStreak: currentWeekStreak };
   }, [workoutLogs]);
 
+  // ── Listen to legacy logs document ──
   useEffect(() => {
-    // Escuchar los logs solo si el usuario está autenticado y db está inicializado
     if (!user || !db) return;
 
-    // Ruta de la colección: /artifacts/{appId}/users/{userId}/app_data/logs
     const docRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "logs");
 
     const unsubscribe = onSnapshot(
@@ -142,7 +140,7 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
           // Soporte para nueva estructura { logs: { ... }, coachAdvice: "..." }
           // y para estructura antigua { ejercicio1: [ ... ], ejercicio2: [ ... ] }
           if (data.logs) {
-            setWorkoutLogs(data.logs);
+            setLegacyLogs(data.logs);
             setCoachAdvice(data.coachAdvice || null);
           } else {
             // Estructura antigua: filtrar metadatos para evitar TypeErrors
@@ -152,11 +150,11 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
                 filteredLogs[key] = value as WorkoutLogEntry[];
               }
             });
-            setWorkoutLogs(filteredLogs);
+            setLegacyLogs(filteredLogs);
             setCoachAdvice((data.coachAdvice as string) || null);
           }
         } else {
-          setWorkoutLogs({});
+          setLegacyLogs({});
           setCoachAdvice(null);
         }
       },
@@ -169,49 +167,37 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     return () => unsubscribe();
   }, [user]);
 
-  const saveLog = async (exerciseName: string, entry: WorkoutLogEntry): Promise<void> => {
+  // ── Load all workout_sessions subcollection ──
+  useEffect(() => {
     if (!user || !db) return;
 
-    const previousLogs = { ...workoutLogs };
-    const newLogs = { ...workoutLogs };
-    const currentExerciseLogs = newLogs[exerciseName] || [];
-    newLogs[exerciseName] = [...currentExerciseLogs, entry];
+    const sessionsRef = collection(db, "artifacts", appId, "users", user.uid, "workout_sessions");
 
-    // Actualización optimista
-    setWorkoutLogs(newLogs);
+    // Use onSnapshot for real-time updates
+    const unsubscribe = onSnapshot(
+      sessionsRef,
+      (snapshot) => {
+        const merged: WorkoutLogs = {};
+        snapshot.docs.forEach((docSnap) => {
+          const session = docSnap.data();
+          if (session.logs && typeof session.logs === "object") {
+            Object.entries(session.logs).forEach(([exercise, entries]) => {
+              if (Array.isArray(entries)) {
+                merged[exercise] = [...(merged[exercise] || []), ...(entries as WorkoutLogEntry[])];
+              }
+            });
+          }
+        });
+        setSessionLogs(merged);
+      },
+      (error) => {
+        console.error("Firestore Sessions Read Error", error);
+        // Don't overwrite dbError if legacy read also failed
+      },
+    );
 
-    try {
-      const docRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "logs");
-      await setDoc(docRef, { logs: newLogs }, { merge: true });
-    } catch (e) {
-      console.error("Save Error", e);
-      setDbError("Error guardando datos");
-      // Revertir
-      setWorkoutLogs(previousLogs);
-    }
-  };
-
-  const deleteLog = async (exerciseName: string, logToDelete: WorkoutLogEntry): Promise<void> => {
-    if (!user || !db) return;
-
-    const previousLogs = { ...workoutLogs };
-    const newLogs = { ...workoutLogs };
-    const currentExerciseLogs = newLogs[exerciseName] || [];
-
-    // Filtrar el log a borrar por su marca de tiempo 'date'
-    newLogs[exerciseName] = currentExerciseLogs.filter((log) => log.date !== logToDelete.date);
-
-    setWorkoutLogs(newLogs);
-
-    try {
-      const docRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "logs");
-      await setDoc(docRef, { logs: newLogs }, { merge: true });
-    } catch (e) {
-      console.error("Delete Error", e);
-      setDbError("Error borrando datos");
-      setWorkoutLogs(previousLogs);
-    }
-  };
+    return () => unsubscribe();
+  }, [user]);
 
   const saveCoachAdvice = async (advice: string): Promise<void> => {
     if (!user || !db) return;
@@ -228,8 +214,6 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
 
   return {
     workoutLogs,
-    saveLog,
-    deleteLog,
     coachAdvice,
     saveCoachAdvice,
     dbError,

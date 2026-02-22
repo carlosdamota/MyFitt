@@ -74,6 +74,14 @@ export interface WorkoutLogEntry {
 
 export type WorkoutLogs = Record<string, WorkoutLogEntry[]>;
 
+export interface WorkoutSession {
+  id: string; // e.g. "2026-02-22T20:30:00.000Z"
+  date: string; // ISO date
+  duration?: string; // e.g. "45:32"
+  routineTitle?: string;
+  logs: WorkoutLogs; // { exerciseName: [entries] }
+}
+
 // ============================================
 // Nutrition Types
 // ============================================

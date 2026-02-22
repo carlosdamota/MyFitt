@@ -20,6 +20,7 @@ interface ExerciseCardProps {
   onDeleteLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   onResetTimer: (duration?: number) => void;
   onRequireAuth?: () => void;
+  isTimerRunning?: boolean;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -37,6 +38,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onDeleteLog,
   onResetTimer,
   onRequireAuth,
+  isTimerRunning,
 }) => {
   const cardClasses = `relative overflow-hidden rounded-3xl border transition-all duration-300 ${
     isCompleted
@@ -148,6 +150,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               isLastInBlock={isLastInBlock}
               configuredReps={exercise.reps}
               instructions={exercise.instructions}
+              isTimerRunning={isTimerRunning}
               onMarkComplete={() => {
                 if (!isCompleted) onToggleComplete(dayKey, exercise.name);
               }}

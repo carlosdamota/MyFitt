@@ -18,35 +18,10 @@ import AuthModal from "../components/auth/AuthModal";
 import { createCheckoutSession } from "../api/billing";
 import { iconLogo, socialPreview } from "../branding/logoConfig";
 import { Button } from "../components/ui/Button";
-
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}
-
-interface StepCardProps {
-  step: string;
-  title: string;
-  desc: string;
-}
-
-interface OptionCardProps {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}
-
-interface PlanCardProps {
-  title: string;
-  badge: string;
-  price: React.ReactNode;
-  desc: string;
-  features: string[];
-  cta: string;
-  onClick: () => void;
-  tone?: "accent" | "neutral";
-}
+import { FeatureCard } from "../components/landing/FeatureCard";
+import { StepCard } from "../components/landing/StepCard";
+import { OptionCard } from "../components/landing/OptionCard";
+import { PlanCard } from "../components/landing/PlanCard";
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -624,86 +599,3 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
-
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, desc }) => (
-  <div className='p-5 rounded-2xl bg-surface-900/50 border border-surface-800 hover:border-surface-700 hover:bg-surface-800/60 transition-all text-left'>
-    <div className='w-11 h-11 rounded-xl bg-surface-800 flex items-center justify-center mb-4'>
-      {icon}
-    </div>
-    <h3 className='text-xl font-bold text-white mb-2'>{title}</h3>
-    <p className='text-slate-400 text-sm leading-relaxed'>{desc}</p>
-  </div>
-);
-
-const StepCard: React.FC<StepCardProps> = ({ step, title, desc }) => (
-  <div className='p-6 rounded-2xl bg-surface-900/50 border border-surface-800 text-left space-y-4'>
-    <div className='text-xs tracking-[0.2em] text-slate-500'>{step}</div>
-    <h3 className='text-xl font-bold text-white'>{title}</h3>
-    <p className='text-slate-400 text-sm leading-relaxed'>{desc}</p>
-  </div>
-);
-
-const OptionCard: React.FC<OptionCardProps> = ({ icon, title, desc }) => (
-  <div className='p-5 rounded-2xl bg-surface-900/50 border border-surface-800 hover:border-surface-700 hover:bg-surface-800/60 transition-all text-left'>
-    <div className='w-11 h-11 rounded-xl bg-surface-800 flex items-center justify-center mb-4'>
-      {icon}
-    </div>
-    <h3 className='text-lg font-semibold text-white mb-2'>{title}</h3>
-    <p className='text-slate-400 text-sm leading-relaxed'>{desc}</p>
-  </div>
-);
-
-const PlanCard: React.FC<PlanCardProps> = ({
-  title,
-  badge,
-  price,
-  desc,
-  features,
-  cta,
-  onClick,
-  tone = "neutral",
-}) => (
-  <div
-    className={`flex flex-col justify-between rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
-      tone === "accent"
-        ? "border-primary-400/40 bg-primary-500/10"
-        : "border-surface-800 bg-surface-900/60"
-    }`}
-  >
-    <div className='flex items-start justify-between'>
-      <div>
-        <p className='text-xs uppercase tracking-[0.2em] text-slate-400'>{badge}</p>
-        <h3 className='text-2xl font-bold text-white'>{title}</h3>
-      </div>
-      <span
-        className={`text-sm font-semibold px-3 py-1 rounded-full ${
-          tone === "accent" ? "bg-primary-500/20 text-primary-200" : "bg-surface-800 text-slate-300"
-        }`}
-      >
-        {price}
-      </span>
-    </div>
-    <p className='text-slate-300'>{desc}</p>
-    <ul className='space-y-2 text-sm text-slate-400'>
-      {features.map((item) => (
-        <li
-          key={item}
-          className='flex items-center gap-2'
-        >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${tone === "accent" ? "bg-primary-400" : "bg-primary-500/50"}`}
-          />
-          {item}
-        </li>
-      ))}
-    </ul>
-    <Button
-      variant={tone === "accent" ? "primary" : "secondary"}
-      onClick={onClick}
-      className='w-full h-auto py-3 rounded-2xl'
-      rightIcon={<ArrowRight size={16} />}
-    >
-      {cta}
-    </Button>
-  </div>
-);

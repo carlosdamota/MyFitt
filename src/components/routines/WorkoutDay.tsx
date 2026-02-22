@@ -27,6 +27,8 @@ interface WorkoutDayProps {
   user: User | null;
   onRequireAuth?: () => void;
   isPro?: boolean;
+  onFlushSession?: (metadata: { duration?: string; routineTitle?: string }) => Promise<void>;
+  onClearSession?: () => void;
 }
 
 const WorkoutDay: React.FC<WorkoutDayProps> = ({
@@ -40,9 +42,11 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   user,
   onRequireAuth,
   isPro,
+  onFlushSession,
+  onClearSession,
 }) => {
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
-  const { error, info } = useToast();
+  const { error, info, success } = useToast();
 
   // Derivar ejercicios completados desde los logs de hoy
   const completedExercises = useMemo(() => {
@@ -78,6 +82,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const { plan } = useEntitlement(user);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
   const [showSocialShare, setShowSocialShare] = useState(false);
+  const flushTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rest Timer Logic
   const {
@@ -113,15 +118,49 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     setShowConfirmFinish(true);
   };
 
-  const handleConfirmFinish = () => {
+  const handleConfirmFinish = async () => {
     setShowConfirmFinish(false);
-    setShowSocialShare(true);
+
+    if (!onFlushSession) {
+      setShowSocialShare(true);
+      return;
+    }
+
+    // Delayed flush with undo capability
+    let cancelled = false;
+
+    success("✅ Sesión guardada", {
+      label: "Deshacer",
+      onClick: () => {
+        cancelled = true;
+        if (flushTimerRef.current) {
+          clearTimeout(flushTimerRef.current);
+          flushTimerRef.current = null;
+        }
+        info("Sesión restaurada. Puedes seguir editando.");
+      },
+    });
+
+    // Flush after 5 seconds unless undone
+    flushTimerRef.current = setTimeout(async () => {
+      if (cancelled) return;
+      try {
+        await onFlushSession({
+          duration: formatTime(time),
+          routineTitle: routine?.title,
+        });
+      } catch (e) {
+        error("Error guardando la sesión. Tus datos están seguros localmente.");
+        return;
+      }
+      setShowSocialShare(true);
+      reset();
+    }, 5000);
   };
 
   const handleCancelFinish = () => {
     setShowConfirmFinish(false);
-    // If they cancel, do we resume? Or just stay stopped?
-    // Let's stay stopped for now.
+    // Stay stopped, don't clear session — user may resume later
   };
 
   // Use prop if available, otherwise fall back to hook
@@ -197,6 +236,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               onDeleteLog={onDeleteLog}
               onResetTimer={handleStartRest}
               onRequireAuth={onRequireAuth}
+              isTimerRunning={isRunning}
             />
           ))
         ) : (
