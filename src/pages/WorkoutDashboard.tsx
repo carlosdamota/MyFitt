@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useOutletContext } from "react-router";
 import { Loader } from "lucide-react";
 
 import { useWorkoutLogs } from "../hooks/useWorkoutLogs";
+import { useWorkoutSession } from "../hooks/useWorkoutSession";
 import { useProfile } from "../hooks/useProfile";
 import { useRoutines } from "../hooks/useRoutines";
 
@@ -11,6 +12,7 @@ import WorkoutDay from "../components/routines/WorkoutDay";
 import RoutineEditor from "../components/routines/RoutineEditor";
 
 import type { DashboardContext } from "../layouts/DashboardLayout";
+import type { WorkoutLogs as WorkoutLogsType } from "../types";
 import WeeklyProgress from "../components/dashboard/WeeklyProgress";
 import { useToast } from "../hooks/useToast";
 
@@ -23,7 +25,8 @@ export default function WorkoutDashboard() {
   const { success } = useToast();
 
   const { profile } = useProfile(user);
-  const { workoutLogs, saveLog, deleteLog, dayStreak, weekStreak } = useWorkoutLogs(user);
+  const { workoutLogs, dayStreak, weekStreak } = useWorkoutLogs(user);
+  const { pendingLogs, addLog, removeLog, flushSession, clearSession } = useWorkoutSession(user);
   const {
     routines,
     loading: routinesLoading,
@@ -31,6 +34,23 @@ export default function WorkoutDashboard() {
     shareRoutine,
     importSharedRoutine,
   } = useRoutines(user);
+
+  // Merge persisted logs with pending session logs for real-time UI
+  const mergedLogs = useMemo<WorkoutLogsType>(() => {
+    const merged: WorkoutLogsType = {};
+
+    // Add all historical/persisted logs
+    Object.entries(workoutLogs).forEach(([exercise, entries]) => {
+      merged[exercise] = [...(merged[exercise] || []), ...entries];
+    });
+
+    // Add pending session logs (not yet in Firestore)
+    Object.entries(pendingLogs).forEach(([exercise, entries]) => {
+      merged[exercise] = [...(merged[exercise] || []), ...entries];
+    });
+
+    return merged;
+  }, [workoutLogs, pendingLogs]);
 
   const [searchParams] = useSearchParams();
 
@@ -67,6 +87,21 @@ export default function WorkoutDashboard() {
     return Object.fromEntries(Object.entries(routines).filter(([, r]) => !r.programId));
   }, [routines, activeTab]);
 
+  // Wrap addLog/removeLog to match the existing onSaveLog/onDeleteLog signatures
+  const handleSaveLog = useCallback(
+    async (exerciseName: string, entry: import("../types").WorkoutLogEntry) => {
+      addLog(exerciseName, entry);
+    },
+    [addLog],
+  );
+
+  const handleDeleteLog = useCallback(
+    async (exerciseName: string, entry: import("../types").WorkoutLogEntry) => {
+      removeLog(exerciseName, entry);
+    },
+    [removeLog],
+  );
+
   if (routinesLoading) {
     return (
       <div className='flex items-center justify-center py-20 text-primary-500'>
@@ -84,7 +119,7 @@ export default function WorkoutDashboard() {
     <>
       <WeeklyProgress
         streak={weekStreak}
-        workoutLogs={workoutLogs}
+        workoutLogs={mergedLogs}
         targetDays={currentRoutine?.totalDays || profile?.availableDays || 3}
       />
       <RoutineTabs
@@ -98,11 +133,13 @@ export default function WorkoutDashboard() {
         isPro={isPro}
         onEditRoutine={() => setShowRoutineEditor(true)}
         onResetTimer={() => {}}
-        onSaveLog={saveLog}
-        onDeleteLog={deleteLog}
-        workoutLogs={workoutLogs}
+        onSaveLog={handleSaveLog}
+        onDeleteLog={handleDeleteLog}
+        workoutLogs={mergedLogs}
         user={user}
         onRequireAuth={onRequireAuth}
+        onFlushSession={flushSession}
+        onClearSession={clearSession}
       />
 
       {showRoutineEditor && (

@@ -86,6 +86,15 @@ service cloud.firestore {
       allow delete: if isOwner(userId);
     }
 
+    // Workout sessions (PRIVATE) - one document per workout session
+    match /artifacts/{appId}/users/{userId}/workout_sessions/{sessionId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.date is string
+        && request.resource.data.logs is map;
+      allow delete: if isOwner(userId);
+    }
+
     // Billing (READ-ONLY for client, server writes)
     match /artifacts/{appId}/users/{userId}/billing/{docId} {
       allow read: if isOwner(userId);

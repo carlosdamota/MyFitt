@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { History, Trophy } from "lucide-react";
+import { History, Trophy, Play } from "lucide-react";
 
 import { calculatePersonalBests, isNewRecord, isBodyweightExercise } from "../../utils/stats";
 import { useProfile } from "../../hooks/useProfile";
@@ -26,6 +26,7 @@ interface ExerciseTrackerProps {
   onMarkComplete?: () => void;
   onUnmarkComplete?: () => void;
   onRequireAuth?: () => void;
+  isTimerRunning?: boolean;
 }
 
 interface SuggestionData {
@@ -49,6 +50,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   onMarkComplete,
   onUnmarkComplete,
   onRequireAuth,
+  isTimerRunning,
 }) => {
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
@@ -216,18 +218,46 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         </div>
       )}
 
-      <SetEntryForm
-        weight={weight}
-        setWeight={setWeight}
-        reps={reps}
-        setReps={setReps}
-        sets={sets}
-        setSets={setSets}
-        rpe={rpe}
-        setRpe={setRpe}
-        onSave={handleSave}
-        isSaving={isSaving}
-      />
+      {isTimerRunning === false ? (
+        <div className='relative'>
+          <div className='opacity-30 pointer-events-none'>
+            <SetEntryForm
+              weight={weight}
+              setWeight={setWeight}
+              reps={reps}
+              setReps={setReps}
+              sets={sets}
+              setSets={setSets}
+              rpe={rpe}
+              setRpe={setRpe}
+              onSave={handleSave}
+              isSaving={isSaving}
+            />
+          </div>
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <div className='flex items-center gap-2 px-4 py-2.5 bg-surface-900/95 border border-primary-500/30 rounded-xl shadow-lg backdrop-blur-sm'>
+              <Play
+                size={14}
+                className='text-primary-400'
+              />
+              <span className='text-xs font-bold text-slate-300'>Pulsa Play para registrar</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <SetEntryForm
+          weight={weight}
+          setWeight={setWeight}
+          reps={reps}
+          setReps={setReps}
+          sets={sets}
+          setSets={setSets}
+          rpe={rpe}
+          setRpe={setRpe}
+          onSave={handleSave}
+          isSaving={isSaving}
+        />
+      )}
 
       <ExerciseAIAssistant
         user={user}

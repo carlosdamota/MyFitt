@@ -4,3 +4,4 @@ node_modules
 .env.*
 *.log
 *_debug.log
+src/scripts/

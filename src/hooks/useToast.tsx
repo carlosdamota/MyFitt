@@ -1,17 +1,23 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { X, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { X, CheckCircle, AlertCircle, Info, Undo2 } from "lucide-react";
 
 export type ToastType = "success" | "error" | "info";
+
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
 
 interface Toast {
   id: string;
   message: string;
   type: ToastType;
+  action?: ToastAction;
 }
 
 interface ToastContextType {
-  toast: (message: string, type?: ToastType) => void;
-  success: (message: string) => void;
+  toast: (message: string, type?: ToastType, action?: ToastAction) => void;
+  success: (message: string, action?: ToastAction) => void;
   error: (message: string) => void;
   info: (message: string) => void;
 }
@@ -34,17 +40,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toast = useCallback(
-    (message: string, type: ToastType = "info") => {
+    (message: string, type: ToastType = "info", action?: ToastAction) => {
       const id = Math.random().toString(36).substring(2, 9);
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => [...prev, { id, message, type, action }]);
+      // Longer timeout when there's an action to give user time to click
+      const timeout = action ? 6000 : 3000;
       setTimeout(() => {
         removeToast(id);
-      }, 3000);
+      }, timeout);
     },
     [removeToast],
   );
 
-  const success = useCallback((message: string) => toast(message, "success"), [toast]);
+  const success = useCallback(
+    (message: string, action?: ToastAction) => toast(message, "success", action),
+    [toast],
+  );
   const error = useCallback((message: string) => toast(message, "error"), [toast]);
   const info = useCallback((message: string) => toast(message, "info"), [toast]);
 
@@ -72,6 +83,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             {t.type === "info" && <Info className='w-5 h-5 text-cyan-400 shrink-0' />}
 
             <span className='text-sm font-medium flex-1'>{t.message}</span>
+
+            {t.action && (
+              <button
+                onClick={() => {
+                  t.action!.onClick();
+                  removeToast(t.id);
+                }}
+                className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wide transition-all active:scale-95 border border-white/10 shrink-0'
+              >
+                <Undo2 size={12} />
+                {t.action.label}
+              </button>
+            )}
 
             <button
               onClick={() => removeToast(t.id)}
