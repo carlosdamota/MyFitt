@@ -25,6 +25,7 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
 
       if (!title || !body) {
         logger.warn(`Notification ${event.params.notificationId} missing title or body`);
+        await snapshot.ref.update({ status: "skipped_invalid_payload" });
         return;
       }
 
@@ -40,6 +41,7 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
       const profile = profileSnap.data();
       if (profile?.pushEnabled === false) {
         logger.info(`User ${userId} has push disabled, skipping`);
+        await snapshot.ref.update({ status: "skipped_push_disabled" });
         return;
       }
 
@@ -55,6 +57,7 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
 
       if (tokens.length === 0) {
         logger.info(`No FCM tokens found for user ${userId}`);
+        await snapshot.ref.update({ status: "skipped_no_tokens" });
         return;
       }
 
@@ -101,6 +104,7 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
         await snapshot.ref.update({ status: "sent", sentAt: FieldValue.serverTimestamp() });
       } catch (err) {
         logger.error(`Error sending push to user ${userId}`, err);
+        await snapshot.ref.update({ status: "failed", errorAt: FieldValue.serverTimestamp() });
       }
     },
   );

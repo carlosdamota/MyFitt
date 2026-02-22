@@ -101,6 +101,8 @@ const emailAgentFns = createEmailAgentFunctions({
 // Cloud Functions (auto-deployed)
 export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
 export const weeklyReengagement = emailAgentFns.weeklyReengagement;
+export const queuePushReengagement = emailAgentFns.queuePushReengagement;
+export const queueFirstWorkoutNudge = emailAgentFns.queueFirstWorkoutNudge;
 export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
 
 // Callable helper (used by webhook internally)
