@@ -135,12 +135,12 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
 
   const containerClass =
     viewMode === "modal"
-      ? "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+      ? "fixed inset-0 z-50 bg-surface-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
       : "w-full max-w-7xl mx-auto animate-in slide-in-from-bottom-4 duration-500";
 
   const contentClass =
     viewMode === "modal"
-      ? "bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 shadow-2xl flex flex-col max-h-[85vh]"
+      ? "bg-surface-900 w-full max-w-2xl rounded-2xl border border-surface-800 shadow-2xl flex flex-col max-h-[85vh]"
       : "flex flex-col gap-8";
 
   return (
@@ -150,7 +150,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
         <div
           className={`${
             viewMode === "modal"
-              ? "p-4 border-b border-slate-800 bg-slate-900/50 rounded-t-2xl flex justify-between items-center"
+              ? "p-4 border-b border-surface-800 bg-surface-900/50 rounded-t-2xl flex justify-between items-center"
               : "mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
           }`}
         >
@@ -169,7 +169,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
           {viewMode === "modal" && (
             <button
               onClick={onClose}
-              className='p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors'
+              className='p-2 hover:bg-surface-800 rounded-lg text-slate-400 hover:text-white transition-colors'
             >
               <X size={20} />
             </button>
@@ -184,7 +184,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
         >
           {loadingRoutines ? (
             <div className='flex flex-col items-center justify-center py-20 gap-4 text-slate-500'>
-              <div className='w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full animate-spin' />
+              <div className='w-8 h-8 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin' />
               <p>Cargando tu arsenal...</p>
             </div>
           ) : (
@@ -220,7 +220,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
                         className={`group relative p-5 rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden ${
                           activeRoutineId === id
                             ? "bg-blue-900/10 border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30"
-                            : "bg-slate-900/40 border-slate-800 hover:border-slate-600 hover:bg-slate-800/60 hover:-translate-y-1 hover:shadow-lg"
+                            : "bg-surface-900/40 border-surface-800 hover:border-surface-600 hover:bg-surface-800/60 hover:-translate-y-1 hover:shadow-lg"
                         }`}
                       >
                         {/* Background Decoration */}
@@ -228,7 +228,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
 
                         <div className='relative z-10 flex flex-col h-full'>
                           <div className='flex justify-between items-start mb-3'>
-                            <div className='p-2 bg-slate-800/50 rounded-lg group-hover:bg-slate-800 transition-colors'>
+                            <div className='p-2 bg-surface-800/50 rounded-lg group-hover:bg-surface-800 transition-colors'>
                               <Dumbbell
                                 size={20}
                                 className={
@@ -261,7 +261,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
                             </span>
                           )}
 
-                          <div className='mt-auto pt-3 border-t border-slate-800/50 flex justify-end'>
+                          <div className='mt-auto pt-3 border-t border-surface-800/50 flex justify-end'>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -285,7 +285,7 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
               {groupedRoutines.defaults.length > 0 && (
                 <div className='space-y-4'>
                   <h3
-                    className={`flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1 ${groupedRoutines.customGroups.length > 0 || groupedRoutines.standalone.length > 0 ? "pt-4 border-t border-slate-800/50" : ""}`}
+                    className={`flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest px-1 ${groupedRoutines.customGroups.length > 0 || groupedRoutines.standalone.length > 0 ? "pt-4 border-t border-surface-800/50" : ""}`}
                   >
                     <Zap size={14} /> Rutinas FITTWIZ
                   </h3>
@@ -310,8 +310,8 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
               {/* Empty State */}
               {groupedRoutines.customGroups.length === 0 &&
                 groupedRoutines.standalone.length === 0 && (
-                  <div className='text-center py-16 px-4 border border-dashed border-slate-800 rounded-3xl bg-slate-900/20'>
-                    <div className='w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500'>
+                  <div className='text-center py-16 px-4 border border-dashed border-surface-800 rounded-3xl bg-surface-900/20'>
+                    <div className='w-16 h-16 bg-surface-800/50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500'>
                       <Plus size={32} />
                     </div>
                     <h3 className='text-lg font-bold text-white mb-2'>Comienza tu viaje</h3>
@@ -327,8 +327,13 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
 
         {/* Footer (only for modal) */}
         {viewMode === "modal" && (
-          <div className='p-4 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl space-y-3'>
-            {!isPro && <ProBanner isPro={isPro} variant='subtle' />}
+          <div className='p-4 border-t border-surface-800 bg-surface-900/50 rounded-b-2xl space-y-3'>
+            {!isPro && (
+              <ProBanner
+                isPro={isPro}
+                variant='subtle'
+              />
+            )}
             <div className='flex justify-end'>
               <button
                 onClick={onClose}

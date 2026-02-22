@@ -7,7 +7,7 @@ const ProUpgradeCta: React.FC = () => {
 
   return (
     <div className='mb-6 p-1 rounded-2xl bg-linear-to-r from-amber-500/20 via-orange-500/20 to-red-500/20'>
-      <div className='bg-slate-900/90 backdrop-blur-sm rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+      <div className='bg-surface-900/90 backdrop-blur-sm rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
         <div className='flex items-center gap-4'>
           <div className='p-3 rounded-2xl bg-linear-to-br from-amber-500/20 to-orange-600/20 text-amber-400 shadow-inner border border-amber-500/10'>
             <Crown size={24} />

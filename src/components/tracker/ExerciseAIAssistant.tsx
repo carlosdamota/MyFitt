@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from "react";
-import { Loader, BookOpen, Trophy, X } from "lucide-react";
+import { Loader, BookOpen, X } from "lucide-react";
 import { callAI, AiError } from "../../api/ai";
 import { logEvent } from "../../utils/analytics";
 import RateLimitError from "../errors/RateLimitError";
 import type { WorkoutLogEntry } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
 import { useEntitlement } from "../../hooks/useEntitlement";
+import { Button } from "../ui/Button";
 
 interface ExerciseAIAssistantProps {
   user: FirebaseUser | null;
@@ -26,7 +27,7 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<string | string[] | null>(null);
-  const [responseType, setResponseType] = useState<"instructions" | "analysis" | null>(null);
+  const [responseType, setResponseType] = useState<"instructions" | null>(null);
   const [showRateLimitError, setShowRateLimitError] = useState<boolean>(false);
   const [quotaResetAt, setQuotaResetAt] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string>("Límite de IA alcanzado");
@@ -85,56 +86,6 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
     }
   }, [exerciseName, instructions, onRequireAuth, user]);
 
-  const handleAnalyzeHistory = useCallback(async (): Promise<void> => {
-    if (history.length === 0) {
-      setResponse("Registra al menos una serie para recibir un análisis.");
-      setResponseType("analysis");
-      return;
-    }
-
-    if (!user) {
-      setResponse("Inicia sesión para usar el coach de IA.");
-      onRequireAuth?.();
-      return;
-    }
-
-    setLoading(true);
-    setResponse(null);
-    setResponseType("analysis");
-    setQuotaMessage("Límite de IA alcanzado");
-    setQuotaResetAt(null);
-    logEvent("Exercise", "Analyze History", exerciseName);
-
-    const formattedHistory = history.map((h) => ({
-      fecha: new Date(h.date).toLocaleDateString(),
-      peso: h.weight,
-      reps: h.reps || 0,
-      series: h.sets || 0,
-    }));
-
-    try {
-      const resp = await callAI("exercise_analysis", {
-        exerciseName,
-        history: formattedHistory,
-      });
-      setResponse(resp.text);
-    } catch (e) {
-      if (e instanceof AiError && e.code === "quota_exceeded") {
-        setQuotaMessage(e.message);
-        setQuotaResetAt(e.resetAt ?? null);
-        setShowRateLimitError(true);
-      } else if (e instanceof AiError && e.code === "auth_required") {
-        setResponse(e.message);
-        onRequireAuth?.();
-      } else {
-        setResponse("Error al analizar el historial.");
-      }
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [exerciseName, history, onRequireAuth, user]);
-
   return (
     <div className='mt-4'>
       {showRateLimitError && (
@@ -148,40 +99,32 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
 
       <div className='flex flex-col sm:flex-row gap-3 pt-4 items-stretch'>
         <div className='flex-1 min-w-0'>{actionSlot}</div>
-        <button
+        <Button
+          variant='secondary'
           onClick={handleShowInstructions}
           disabled={loading}
-          className='flex-1 bg-slate-700/80 hover:bg-slate-600 disabled:opacity-50 text-slate-200 text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-600 shadow-sm'
+          className='flex-1 py-3 text-xs w-full bg-surface-950/80 border-surface-800 hover:bg-surface-900 hover:border-surface-700 shadow-inner'
+          leftIcon={
+            loading && responseType === "instructions" ? (
+              <Loader
+                size={14}
+                className='animate-spin'
+              />
+            ) : (
+              <BookOpen size={14} />
+            )
+          }
         >
-          {loading && responseType === "instructions" ? (
-            <Loader
-              size={14}
-              className='animate-spin'
-            />
-          ) : (
-            <>
-              <BookOpen size={14} /> Instrucciones
-            </>
-          )}
-        </button>
+          {loading && responseType === "instructions" ? "Cargando..." : "Instrucciones de Técnica"}
+        </Button>
       </div>
 
       {response && (
-        <div
-          className={`mt-4 p-4 rounded-xl border text-sm animate-in zoom-in-95 duration-200 shadow-xl ${
-            responseType === "instructions"
-              ? "bg-slate-800/90 border-slate-600 backdrop-blur-md"
-              : "bg-amber-900/40 border-amber-700/50 backdrop-blur-md"
-          }`}
-        >
+        <div className='mt-4 p-4 rounded-2xl border text-sm animate-in zoom-in-95 duration-200 shadow-2xl backdrop-blur-xl bg-surface-950/90 border-surface-800'>
           <div className='flex justify-between items-start mb-3 border-b border-white/5 pb-2'>
-            <h4
-              className={`font-bold flex items-center gap-2 ${
-                responseType === "instructions" ? "text-slate-200" : "text-amber-400"
-              }`}
-            >
-              {responseType === "instructions" ? <BookOpen size={16} /> : <Trophy size={16} />}
-              {responseType === "instructions" ? "Técnica Correcta" : "AI Coach"}
+            <h4 className='font-bold flex items-center gap-2 text-slate-200'>
+              <BookOpen size={16} />
+              Técnica Correcta
             </h4>
             <button
               onClick={() => setResponse(null)}

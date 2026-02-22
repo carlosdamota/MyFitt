@@ -11,12 +11,12 @@ interface RoutineInfoSectionProps {
 
 const toneStyles = {
   warmup: {
-    wrapper: "bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-start gap-4",
+    wrapper: "bg-surface-900/40 border border-surface-800 rounded-2xl p-5 flex items-start gap-4",
     iconWrapper:
       "p-2.5 bg-orange-500/10 rounded-xl text-orange-400 shrink-0 border border-orange-500/10",
   },
   cooldown: {
-    wrapper: "bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-start gap-4",
+    wrapper: "bg-surface-900/40 border border-surface-800 rounded-2xl p-5 flex items-start gap-4",
     iconWrapper:
       "p-2.5 bg-green-500/10 rounded-xl text-green-400 shrink-0 border border-green-500/10",
   },

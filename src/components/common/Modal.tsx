@@ -47,7 +47,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-100 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300 flex items-center justify-center p-4'
+      className='fixed inset-0 z-100 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300 flex items-center justify-center p-4'
       role='dialog'
       aria-modal='true'
       aria-labelledby='modal-title'
@@ -59,9 +59,9 @@ const Modal: React.FC<ModalProps> = ({
         onClick={onClose}
       />
       <div
-        className={`relative w-full max-w-lg bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col max-h-[90vh] ${className}`}
+        className={`relative w-full max-w-lg bg-surface-950 rounded-3xl border border-surface-800 shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col max-h-[90vh] ${className}`}
       >
-        <div className='bg-slate-900/50 p-4 pl-6 flex justify-between items-center border-b border-slate-800/50 backdrop-blur-sm'>
+        <div className='bg-surface-950 p-4 pl-6 flex justify-between items-center border-b border-surface-800'>
           <h2
             id='modal-title'
             className='text-lg font-bold text-white flex items-center gap-2'
@@ -71,7 +71,7 @@ const Modal: React.FC<ModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className='p-2 bg-slate-800/50 rounded-full text-slate-400 hover:text-white transition-colors active:scale-90'
+            className='p-2 bg-surface-800 hover:bg-surface-700 rounded-full text-slate-400 hover:text-white transition-colors active:scale-95'
             aria-label='Cerrar'
           >
             <X size={20} />

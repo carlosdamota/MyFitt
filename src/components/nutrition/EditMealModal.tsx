@@ -66,13 +66,13 @@ const EditMealModal: React.FC<EditMealModalProps> = ({ isOpen, onClose, meal, on
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs'>
-      <div className='bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col'>
-        <div className='p-4 border-b border-slate-800 flex justify-between items-center'>
-          <h3 className='font-bold text-white'>Editar Comida</h3>
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/90 backdrop-blur-md animate-in fade-in'>
+      <div className='bg-surface-900 border border-surface-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300'>
+        <div className='p-5 border-b border-surface-800 flex justify-between items-center bg-surface-900'>
+          <h3 className='text-lg font-bold text-white'>Editar Comida</h3>
           <button
             onClick={onClose}
-            className='text-slate-400 hover:text-white'
+            className='p-2 bg-surface-800 rounded-full text-slate-400 hover:text-white transition-colors'
           >
             <X size={20} />
           </button>
@@ -80,74 +80,78 @@ const EditMealModal: React.FC<EditMealModalProps> = ({ isOpen, onClose, meal, on
 
         <form
           onSubmit={handleSubmit}
-          className='flex-1 overflow-y-auto p-4 space-y-4'
+          className='flex-1 overflow-y-auto p-5 space-y-6'
         >
+          {/* Nombre de la comida */}
           <div>
-            <label className='text-xs text-slate-500 uppercase font-bold block mb-1'>Nombre</label>
+            <label className='text-xs text-slate-400 uppercase font-bold tracking-wider block mb-2'>
+              Nombre de la Comida
+            </label>
             <input
               type='text'
               value={formData.food}
               onChange={(e) => handleChange(e, "food")}
-              className='w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
+              className='w-full bg-surface-950 border border-surface-800 rounded-xl p-3 text-white text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 outline-none transition-all shadow-inner'
             />
           </div>
 
-          <div className='grid grid-cols-4 gap-2'>
-            <div>
-              <label className='text-[10px] text-slate-500 uppercase font-bold block mb-1'>
-                Calculado
-              </label>
-              <input
-                type='number'
-                value={formData.calories}
-                onChange={(e) => handleChange(e, "calories")}
-                className='w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-              />
-            </div>
-            <div>
-              <label className='text-[10px] text-blue-500 uppercase font-bold block mb-1'>
-                Proteína
-              </label>
-              <input
-                type='number'
-                value={formData.protein}
-                onChange={(e) => handleChange(e, "protein")}
-                className='w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none'
-              />
-            </div>
-            <div>
-              <label className='text-[10px] text-purple-500 uppercase font-bold block mb-1'>
-                Carbos
-              </label>
-              <input
-                type='number'
-                value={formData.carbs}
-                onChange={(e) => handleChange(e, "carbs")}
-                className='w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white text-sm focus:border-purple-500 outline-none'
-              />
-            </div>
-            <div>
-              <label className='text-[10px] text-yellow-500 uppercase font-bold block mb-1'>
-                Grasas
-              </label>
-              <input
-                type='number'
-                value={formData.fats}
-                onChange={(e) => handleChange(e, "fats")}
-                className='w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white text-sm focus:border-yellow-500 outline-none'
-              />
+          {/* Macros Grid */}
+          <div className='bg-surface-950/50 p-4 rounded-xl border border-surface-800/50 space-y-3'>
+            <label className='text-xs text-slate-400 uppercase font-bold tracking-wider block mb-1'>
+              Macros Totales
+            </label>
+            <div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
+              <div className='space-y-1'>
+                <label className='text-[10px] text-slate-500 font-bold block'>Kcal</label>
+                <input
+                  type='number'
+                  value={formData.calories}
+                  onChange={(e) => handleChange(e, "calories")}
+                  className='w-full bg-surface-900 border border-surface-800 rounded-lg p-2.5 text-white font-mono text-sm focus:border-blue-500 outline-none text-center'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-[10px] text-blue-400 font-bold block'>Prot (g)</label>
+                <input
+                  type='number'
+                  value={formData.protein}
+                  onChange={(e) => handleChange(e, "protein")}
+                  className='w-full bg-surface-900 border border-surface-800 rounded-lg p-2.5 text-white font-mono text-sm focus:border-blue-500 outline-none text-center'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-[10px] text-purple-400 font-bold block'>Carb (g)</label>
+                <input
+                  type='number'
+                  value={formData.carbs}
+                  onChange={(e) => handleChange(e, "carbs")}
+                  className='w-full bg-surface-900 border border-surface-800 rounded-lg p-2.5 text-white font-mono text-sm focus:border-purple-500 outline-none text-center'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-[10px] text-yellow-500 font-bold block'>Grasa (g)</label>
+                <input
+                  type='number'
+                  value={formData.fats}
+                  onChange={(e) => handleChange(e, "fats")}
+                  className='w-full bg-surface-900 border border-surface-800 rounded-lg p-2.5 text-white font-mono text-sm focus:border-yellow-500 outline-none text-center'
+                />
+              </div>
             </div>
           </div>
 
-          <div className='space-y-2'>
+          {/* Ingredientes */}
+          <div className='space-y-3'>
             <div className='flex justify-between items-center'>
-              <label className='text-xs text-slate-500 uppercase font-bold'>Ingredientes</label>
+              <label className='text-xs text-slate-400 uppercase font-bold tracking-wider'>
+                Ingredientes
+              </label>
               <button
                 type='button'
                 onClick={addIngredient}
-                className='text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-colors'
+                className='text-[10px] bg-surface-800 hover:bg-surface-700 text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-bold'
               >
-                <Plus size={10} /> Añadir
+                <Plus size={12} /> Añadir
               </button>
             </div>
 
@@ -155,41 +159,46 @@ const EditMealModal: React.FC<EditMealModalProps> = ({ isOpen, onClose, meal, on
               {formData.ingredients?.map((ing, idx) => (
                 <div
                   key={idx}
-                  className='bg-slate-950/50 p-2 rounded-lg border border-slate-800/50 flex gap-2 items-center'
+                  className='bg-surface-950 p-2 sm:p-3 rounded-xl border border-surface-800 flex gap-2 sm:gap-3 items-center'
                 >
-                  <div className='flex-1 space-y-1'>
+                  <div className='flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2'>
                     <input
                       type='text'
                       value={ing.name}
                       onChange={(e) => handleBsIngredientChange(idx, "name", e.target.value)}
-                      className='w-full bg-transparent text-xs text-white border-none p-0 focus:ring-0 placeholder-slate-600'
-                      placeholder='Ingrediente'
+                      className='w-full bg-transparent text-sm text-white border border-surface-800 rounded-md p-2 focus:border-cyan-500 outline-none placeholder-slate-600'
+                      placeholder='Nombre ingrediente'
                     />
                     <input
                       type='text'
                       value={ing.amount}
                       onChange={(e) => handleBsIngredientChange(idx, "amount", e.target.value)}
-                      className='w-full bg-transparent text-[10px] text-slate-400 border-none p-0 focus:ring-0 placeholder-slate-600'
-                      placeholder='Cantidad'
+                      className='w-full bg-transparent text-sm text-slate-300 border border-surface-800 rounded-md p-2 focus:border-cyan-500 outline-none placeholder-slate-600'
+                      placeholder='Cantidad (ej. 100g)'
                     />
                   </div>
                   <button
                     type='button'
                     onClick={() => removeIngredient(idx)}
-                    className='text-slate-600 hover:text-red-400 p-1'
+                    className='text-slate-500 hover:text-red-400 p-2 bg-surface-900 rounded-lg transition-colors'
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               ))}
+              {(!formData.ingredients || formData.ingredients.length === 0) && (
+                <p className='text-xs text-slate-500 text-center py-4 bg-surface-950/50 rounded-xl border border-dashed border-surface-800'>
+                  No hay ingredientes registrados.
+                </p>
+              )}
             </div>
           </div>
         </form>
 
-        <div className='p-4 border-t border-slate-800 flex justify-end gap-3 bg-slate-900'>
+        <div className='p-5 border-t border-surface-800 flex justify-end gap-3 bg-surface-900'>
           <button
             onClick={onClose}
-            className='px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors'
+            className='px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-surface-800 transition-colors'
             disabled={loading}
           >
             Cancelar
@@ -197,13 +206,13 @@ const EditMealModal: React.FC<EditMealModalProps> = ({ isOpen, onClose, meal, on
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2'
+            className='px-5 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center gap-2 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none'
           >
             {loading ? (
               "Guardando..."
             ) : (
               <>
-                <Save size={16} /> Guardar Cambios
+                <Save size={16} /> Guardar
               </>
             )}
           </button>

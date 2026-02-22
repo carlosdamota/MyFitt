@@ -126,9 +126,9 @@ function DashboardLayoutContent() {
   // Show loading while we determine if onboarding is needed
   if (user && profileLoading) {
     return (
-      <div className='min-h-screen bg-(--bg-0) flex items-center justify-center'>
+      <div className='min-h-screen bg-surface-950 flex items-center justify-center'>
         <Loader
-          className='animate-spin text-cyan-400'
+          className='animate-spin text-primary-500'
           size={32}
         />
       </div>
@@ -147,10 +147,11 @@ function DashboardLayoutContent() {
   }
 
   return (
-    <div className='min-h-screen bg-(--bg-0) text-slate-200 pb-24 font-sans selection:bg-cyan-500/30'>
-      <div className='fixed inset-0 z-0 pointer-events-none'>
-        <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[110px]' />
-        <div className='absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-amber-500/10 blur-[110px]' />
+    <div className='min-h-screen bg-surface-950 text-slate-200 pb-24 font-sans selection:bg-primary-500/30 flex flex-col'>
+      {/* Background ambient lighting for premium feel */}
+      <div className='fixed inset-0 z-0 pointer-events-none overflow-hidden'>
+        <div className='absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-500/10 blur-[120px]' />
+        <div className='absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary-500/10 blur-[120px]' />
       </div>
 
       <AuthModal
@@ -183,21 +184,25 @@ function DashboardLayoutContent() {
         onClose={closeProUpgradeModal}
       />
 
-      <Header
-        user={user}
-        isPro={isPro}
-        streak={0}
-        dbError={null}
-        authError={authError}
-        onLogin={() => setShowAuthModal(true)}
-        onLogout={handleLogout}
-      />
+      <div className='flex-none'>
+        <Header
+          user={user}
+          isPro={isPro}
+          streak={0}
+          dbError={null}
+          authError={authError}
+          onLogin={() => setShowAuthModal(true)}
+          onLogout={handleLogout}
+        />
+      </div>
 
-      <main className='p-4 relative z-10 space-y-6'>
+      <main className='flex-1 p-4 relative z-10 space-y-6 max-w-5xl mx-auto w-full'>
         <Outlet context={outletContext} />
       </main>
 
-      <Footer />
+      <div className='flex-none'>
+        <Footer />
+      </div>
       <TimerOverlay
         timer={timer}
         isRunning={isTimerRunning}

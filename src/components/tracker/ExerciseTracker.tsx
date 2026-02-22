@@ -172,25 +172,26 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   }, [restTime, configuredReps, isLastInBlock]);
 
   return (
-    <div className='mt-4 bg-slate-900/40 backdrop-blur-md p-4 rounded-2xl border border-white/5 shadow-xl'>
-      <div className='flex items-center justify-between mb-3'>
-        <span className='text-xs text-slate-400 font-bold uppercase flex items-center gap-1.5'>
+    <div className='mt-4 bg-surface-950/90 backdrop-blur-xl p-5 rounded-3xl border border-surface-800 shadow-2xl relative overflow-hidden'>
+      <div className='absolute top-0 left-0 w-1 h-12 bg-linear-to-b from-cyan-400 to-transparent' />
+      <div className='flex items-center justify-between mb-4'>
+        <span className='text-xs text-slate-300 font-bold uppercase tracking-widest flex items-center gap-2'>
           <History
-            size={14}
-            className='text-blue-400'
-          />{" "}
+            size={16}
+            className='text-primary-400'
+          />
           Registrar Serie
         </span>
 
         {personalBests && (
           <div className='flex gap-2'>
             {personalBests.low && (
-              <span className='text-[10px] bg-red-500/10 text-red-300 px-2 py-0.5 rounded-lg border border-red-500/20'>
+              <span className='text-[10px] bg-danger-500/10 text-danger-300 px-2 py-0.5 rounded-lg border border-danger-500/20'>
                 🏆 {personalBests.low.weight}kg
               </span>
             )}
             {personalBests.mid && (
-              <span className='text-[10px] bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded-lg border border-blue-500/20'>
+              <span className='text-[10px] bg-primary-500/10 text-primary-300 px-2 py-0.5 rounded-lg border border-primary-500/20'>
                 🏅 {personalBests.mid.weight}kg
               </span>
             )}
@@ -204,12 +205,12 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       />
 
       {newRecordAlert && (
-        <div className='mb-3 bg-yellow-500/10 border border-yellow-500/20 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-lg shadow-yellow-900/10'>
+        <div className='mb-3 bg-warning-500/10 border border-warning-500/20 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-lg shadow-warning-900/10'>
           <Trophy
             size={16}
-            className='text-yellow-400 animate-bounce'
+            className='text-warning-400 animate-bounce'
           />
-          <span className='text-xs text-yellow-200 font-bold uppercase tracking-wide'>
+          <span className='text-xs text-warning-200 font-bold uppercase tracking-wide'>
             {newRecordAlert}
           </span>
         </div>
@@ -235,38 +236,38 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         instructions={instructions}
         onRequireAuth={onRequireAuth}
         actionSlot={
-          <div className='p-2 sm:p-1.5 bg-slate-900/60 rounded-xl border border-white/5 flex items-center justify-between gap-2 h-full'>
+          <div className='p-2 sm:p-2 bg-surface-950/80 rounded-xl border border-surface-800 flex items-center justify-between gap-2 h-full shadow-inner'>
             <div className='hidden sm:flex items-center gap-1 pl-1'>
               <History
-                size={12}
-                className='text-blue-400'
+                size={14}
+                className='text-primary-400'
               />
             </div>
 
-            <div className='flex items-center gap-2 sm:gap-1 flex-1 justify-center sm:justify-end w-full'>
+            <div className='flex items-center gap-2 sm:gap-2 flex-1 justify-center sm:justify-start w-full px-2'>
               <button
                 onClick={() => setCustomRestTime((prev) => Math.max(0, prev - 10))}
-                className='w-8 h-8 sm:w-6 sm:h-6 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors text-xs sm:text-[10px]'
+                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
               >
                 -10
               </button>
 
-              <div className='text-sm sm:text-xs font-mono font-bold text-white w-8 text-center'>
+              <div className='text-sm sm:text-sm font-mono font-bold text-white w-8 text-center'>
                 {customRestTime}
               </div>
 
               <button
                 onClick={() => setCustomRestTime((prev) => prev + 10)}
-                className='w-8 h-8 sm:w-6 sm:h-6 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors text-xs sm:text-[10px]'
+                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
               >
                 +10
               </button>
 
-              <div className='h-4 w-px bg-white/10 mx-1 hidden sm:block'></div>
+              <div className='h-4 w-px bg-surface-800 mx-2 hidden sm:block'></div>
 
               <button
                 onClick={() => onTimerReset(customRestTime)}
-                className='flex-1 sm:flex-none sm:ml-1 px-3 py-1.5 sm:px-2 sm:py-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white text-xs sm:text-[10px] font-bold uppercase rounded-lg border border-blue-500/30 transition-all active:scale-95 text-center'
+                className='flex-1 sm:flex-none sm:ml-1 px-4 py-2 sm:px-3 sm:py-1.5 bg-linear-to-r from-primary-500 to-indigo-500 hover:from-primary-400 hover:to-indigo-400 text-white text-xs sm:text-[11px] font-bold uppercase rounded-lg shadow-md shadow-primary-500/20 transition-all active:scale-95 text-center border-none'
               >
                 Inicio
               </button>

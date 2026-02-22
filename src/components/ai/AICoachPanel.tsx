@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Sparkles, User } from "lucide-react";
+import { Sparkles, User, ChevronRight } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import { useProfile } from "../../hooks/useProfile";
 import { useRoutines } from "../../hooks/useRoutines";
 import type { ProfileFormData } from "../../types";
 import AIGenerator from "../profile/AIGenerator";
 import GoalsContextPanel from "../profile/GoalsContextPanel";
+import { Button } from "../ui/Button";
 
 interface AICoachPanelProps {
   user: FirebaseUser | null;
@@ -60,7 +61,7 @@ const GeneratedRoutinesHistory: React.FC<{
         {programs.slice(0, 3).map((prog, idx) => (
           <div
             key={idx}
-            className='bg-slate-900/30 border border-slate-800 rounded-xl p-3 flex items-center justify-between'
+            className='bg-surface-900/30 border border-surface-800 rounded-xl p-3 flex items-center justify-between'
           >
             <div>
               <h4 className='text-sm font-bold text-slate-300'>{prog.title}</h4>
@@ -72,12 +73,14 @@ const GeneratedRoutinesHistory: React.FC<{
                 <span>{prog.focus}</span>
               </div>
             </div>
-            <button
+            <Button
+              variant='secondary'
+              size='sm'
               onClick={onShowRoutines}
-              className='text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-900/10 hover:bg-blue-900/20 px-3 py-1.5 rounded-lg transition-colors'
+              className='text-xs font-bold text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 hover:text-primary-300 border-none px-3 py-1.5 h-auto rounded-lg'
             >
               Ver
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -114,7 +117,7 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
   if (!formData) {
     return (
       <div className='space-y-4'>
-        <div className='rounded-2xl border border-slate-800 bg-slate-900/40 p-5'>
+        <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-5'>
           <div className='flex items-center gap-3'>
             <div className='p-2 rounded-xl bg-emerald-500/10 text-emerald-300'>
               <Sparkles size={18} />
@@ -125,12 +128,13 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
             </div>
           </div>
         </div>
-        <button
+        <Button
           onClick={onShowProfile}
-          className='w-full py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors flex items-center justify-center gap-2'
+          className='w-full'
+          leftIcon={<User size={16} />}
         >
-          <User size={16} /> Completar perfil
-        </button>
+          Completar perfil
+        </Button>
       </div>
     );
   }
@@ -141,17 +145,18 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
 
   return (
     <div className='space-y-5 pb-12'>
-      <div className='rounded-2xl border border-slate-800 bg-slate-900/40 p-4 flex items-center justify-between gap-3'>
+      <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-4 flex items-center justify-between gap-3'>
         <div>
           <p className='text-xs text-slate-400 uppercase tracking-wider'>AI Coach</p>
           <p className='text-sm text-slate-300'>La IA usa tu perfil actual para generar rutinas.</p>
         </div>
-        <button
+        <Button
+          variant='secondary'
+          size='sm'
           onClick={onShowProfile}
-          className='px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors'
         >
           Editar perfil
-        </button>
+        </Button>
       </div>
 
       {/* Generated Routines Summary */}

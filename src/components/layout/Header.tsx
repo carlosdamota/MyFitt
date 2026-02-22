@@ -16,6 +16,8 @@ import {
 import type { User as FirebaseUser } from "firebase/auth";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import { iconLogo } from "../../branding/logoConfig";
+import { Button } from "../ui/Button";
+import { Badge } from "../ui/Badge";
 
 interface HeaderProps {
   user: FirebaseUser | null;
@@ -114,20 +116,20 @@ const Header: React.FC<HeaderProps> = ({
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
       isActive
-        ? "text-white bg-slate-800 shadow-inner"
-        : "text-slate-300 hover:text-white hover:bg-slate-800/70"
+        ? "text-white bg-surface-800 shadow-inner"
+        : "text-slate-300 hover:text-white hover:bg-surface-800/70"
     }`;
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
     `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors ${
       isActive
-        ? "text-white bg-slate-800 shadow-inner"
-        : "text-slate-200 hover:bg-slate-800 hover:text-white"
+        ? "text-white bg-surface-800 shadow-inner"
+        : "text-slate-200 hover:bg-surface-800 hover:text-white"
     }`;
 
   return (
     <>
-      <header className='bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-3 md:p-4 sticky top-0 z-20'>
+      <header className='bg-surface-900/80 backdrop-blur-md border-b border-surface-800 p-3 md:p-4 sticky top-0 z-20'>
         <div className='flex justify-between items-center'>
           {/* Logo & Streak */}
           <div className='flex items-center gap-3'>
@@ -154,7 +156,7 @@ const Header: React.FC<HeaderProps> = ({
                     className='text-orange-500 fill-orange-500/20'
                   />
                   <span className='text-[10px] font-bold text-orange-400 uppercase tracking-wide'>
-                    {streak} días racha
+                    {streak} {streak === 1 ? "semana" : "semanas"} racha
                   </span>
                 </div>
               )}
@@ -195,8 +197,9 @@ const Header: React.FC<HeaderProps> = ({
             </div>
 
             {user && plan && (
-              <div
-                className='hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg border border-slate-800 bg-slate-900/70 text-[10px] uppercase tracking-wider text-slate-300'
+              <Badge
+                variant={plan === "pro" ? "primary" : "outline"}
+                className='hidden sm:inline-flex uppercase tracking-wider'
                 title={
                   plan === "pro"
                     ? renewalLabel
@@ -205,41 +208,46 @@ const Header: React.FC<HeaderProps> = ({
                     : "Plan gratuito"
                 }
               >
-                <span className={plan === "pro" ? "text-cyan-300" : "text-slate-400"}>
-                  {plan === "pro" ? "PRO" : "FREE"}
-                </span>
+                {plan === "pro" ? "PRO" : "FREE"}
                 {plan === "pro" && renewalLabel && (
-                  <span className='text-slate-400'>Renueva {renewalLabel}</span>
+                  <span className='ml-1 opacity-70'>Renueva {renewalLabel}</span>
                 )}
-              </div>
+              </Badge>
             )}
 
             {/* Auth buttons */}
             {!user && (
-              <button
+              <Button
+                variant='primary'
+                size='sm'
                 onClick={onLogin}
-                className='text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-3 py-1.5 rounded-xl transition-colors hidden sm:flex items-center gap-1'
+                className='hidden sm:flex'
+                leftIcon={<User size={14} />}
               >
-                <User size={12} /> Iniciar sesión
-              </button>
+                Iniciar sesión
+              </Button>
             )}
             {user && (
-              <button
+              <Button
+                variant='secondary'
+                size='sm'
                 onClick={onLogout}
-                className='text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl transition-colors hidden sm:block'
+                className='hidden sm:flex'
               >
                 Salir
-              </button>
+              </Button>
             )}
 
             {/* Mobile menu button */}
-            <button
+            <Button
+              variant='secondary'
+              size='icon'
               onClick={() => setMobileOpen(true)}
-              className='p-2 bg-slate-800 rounded-xl text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 transition-colors lg:hidden'
+              className='lg:hidden bg-transparent border-transparent hover:bg-surface-800 text-slate-300 hover:text-white shrink-0'
               aria-label='Abrir menú'
             >
               <Menu size={20} />
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -256,12 +264,12 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 transform transition-transform duration-300 ease-out lg:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 bg-surface-900 border-r border-surface-800 z-50 transform transition-transform duration-300 ease-out lg:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Sidebar Header */}
-        <div className='p-4 border-b border-slate-800 flex justify-between items-center'>
+        <div className='p-4 border-b border-surface-800 flex justify-between items-center'>
           <div className='flex items-center gap-2'>
             <img
               src={iconLogo.src}
@@ -270,13 +278,15 @@ const Header: React.FC<HeaderProps> = ({
             />
             <span className='text-lg font-black italic tracking-tighter text-white'>FITTWIZ</span>
           </div>
-          <button
+          <Button
+            variant='ghost'
+            size='icon'
             onClick={() => setMobileOpen(false)}
-            className='p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors'
             aria-label='Cerrar menú'
+            className='w-10 h-10'
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* Sidebar Nav Items */}
@@ -296,28 +306,31 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Sidebar Footer - Auth */}
-        <div className='absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800'>
+        <div className='absolute bottom-0 left-0 right-0 p-4 border-t border-surface-800 bg-surface-900'>
           {!user && (
-            <button
+            <Button
+              variant='primary'
+              className='w-full justify-center'
               onClick={() => {
                 onLogin();
                 setMobileOpen(false);
               }}
-              className='w-full py-3 rounded-xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-900 transition-colors flex items-center justify-center gap-2'
+              leftIcon={<User size={16} />}
             >
-              <User size={16} /> Iniciar sesión
-            </button>
+              Iniciar sesión
+            </Button>
           )}
           {user && (
-            <button
+            <Button
+              variant='secondary'
+              className='w-full justify-center'
               onClick={() => {
                 onLogout();
                 setMobileOpen(false);
               }}
-              className='w-full py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors'
             >
               Cerrar sesión
-            </button>
+            </Button>
           )}
         </div>
       </aside>

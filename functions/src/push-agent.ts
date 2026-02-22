@@ -17,70 +17,84 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
     `artifacts/${appId}/users/{userId}/notifications/{notificationId}`,
     async (event) => {
       const snapshot = event.data;
-      if (!snapshot) return;
-
-      const notificationData = snapshot.data();
       const userId = event.params.userId;
-      const { title, body, url } = notificationData;
+      const notificationId = event.params.notificationId;
 
-      if (!title || !body) {
-        logger.warn(`Notification ${event.params.notificationId} missing title or body`);
-        await snapshot.ref.update({ status: "skipped_invalid_payload" });
+      if (!snapshot) {
+        logger.warn(`[PushAgent] No data for ${notificationId}`);
         return;
       }
-
-      // Check if user has push disabled
-      const profileSnap = await db
-        .collection("artifacts")
-        .doc(appId)
-        .collection("users")
-        .doc(userId)
-        .collection("app_data")
-        .doc("profile")
-        .get();
-      const profile = profileSnap.data();
-      if (profile?.pushEnabled === false) {
-        logger.info(`User ${userId} has push disabled, skipping`);
-        await snapshot.ref.update({ status: "skipped_push_disabled" });
-        return;
-      }
-
-      // Get user's FCM tokens from the correct path
-      const tokensSnapshot = await db
-        .collection("artifacts")
-        .doc(appId)
-        .collection("users")
-        .doc(userId)
-        .collection("fcm_tokens")
-        .get();
-      const tokens = tokensSnapshot.docs.map((d) => d.id);
-
-      if (tokens.length === 0) {
-        logger.info(`No FCM tokens found for user ${userId}`);
-        await snapshot.ref.update({ status: "skipped_no_tokens" });
-        return;
-      }
-
-      const message: any = {
-        notification: {
-          title,
-          body,
-        },
-        webpush: {
-          notification: {
-            icon: "/icon-192x192.png",
-            click_action: url || "/",
-          },
-          fcmOptions: {
-            link: url || "/",
-          },
-        },
-        tokens: tokens,
-      };
 
       try {
+        const notificationData = snapshot.data();
+        const { title, body, url } = notificationData;
+
+        logger.info(`[PushAgent] Processing notification ${notificationId} for ${userId}`, {
+          hasTitle: Boolean(title),
+          hasBody: Boolean(body),
+          dataPreview: { ...notificationData, body: body ? body.substring(0, 50) : undefined },
+        });
+
+        if (!title || !body) {
+          logger.warn(`[PushAgent] Notification ${notificationId} missing title or body`);
+          await snapshot.ref.update({ status: "skipped_invalid_payload" });
+          return;
+        }
+
+        // Check if user has push disabled
+        const profileSnap = await db
+          .collection("artifacts")
+          .doc(appId)
+          .collection("users")
+          .doc(userId)
+          .collection("app_data")
+          .doc("profile")
+          .get();
+
+        const profile = profileSnap.data();
+        if (profile?.pushEnabled === false) {
+          logger.info(`[PushAgent] User ${userId} has push disabled, skipping`);
+          await snapshot.ref.update({ status: "skipped_push_disabled" });
+          return;
+        }
+
+        // Get user's FCM tokens from the correct path
+        const tokensSnapshot = await db
+          .collection("artifacts")
+          .doc(appId)
+          .collection("users")
+          .doc(userId)
+          .collection("fcm_tokens")
+          .get();
+        const tokens = tokensSnapshot.docs.map((d) => d.id);
+
+        if (tokens.length === 0) {
+          logger.info(`[PushAgent] No FCM tokens found for user ${userId}`);
+          await snapshot.ref.update({ status: "skipped_no_tokens" });
+          return;
+        }
+
+        const message: any = {
+          notification: {
+            title,
+            body,
+          },
+          webpush: {
+            notification: {
+              icon: "/icon-192x192.png",
+              click_action: url || "/",
+            },
+            fcmOptions: {
+              link: url || "/",
+            },
+          },
+          tokens: tokens,
+        };
+
         const response = await messaging.sendEachForMulticast(message);
-        logger.info(`Sent push to ${response.successCount} devices for user ${userId}`);
+        logger.info(
+          `[PushAgent] Sent push to ${response.successCount}/${tokens.length} devices for user ${userId}`,
+        );
 
         // Cleanup invalid tokens
         if (response.failureCount > 0) {
@@ -98,12 +112,12 @@ export const createPushAgentFunctions = ({ db, appId }: PushAgentDeps) => {
             }
           });
           await batch.commit();
-          logger.info(`Cleaned up ${response.failureCount} invalid FCM tokens`);
+          logger.info(`[PushAgent] Cleaned up ${response.failureCount} invalid FCM tokens`);
         }
 
         await snapshot.ref.update({ status: "sent", sentAt: FieldValue.serverTimestamp() });
       } catch (err) {
-        logger.error(`Error sending push to user ${userId}`, err);
+        logger.error(`[PushAgent] CRITICAL ERROR sending push to ${userId}`, err);
         await snapshot.ref.update({ status: "failed", errorAt: FieldValue.serverTimestamp() });
       }
     },

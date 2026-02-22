@@ -1,5 +1,5 @@
-import React from "react";
 import { RotateCcw, Pause, Play } from "lucide-react";
+import { Button } from "../ui/Button";
 
 interface TimerOverlayProps {
   timer: number;
@@ -13,7 +13,7 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-slate-800 p-4 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}
+      className={`fixed bottom-0 left-0 right-0 bg-surface-900/90 backdrop-blur-lg border-t border-surface-800 p-4 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}
       role='timer'
       aria-live='polite'
     >
@@ -23,23 +23,25 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
             Descanso Restante
           </span>
           <span
-            className={`text-4xl font-mono font-bold tracking-tighter ${timer < 10 ? "text-red-500 animate-pulse" : "text-white"}`}
+            className={`text-4xl font-mono font-bold tracking-tighter ${timer < 10 ? "text-danger-500 animate-pulse" : "text-white"}`}
           >
             {timer}
             <span className='text-lg text-slate-600'>s</span>
           </span>
         </div>
         <div className='flex items-center gap-3'>
-          <button
+          <Button
+            variant='outline'
             onClick={() => onReset(60)}
-            className='w-12 h-12 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700'
+            className='w-12 h-12 flex items-center justify-center rounded-full p-0 border-surface-700 bg-surface-800 flex-none'
             aria-label='Reiniciar temporizador'
           >
             <RotateCcw size={20} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant='primary'
             onClick={onToggle}
-            className={`w-14 h-14 flex items-center justify-center rounded-full text-white shadow-lg shadow-blue-900/20 transition-all transform active:scale-95 ${isRunning ? "bg-amber-500 hover:bg-amber-600" : "bg-blue-600 hover:bg-blue-500"}`}
+            className={`w-14 h-14 flex items-center justify-center rounded-full p-0 shadow-lg flex-none ${isRunning ? "bg-amber-500 hover:bg-amber-600 shadow-warning-900/40 text-slate-900" : "bg-primary-600 hover:bg-primary-500 shadow-primary-900/40 text-white"}`}
             aria-label={isRunning ? "Pausar temporizador" : "Iniciar temporizador"}
           >
             {isRunning ? (
@@ -54,7 +56,7 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
                 className='ml-1'
               />
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

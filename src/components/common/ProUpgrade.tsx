@@ -48,11 +48,11 @@ const ProUpgrade: React.FC<ProUpgradeProps> = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-slate-900/50 border border-slate-800/50 p-6 flex flex-col items-center justify-center text-center gap-4 group hover:border-amber-500/20 transition-all ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-surface-900/50 border border-surface-800/50 p-6 flex flex-col items-center justify-center text-center gap-4 group hover:border-amber-500/20 transition-all ${className}`}
     >
       <div className='absolute inset-0 bg-linear-to-br from-amber-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity' />
 
-      <div className='p-3 rounded-full bg-slate-800/50 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-500 transition-colors'>
+      <div className='p-3 rounded-full bg-surface-800/50 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-500 transition-colors'>
         <Lock size={24} />
       </div>
 

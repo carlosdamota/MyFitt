@@ -1,52 +1,12 @@
 @import "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap";
 @import "tailwindcss";
 
-/* Estilos globales */
-:root {
-  font-family: "Sora", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  /* Background colors */
-  --bg-0: #050812;
-  --bg-1: #0b1224;
-  --bg-2: #0f172a;
-  --bg-3: #1e293b;
-
-  /* Text/ink colors */
-  --ink-0: #f8fafc;
-  --ink-1: #cbd5f5;
-  --ink-2: #94a3b8;
-  --ink-3: #64748b;
-
-  /* Accent colors */
-  --accent-primary: #22d3ee;
-  --accent-primary-hover: #06b6d4;
-  --accent-secondary: #f59e0b;
-  --accent-secondary-hover: #d97706;
-
-  /* Status colors */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-
-  /* Border radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: var(--bg-0);
-  color: var(--ink-0);
-}
-
+/* Estilos globales y paleta unificada */
 @theme {
+  /* Hacemos que Tailwind conozca estas variables personalizadas para el branding (por defecto cyan-500) */
+  --color-primary: #06b6d4;
+  --color-primary-hover: #0891b2;
+
   --animate-shimmer: shimmer 2s linear infinite;
   @keyframes shimmer {
     from {
@@ -56,4 +16,39 @@ body {
       transform: translateX(100%);
     }
   }
+}
+
+:root {
+  font-family: "Sora", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* En lugar de usar custom props, nos apoyaremos 100% en la paleta extendida del tailwind.config.js (los 'slate' para fondos y 'cyan/blue' para acentos) */
+  /* Solo guardamos variables semánticas clave si son necesarias para lógica dinámica, pero por ahora usaremos clases utilitarias de Tailwind puras */
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  /* Fondo base premium oscuro (Soft Dark) */
+  background-color: #0b1120; /* softer slate-950 */
+  /* Texto general de buen contraste pero no blanco cegador */
+  color: #e2e8f0; /* slate-200 */
+}
+
+/* Fix browser autofill background turning white in dark mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 40px theme("colors.slate.950", #020617) inset !important;
+  -webkit-text-fill-color: theme("colors.slate.100", #f1f5f9) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Fix select dropdown options background in dark mode */
+select option {
+  background-color: theme("colors.slate.950", #020617);
+  color: theme("colors.slate.100", #f1f5f9);
 }

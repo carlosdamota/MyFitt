@@ -1,5 +1,10 @@
 # Guía de Configuración de Firebase
 
+## 0. Requisitos locales
+- Node.js **22.x**
+- pnpm instalado (`corepack enable` recomendado)
+
+
 Sigue estos pasos para obtener tus credenciales y configurar el backend:
 
 ## 1. Crear Proyecto en Firebase Console
@@ -65,3 +70,6 @@ Configura variables de entorno en Functions:
 - `WEB_ORIGIN` (URL de la PWA)
 
 ¡Listo! Reinicia tu servidor de desarrollo (`pnpm dev`) para que cargue las nuevas variables.
+
+### Deploy de Functions
+Desde la raíz del repo, Firebase usará `pnpm` para compilar las functions en predeploy.

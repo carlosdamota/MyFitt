@@ -13,6 +13,7 @@ interface WebhookDeps {
   appId: string;
   stripe: Stripe;
   stripeWebhookSecret: string;
+  sendProSubscriptionEmail: (userId: string, isSubscribing: boolean) => Promise<void>;
 }
 
 export const createStripeWebhookFunction = ({
@@ -21,6 +22,7 @@ export const createStripeWebhookFunction = ({
   appId,
   stripe,
   stripeWebhookSecret,
+  sendProSubscriptionEmail,
 }: WebhookDeps) => {
   const updatePlanForCustomer = async (
     customerId: string,
@@ -54,7 +56,6 @@ export const createStripeWebhookFunction = ({
 
     // --- Send commercial email on plan change ---
     try {
-      const { sendProSubscriptionEmail } = await import("./index.js");
       if (typeof sendProSubscriptionEmail === "function") {
         await sendProSubscriptionEmail(uid, isPro);
       }

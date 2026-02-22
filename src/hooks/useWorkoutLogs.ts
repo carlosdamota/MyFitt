@@ -11,7 +11,8 @@ export interface UseWorkoutLogsReturn {
   coachAdvice: string | null;
   saveCoachAdvice: (advice: string) => Promise<void>;
   dbError: string | null;
-  streak: number;
+  dayStreak: number;
+  weekStreak: number;
 }
 
 export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
@@ -19,48 +20,107 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
   const [coachAdvice, setCoachAdvice] = useState<string | null>(null);
   const [dbError, setDbError] = useState<string | null>(null);
 
-  // Calcular racha (Streak)
-  const streak = useMemo<number>(() => {
+  // Calcular racha diaria (Day Streak) y racha semanal (Week Streak)
+  const { dayStreak, weekStreak } = useMemo(() => {
     // Obtener todas las fechas únicas de entrenamiento
     const allDates = new Set<string>();
     Object.values(workoutLogs).forEach((logs) => {
       logs.forEach((log) => {
-        allDates.add(new Date(log.date).toDateString());
+        const d = new Date(log.date);
+        if (!isNaN(d.getTime())) {
+          allDates.add(d.toDateString());
+        }
       });
     });
 
-    if (allDates.size === 0) return 0;
+    if (allDates.size === 0) return { dayStreak: 0, weekStreak: 0 };
 
     const sortedDates = Array.from(allDates)
       .map((d) => new Date(d))
       .sort((a, b) => b.getTime() - a.getTime());
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    // Verificar si el último entrenamiento fue hoy o ayer
+    // --- CÁLCULO RACHA DIARIA ---
+    let currentDayStreak = 0;
     const lastWorkout = sortedDates[0];
-    // Si el último entreno fue antes de ayer, la racha se rompió (0)
-    if (lastWorkout < yesterday) return 0;
 
-    let currentStreak = 1; // Empezamos con 1 porque ya verificamos que entrenó hoy o ayer
+    // Si el último entreno fue hoy o ayer, calculamos racha diaria
+    if (lastWorkout >= yesterday) {
+      currentDayStreak = 1;
+      for (let i = 0; i < sortedDates.length - 1; i++) {
+        const current = sortedDates[i];
+        const next = sortedDates[i + 1];
+        const diffTime = Math.abs(current.getTime() - next.getTime());
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-    // Si entrenó hoy, el siguiente a buscar es ayer. Si entrenó ayer, el siguiente es anteayer.
-    // Simplemente contamos días consecutivos hacia atrás.
-    for (let i = 0; i < sortedDates.length - 1; i++) {
-      const current = sortedDates[i];
-      const next = sortedDates[i + 1];
-      const diffTime = Math.abs(current.getTime() - next.getTime());
-      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 1) {
-        currentStreak++;
-      } else {
-        break;
+        if (diffDays === 1) {
+          currentDayStreak++;
+        } else {
+          break;
+        }
       }
     }
-    return currentStreak;
+
+    // --- CÁLCULO RACHA SEMANAL ---
+    // Agrupar fechas por semana (Lunes a Domingo)
+    const getWeekId = (date: Date) => {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Lunes
+      const monday = new Date(d);
+      monday.setDate(diff);
+      return monday.toDateString();
+    };
+
+    const weeksWithWorkouts = new Set<string>();
+    sortedDates.forEach((d) => weeksWithWorkouts.add(getWeekId(d)));
+
+    const currentWeekId = getWeekId(today);
+    const lastWeekDate = new Date(today);
+    lastWeekDate.setDate(today.getDate() - 7);
+    const lastWeekId = getWeekId(lastWeekDate);
+
+    let currentWeekStreak = 0;
+    const sortedWeekIds = Array.from(weeksWithWorkouts)
+      .map((d) => new Date(d))
+      .sort((a, b) => b.getTime() - a.getTime())
+      .map((d) => d.toDateString());
+
+    const hasWorkoutThisWeek = weeksWithWorkouts.has(currentWeekId);
+    const hasWorkoutLastWeek = weeksWithWorkouts.has(lastWeekId);
+
+    // La racha se mantiene si entrenó esta semana O si la semana pasada entrenó (y esta sigue en curso)
+    if (hasWorkoutThisWeek || hasWorkoutLastWeek) {
+      currentWeekStreak = hasWorkoutThisWeek ? 1 : 0; // Si no ha entrenado esta semana, empezamos desde la racha de semanas pasadas
+
+      // Si entrenó esta semana, empezamos a buscar desde esta semana hacia atrás
+      // Si no, empezamos desde la semana pasada
+      let startIdx = hasWorkoutThisWeek ? 0 : sortedWeekIds.indexOf(lastWeekId);
+      if (startIdx === -1) startIdx = 0;
+
+      if (hasWorkoutThisWeek) currentWeekStreak = 1;
+      else if (hasWorkoutLastWeek) {
+        // No tiene hoy, pero tiene la pasada. La racha es la que traía hasta la pasada.
+        currentWeekStreak = 0;
+      }
+
+      // Re-calculamos contando semanas consecutivas reales
+      let tempStreak = 0;
+      let checkWeek = new Date(hasWorkoutThisWeek ? currentWeekId : lastWeekId);
+
+      while (weeksWithWorkouts.has(checkWeek.toDateString())) {
+        tempStreak++;
+        checkWeek.setDate(checkWeek.getDate() - 7);
+      }
+      currentWeekStreak = tempStreak;
+    }
+
+    return { dayStreak: currentDayStreak, weekStreak: currentWeekStreak };
   }, [workoutLogs]);
 
   useEffect(() => {
@@ -166,5 +226,14 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     }
   };
 
-  return { workoutLogs, saveLog, deleteLog, coachAdvice, saveCoachAdvice, dbError, streak };
+  return {
+    workoutLogs,
+    saveLog,
+    deleteLog,
+    coachAdvice,
+    saveCoachAdvice,
+    dbError,
+    dayStreak,
+    weekStreak,
+  };
 };
