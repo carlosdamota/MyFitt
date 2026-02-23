@@ -200,7 +200,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
               ? "bg-primary-400"
               : i === step
                 ? "bg-linear-to-r from-primary-400 to-indigo-400"
-                : "bg-surface-800"
+                : "bg-slate-200 dark:bg-surface-800"
           }`}
         />
       ))}
@@ -261,7 +261,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   };
 
   return (
-    <div className='min-h-screen bg-(--bg-0) text-slate-200 font-sans selection:bg-cyan-500/30'>
+    <div className='min-h-screen bg-slate-50 dark:bg-(--bg-0) text-slate-800 dark:text-slate-200 font-sans selection:bg-cyan-500/30 transition-colors'>
       {/* Background effects */}
       <div className='fixed inset-0 z-0 pointer-events-none'>
         <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-500/10 blur-[110px]' />
@@ -283,7 +283,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
           {step < TOTAL_STEPS - 1 ? (
             <button
               onClick={onSkip}
-              className='text-slate-500 hover:text-slate-300 transition-colors p-1'
+              className='text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors p-1'
               title='Saltar onboarding'
             >
               <X size={20} />
@@ -334,7 +334,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
 
         {/* Step counter */}
         {step < TOTAL_STEPS - 1 && (
-          <p className='text-center text-[11px] text-slate-600 mt-4'>
+          <p className='text-center text-[11px] text-slate-500 dark:text-slate-600 mt-4'>
             Paso {step + 1} de {TOTAL_STEPS - 1}
           </p>
         )}

@@ -12,22 +12,24 @@ const UpdateToast: React.FC = () => {
 
   return (
     <div className='fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[380px] z-100'>
-      <div className='rounded-2xl border border-blue-400/20 bg-surface-900/95 backdrop-blur-xl shadow-2xl shadow-blue-900/20 p-4'>
+      <div className='rounded-2xl border border-blue-200 dark:border-blue-400/20 bg-white/95 dark:bg-surface-900/95 backdrop-blur-xl shadow-xl dark:shadow-2xl shadow-blue-500/10 dark:shadow-blue-900/20 p-4 transition-colors'>
         <div className='flex items-start gap-3'>
-          <div className='mt-0.5 rounded-xl p-2 bg-blue-500/15 text-blue-300 border border-blue-400/20'>
+          <div className='mt-0.5 rounded-xl p-2 bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-400/20 transition-colors'>
             <Download size={18} />
           </div>
 
           <div className='min-w-0 flex-1'>
-            <p className='text-sm font-bold text-white'>Nueva version disponible</p>
-            <p className='text-xs text-slate-300 mt-0.5'>
+            <p className='text-sm font-bold text-slate-900 dark:text-white transition-colors'>
+              Nueva version disponible
+            </p>
+            <p className='text-xs text-slate-600 dark:text-slate-300 mt-0.5 transition-colors'>
               Actualiza para aplicar las mejoras mas recientes.
             </p>
 
             <button
               type='button'
               onClick={() => updateServiceWorker(true)}
-              className='mt-3 inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 px-3 py-2 text-xs font-bold text-white shadow-md shadow-blue-900/25 transition-transform hover:-translate-y-0.5 active:translate-y-0'
+              className='mt-3 inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 px-3 py-2 text-xs font-bold text-white shadow-md shadow-blue-500/25 dark:shadow-blue-900/25 transition-all hover:-translate-y-0.5 active:translate-y-0'
             >
               <RefreshCw size={14} />
               Actualizar ahora

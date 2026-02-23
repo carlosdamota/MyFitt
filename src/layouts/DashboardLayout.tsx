@@ -8,6 +8,7 @@ import { useCookieConsent } from "../hooks/useCookieConsent";
 import { useEntitlement } from "../hooks/useEntitlement";
 import { useTimer } from "../hooks/useTimer";
 import { useProfile } from "../hooks/useProfile";
+import { useRoutines } from "../hooks/useRoutines";
 
 // Layout components
 import Header from "../components/layout/Header";
@@ -44,6 +45,14 @@ function DashboardLayoutContent() {
   const { openProUpgradeModal, closeProUpgradeModal, showProModal } = useProUpgrade();
 
   const { profile, loading: profileLoading, saveProfile } = useProfile(user);
+
+  // Use routines hook to check if user has custom routines
+  // (We don't need all routines, just checking if there are any non-default ones)
+  const { routines, loading: routinesLoading } = useRoutines(user);
+  const hasCustomRoutines = useMemo(() => {
+    return Object.values(routines).some((routine: any) => !routine.isDefault);
+  }, [routines]);
+
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   // Close AuthModal automatically when a user logs in
@@ -70,6 +79,10 @@ function DashboardLayoutContent() {
     !onboardingDismissed &&
     !!user &&
     !profileLoading &&
+    !routinesLoading &&
+    !hasCustomRoutines &&
+    typeof sessionStorage !== "undefined" &&
+    sessionStorage.getItem("isDeletingAccount") !== "true" &&
     (!profile || (!profile.onboardingCompleted && (!profile.updatedAt || isNewAccount)));
 
   useEffect(() => {
@@ -86,10 +99,6 @@ function DashboardLayoutContent() {
 
   const handleOnboardingSkip = async () => {
     setOnboardingDismissed(true);
-    // Mark as completed so it doesn't show again
-    if (user) {
-      await saveProfile({ onboardingCompleted: true });
-    }
   };
 
   const handleRequireAuth = () => setShowAuthModal(true);
@@ -126,7 +135,7 @@ function DashboardLayoutContent() {
   // Show loading while we determine if onboarding is needed
   if (user && profileLoading) {
     return (
-      <div className='min-h-screen bg-surface-950 flex items-center justify-center'>
+      <div className='min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center text-slate-900 dark:text-slate-100'>
         <Loader
           className='animate-spin text-primary-500'
           size={32}
@@ -147,7 +156,7 @@ function DashboardLayoutContent() {
   }
 
   return (
-    <div className='min-h-screen bg-surface-950 text-slate-200 pb-24 font-sans selection:bg-primary-500/30 flex flex-col'>
+    <div className='min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-slate-200 pb-24 font-sans selection:bg-primary-500/30 flex flex-col transition-colors duration-300'>
       {/* Background ambient lighting for premium feel */}
       <div className='fixed inset-0 z-0 pointer-events-none overflow-hidden'>
         <div className='absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-500/10 blur-[120px]' />

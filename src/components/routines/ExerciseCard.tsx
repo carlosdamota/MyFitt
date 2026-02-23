@@ -42,13 +42,15 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 }) => {
   const cardClasses = `relative overflow-hidden rounded-3xl border transition-all duration-300 ${
     isCompleted
-      ? "bg-surface-950/40 border-surface-800/50 opacity-60 grayscale"
-      : "bg-surface-900 border-surface-800 shadow-xl hover:bg-surface-800/80 hover:border-surface-700/80"
+      ? "bg-slate-50 dark:bg-surface-950/40 border-slate-200 dark:border-surface-800/50 opacity-60 grayscale"
+      : "bg-white dark:bg-surface-900 border-slate-200 dark:border-surface-800 shadow-sm dark:shadow-xl hover:bg-slate-50 hover:border-slate-300 dark:hover:bg-surface-800/80 dark:hover:border-surface-700/80"
   }`;
 
   return (
     <div className={cardClasses}>
-      {!isCompleted && <div className='absolute left-0 top-0 bottom-0 w-1 bg-blue-500/50' />}
+      {!isCompleted && (
+        <div className='absolute left-0 top-0 bottom-0 w-1 bg-blue-500 dark:bg-blue-500/50 transition-colors' />
+      )}
 
       <div className='p-4 sm:p-5'>
         <div className='flex items-center gap-4'>
@@ -58,7 +60,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               onToggleComplete(dayKey, exercise.name, true);
             }}
             className={`shrink-0 transition-transform duration-200 active:scale-90 ${
-              isCompleted ? "text-success-500" : "text-slate-600 hover:text-primary-500"
+              isCompleted
+                ? "text-success-500"
+                : "text-slate-400 dark:text-slate-600 hover:text-blue-500 dark:hover:text-primary-500 transition-colors"
             }`}
           >
             {isCompleted ? (
@@ -81,35 +85,35 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <div className='flex justify-between items-center'>
               <div>
                 <h3
-                  className={`font-bold text-lg leading-tight mb-1 ${
+                  className={`font-bold text-lg leading-tight mb-1 transition-colors ${
                     isCompleted
-                      ? "text-slate-500 line-through decoration-2 decoration-slate-700"
-                      : "text-slate-100"
+                      ? "text-slate-400 dark:text-slate-500 line-through decoration-2 decoration-slate-300 dark:decoration-slate-700"
+                      : "text-slate-900 dark:text-slate-100"
                   }`}
                 >
                   {exercise.name}
                 </h3>
                 <div className='flex items-center gap-2 mt-1'>
                   {exercise.sets && (
-                    <span className='text-xs font-bold text-slate-300 bg-surface-800/50 px-2 py-0.5 rounded border border-surface-700'>
+                    <span className='text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-surface-800/50 px-2 py-0.5 rounded border border-slate-200 dark:border-surface-700 transition-colors'>
                       {exercise.sets} SERIES
                     </span>
                   )}
-                  <span className='text-xs font-mono text-primary-400 bg-primary-900/20 px-2 py-0.5 rounded border border-primary-500/20'>
+                  <span className='text-xs font-mono text-blue-600 dark:text-primary-400 bg-blue-50 dark:bg-primary-900/20 px-2 py-0.5 rounded border border-blue-200 dark:border-primary-500/20 transition-colors'>
                     {exercise.reps} REPS
                   </span>
                   {exercise.intensity && (
-                    <span className='text-[10px] font-bold text-warning-500/80 bg-warning-900/10 px-1.5 py-0.5 rounded border border-warning-500/20'>
+                    <span className='text-[10px] font-bold text-amber-600 dark:text-warning-500/80 bg-amber-50 dark:bg-warning-900/10 px-1.5 py-0.5 rounded border border-amber-200 dark:border-warning-500/20 transition-colors'>
                       {exercise.intensity}
                     </span>
                   )}
                 </div>
               </div>
               <div
-                className={`w-8 h-8 flex items-center justify-center rounded-full bg-surface-800/50 text-slate-400 transition-all duration-300 ${
+                className={`w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-surface-800/50 text-slate-500 dark:text-slate-400 transition-all duration-300 ${
                   isExpanded
-                    ? "rotate-180 bg-surface-700 text-white"
-                    : "hover:bg-surface-800 hover:text-white"
+                    ? "rotate-180 bg-slate-200 dark:bg-surface-700 text-slate-900 dark:text-white"
+                    : "hover:bg-slate-200 hover:text-slate-900 dark:hover:bg-surface-800 dark:hover:text-white"
                 }`}
               >
                 <ChevronDown size={18} />
@@ -119,23 +123,25 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         </div>
 
         {isExpanded && (
-          <div className='mt-5 pt-5 border-t border-white/5 animate-in slide-in-from-top-2 duration-300'>
-            <div className='w-full h-48 bg-surface-950/50 rounded-xl border border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4'>
+          <div className='mt-5 pt-5 border-t border-slate-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-300 transition-colors'>
+            <div className='w-full h-48 bg-slate-50 dark:bg-surface-950/50 rounded-xl border border-slate-200 dark:border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4 transition-colors'>
               <ExerciseVisual
                 name={exercise.name}
                 svg={exercise.svg}
                 svgIcon={exercise.svg_icon}
               />
-              <div className='absolute inset-0 bg-linear-to-t from-surface-900/80 via-transparent to-transparent pointer-events-none' />
+              <div className='absolute inset-0 bg-linear-to-t from-white/80 dark:from-surface-900/80 via-transparent to-transparent pointer-events-none transition-colors' />
             </div>
 
             {exercise.note && (
-              <div className='flex items-start gap-3 bg-primary-950/30 border border-primary-500/20 p-4 rounded-xl mb-4'>
+              <div className='flex items-start gap-3 bg-blue-50 dark:bg-primary-950/30 border border-blue-200 dark:border-primary-500/20 p-4 rounded-xl mb-4 transition-colors'>
                 <Info
                   size={18}
-                  className='text-primary-400 shrink-0 mt-0.5'
+                  className='text-blue-500 dark:text-primary-400 shrink-0 mt-0.5 transition-colors'
                 />
-                <p className='text-sm text-primary-100/80 leading-relaxed'>{exercise.note}</p>
+                <p className='text-sm text-blue-900 dark:text-primary-100/80 leading-relaxed transition-colors'>
+                  {exercise.note}
+                </p>
               </div>
             )}
 

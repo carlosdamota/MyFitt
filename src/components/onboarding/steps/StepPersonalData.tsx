@@ -17,8 +17,10 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
             className='text-primary-400'
           />
         </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>Cuéntanos de ti</h2>
-        <p className='text-sm text-slate-400'>
+        <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+          Cuéntanos de ti
+        </h2>
+        <p className='text-sm text-slate-500 dark:text-slate-400'>
           Necesitamos algunos datos para personalizar tu experiencia
         </p>
       </div>
@@ -26,7 +28,7 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
       <div className='space-y-4'>
         <div className='grid grid-cols-2 gap-4'>
           <div>
-            <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
+            <label className='text-xs text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
               <Weight size={12} /> Peso (kg)
             </label>
             <input
@@ -36,12 +38,12 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("weight", e.target.value)
               }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
+              className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='75'
             />
           </div>
           <div>
-            <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
+            <label className='text-xs text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
               <Ruler size={12} /> Altura (cm)
             </label>
             <input
@@ -51,7 +53,7 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleChange("height", e.target.value)
               }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
+              className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='180'
             />
           </div>
@@ -59,24 +61,28 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
 
         <div className='grid grid-cols-2 gap-4'>
           <div>
-            <label className='text-xs text-slate-400 mb-1.5 block font-medium'>Edad</label>
+            <label className='text-xs text-slate-500 dark:text-slate-400 mb-1.5 block font-medium'>
+              Edad
+            </label>
             <input
               type='number'
               inputMode='numeric'
               value={formData.age}
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
+              className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='30'
             />
           </div>
           <div>
-            <label className='text-xs text-slate-400 mb-1.5 block font-medium'>Género</label>
+            <label className='text-xs text-slate-500 dark:text-slate-400 mb-1.5 block font-medium'>
+              Género
+            </label>
             <select
               value={formData.gender}
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("gender", e.target.value)
               }
-              className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-colors shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
+              className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-colors shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-600 cursor-pointer appearance-none'
             >
               <option value='male'>Hombre</option>
               <option value='female'>Mujer</option>

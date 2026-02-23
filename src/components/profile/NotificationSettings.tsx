@@ -76,13 +76,15 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
   if (loading || !user) return null;
 
   return (
-    <div className='bg-surface-800/50 rounded-2xl p-5 border border-surface-700/50 space-y-4'>
-      <h3 className='text-sm font-bold text-slate-300 uppercase tracking-wider'>Notificaciones</h3>
+    <div className='bg-white dark:bg-surface-800/50 rounded-2xl p-5 border border-slate-200 dark:border-surface-700/50 space-y-4 shadow-sm dark:shadow-none transition-colors'>
+      <h3 className='text-sm font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider'>
+        Notificaciones
+      </h3>
 
       {/* Email Toggle */}
       <button
         onClick={toggleEmailOptOut}
-        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-colors'
+        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-slate-50 dark:bg-surface-800 border border-slate-200 dark:border-surface-700 hover:border-slate-300 dark:hover:border-surface-600 transition-colors'
       >
         <div className='flex items-center gap-3'>
           {emailOptOut ? (
@@ -97,8 +99,8 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
             />
           )}
           <div className='text-left'>
-            <p className='text-sm font-semibold text-white'>Emails</p>
-            <p className='text-xs text-slate-400'>
+            <p className='text-sm font-semibold text-slate-800 dark:text-white'>Emails</p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>
               {emailOptOut
                 ? "No recibirás emails comerciales"
                 : "Recibirás emails de motivación y novedades"}
@@ -107,7 +109,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
         </div>
         <div
           className={`w-10 h-6 rounded-full transition-colors relative ${
-            emailOptOut ? "bg-surface-600" : "bg-success-500"
+            emailOptOut ? "bg-slate-300 dark:bg-surface-600" : "bg-success-500"
           }`}
         >
           <div
@@ -121,7 +123,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
       {/* Push Toggle */}
       <button
         onClick={handlePushToggle}
-        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-surface-800 border border-surface-700 hover:border-surface-600 transition-colors'
+        className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-slate-50 dark:bg-surface-800 border border-slate-200 dark:border-surface-700 hover:border-slate-300 dark:hover:border-surface-600 transition-colors'
       >
         <div className='flex items-center gap-3'>
           {pushEnabled ? (
@@ -136,8 +138,10 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
             />
           )}
           <div className='text-left'>
-            <p className='text-sm font-semibold text-white'>Notificaciones Push</p>
-            <p className='text-xs text-slate-400'>
+            <p className='text-sm font-semibold text-slate-800 dark:text-white'>
+              Notificaciones Push
+            </p>
+            <p className='text-xs text-slate-500 dark:text-slate-400'>
               {pushPermission === "denied"
                 ? "Bloqueadas en el navegador"
                 : pushEnabled
@@ -148,7 +152,9 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
         </div>
         <div
           className={`w-10 h-6 rounded-full transition-colors relative ${
-            pushEnabled && pushPermission !== "denied" ? "bg-success-500" : "bg-surface-600"
+            pushEnabled && pushPermission !== "denied"
+              ? "bg-success-500"
+              : "bg-slate-300 dark:bg-surface-600"
           }`}
         >
           <div
@@ -159,7 +165,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
         </div>
       </button>
 
-      <p className='text-[10px] text-slate-500 text-center'>
+      <p className='text-[10px] text-slate-500 dark:text-slate-500 text-center transition-colors'>
         Los emails de seguridad se envían siempre, independientemente de esta configuración.
       </p>
     </div>

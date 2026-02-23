@@ -23,14 +23,18 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
             className='text-blue-400'
           />
         </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>¿Con qué cuentas?</h2>
-        <p className='text-sm text-slate-400'>Tu equipo y disponibilidad semanal</p>
+        <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+          ¿Con qué cuentas?
+        </h2>
+        <p className='text-sm text-slate-500 dark:text-slate-400'>
+          Tu equipo y disponibilidad semanal
+        </p>
       </div>
 
       <div className='space-y-6'>
         {/* Equipment chips */}
         <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-2 block font-medium'>
             Equipamiento disponible
           </label>
           <div className='flex flex-wrap gap-2'>
@@ -43,14 +47,14 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                   onClick={() => toggleEquipment(option.value)}
                   className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all select-none ${
                     isSelected
-                      ? "border-primary-400/70 bg-primary-500/10 text-primary-100"
-                      : "border-surface-800 bg-surface-900/50 text-slate-300 hover:border-surface-700"
+                      ? "border-primary-400/70 bg-primary-500/10 text-primary-700 dark:text-primary-100"
+                      : "border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/50 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-surface-700"
                   }`}
                 >
                   <span className='flex flex-col gap-0.5 text-left'>
                     <span className='text-xs font-semibold'>{option.label}</span>
                     <span
-                      className={`text-[10px] ${isSelected ? "text-primary-200/70" : "text-slate-500"}`}
+                      className={`text-[10px] ${isSelected ? "text-primary-600/70 dark:text-primary-200/70" : "text-slate-500"}`}
                     >
                       {option.description}
                     </span>
@@ -63,7 +67,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
 
         {/* Days available — free users limited to 2 */}
         <div>
-          <label className='text-xs text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
             <Calendar size={12} /> Días por semana
           </label>
           <div className='flex items-center gap-2'>
@@ -101,7 +105,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
 
         {/* Time per session */}
         <div>
-          <label className='text-xs text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5 font-medium'>
             <Clock size={12} /> Minutos por sesión
           </label>
           <div className='flex items-center gap-2'>
@@ -113,7 +117,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                 className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${
                   formData.dailyTimeMinutes === t
                     ? "bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/20"
-                    : "bg-surface-800/50 border-surface-700 text-slate-400 hover:border-surface-600"
+                    : "bg-white dark:bg-surface-800/50 border-slate-200 dark:border-surface-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-surface-600"
                 } shadow-sm`}
               >
                 <span className='block text-lg font-black'>{t}</span>
@@ -125,7 +129,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
 
         {/* Injuries */}
         <div>
-          <label className='text-xs text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5 font-medium'>
             <AlertCircle size={12} /> Lesiones / Limitaciones (opcional)
           </label>
           <textarea
@@ -133,7 +137,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               handleChange("injuries", e.target.value)
             }
-            className='w-full bg-surface-900/80 border border-surface-700/80 rounded-xl p-3 text-white text-sm focus:border-primary-400/60 outline-none h-16 resize-none transition-colors'
+            className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none h-16 resize-none transition-colors'
             placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
           />
         </div>

@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
     icon: (
       <Home
         size={18}
-        className='text-cyan-300'
+        className='text-cyan-600 dark:text-cyan-300'
       />
     ),
   },
@@ -52,7 +52,7 @@ const navItems: NavItem[] = [
     icon: (
       <LayoutGrid
         size={18}
-        className='text-slate-300'
+        className='text-slate-500 dark:text-slate-300'
       />
     ),
   },
@@ -62,7 +62,7 @@ const navItems: NavItem[] = [
     icon: (
       <Utensils
         size={18}
-        className='text-amber-300'
+        className='text-amber-600 dark:text-amber-300'
       />
     ),
   },
@@ -72,7 +72,7 @@ const navItems: NavItem[] = [
     icon: (
       <Sparkles
         size={18}
-        className='text-emerald-300'
+        className='text-emerald-600 dark:text-emerald-300'
       />
     ),
   },
@@ -82,7 +82,7 @@ const navItems: NavItem[] = [
     icon: (
       <BarChart2
         size={18}
-        className='text-indigo-300'
+        className='text-indigo-600 dark:text-indigo-300'
       />
     ),
   },
@@ -92,7 +92,7 @@ const navItems: NavItem[] = [
     icon: (
       <User
         size={18}
-        className='text-slate-200'
+        className='text-slate-500 dark:text-slate-200'
       />
     ),
   },
@@ -116,20 +116,20 @@ const Header: React.FC<HeaderProps> = ({
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
       isActive
-        ? "text-white bg-surface-800 shadow-inner"
-        : "text-slate-300 hover:text-white hover:bg-surface-800/70"
+        ? "text-slate-900 dark:text-white bg-slate-100 dark:bg-surface-800 shadow-sm dark:shadow-inner"
+        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800/70"
     }`;
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
     `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors ${
       isActive
-        ? "text-white bg-surface-800 shadow-inner"
-        : "text-slate-200 hover:bg-surface-800 hover:text-white"
+        ? "text-slate-900 dark:text-white bg-slate-100 dark:bg-surface-800 shadow-sm dark:shadow-inner"
+        : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-surface-800 hover:text-slate-900 dark:hover:text-white"
     }`;
 
   return (
     <>
-      <header className='bg-surface-900/80 backdrop-blur-md border-b border-surface-800 p-3 md:p-4 sticky top-0 z-20'>
+      <header className='bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-slate-200 dark:border-surface-800 p-3 md:p-4 sticky top-0 z-20 transition-colors'>
         <div className='flex justify-between items-center'>
           {/* Logo & Streak */}
           <div className='flex items-center gap-3'>
@@ -144,10 +144,12 @@ const Header: React.FC<HeaderProps> = ({
                   alt={iconLogo.alt}
                   className='w-5 h-5 md:w-6 md:h-6'
                 />
-                <span className='text-white hidden sm:inline font-black italic tracking-tighter text-xl'>
+                <span className='text-slate-900 dark:text-white hidden sm:inline font-black italic tracking-tighter text-xl transition-colors'>
                   FITTWIZ
                 </span>
-                <span className='text-white sm:hidden font-black italic tracking-tighter'>FW</span>
+                <span className='text-slate-900 dark:text-white sm:hidden font-black italic tracking-tighter transition-colors'>
+                  FW
+                </span>
               </Link>
               {streak > 0 && (
                 <div className='flex items-center gap-1 mt-1'>
@@ -191,7 +193,9 @@ const Header: React.FC<HeaderProps> = ({
               )}
               <Cloud
                 size={16}
-                className={user ? "text-green-400" : "text-slate-600"}
+                className={
+                  user ? "text-green-500 dark:text-green-400" : "text-slate-400 dark:text-slate-600"
+                }
                 aria-label={user ? "Conectado" : "Desconectado"}
               />
             </div>
@@ -243,7 +247,7 @@ const Header: React.FC<HeaderProps> = ({
               variant='secondary'
               size='icon'
               onClick={() => setMobileOpen(true)}
-              className='lg:hidden bg-transparent border-transparent hover:bg-surface-800 text-slate-300 hover:text-white shrink-0'
+              className='lg:hidden bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-surface-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shrink-0 transition-colors'
               aria-label='Abrir menú'
             >
               <Menu size={20} />
@@ -258,25 +262,27 @@ const Header: React.FC<HeaderProps> = ({
           className='fixed inset-0 z-50 lg:hidden'
           onClick={() => setMobileOpen(false)}
         >
-          <div className='absolute inset-0 bg-black/60 backdrop-blur-sm' />
+          <div className='absolute inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm' />
         </div>
       )}
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-surface-900 border-r border-surface-800 z-50 transform transition-transform duration-300 ease-out lg:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-surface-900 border-r border-slate-200 dark:border-surface-800 z-50 transform transition-transform duration-300 ease-out lg:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Sidebar Header */}
-        <div className='p-4 border-b border-surface-800 flex justify-between items-center'>
+        <div className='p-4 border-b border-slate-200 dark:border-surface-800 flex justify-between items-center transition-colors'>
           <div className='flex items-center gap-2'>
             <img
               src={iconLogo.src}
               alt={iconLogo.alt}
               className='w-6 h-6'
             />
-            <span className='text-lg font-black italic tracking-tighter text-white'>FITTWIZ</span>
+            <span className='text-lg font-black italic tracking-tighter text-slate-900 dark:text-white transition-colors'>
+              FITTWIZ
+            </span>
           </div>
           <Button
             variant='ghost'
@@ -306,7 +312,7 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Sidebar Footer - Auth */}
-        <div className='absolute bottom-0 left-0 right-0 p-4 border-t border-surface-800 bg-surface-900'>
+        <div className='absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900 transition-colors'>
           {!user && (
             <Button
               variant='primary'

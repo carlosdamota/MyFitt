@@ -103,7 +103,7 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
           variant='secondary'
           onClick={handleShowInstructions}
           disabled={loading}
-          className='flex-1 py-3 text-xs w-full bg-surface-950/80 border-surface-800 hover:bg-surface-900 hover:border-surface-700 shadow-inner'
+          className='flex-1 py-3 text-xs w-full bg-slate-50 dark:bg-surface-950/80 border-slate-200 dark:border-surface-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-surface-900 dark:hover:border-surface-700 shadow-sm dark:shadow-inner transition-colors'
           leftIcon={
             loading && responseType === "instructions" ? (
               <Loader
@@ -120,23 +120,23 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
       </div>
 
       {response && (
-        <div className='mt-4 p-4 rounded-2xl border text-sm animate-in zoom-in-95 duration-200 shadow-2xl backdrop-blur-xl bg-surface-950/90 border-surface-800'>
-          <div className='flex justify-between items-start mb-3 border-b border-white/5 pb-2'>
-            <h4 className='font-bold flex items-center gap-2 text-slate-200'>
+        <div className='mt-4 p-4 rounded-2xl border text-sm animate-in zoom-in-95 duration-200 shadow-md dark:shadow-2xl backdrop-blur-xl bg-white/90 dark:bg-surface-950/90 border-slate-200 dark:border-surface-800 transition-colors'>
+          <div className='flex justify-between items-start mb-3 border-b border-slate-200 dark:border-white/5 pb-2 transition-colors'>
+            <h4 className='font-bold flex items-center gap-2 text-slate-900 dark:text-slate-200 transition-colors'>
               <BookOpen size={16} />
               Técnica Correcta
             </h4>
             <button
               onClick={() => setResponse(null)}
-              className='text-slate-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full'
+              className='text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full'
             >
               <X size={16} />
             </button>
           </div>
 
-          <div className='text-slate-300 leading-relaxed'>
+          <div className='text-slate-600 dark:text-slate-300 leading-relaxed transition-colors'>
             {Array.isArray(response) ? (
-              <ol className='list-decimal pl-4 space-y-2 marker:text-slate-500 marker:font-bold'>
+              <ol className='list-decimal pl-4 space-y-2 marker:text-slate-400 dark:marker:text-slate-500 marker:font-bold transition-colors'>
                 {response.map((step, i) => (
                   <li
                     key={i}

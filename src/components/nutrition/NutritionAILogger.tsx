@@ -77,7 +77,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog, o
   };
 
   return (
-    <div className='bg-surface-900 rounded-3xl border border-surface-800 p-5 shadow-sm'>
+    <div className='bg-white dark:bg-surface-900 rounded-3xl border border-slate-200 dark:border-surface-800 p-5 shadow-sm transition-colors'>
       {showRateLimitError && (
         <RateLimitError
           message={quotaMessage}
@@ -105,7 +105,7 @@ const NutritionAILogger: React.FC<NutritionAILoggerProps> = ({ user, onAddLog, o
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder='Ej: 2 huevos revueltos y una manzana'
-            className='w-full bg-surface-950 border border-surface-800 rounded-2xl py-3.5 pl-4 pr-12 text-sm text-slate-200 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 outline-none placeholder-slate-500 transition-all shadow-inner'
+            className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-800 rounded-2xl py-3.5 pl-4 pr-12 text-sm text-slate-800 dark:text-slate-200 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-500 transition-all shadow-sm dark:shadow-inner'
             disabled={analyzing}
           />
           <button

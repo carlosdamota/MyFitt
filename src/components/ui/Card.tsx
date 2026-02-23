@@ -10,10 +10,13 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     const baseStyles = "rounded-2xl overflow-hidden relative";
 
     const variants = {
-      default: "bg-surface-900 border border-surface-800",
-      glass: "bg-surface-900/60 backdrop-blur-xl border border-white/5 shadow-xl",
-      gradient: "bg-gradient-to-br from-surface-800 to-surface-900 border border-surface-700/50",
-      outline: "bg-transparent border-2 border-surface-800",
+      default:
+        "bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 transition-colors",
+      glass:
+        "bg-white/60 dark:bg-surface-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-lg dark:shadow-xl transition-colors",
+      gradient:
+        "bg-gradient-to-br from-slate-50 dark:from-surface-800 to-white dark:to-surface-900 border border-slate-200 dark:border-surface-700/50 transition-colors",
+      outline: "bg-transparent border-2 border-slate-200 dark:border-surface-800 transition-colors",
     };
 
     return (
@@ -33,7 +36,10 @@ const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("px-6 py-5 border-b border-surface-800/50", className)}
+      className={cn(
+        "px-6 py-5 border-b border-slate-200 dark:border-surface-800/50 transition-colors",
+        className,
+      )}
       {...props}
     />
   ),
@@ -44,7 +50,10 @@ const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadin
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("text-lg font-semibold text-white tracking-tight", className)}
+      className={cn(
+        "text-lg font-semibold text-slate-900 dark:text-white tracking-tight transition-colors",
+        className,
+      )}
       {...props}
     />
   ),
@@ -57,7 +66,7 @@ const CardDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-slate-400 mt-1", className)}
+    className={cn("text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors", className)}
     {...props}
   />
 ));
@@ -79,7 +88,7 @@ const CardFooter = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        "px-6 py-4 bg-surface-950/30 border-t border-surface-800/50 flex items-center justify-between",
+        "px-6 py-4 bg-slate-50 dark:bg-surface-950/30 border-t border-slate-200 dark:border-surface-800/50 flex items-center justify-between transition-colors",
         className,
       )}
       {...props}

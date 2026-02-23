@@ -33,12 +33,12 @@ const MealHistory: React.FC<MealHistoryProps> = ({
   return (
     <div className='space-y-4'>
       {/* Date Navigator */}
-      <div className='bg-surface-900/50 p-4 rounded-2xl border border-surface-800 flex items-center justify-between shadow-lg'>
+      <div className='bg-white dark:bg-surface-900/50 p-4 rounded-2xl border border-slate-200 dark:border-surface-800 flex items-center justify-between shadow-sm dark:shadow-lg transition-colors'>
         <Button
           variant='ghost'
           size='sm'
           onClick={() => onDateChange(-1)}
-          className='p-2 h-auto text-slate-400 hover:text-white'
+          className='p-2 h-auto text-slate-400 hover:text-slate-900 dark:hover:text-white'
         >
           <ChevronLeft size={20} />
         </Button>
@@ -49,7 +49,7 @@ const MealHistory: React.FC<MealHistoryProps> = ({
               className='text-blue-400'
             />
           </div>
-          <span className='text-sm font-bold text-white tracking-wide'>
+          <span className='text-sm font-bold text-slate-900 dark:text-white tracking-wide transition-colors'>
             {isToday
               ? "HOY"
               : selectedDate
@@ -62,7 +62,7 @@ const MealHistory: React.FC<MealHistoryProps> = ({
           size='sm'
           onClick={() => onDateChange(1)}
           disabled={isToday}
-          className='p-2 h-auto text-slate-400 hover:text-white'
+          className='p-2 h-auto text-slate-400 hover:text-slate-900 dark:hover:text-white'
         >
           <ChevronRight size={20} />
         </Button>
@@ -82,7 +82,7 @@ const MealHistory: React.FC<MealHistoryProps> = ({
           <span className='text-xs font-medium'>Sincronizando diario...</span>
         </div>
       ) : dayLogs.length === 0 ? (
-        <div className='bg-surface-900/30 rounded-2xl border border-dashed border-surface-800 py-10 flex flex-col items-center justify-center gap-2'>
+        <div className='bg-slate-50 dark:bg-surface-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-surface-800 py-10 flex flex-col items-center justify-center gap-2 transition-colors'>
           <p className='text-slate-600 text-sm font-medium italic'>Nada registrado para este día</p>
           <p className='text-[10px] text-slate-700 uppercase font-bold tracking-tighter'>
             FITTWIZ Nutrición

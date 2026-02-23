@@ -9,6 +9,7 @@ import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
 import NotificationSettings from "./NotificationSettings";
+import ThemeToggle from "../common/ThemeToggle";
 import DeleteAccountModal from "./DeleteAccountModal";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
@@ -65,7 +66,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   };
 
   if (loading || !formData)
-    return <div className='p-8 text-center text-slate-500'>Cargando perfil...</div>;
+    return (
+      <div className='p-8 text-center text-slate-500 dark:text-slate-400'>Cargando perfil...</div>
+    );
 
   return (
     <div className='space-y-6 pb-20 px-1'>
@@ -105,7 +108,12 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
 
       <NotificationSettings user={user} />
 
-      <div className='mt-4 pt-4 border-t border-surface-800 text-center'>
+      <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-5 mb-6 shadow-sm dark:shadow-xl transition-colors'>
+        <h3 className='text-sm font-semibold text-slate-800 dark:text-white mb-4'>Apariencia</h3>
+        <ThemeToggle />
+      </div>
+
+      <div className='mt-4 pt-4 border-t border-slate-200 dark:border-surface-800 text-center transition-colors'>
         <Button
           variant='ghost'
           onClick={() => setShowRoutineManager(true)}
@@ -137,7 +145,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
               (window as any)._devTapCount = 0;
             }
           }}
-          className='text-[10px] text-slate-700 font-mono cursor-default select-none active:text-slate-500'
+          className='text-[10px] text-slate-400 dark:text-slate-700 font-mono cursor-default select-none active:text-slate-500 transition-colors'
         >
           v1.0.0
         </p>
@@ -154,7 +162,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           >
             Eliminar mi cuenta
           </Button>
-          <p className='text-[11px] text-slate-600 text-center mt-2'>
+          <p className='text-[11px] text-slate-500 dark:text-slate-600 text-center mt-2 transition-colors'>
             Se eliminarán todos tus datos de forma irreversible.
           </p>
         </div>

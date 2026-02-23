@@ -71,11 +71,11 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm'>
-      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-surface-800 bg-surface-950'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 p-4 backdrop-blur-sm transition-colors'>
+      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950 shadow-xl dark:shadow-2xl transition-colors'>
         {/* Header */}
-        <div className='flex items-center justify-between border-b border-surface-800 bg-surface-950 px-4 py-3'>
-          <h2 className='flex items-center gap-2 text-lg font-bold text-white'>
+        <div className='flex items-center justify-between border-b border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950 px-4 py-3 transition-colors'>
+          <h2 className='flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white transition-colors'>
             <Share2
               size={18}
               className='text-blue-400'
@@ -84,7 +84,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className='text-slate-400 hover:text-white'
+            className='text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors'
           >
             <X size={20} />
           </button>
@@ -104,7 +104,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
           />
         </div>
 
-        <div className='flex-1 space-y-4 overflow-y-auto bg-surface-950/50 p-6'>
+        <div className='flex-1 space-y-4 overflow-y-auto bg-slate-50 dark:bg-surface-950/50 p-6 transition-colors'>
           <WorkoutShareButton
             captureRef={cardRef}
             shareTitle='Mi Entrenamiento en FITTWIZ'

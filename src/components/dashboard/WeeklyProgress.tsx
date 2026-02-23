@@ -111,21 +111,25 @@ export default function WeeklyProgress({
   const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
 
   return (
-    <div className='bg-surface-900 border border-surface-800 rounded-2xl p-5 mb-6 shadow-xl relative overflow-hidden'>
+    <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-5 mb-6 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors'>
       {/* Background decoration */}
       <div className='absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none' />
 
       <div className='flex justify-between items-start mb-6 relative z-10'>
         <div>
-          <h2 className='text-lg sm:text-xl font-bold text-white flex items-center gap-2'>
+          <h2 className='text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 transition-colors'>
             Progreso Semanal
-            {isGoalMet && <Trophy className='text-amber-400 w-5 h-5 animate-pulse' />}
+            {isGoalMet && (
+              <Trophy className='text-amber-500 dark:text-amber-400 w-5 h-5 animate-pulse' />
+            )}
           </h2>
-          <p className='text-slate-400 text-sm mt-1'>{motivationalMessage}</p>
+          <p className='text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors'>
+            {motivationalMessage}
+          </p>
         </div>
         <Link
           to='/app/stats'
-          className='text-cyan-400 text-xs sm:text-sm font-medium flex items-center hover:text-cyan-300 transition-colors bg-surface-800 px-3 py-1.5 rounded-xl border border-surface-700'
+          className='text-blue-600 dark:text-cyan-400 text-xs sm:text-sm font-medium flex items-center hover:text-blue-700 dark:hover:text-cyan-300 transition-colors bg-slate-50 dark:bg-surface-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-surface-700'
         >
           Ver estadísticas{" "}
           <ChevronRight
@@ -146,7 +150,7 @@ export default function WeeklyProgress({
             >
               {/* Background circle */}
               <circle
-                className='text-surface-800'
+                className='text-slate-200 dark:text-surface-800 transition-colors'
                 strokeWidth='6'
                 stroke='currentColor'
                 fill='transparent'
@@ -156,7 +160,7 @@ export default function WeeklyProgress({
               />
               {/* Progress circle */}
               <circle
-                className={`${isGoalMet ? "text-cyan-400" : "text-cyan-500"}`}
+                className={`${isGoalMet ? "text-blue-500 dark:text-cyan-400" : "text-blue-400 dark:text-cyan-500"} transition-colors`}
                 strokeWidth='6'
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
@@ -169,9 +173,11 @@ export default function WeeklyProgress({
               />
             </svg>
             <div className='absolute inset-0 flex flex-col items-center justify-center pt-1'>
-              <span className='text-2xl font-black text-white leading-none'>
+              <span className='text-2xl font-black text-slate-900 dark:text-white leading-none transition-colors'>
                 {workoutsThisWeek}
-                <span className='text-sm text-slate-500 font-medium'>/{targetDays}</span>
+                <span className='text-sm text-slate-500 dark:text-slate-500 font-medium'>
+                  /{targetDays}
+                </span>
               </span>
             </div>
           </div>
@@ -179,22 +185,22 @@ export default function WeeklyProgress({
           {/* Stats Info */}
           <div className='flex flex-col gap-3'>
             <div className='flex flex-col'>
-              <span className='text-xs text-slate-400 uppercase tracking-wider font-bold'>
+              <span className='text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold transition-colors'>
                 Objetivo
               </span>
-              <span className='text-sm text-white font-medium flex items-center gap-1.5'>
+              <span className='text-sm text-slate-900 dark:text-white font-medium flex items-center gap-1.5 transition-colors'>
                 <Target
                   size={14}
-                  className='text-cyan-500'
+                  className='text-blue-500 dark:text-cyan-500'
                 />
                 {targetDays} Sesiones
               </span>
             </div>
             <div className='flex flex-col'>
-              <span className='text-xs text-slate-400 uppercase tracking-wider font-bold'>
+              <span className='text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold transition-colors'>
                 Racha Actual Semanas
               </span>
-              <span className='text-sm text-white font-medium flex items-center gap-1.5'>
+              <span className='text-sm text-slate-900 dark:text-white font-medium flex items-center gap-1.5 transition-colors'>
                 <Flame
                   size={14}
                   className='text-orange-500'
@@ -207,10 +213,10 @@ export default function WeeklyProgress({
         </div>
 
         {/* Days Grid */}
-        <div className='flex-1 w-full bg-surface-950 rounded-2xl p-2 sm:p-3 border border-surface-800 flex items-center gap-1 sm:gap-2 justify-between'>
+        <div className='flex-1 w-full bg-slate-50 dark:bg-surface-950 rounded-2xl p-2 sm:p-3 border border-slate-200 dark:border-surface-800 flex items-center gap-1 sm:gap-2 justify-between transition-colors'>
           <button
             onClick={() => changeWeek(-1)}
-            className='p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-surface-800 transition-all active:scale-95 shrink-0'
+            className='p-1.5 sm:p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-surface-800 transition-all active:scale-95 shrink-0'
             aria-label='Semana anterior'
           >
             <ChevronLeft size={18} />
@@ -229,8 +235,10 @@ export default function WeeklyProgress({
                   className='flex flex-col items-center gap-1.5 relative group'
                 >
                   <span
-                    className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${
-                      isToday ? "text-cyan-400" : "text-slate-500"
+                    className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                      isToday
+                        ? "text-blue-600 dark:text-cyan-400"
+                        : "text-slate-500 dark:text-slate-500"
                     }`}
                   >
                     {weekDays[index]}
@@ -241,10 +249,10 @@ export default function WeeklyProgress({
                       w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 relative shrink-0
                       ${
                         hasWorkout
-                          ? "bg-linear-to-br from-cyan-400 to-blue-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.4)] scale-105 border-none"
+                          ? "bg-linear-to-br from-blue-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.4)] dark:shadow-[0_0_12px_rgba(34,211,238,0.4)] scale-105 border-none"
                           : isToday
-                            ? "bg-surface-800 text-cyan-400 border border-cyan-500/50"
-                            : "bg-surface-800/30 text-slate-600 border border-surface-800"
+                            ? "bg-blue-50 dark:bg-surface-800 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-cyan-500/50"
+                            : "bg-white dark:bg-surface-800/30 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-surface-800"
                       }
                       ${isFuture ? "opacity-30" : "opacity-100"}
                     `}
@@ -267,8 +275,8 @@ export default function WeeklyProgress({
             disabled={isCurrentWeek}
             className={`p-1.5 sm:p-2 rounded-xl transition-all active:scale-95 shrink-0 ${
               isCurrentWeek
-                ? "text-slate-700 cursor-not-allowed opacity-50"
-                : "text-slate-400 hover:text-white hover:bg-surface-800"
+                ? "text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-surface-800"
             }`}
             aria-label='Semana siguiente'
           >

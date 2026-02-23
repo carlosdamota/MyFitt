@@ -75,8 +75,8 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
 
   if (sortedMuscles.length === 0) {
     return (
-      <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-xl relative overflow-hidden'>
-        <h3 className='text-xs text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-4'>
+      <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-3xl p-6 shadow-lg dark:shadow-xl relative overflow-hidden transition-colors'>
+        <h3 className='text-xs text-slate-600 dark:text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-4 transition-colors'>
           <Dumbbell
             size={16}
             className='text-primary-400'
@@ -91,10 +91,10 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
   }
 
   return (
-    <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-xl relative overflow-hidden'>
+    <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-3xl p-6 shadow-lg dark:shadow-xl relative overflow-hidden transition-colors'>
       {/* Background glow similar to other cards */}
       <div className='absolute -top-24 -right-24 w-48 h-48 bg-primary-500/5 rounded-full blur-3xl pointer-events-none' />
-      <h3 className='text-xs text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-6'>
+      <h3 className='text-xs text-slate-600 dark:text-slate-300 font-bold uppercase flex items-center gap-2 tracking-widest mb-6 transition-colors'>
         <Dumbbell
           size={16}
           className='text-primary-400'
@@ -114,7 +114,7 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
               className='space-y-1'
             >
               <div className='flex justify-between items-center text-xs'>
-                <span className='text-slate-300 font-medium tracking-wide flex items-center gap-2'>
+                <span className='text-slate-700 dark:text-slate-300 font-medium tracking-wide flex items-center gap-2 transition-colors'>
                   <span
                     className='w-2 h-2 rounded-full shrink-0'
                     style={{ backgroundColor: color }}
@@ -128,7 +128,7 @@ const MuscleFocusChart: React.FC<MuscleFocusChartProps> = ({ logs, routines }) =
                   {percentage}%
                 </span>
               </div>
-              <div className='h-2 bg-surface-950/50 rounded-full overflow-hidden border border-white/5'>
+              <div className='h-2 bg-slate-100 dark:bg-surface-950/50 rounded-full overflow-hidden border border-slate-200 dark:border-white/5 transition-colors'>
                 <div
                   className='h-full rounded-full transition-all duration-1000 ease-out'
                   style={{

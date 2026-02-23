@@ -174,26 +174,26 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   }, [restTime, configuredReps, isLastInBlock]);
 
   return (
-    <div className='mt-4 bg-surface-950/90 backdrop-blur-xl p-5 rounded-3xl border border-surface-800 shadow-2xl relative overflow-hidden'>
-      <div className='absolute top-0 left-0 w-1 h-12 bg-linear-to-b from-cyan-400 to-transparent' />
+    <div className='mt-4 bg-white/90 dark:bg-surface-950/90 backdrop-blur-xl p-5 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-sm dark:shadow-2xl relative overflow-hidden transition-colors'>
+      <div className='absolute top-0 left-0 w-1 h-12 bg-linear-to-b from-blue-500 dark:from-cyan-400 to-transparent' />
       <div className='flex items-center justify-between mb-4'>
-        <span className='text-xs text-slate-300 font-bold uppercase tracking-widest flex items-center gap-2'>
+        <span className='text-xs text-slate-500 dark:text-slate-300 font-bold uppercase tracking-widest flex items-center gap-2 transition-colors'>
           <History
             size={16}
-            className='text-primary-400'
+            className='text-blue-500 dark:text-primary-400'
           />
           Registrar Serie
         </span>
 
         {personalBests && (
-          <div className='flex gap-2'>
+          <div className='flex gap-2 transition-colors'>
             {personalBests.low && (
-              <span className='text-[10px] bg-danger-500/10 text-danger-300 px-2 py-0.5 rounded-lg border border-danger-500/20'>
+              <span className='text-[10px] bg-red-50 text-red-600 dark:bg-danger-500/10 dark:text-danger-300 px-2 py-0.5 rounded-lg border border-red-200 dark:border-danger-500/20'>
                 🏆 {personalBests.low.weight}kg
               </span>
             )}
             {personalBests.mid && (
-              <span className='text-[10px] bg-primary-500/10 text-primary-300 px-2 py-0.5 rounded-lg border border-primary-500/20'>
+              <span className='text-[10px] bg-blue-50 text-blue-600 dark:bg-primary-500/10 dark:text-primary-300 px-2 py-0.5 rounded-lg border border-blue-200 dark:border-primary-500/20'>
                 🏅 {personalBests.mid.weight}kg
               </span>
             )}
@@ -207,12 +207,12 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       />
 
       {newRecordAlert && (
-        <div className='mb-3 bg-warning-500/10 border border-warning-500/20 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-lg shadow-warning-900/10'>
+        <div className='mb-3 bg-amber-50 dark:bg-warning-500/10 border border-amber-200 dark:border-warning-500/20 p-2.5 rounded-xl flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-sm dark:shadow-warning-900/10 transition-colors'>
           <Trophy
             size={16}
-            className='text-warning-400 animate-bounce'
+            className='text-amber-500 dark:text-warning-400 animate-bounce'
           />
-          <span className='text-xs text-warning-200 font-bold uppercase tracking-wide'>
+          <span className='text-xs text-amber-600 dark:text-warning-200 font-bold uppercase tracking-wide'>
             {newRecordAlert}
           </span>
         </div>
@@ -235,12 +235,14 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
             />
           </div>
           <div className='absolute inset-0 flex items-center justify-center'>
-            <div className='flex items-center gap-2 px-4 py-2.5 bg-surface-900/95 border border-primary-500/30 rounded-xl shadow-lg backdrop-blur-sm'>
+            <div className='flex items-center gap-2 px-4 py-2.5 bg-white/95 dark:bg-surface-900/95 border border-slate-200 dark:border-primary-500/30 rounded-xl shadow-lg backdrop-blur-sm transition-colors'>
               <Play
                 size={14}
-                className='text-primary-400'
+                className='text-blue-500 dark:text-primary-400'
               />
-              <span className='text-xs font-bold text-slate-300'>Pulsa Play para registrar</span>
+              <span className='text-xs font-bold text-slate-600 dark:text-slate-300'>
+                Pulsa Play para registrar
+              </span>
             </div>
           </div>
         </div>
@@ -266,38 +268,38 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         instructions={instructions}
         onRequireAuth={onRequireAuth}
         actionSlot={
-          <div className='p-2 sm:p-2 bg-surface-950/80 rounded-xl border border-surface-800 flex items-center justify-between gap-2 h-full shadow-inner'>
+          <div className='p-2 sm:p-2 bg-slate-50 dark:bg-surface-950/80 rounded-xl border border-slate-200 dark:border-surface-800 flex items-center justify-between gap-2 h-full shadow-inner transition-colors'>
             <div className='hidden sm:flex items-center gap-1 pl-1'>
               <History
                 size={14}
-                className='text-primary-400'
+                className='text-blue-500 dark:text-primary-400'
               />
             </div>
 
             <div className='flex items-center gap-2 sm:gap-2 flex-1 justify-center sm:justify-start w-full px-2'>
               <button
                 onClick={() => setCustomRestTime((prev) => Math.max(0, prev - 10))}
-                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
+                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800 hover:border-slate-300 dark:hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
               >
                 -10
               </button>
 
-              <div className='text-sm sm:text-sm font-mono font-bold text-white w-8 text-center'>
+              <div className='text-sm sm:text-sm font-mono font-bold text-slate-900 dark:text-white w-8 text-center transition-colors'>
                 {customRestTime}
               </div>
 
               <button
                 onClick={() => setCustomRestTime((prev) => prev + 10)}
-                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-surface-900 border border-surface-800 text-slate-400 hover:text-white hover:bg-surface-800 hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
+                className='w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800 hover:border-slate-300 dark:hover:border-surface-700 flex items-center justify-center transition-all text-xs sm:text-[10px] shadow-sm'
               >
                 +10
               </button>
 
-              <div className='h-4 w-px bg-surface-800 mx-2 hidden sm:block'></div>
+              <div className='h-4 w-px bg-slate-200 dark:bg-surface-800 mx-2 hidden sm:block transition-colors'></div>
 
               <button
                 onClick={() => onTimerReset(customRestTime)}
-                className='flex-1 sm:flex-none sm:ml-1 px-4 py-2 sm:px-3 sm:py-1.5 bg-linear-to-r from-primary-500 to-indigo-500 hover:from-primary-400 hover:to-indigo-400 text-white text-xs sm:text-[11px] font-bold uppercase rounded-lg shadow-md shadow-primary-500/20 transition-all active:scale-95 text-center border-none'
+                className='flex-1 sm:flex-none sm:ml-1 px-4 py-2 sm:px-3 sm:py-1.5 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-primary-500 dark:to-indigo-500 hover:from-blue-500 hover:to-indigo-500 dark:hover:from-primary-400 dark:hover:to-indigo-400 text-white text-xs sm:text-[11px] font-bold uppercase rounded-lg shadow-sm dark:shadow-md dark:shadow-primary-500/20 transition-all active:scale-95 text-center border-none'
               >
                 Inicio
               </button>

@@ -41,11 +41,11 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-200'>
-      <div className='bg-surface-900 border border-surface-800 rounded-3xl p-6 max-w-sm w-full relative shadow-2xl animate-in zoom-in-95 duration-300'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 dark:bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-200 transition-colors'>
+      <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-3xl p-6 max-w-sm w-full relative shadow-xl dark:shadow-2xl animate-in zoom-in-95 duration-300 transition-colors'>
         <button
           onClick={onClose}
-          className='absolute top-4 right-4 p-2 text-slate-500 hover:text-white rounded-full hover:bg-surface-800 transition-colors'
+          className='absolute top-4 right-4 p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-surface-800 transition-colors'
         >
           <X size={20} />
         </button>
@@ -56,20 +56,23 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
           </div>
 
           <div>
-            <h2 className='text-2xl font-black text-white mb-2'>¡Rutina Completada!</h2>
-            <p className='text-slate-400 text-sm'>
-              Has finalizado <span className='text-blue-400 font-bold'>"{routineTitle}"</span>
+            <h2 className='text-2xl font-black text-slate-900 dark:text-white mb-2 transition-colors'>
+              ¡Rutina Completada!
+            </h2>
+            <p className='text-slate-500 dark:text-slate-400 text-sm transition-colors'>
+              Has finalizado{" "}
+              <span className='text-blue-500 dark:text-blue-400 font-bold'>"{routineTitle}"</span>
             </p>
           </div>
 
-          <div className='flex items-center gap-3 bg-surface-800/50 px-6 py-4 rounded-2xl border border-surface-700/50 w-full justify-center'>
+          <div className='flex items-center gap-3 bg-slate-50 dark:bg-surface-800/50 px-6 py-4 rounded-2xl border border-slate-200 dark:border-surface-700/50 w-full justify-center transition-colors'>
             <Clock
               size={24}
               className='text-blue-400'
             />
             <div className='flex flex-col items-start'>
               <span className='text-xs font-bold text-slate-500 uppercase'>Tiempo Total</span>
-              <span className='text-2xl font-mono font-bold text-white leading-none'>
+              <span className='text-2xl font-mono font-bold text-slate-900 dark:text-white leading-none transition-colors'>
                 {totalTime}
               </span>
             </div>
@@ -85,7 +88,7 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
 
           <button
             onClick={onClose}
-            className='text-slate-500 text-sm hover:text-white transition-colors'
+            className='text-slate-500 text-sm hover:text-slate-900 dark:hover:text-white transition-colors'
           >
             Cerrar
           </button>

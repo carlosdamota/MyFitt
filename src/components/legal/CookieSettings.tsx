@@ -17,8 +17,8 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
   };
 
   return (
-    <div className='fixed inset-0 z-400 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-300'>
-      <div className='bg-surface-900 border border-surface-800 rounded-2xl p-6 max-w-2xl mx-4 animate-in zoom-in-95 duration-200 shadow-2xl max-h-[90vh] overflow-y-auto'>
+    <div className='fixed inset-0 z-400 flex items-center justify-center p-4 bg-white/80 dark:bg-surface-950/80 backdrop-blur-sm animate-in fade-in duration-300 transition-colors'>
+      <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-6 max-w-2xl mx-4 animate-in zoom-in-95 duration-200 shadow-2xl max-h-[90vh] overflow-y-auto transition-colors'>
         {/* Header */}
         <div className='flex items-start gap-3 mb-6'>
           <div className='p-2 bg-blue-600/20 rounded-lg'>
@@ -28,12 +28,16 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
             />
           </div>
           <div className='flex-1'>
-            <h2 className='text-xl font-bold text-white mb-1'>Configuración de Cookies</h2>
-            <p className='text-sm text-slate-400'>Personaliza qué cookies quieres permitir</p>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-1 transition-colors'>
+              Configuración de Cookies
+            </h2>
+            <p className='text-sm text-slate-500 dark:text-slate-400 transition-colors'>
+              Personaliza qué cookies quieres permitir
+            </p>
           </div>
           <button
             onClick={onClose}
-            className='text-slate-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded'
+            className='text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded'
           >
             <X size={20} />
           </button>
@@ -42,7 +46,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
         {/* Cookie Types */}
         <div className='space-y-4 mb-6'>
           {/* Essential Cookies */}
-          <div className='bg-surface-950 border border-surface-800 rounded-lg p-4'>
+          <div className='bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-800 rounded-lg p-4 transition-colors'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex items-start gap-3 flex-1'>
                 <div className='p-2 bg-green-600/20 rounded-lg'>
@@ -52,8 +56,10 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
                   />
                 </div>
                 <div>
-                  <h3 className='text-sm font-bold text-white mb-1'>Cookies Esenciales</h3>
-                  <p className='text-xs text-slate-400 leading-relaxed'>
+                  <h3 className='text-sm font-bold text-slate-900 dark:text-white mb-1 transition-colors'>
+                    Cookies Esenciales
+                  </h3>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 leading-relaxed transition-colors'>
                     Necesarias para el funcionamiento básico de la app (autenticación, sesión). No
                     se pueden desactivar.
                   </p>
@@ -71,7 +77,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
           </div>
 
           {/* Analytics Cookies */}
-          <div className='bg-surface-950 border border-surface-800 rounded-lg p-4'>
+          <div className='bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-800 rounded-lg p-4 transition-colors'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex items-start gap-3 flex-1'>
                 <div className='p-2 bg-blue-600/20 rounded-lg'>
@@ -81,8 +87,10 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
                   />
                 </div>
                 <div>
-                  <h3 className='text-sm font-bold text-white mb-1'>Cookies Analíticas</h3>
-                  <p className='text-xs text-slate-400 leading-relaxed'>
+                  <h3 className='text-sm font-bold text-slate-900 dark:text-white mb-1 transition-colors'>
+                    Cookies Analíticas
+                  </h3>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 leading-relaxed transition-colors'>
                     Nos ayudan a entender cómo usas la app para mejorarla. Datos anónimos procesados
                     por Google Analytics.
                   </p>
@@ -108,8 +116,8 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
         </div>
 
         {/* Info Box */}
-        <div className='bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-6'>
-          <p className='text-xs text-blue-200'>
+        <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/30 rounded-lg p-3 mb-6 transition-colors'>
+          <p className='text-xs text-blue-700 dark:text-blue-200 transition-colors'>
             💡 <strong>Tu privacidad es importante.</strong> Puedes cambiar estas preferencias en
             cualquier momento desde el footer de la app.
           </p>
@@ -119,7 +127,7 @@ const CookieSettings: React.FC<CookieSettingsProps> = ({ currentConsent, onSave,
         <div className='flex gap-3'>
           <button
             onClick={onClose}
-            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-surface-800 hover:bg-surface-700 text-white border border-surface-700 transition-colors'
+            className='flex-1 py-2.5 rounded-xl font-bold text-sm bg-slate-100 dark:bg-surface-800 hover:bg-slate-200 dark:hover:bg-surface-700 text-slate-800 dark:text-white border border-slate-200 dark:border-surface-700 transition-colors'
           >
             Cancelar
           </button>

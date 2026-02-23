@@ -18,11 +18,11 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
 }) => {
   return (
     <div
-      className={`flex items-center justify-between p-4 bg-surface-950/50 border border-surface-800 rounded-2xl backdrop-blur-sm ${className}`}
+      className={`flex items-center justify-between p-4 bg-white/50 dark:bg-surface-950/50 border border-slate-200 dark:border-surface-800 rounded-2xl backdrop-blur-sm transition-colors ${className}`}
     >
       <div className='flex items-center gap-3'>
         <div
-          className={`p-2 rounded-xl ${isRunning ? "bg-green-500/10 text-green-400" : "bg-surface-800 text-slate-400"}`}
+          className={`p-2 rounded-xl transition-colors ${isRunning ? "bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400" : "bg-slate-100 dark:bg-surface-800 text-slate-500 dark:text-slate-400"}`}
         >
           <Timer
             size={20}
@@ -30,10 +30,10 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
           />
         </div>
         <div className='flex flex-col'>
-          <span className='text-xs font-bold text-slate-500 uppercase tracking-wider'>
+          <span className='text-xs font-bold text-slate-600 dark:text-slate-500 uppercase tracking-wider transition-colors'>
             Tiempo de Rutina
           </span>
-          <span className='text-2xl font-mono font-bold text-white tracking-widest leading-none mt-1'>
+          <span className='text-2xl font-mono font-bold text-slate-900 dark:text-white tracking-widest leading-none mt-1 transition-colors'>
             {timeFormatted}
           </span>
         </div>

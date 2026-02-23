@@ -18,14 +18,18 @@ export const StepStructure: React.FC<StepStructureProps> = ({ formData, handleCh
             className='text-indigo-400'
           />
         </div>
-        <h2 className='text-2xl font-bold text-white mb-2'>Arquitectura del Plan</h2>
-        <p className='text-sm text-slate-400'>¿Cómo quieres estructurar tu progreso?</p>
+        <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+          Arquitectura del Plan
+        </h2>
+        <p className='text-sm text-slate-500 dark:text-slate-400'>
+          ¿Cómo quieres estructurar tu progreso?
+        </p>
       </div>
 
       <div className='space-y-6'>
         {/* Training Split */}
         <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
             División de Entrenamiento (Split)
           </label>
           <div className='grid grid-cols-1 gap-2'>
@@ -36,8 +40,8 @@ export const StepStructure: React.FC<StepStructureProps> = ({ formData, handleCh
                 onClick={() => handleChange("trainingSplit", option.value)}
                 className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
                   formData.trainingSplit === option.value
-                    ? "border-indigo-400/70 bg-indigo-500/10 text-white"
-                    : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
+                    ? "border-indigo-400/70 bg-indigo-500/10 text-slate-900 dark:text-white"
+                    : "border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-surface-700"
                 }`}
               >
                 <div>
@@ -57,7 +61,7 @@ export const StepStructure: React.FC<StepStructureProps> = ({ formData, handleCh
 
         {/* Focus Areas */}
         <div>
-          <label className='text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
+          <label className='text-xs text-slate-500 dark:text-slate-400 mb-2 block font-medium uppercase tracking-wider'>
             Zonas de Enfoque (Opcional)
           </label>
           <div className='grid grid-cols-3 gap-2'>
@@ -80,8 +84,8 @@ export const StepStructure: React.FC<StepStructureProps> = ({ formData, handleCh
                   }}
                   className={`py-3 rounded-xl border text-center transition-all ${
                     isSelected
-                      ? "border-purple-400/70 bg-purple-500/10 text-white"
-                      : "border-surface-800 bg-surface-900/50 text-slate-400 hover:border-surface-700"
+                      ? "border-purple-400/70 bg-purple-500/10 text-slate-900 dark:text-white"
+                      : "border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-surface-700"
                   }`}
                 >
                   <span className='text-xl block mb-1'>{option.emoji}</span>

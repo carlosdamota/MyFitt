@@ -118,13 +118,13 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
 
   return (
     <div
-      className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-surface-950/95 backdrop-blur-sm animate-in fade-in duration-200'
+      className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-surface-950/95 backdrop-blur-sm animate-in fade-in duration-200 transition-colors'
       role='dialog'
       aria-modal='true'
       onClick={onClose}
     >
       <div
-        className='bg-surface-900 w-full max-w-md rounded-3xl border border-surface-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300'
+        className='bg-white dark:bg-surface-900 w-full max-w-md rounded-3xl border border-slate-200 dark:border-surface-800 shadow-xl dark:shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 transition-colors'
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with gradient */}
@@ -155,17 +155,21 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
           {PRO_BENEFITS.map((benefit, index) => (
             <div
               key={index}
-              className='flex items-start gap-3 p-3 rounded-xl bg-surface-800/50 border border-surface-700/50'
+              className='flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-surface-800/50 border border-slate-200 dark:border-surface-700/50 transition-colors'
             >
-              <div className='p-2 bg-blue-500/20 rounded-lg shrink-0'>
+              <div className='p-2 bg-blue-50 dark:bg-blue-500/20 rounded-lg shrink-0 transition-colors'>
                 <benefit.icon
                   size={18}
-                  className='text-blue-400'
+                  className='text-blue-600 dark:text-blue-400 transition-colors'
                 />
               </div>
               <div>
-                <p className='text-sm font-bold text-white'>{benefit.title}</p>
-                <p className='text-xs text-slate-400'>{benefit.description}</p>
+                <p className='text-sm font-bold text-slate-900 dark:text-white transition-colors'>
+                  {benefit.title}
+                </p>
+                <p className='text-xs text-slate-600 dark:text-slate-400 transition-colors'>
+                  {benefit.description}
+                </p>
               </div>
             </div>
           ))}
@@ -174,11 +178,19 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
         {/* Price and CTA */}
         <div className='px-6 pb-6'>
           <div className='text-center mb-4'>
-            <span className='text-4xl font-black text-white'>2,99€</span>
-            <span className='text-slate-400 text-sm ml-2'>/mes</span>
+            <span className='text-4xl font-black text-slate-900 dark:text-white transition-colors'>
+              2,99€
+            </span>
+            <span className='text-slate-500 dark:text-slate-400 text-sm ml-2 transition-colors'>
+              /mes
+            </span>
           </div>
 
-          {error && <p className='text-red-400 text-sm text-center mb-3'>{error}</p>}
+          {error && (
+            <p className='text-red-600 dark:text-red-400 text-sm text-center mb-3 transition-colors'>
+              {error}
+            </p>
+          )}
 
           <Button
             variant='primary'
@@ -206,18 +218,18 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
         </div>
 
         {/* Trust badges */}
-        <div className='px-6 pb-12 flex justify-center gap-6 text-xs text-slate-500 bg-surface-900'>
+        <div className='px-6 pb-12 flex justify-center gap-6 text-xs text-slate-500 bg-white dark:bg-surface-900 transition-colors'>
           <span className='flex items-center gap-1'>
             <Check
               size={14}
-              className='text-green-400'
+              className='text-green-600 dark:text-green-400 transition-colors'
             />
             Pago seguro
           </span>
           <span className='flex items-center gap-1'>
             <Check
               size={14}
-              className='text-green-400'
+              className='text-green-600 dark:text-green-400 transition-colors'
             />
             Cancelable
           </span>

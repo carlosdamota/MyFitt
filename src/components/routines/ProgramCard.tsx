@@ -55,8 +55,8 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
     <div
       className={`relative rounded-2xl overflow-hidden mb-4 transition-all duration-300 group ${
         isActiveProgram
-          ? "bg-surface-900 border border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.15)]"
-          : "bg-surface-900/40 border border-surface-800 hover:border-surface-700 hover:bg-surface-900/60"
+          ? "bg-blue-50 dark:bg-surface-900 border border-blue-400 dark:border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+          : "bg-white dark:bg-surface-900/40 border border-slate-200 dark:border-surface-800 hover:border-slate-300 dark:hover:border-surface-700 hover:bg-slate-50 dark:hover:bg-surface-900/60 transition-colors"
       }`}
     >
       {/* Active glow */}
@@ -72,10 +72,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
         {/* Row 1: Icon + Title */}
         <div className='flex items-start gap-3'>
           <div
-            className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg ${
+            className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg transition-colors ${
               isActiveProgram
                 ? "bg-linear-to-br from-blue-600 to-purple-600 text-white shadow-blue-900/30"
-                : "bg-surface-800 text-slate-400"
+                : "bg-slate-100 dark:bg-surface-800 text-slate-500 dark:text-slate-400"
             }`}
           >
             <Calendar size={20} />
@@ -83,8 +83,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
 
           <div className='flex-1 min-w-0'>
             <h3
-              className={`font-bold text-base sm:text-lg leading-tight mb-1 ${
-                isActiveProgram ? "text-white" : "text-slate-200"
+              className={`font-bold text-base sm:text-lg leading-tight mb-1 transition-colors ${
+                isActiveProgram
+                  ? "text-slate-900 dark:text-white"
+                  : "text-slate-700 dark:text-slate-200"
               }`}
             >
               {title}
@@ -98,7 +100,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                   Oficial
                 </span>
               )}
-              <span className='inline-flex items-center gap-1.5 text-[11px] text-slate-400 bg-surface-800/60 px-2 py-0.5 rounded-md border border-surface-700/50'>
+              <span className='inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-surface-800/60 px-2 py-0.5 rounded-md border border-slate-200 dark:border-surface-700/50 transition-colors'>
                 <span className='w-1.5 h-1.5 rounded-full bg-slate-400' />
                 {totalDays} Días
               </span>
@@ -117,7 +119,9 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Chevron (top-right, always visible) */}
           <button
             className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-              isExpanded ? "bg-surface-800 text-slate-300" : "text-slate-500"
+              isExpanded
+                ? "bg-slate-100 dark:bg-surface-800 text-slate-600 dark:text-slate-300"
+                : "text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-transparent"
             }`}
           >
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -133,10 +137,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                 onActivate(sortedRoutines[0].id);
               }
             }}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.97] ${
+            className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm dark:shadow-md active:scale-[0.97] ${
               isActiveProgram
                 ? "bg-blue-600 text-white shadow-blue-900/30 hover:bg-blue-500"
-                : "bg-surface-800 text-slate-300 border border-surface-700 hover:bg-surface-700 hover:text-white"
+                : "bg-slate-50 dark:bg-surface-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-surface-700 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-surface-700 dark:hover:text-white"
             }`}
           >
             {isActiveProgram ? (
@@ -154,7 +158,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                 e.stopPropagation();
                 if (confirm("¿Borrar todo el programa y sus rutinas?")) onDeleteProgram(programId);
               }}
-              className='shrink-0 p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded-xl transition-colors border border-surface-800'
+              className='shrink-0 p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors border border-slate-200 dark:border-surface-800'
               title='Borrar Programa'
             >
               <Trash2 size={16} />
@@ -165,7 +169,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
 
       {/* Day List */}
       {isExpanded && (
-        <div className='border-t border-surface-800/50 bg-surface-950/30 p-2 space-y-1'>
+        <div className='border-t border-slate-200 dark:border-surface-800/50 bg-slate-50 dark:bg-surface-950/30 p-2 space-y-1 transition-colors'>
           {sortedRoutines.map(({ id, data }) => (
             <div
               key={id}
@@ -173,7 +177,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
               className={`group/day flex items-center gap-3 p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer ${
                 activeRoutineId === id
                   ? "bg-blue-500/10 border-blue-500/50"
-                  : "bg-transparent border-transparent hover:bg-surface-800/40 hover:border-surface-700/50"
+                  : "bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-surface-800/40 hover:border-slate-200 dark:hover:border-surface-700/50"
               }`}
             >
               {/* Day number */}
@@ -181,7 +185,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                 className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border transition-colors ${
                   activeRoutineId === id
                     ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/40"
-                    : "bg-surface-800/80 border-surface-700 text-slate-400"
+                    : "bg-white dark:bg-surface-800/80 border-slate-200 dark:border-surface-700 text-slate-500 dark:text-slate-400"
                 }`}
               >
                 {data.dayNumber || 0}
@@ -190,13 +194,15 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
               {/* Text */}
               <div className='flex-1 min-w-0'>
                 <h4
-                  className={`font-semibold text-sm truncate ${
-                    activeRoutineId === id ? "text-blue-100" : "text-slate-300"
+                  className={`font-semibold text-sm truncate transition-colors ${
+                    activeRoutineId === id
+                      ? "text-blue-700 dark:text-blue-100"
+                      : "text-slate-800 dark:text-slate-300 group-hover/day:text-slate-900 dark:group-hover/day:text-white"
                   }`}
                 >
                   {cleanRoutineTitle(data.title) || `Día ${data.dayNumber}`}
                 </h4>
-                <p className='text-[10px] text-slate-500 truncate'>
+                <p className='text-[10px] text-slate-500 dark:text-slate-500 truncate transition-colors'>
                   {data.focus}
                   <span className='mx-1'>·</span>
                   {data.blocks.length} Bloques
@@ -214,7 +220,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                       e.stopPropagation();
                       if (confirm("¿Borrar este día?")) onDeleteRoutine(id);
                     }}
-                    className='p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-900/10 rounded-lg transition-colors sm:opacity-0 group-hover/day:opacity-100 focus:opacity-100'
+                    className='p-1.5 text-slate-400 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors sm:opacity-0 group-hover/day:opacity-100 focus:opacity-100'
                     title='Eliminar día'
                   >
                     <Trash2 size={14} />

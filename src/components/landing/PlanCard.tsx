@@ -27,23 +27,27 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     className={`flex flex-col justify-between rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
       tone === "accent"
         ? "border-primary-400/40 bg-primary-500/10"
-        : "border-surface-800 bg-surface-900/60"
+        : "border-slate-200 dark:border-surface-800 bg-white/60 dark:bg-surface-900/60"
     }`}
   >
     <div className='flex items-start justify-between'>
       <div>
         <p className='text-xs uppercase tracking-[0.2em] text-slate-400'>{badge}</p>
-        <h3 className='text-2xl font-bold text-white'>{title}</h3>
+        <h3 className='text-2xl font-bold text-slate-900 dark:text-white transition-colors'>
+          {title}
+        </h3>
       </div>
       <span
         className={`text-sm font-semibold px-3 py-1 rounded-full ${
-          tone === "accent" ? "bg-primary-500/20 text-primary-200" : "bg-surface-800 text-slate-300"
+          tone === "accent"
+            ? "bg-primary-500/20 text-primary-200"
+            : "bg-slate-100 dark:bg-surface-800 text-slate-600 dark:text-slate-300"
         }`}
       >
         {price}
       </span>
     </div>
-    <p className='text-slate-300'>{desc}</p>
+    <p className='text-slate-500 dark:text-slate-300'>{desc}</p>
     <ul className='space-y-2 text-sm text-slate-400'>
       {features.map((item) => (
         <li
