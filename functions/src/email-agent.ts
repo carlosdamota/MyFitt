@@ -693,6 +693,140 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
     },
   );
 
+  // ─── 2d. ONBOARDING REMINDER NUDGE (Scheduled) ────────────────────────
+  // Nudges users who created their account ~24h ago but haven't completed onboarding.
+  const queueOnboardingReminderNudge = onSchedule(
+    { schedule: "every day 14:00", timeZone: campaignTimeZone },
+    async () => {
+      logger.info("Running onboarding reminder queue...", { campaignTimeZone });
+
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+      // Grace period of ~24h to max 48h to prevent spamming old users
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+      const maxQueuedPerRun = 80;
+
+      const usersRef = db.collection("artifacts").doc(appId).collection("users");
+      const usersSnap = await usersRef.listDocuments();
+
+      let queuedCount = 0;
+      let sentEmailCount = 0;
+      let skippedOutreachCap = 0;
+
+      for (const userDocRef of usersSnap) {
+        if (queuedCount >= maxQueuedPerRun) break;
+
+        const profileRef = userDocRef.collection("app_data").doc("profile");
+        const profileSnap = await profileRef.get();
+        const profile = profileSnap.data();
+
+        // Check if onboarding is already completed
+        if (profile?.onboardingCompleted === true) continue;
+
+        // Verify account age (must be between 24h and 48h old)
+        // If not found in profile, try to fetch from auth record
+        let createdAtRaw = profile?.createdAt;
+        let authEmail = profile?.email;
+        let authName = profile?.displayName;
+
+        if (!createdAtRaw || !authEmail) {
+          try {
+            const userRecord = await auth.getUser(userDocRef.id);
+            createdAtRaw = createdAtRaw || userRecord.metadata.creationTime;
+            authEmail = authEmail || userRecord.email;
+            authName = authName || userRecord.displayName;
+          } catch (e) {
+            // User might be deleted in auth but not firestore
+            continue;
+          }
+        }
+
+        const createdAt =
+          typeof createdAtRaw === "string"
+            ? new Date(createdAtRaw)
+            : (createdAtRaw?.toDate?.() ?? null);
+
+        if (!createdAt || Number.isNaN(createdAt.getTime())) continue;
+
+        // Skip if they are too new (less than 24h) or too old (more than 48h)
+        if (createdAt > oneDayAgo || createdAt < twoDaysAgo) continue;
+
+        // Check if we already sent this reminder
+        if (profile?.onboardingReminderSentAt) continue;
+
+        // Check if they explicitly have routines (safety check)
+        const routinesSnap = await userDocRef.collection("routines").limit(1).get();
+        const hasCustomRoutines = routinesSnap.docs.some((doc) => !doc.data().isDefault);
+        if (hasCustomRoutines) {
+          // They somehow bypassed onboarding but have routines. Mark as complete to avoid further checks.
+          await profileRef.set({ onboardingCompleted: true }, { merge: true });
+          continue;
+        }
+
+        const now = new Date();
+        const hasOutreachSlot = await acquireOutreachSlot(profileRef, now);
+        if (!hasOutreachSlot) {
+          skippedOutreachCap++;
+          continue;
+        }
+
+        const displayName = authName || "Atleta";
+        const emailTemplate: EmailContent = {
+          subject: "Tu plan de entrenamiento inteligente te espera 🚀",
+          body_html: `
+            <p>Hola <strong>${displayName}</strong>,</p>
+            <p>Nos dimos cuenta de que creaste tu cuenta hace poco pero no has terminado de configurar tu perfil en FITTWIZ.</p>
+            <p>La personalización lo es todo. Nuestro asistente IA necesita unos pocos datos sobre tu experiencia, material disponible y objetivos para diseñarte una rutina perfecta.</p>
+            <p>Entra ahora, responde unas breves preguntas en menos de 1 minuto y descubre el entrenamiento que transformará tu físico.</p>
+          `,
+        };
+
+        try {
+          // 1. Send High-Conversion Email if they have not opted out
+          if (authEmail && profile?.emailOptOut !== true) {
+            await sendEmail(authEmail, emailTemplate, userDocRef.id);
+            sentEmailCount++;
+          }
+
+          // 2. Queue Push Notification if push is enabled
+          if (profile?.pushEnabled !== false) {
+            await userDocRef.collection("notifications").add({
+              title: "Termina de configurar tu cuenta ⚙️",
+              body: "Descubre tu rutina ideal generada con IA en 1 minuto.",
+              url: "/app/dashboard",
+              status: "pending",
+              createdAt: new Date(),
+              type: "onboarding_reminder_push",
+            });
+            queuedCount++;
+          }
+
+          // Mark as sent
+          await profileRef.set({ onboardingReminderSentAt: now }, { merge: true });
+        } catch (err) {
+          logger.error(`Failed to execute onboarding reminder for user ${userDocRef.id}`, err);
+        }
+      }
+
+      logger.info("Onboarding reminder queue completed", {
+        queuedCount,
+        sentEmailCount,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+      });
+
+      await persistCampaignMetrics("onboarding_reminder_nudge", {
+        queuedCount,
+        sentEmailCount,
+        skippedOutreachCap,
+        scannedUsers: usersSnap.length,
+      });
+    },
+  );
+
   // ─── 3. SECURITY ALERT (HTTP endpoint) ────────────────────────────
   const sendSecurityAlert = onRequest(
     { timeoutSeconds: 30, invoker: "public" },
@@ -788,6 +922,7 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
     weeklyReengagement,
     queuePushReengagement,
     queueFirstWorkoutNudge,
+    queueOnboardingReminderNudge,
     sendSecurityAlert,
     sendProSubscriptionEmail,
   };
