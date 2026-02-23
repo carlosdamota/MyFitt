@@ -240,11 +240,13 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
             />
           ))
         ) : (
-          <div className='p-12 text-center bg-surface-900/20 rounded-3xl border border-surface-800 border-dashed'>
-            <div className='w-16 h-16 rounded-full bg-surface-800/50 flex items-center justify-center mx-auto mb-4 text-slate-600'>
+          <div className='p-12 text-center bg-slate-50/50 dark:bg-surface-900/20 rounded-3xl border border-slate-200 dark:border-surface-800 border-dashed transition-colors'>
+            <div className='w-16 h-16 rounded-full bg-slate-100 dark:bg-surface-800/50 flex items-center justify-center mx-auto mb-4 text-slate-400 dark:text-slate-600 transition-colors'>
               <Dumbbell size={32} />
             </div>
-            <p className='text-slate-500 font-medium'>No hay ejercicios en esta rutina.</p>
+            <p className='text-slate-500 dark:text-slate-500 font-medium transition-colors'>
+              No hay ejercicios en esta rutina.
+            </p>
           </div>
         )}
       </div>
@@ -273,8 +275,8 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
 
       {/* Confirmation Dialog */}
       {showConfirmFinish && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200'>
-          <div className='relative bg-surface-900 border border-surface-700/50 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl overflow-hidden'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 dark:bg-surface-950/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 transition-colors'>
+          <div className='relative bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700/50 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-xl dark:shadow-2xl overflow-hidden transition-colors'>
             {/* Background Glows */}
             <div className='absolute -top-24 -right-24 w-48 h-48 bg-primary-500/20 rounded-full blur-3xl pointer-events-none' />
             <div className='absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none' />
@@ -286,12 +288,12 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                   className='text-primary-400'
                 />
               </div>
-              <h3 className='text-2xl font-black text-white mb-3 tracking-tight'>
+              <h3 className='text-2xl font-black text-slate-900 dark:text-white mb-3 tracking-tight transition-colors'>
                 ¿Terminar entrenamiento?
               </h3>
-              <p className='text-slate-300 text-sm leading-relaxed mb-8'>
+              <p className='text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8 transition-colors'>
                 Has entrenado durante{" "}
-                <span className='inline-block px-2 py-0.5 bg-surface-800 rounded-lg text-primary-400 font-bold border border-surface-700/50'>
+                <span className='inline-block px-2 py-0.5 bg-slate-100 dark:bg-surface-800 rounded-lg text-blue-600 dark:text-primary-400 font-bold border border-slate-200 dark:border-surface-700/50 transition-colors'>
                   {formatTime(time)}
                 </span>
                 . ¿Quieres finalizar y guardar tu progreso?
@@ -301,13 +303,13 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                 <Button
                   variant='ghost'
                   onClick={handleCancelFinish}
-                  className='flex-1 py-3 text-slate-300 bg-surface-800/50 hover:bg-surface-700 hover:text-white rounded-xl font-bold transition-all border border-surface-700/50'
+                  className='flex-1 py-3 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-surface-800/50 hover:bg-slate-200 dark:hover:bg-surface-700 hover:text-slate-900 dark:hover:text-white rounded-xl font-bold transition-all border border-slate-200 dark:border-surface-700/50'
                 >
                   Cancelar
                 </Button>
                 <Button
                   onClick={handleConfirmFinish}
-                  className='flex-1 py-3 bg-linear-to-r from-primary-500 to-indigo-500 hover:from-primary-400 hover:to-indigo-400 text-white rounded-xl font-bold shadow-lg shadow-primary-500/25 transition-all outline-none border-none'
+                  className='flex-1 py-3 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-primary-500 dark:to-indigo-500 hover:from-blue-500 hover:to-indigo-500 dark:hover:from-primary-400 dark:hover:to-indigo-400 text-white rounded-xl font-bold shadow-md dark:shadow-shadow-lg shadow-blue-500/25 dark:shadow-primary-500/25 transition-all outline-none border-none'
                 >
                   Terminar
                 </Button>
@@ -377,7 +379,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
       />
 
       {/* Rest Timer Overlay */}
-      {showRestTimer && restTimer > 0 && (
+      {showRestTimer && (
         <RestTimer
           timeLeft={restTimer}
           isRunning={isRestTimerRunning}

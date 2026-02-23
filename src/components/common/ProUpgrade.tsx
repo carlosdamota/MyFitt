@@ -48,23 +48,25 @@ const ProUpgrade: React.FC<ProUpgradeProps> = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-surface-900/50 border border-surface-800/50 p-6 flex flex-col items-center justify-center text-center gap-4 group hover:border-amber-500/20 transition-all ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-white dark:bg-surface-900/50 border border-slate-200 dark:border-surface-800/50 p-6 flex flex-col items-center justify-center text-center gap-4 group hover:border-amber-500/20 transition-all shadow-sm dark:shadow-none ${className}`}
     >
       <div className='absolute inset-0 bg-linear-to-br from-amber-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity' />
 
-      <div className='p-3 rounded-full bg-surface-800/50 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-500 transition-colors'>
+      <div className='p-3 rounded-full bg-slate-100 dark:bg-surface-800/50 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-500 transition-colors'>
         <Lock size={24} />
       </div>
 
       <div>
-        <h3 className='text-lg font-bold text-white mb-1 flex items-center justify-center gap-2'>
+        <h3 className='text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-center gap-2 transition-colors'>
           {title}
           <Sparkles
             size={16}
             className='text-amber-400'
           />
         </h3>
-        <p className='text-sm text-slate-400 max-w-xs mx-auto'>{description}</p>
+        <p className='text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto transition-colors'>
+          {description}
+        </p>
       </div>
 
       <button

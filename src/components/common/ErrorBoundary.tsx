@@ -33,20 +33,26 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className='min-h-screen bg-surface-950 flex items-center justify-center p-4'>
-          <div className='bg-surface-900 border border-red-900/50 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl'>
-            <div className='bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6'>
+        <div className='min-h-screen bg-slate-50 dark:bg-surface-950 flex items-center justify-center p-4 transition-colors'>
+          <div className='bg-white dark:bg-surface-900 border border-red-200 dark:border-red-900/50 rounded-2xl p-8 max-w-md w-full text-center shadow-xl dark:shadow-2xl transition-colors'>
+            <div className='bg-red-50 dark:bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors'>
               <AlertTriangle
                 size={32}
-                className='text-red-500'
+                className='text-red-600 dark:text-red-500 transition-colors'
               />
             </div>
-            <h2 className='text-2xl font-bold text-white mb-2'>Algo salió mal</h2>
-            <p className='text-slate-400 mb-6'>Ha ocurrido un error inesperado en la aplicación.</p>
+            <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+              Algo salió mal
+            </h2>
+            <p className='text-slate-600 dark:text-slate-400 mb-6 transition-colors'>
+              Ha ocurrido un error inesperado en la aplicación.
+            </p>
 
             {this.state.error && (
-              <div className='bg-surface-950 p-4 rounded-lg border border-surface-800 text-left mb-6 overflow-auto max-h-40'>
-                <p className='text-red-400 font-mono text-xs'>{this.state.error.toString()}</p>
+              <div className='bg-slate-50 dark:bg-surface-950 p-4 rounded-lg border border-slate-200 dark:border-surface-800 text-left mb-6 overflow-auto max-h-40 transition-colors'>
+                <p className='text-red-600 dark:text-red-400 font-mono text-xs transition-colors'>
+                  {this.state.error.toString()}
+                </p>
               </div>
             )}
 

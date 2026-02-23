@@ -76,7 +76,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
     <div>
       {/* Header */}
       <div className='flex items-center justify-between mb-4'>
-        <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider'>
+        <h3 className='text-xs text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider transition-colors'>
           <FileText
             size={14}
             className='text-emerald-400'
@@ -101,16 +101,18 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
           return (
             <div
               key={date}
-              className='bg-surface-900 rounded-3xl border border-surface-800 shadow-xl overflow-hidden relative'
+              className='bg-white dark:bg-surface-900 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-lg dark:shadow-xl overflow-hidden relative transition-colors'
             >
               {/* Date Header */}
-              <div className='flex items-center justify-between px-5 py-3 bg-surface-800/30 border-b border-surface-800'>
+              <div className='flex items-center justify-between px-5 py-3 bg-slate-50 dark:bg-surface-800/30 border-b border-slate-200 dark:border-surface-800 transition-colors'>
                 <div className='flex items-center gap-2'>
                   <Calendar
                     size={14}
                     className='text-slate-400'
                   />
-                  <span className='text-slate-200 font-bold text-sm'>{formatDate(date)}</span>
+                  <span className='text-slate-800 dark:text-slate-200 font-bold text-sm transition-colors'>
+                    {formatDate(date)}
+                  </span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <span className='text-[10px] text-slate-500 font-mono'>
@@ -127,17 +129,17 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
               </div>
 
               {/* Exercise Rows */}
-              <div className='divide-y divide-surface-800/50'>
+              <div className='divide-y divide-slate-100 dark:divide-surface-800/50'>
                 {daysLogs.map((log, i) => (
                   <div
                     key={i}
-                    className='flex items-center gap-4 px-5 py-3.5 hover:bg-surface-800/30 transition-colors'
+                    className='flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-surface-800/30 transition-colors'
                   >
                     <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-semibold text-slate-200 truncate'>
+                      <p className='text-sm font-semibold text-slate-800 dark:text-slate-200 truncate transition-colors'>
                         {log.exercise}
                       </p>
-                      <p className='text-[11px] text-slate-400 font-medium mt-0.5'>
+                      <p className='text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 transition-colors'>
                         {log.weight}kg × {log.reps} reps × {log.sets} series
                       </p>
                     </div>
@@ -157,11 +159,11 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
               </div>
 
               {/* Daily Footer */}
-              <div className='flex items-center justify-between px-5 py-3.5 bg-surface-950/50 border-t border-surface-800/50'>
+              <div className='flex items-center justify-between px-5 py-3.5 bg-slate-50 dark:bg-surface-950/50 border-t border-slate-200 dark:border-surface-800/50 transition-colors'>
                 <span className='text-[10px] text-slate-500 uppercase font-bold tracking-widest'>
                   Vol. Diario
                 </span>
-                <span className='text-sm font-black text-white font-mono'>
+                <span className='text-sm font-black text-slate-900 dark:text-white font-mono transition-colors'>
                   {dailyVolume >= 1000 ? `${(dailyVolume / 1000).toFixed(1)}k` : dailyVolume}
                 </span>
               </div>

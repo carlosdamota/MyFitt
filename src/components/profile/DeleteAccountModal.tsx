@@ -93,6 +93,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   const performDeletion = async () => {
     setIsDeleting(true);
     setError(null);
+    sessionStorage.setItem("isDeletingAccount", "true");
 
     try {
       const token = await user.getIdToken();
@@ -108,15 +109,18 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        sessionStorage.removeItem("isDeletingAccount");
         throw new Error(data.error || "Failed to delete account");
       }
 
       await auth?.signOut();
+      sessionStorage.removeItem("isDeletingAccount");
       onAccountDeleted();
     } catch (err: any) {
       console.error("Delete account error:", err);
       setError("Error al comunicar con el servidor. Inténtalo de nuevo.");
       setIsDeleting(false);
+      sessionStorage.removeItem("isDeletingAccount");
     }
   };
 
@@ -132,8 +136,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
         onClick={handleClose}
       />
 
-      <div className='relative bg-surface-900 border border-surface-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl'>
-        <div className='flex items-center justify-between p-4 border-b border-surface-800'>
+      <div className='relative bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-sm dark:shadow-2xl transition-colors'>
+        <div className='flex items-center justify-between p-4 border-b border-slate-200 dark:border-surface-800'>
           <div className='flex items-center gap-2'>
             {step === "feedback" ? (
               <MessageSquare
@@ -146,14 +150,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 className='text-danger-400'
               />
             )}
-            <h2 className='text-lg font-bold text-white'>
+            <h2 className='text-lg font-bold text-slate-900 dark:text-white'>
               {step === "feedback" ? "¿Por qué te vas?" : "Confirmar eliminación"}
             </h2>
           </div>
           <Button
             variant='ghost'
             onClick={handleClose}
-            className='p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors'
+            className='p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors'
             aria-label='Cerrar modal'
           >
             <X size={18} />
@@ -163,7 +167,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
         <div className='p-4'>
           {step === "feedback" && (
             <div className='space-y-4'>
-              <p className='text-sm text-slate-400'>
+              <p className='text-sm text-slate-500 dark:text-slate-400'>
                 Tu opinión nos ayuda a mejorar. Es completamente opcional y anónima.
               </p>
 
@@ -173,8 +177,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                     key={reason.id}
                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                       selectedReason === reason.id
-                        ? "border-danger-500/50 bg-danger-500/10 text-white"
-                        : "border-surface-700 bg-surface-800/50 text-slate-300 hover:border-surface-600"
+                        ? "border-danger-500/50 bg-danger-50 text-danger-700 dark:bg-danger-500/10 dark:text-white"
+                        : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-surface-700 dark:bg-surface-800/50 dark:text-slate-300 dark:hover:border-surface-600"
                     }`}
                   >
                     <input
@@ -187,7 +191,9 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                     />
                     <div
                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        selectedReason === reason.id ? "border-danger-500" : "border-slate-600"
+                        selectedReason === reason.id
+                          ? "border-danger-500"
+                          : "border-slate-300 dark:border-slate-600"
                       }`}
                     >
                       {selectedReason === reason.id && (
@@ -206,7 +212,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                   placeholder='Cuéntanos más (opcional)...'
                   rows={3}
                   maxLength={1000}
-                  className='w-full bg-surface-800 border border-surface-700 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 resize-none'
+                  className='w-full bg-slate-50 dark:bg-surface-800 border border-slate-200 dark:border-surface-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 resize-none'
                 />
               )}
 
@@ -254,16 +260,17 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-slate-300 mb-2'>
-                  Escribe <span className='font-mono text-danger-400'>ELIMINAR</span> para
-                  confirmar:
+                <label className='block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2'>
+                  Escribe{" "}
+                  <span className='font-mono text-danger-500 dark:text-danger-400'>ELIMINAR</span>{" "}
+                  para confirmar:
                 </label>
                 <input
                   type='text'
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
                   placeholder='ELIMINAR'
-                  className='w-full bg-surface-800 border border-surface-700 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-danger-500/50 font-mono tracking-wider'
+                  className='w-full bg-slate-50 dark:bg-surface-800 border border-slate-300 dark:border-surface-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-danger-500/50 font-mono tracking-wider transition-colors'
                   autoComplete='off'
                 />
               </div>

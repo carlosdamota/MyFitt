@@ -48,8 +48,10 @@ const MacroBar: React.FC<MacroBarProps> = ({ label, current, target, color, icon
         <span className={`font-bold flex items-center gap-1.5 ${color}`}>
           <Icon size={14} /> {label}
         </span>
-        <span className={`font-mono text-[11px] ${isOver ? "text-red-400" : "text-slate-300"}`}>
-          <span className='text-white font-black'>{Math.round(current)}</span>
+        <span
+          className={`font-mono text-[11px] ${isOver ? "text-red-400" : "text-slate-500 dark:text-slate-300"}`}
+        >
+          <span className='text-slate-900 dark:text-white font-black'>{Math.round(current)}</span>
           <span className='opacity-50'>/</span>
           {target}g
           {isOver && (
@@ -60,7 +62,7 @@ const MacroBar: React.FC<MacroBarProps> = ({ label, current, target, color, icon
           )}
         </span>
       </div>
-      <div className='h-2.5 bg-surface-950/80 rounded-full overflow-hidden border border-surface-800/80 shadow-inner'>
+      <div className='h-2.5 bg-slate-100 dark:bg-surface-950/80 rounded-full overflow-hidden border border-slate-200 dark:border-surface-800/80 shadow-sm dark:shadow-inner transition-colors'>
         <div
           className={`h-full transition-all duration-700 ease-out ${getGradient()} shadow-lg relative`}
           style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -114,12 +116,12 @@ const MacroSummary: React.FC<MacroSummaryProps> = ({ dayTotals, targets }) => {
   const isCaloriesOver = dayTotals.calories > targets.calories;
 
   return (
-    <div className='relative overflow-hidden bg-surface-900 rounded-3xl border border-surface-800 p-6 shadow-2xl'>
+    <div className='relative overflow-hidden bg-white dark:bg-surface-900 rounded-3xl border border-slate-200 dark:border-surface-800 p-6 shadow-sm dark:shadow-2xl transition-colors'>
       {/* Subtle energetic glow in the background */}
       <div className='absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none' />
       <div className='absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none' />
 
-      <h3 className='text-sm font-bold text-slate-300 uppercase mb-8 flex items-center gap-2 tracking-widest relative z-10'>
+      <h3 className='text-sm font-bold text-slate-700 dark:text-slate-300 uppercase mb-8 flex items-center gap-2 tracking-widest relative z-10 transition-colors'>
         <Utensils
           size={18}
           className='text-blue-400'
@@ -144,7 +146,7 @@ const MacroSummary: React.FC<MacroSummaryProps> = ({ dayTotals, targets }) => {
               fill='none'
               stroke='currentColor'
               strokeWidth={strokeWidth}
-              className='text-surface-800'
+              className='text-slate-200 dark:text-surface-800 transition-colors'
               strokeLinecap='butt'
             />
 
@@ -200,7 +202,7 @@ const MacroSummary: React.FC<MacroSummaryProps> = ({ dayTotals, targets }) => {
           {/* Inner Text */}
           <div className='absolute inset-0 flex flex-col items-center justify-center'>
             <span
-              className={`text-3xl font-mono font-black tracking-tighter ${isCaloriesOver ? "text-red-400" : "text-white"}`}
+              className={`text-3xl font-mono font-black tracking-tighter ${isCaloriesOver ? "text-red-400" : "text-slate-900 dark:text-white"} transition-colors`}
             >
               {Math.round(dayTotals.calories)}
             </span>
@@ -217,21 +219,21 @@ const MacroSummary: React.FC<MacroSummaryProps> = ({ dayTotals, targets }) => {
               <span className='text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1'>
                 Objetivo Total
               </span>
-              <span className='text-3xl font-mono font-black text-white'>
+              <span className='text-3xl font-mono font-black text-slate-900 dark:text-white transition-colors'>
                 {targets.calories}{" "}
                 <span className='text-sm text-slate-500 tracking-normal font-sans font-medium'>
                   kcal
                 </span>
               </span>
             </div>
-            <div className='bg-surface-800/60 px-2.5 py-1 rounded-lg border border-surface-700/50 flex items-center justify-center mb-1 shadow-inner'>
-              <span className='text-sm font-bold text-slate-300'>
+            <div className='bg-slate-100 dark:bg-surface-800/60 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-surface-700/50 flex items-center justify-center mb-1 shadow-sm dark:shadow-inner transition-colors'>
+              <span className='text-sm font-bold text-slate-600 dark:text-slate-300 transition-colors'>
                 {Math.round(caloriesPercentage)}%
               </span>
             </div>
           </div>
 
-          <div className='h-3 bg-surface-950/80 rounded-full overflow-hidden border border-surface-800/80 shadow-inner'>
+          <div className='h-3 bg-slate-100 dark:bg-surface-950/80 rounded-full overflow-hidden border border-slate-200 dark:border-surface-800/80 shadow-sm dark:shadow-inner transition-colors'>
             <div
               className={`h-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(0,0,0,0.4)] ${isCaloriesOver ? "bg-red-500" : "bg-linear-to-r from-emerald-500 to-green-400"} relative`}
               style={{ width: `${Math.min(caloriesPercentage, 100)}%` }}
@@ -251,7 +253,7 @@ const MacroSummary: React.FC<MacroSummaryProps> = ({ dayTotals, targets }) => {
       </div>
 
       {/* Macro Bars */}
-      <div className='grid grid-cols-1 gap-5 pt-4 border-t border-surface-800/50 relative z-10'>
+      <div className='grid grid-cols-1 gap-5 pt-4 border-t border-slate-200 dark:border-surface-800/50 relative z-10 transition-colors'>
         <MacroBar
           label='Proteína'
           current={dayTotals.protein}

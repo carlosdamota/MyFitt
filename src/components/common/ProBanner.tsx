@@ -8,11 +8,7 @@ interface ProBannerProps {
   variant?: "subtle" | "prominent";
 }
 
-const ProBanner: React.FC<ProBannerProps> = ({
-  isPro,
-  remaining,
-  variant = "subtle",
-}) => {
+const ProBanner: React.FC<ProBannerProps> = ({ isPro, remaining, variant = "subtle" }) => {
   const { openProUpgradeModal } = useProUpgrade();
 
   if (isPro) return null;
@@ -21,17 +17,21 @@ const ProBanner: React.FC<ProBannerProps> = ({
 
   if (variant === "prominent") {
     return (
-      <div className='rounded-2xl border border-blue-500/30 bg-linear-to-r from-blue-900/30 to-purple-900/30 p-4'>
+      <div className='rounded-2xl border border-blue-200 dark:border-blue-500/30 bg-linear-to-r from-blue-50 dark:from-blue-900/30 to-purple-50 dark:to-purple-900/30 p-4 transition-colors'>
         <div className='flex items-center gap-3'>
-          <div className='p-2 rounded-xl bg-blue-500/20'>
+          <div className='p-2 rounded-xl bg-blue-100 dark:bg-blue-500/20 transition-colors'>
             <Sparkles
               size={20}
               className='text-blue-400'
             />
           </div>
           <div className='flex-1'>
-            <p className='text-sm font-bold text-white'>Desbloquea más generaciones con Pro</p>
-            <p className='text-xs text-slate-400'>20 rutinas de IA al mes</p>
+            <p className='text-sm font-bold text-slate-900 dark:text-white transition-colors'>
+              Desbloquea más generaciones con Pro
+            </p>
+            <p className='text-xs text-slate-600 dark:text-slate-400 transition-colors'>
+              20 rutinas de IA al mes
+            </p>
           </div>
           <button
             onClick={handleUpgrade}
@@ -47,13 +47,13 @@ const ProBanner: React.FC<ProBannerProps> = ({
   return (
     <button
       onClick={handleUpgrade}
-      className='w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-linear-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 hover:border-blue-500/40 transition-colors group'
+      className='w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-linear-to-r from-blue-50 dark:from-blue-600/10 to-purple-50 dark:to-purple-600/10 border border-blue-200 dark:border-blue-500/20 hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors group'
     >
       <Zap
         size={14}
         className='text-blue-400 group-hover:text-blue-300'
       />
-      <span className='text-xs font-semibold text-slate-300 group-hover:text-white'>
+      <span className='text-xs font-semibold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors'>
         {remaining !== undefined && remaining <= 3
           ? `Solo ${remaining} generaciones restantes. `
           : ""}

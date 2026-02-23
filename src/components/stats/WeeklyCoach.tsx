@@ -62,7 +62,7 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
   return (
     <div className='space-y-4'>
       {/* CTA Card */}
-      <div className='relative overflow-hidden bg-surface-900/80 border border-purple-500/20 rounded-2xl p-6 text-center'>
+      <div className='relative overflow-hidden bg-white/80 dark:bg-surface-900/80 border border-purple-200 dark:border-purple-500/20 rounded-2xl p-6 text-center transition-colors'>
         {/* Background decoration */}
         <div className='absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none' />
         <div className='absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none' />
@@ -75,8 +75,10 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
             />
           </div>
 
-          <h3 className='text-lg font-bold text-white mb-1'>Coach Personal IA</h3>
-          <p className='text-sm text-slate-400 mb-6 max-w-xs mx-auto'>
+          <h3 className='text-lg font-bold text-slate-900 dark:text-white mb-1 transition-colors'>
+            Coach Personal IA
+          </h3>
+          <p className='text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-xs mx-auto transition-colors'>
             Análisis crítico de tu frecuencia, cargas y progreso semanal.
           </p>
 
@@ -105,18 +107,20 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
 
       {/* Report */}
       {report && (
-        <div className='bg-surface-900/80 rounded-2xl border border-surface-800/50 p-5 animate-in fade-in slide-in-from-bottom-4 duration-300'>
+        <div className='bg-white/80 dark:bg-surface-900/80 rounded-2xl border border-slate-200 dark:border-surface-800/50 p-5 animate-in fade-in slide-in-from-bottom-4 duration-300 transition-colors'>
           <div className='flex items-center gap-2 mb-4'>
             <Sparkles
               size={14}
               className='text-purple-400'
             />
-            <span className='text-[11px] font-bold text-purple-300 uppercase tracking-wider'>
+            <span className='text-[11px] font-bold text-purple-600 dark:text-purple-300 uppercase tracking-wider transition-colors'>
               Reporte de Inteligencia
             </span>
           </div>
-          <div className='text-sm text-slate-200 whitespace-pre-wrap leading-relaxed'>{report}</div>
-          <div className='mt-5 pt-3 border-t border-surface-800/50 flex justify-between text-[9px] text-slate-600 font-bold uppercase tracking-wider'>
+          <div className='text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed transition-colors'>
+            {report}
+          </div>
+          <div className='mt-5 pt-3 border-t border-slate-200 dark:border-surface-800/50 flex justify-between text-[9px] text-slate-500 dark:text-slate-600 font-bold uppercase tracking-wider transition-colors'>
             <span>Gemini AI</span>
             <span>{new Date().toLocaleDateString()}</span>
           </div>

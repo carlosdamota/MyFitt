@@ -36,7 +36,7 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
   const hasIngredients = ingredients && ingredients.length > 0;
 
   return (
-    <div className='bg-surface-900/80 rounded-2xl border border-surface-800 animate-in slide-in-from-bottom-2 duration-300 hover:border-surface-700 transition-colors group relative'>
+    <div className='bg-white dark:bg-surface-900/80 rounded-2xl border border-slate-200 dark:border-surface-800 animate-in slide-in-from-bottom-2 duration-300 hover:border-slate-300 dark:hover:border-surface-700 transition-colors group relative shadow-sm dark:shadow-none'>
       {/* Main Row */}
       <div className='flex items-center p-4 relative'>
         {/* Ingredient Toggle */}
@@ -45,8 +45,8 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
           disabled={!hasIngredients}
           className={`mr-3 p-1.5 rounded-lg transition-all ${
             hasIngredients
-              ? "hover:bg-surface-800 text-slate-500 hover:text-indigo-400 cursor-pointer"
-              : "text-slate-700 cursor-default opacity-50"
+              ? "hover:bg-slate-100 dark:hover:bg-surface-800 text-slate-400 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 cursor-pointer"
+              : "text-slate-300 dark:text-slate-700 cursor-default opacity-50"
           }`}
         >
           <ChevronDown
@@ -57,11 +57,11 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
 
         {/* Meal Info */}
         <div className='flex-1 min-w-0 pr-2'>
-          <h4 className='font-bold text-slate-200 text-sm group-hover:text-white transition-colors truncate'>
+          <h4 className='font-bold text-slate-800 dark:text-slate-200 text-sm group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate'>
             {food}
           </h4>
           <div className='flex gap-3 text-[10px] text-slate-500 mt-1.5 font-mono font-bold uppercase tracking-wide'>
-            <span className='text-slate-400'>{Math.round(calories)} kcal</span>
+            <span className='text-slate-500 dark:text-slate-400'>{Math.round(calories)} kcal</span>
             <span className='text-slate-600'>|</span>
             <span className='text-blue-500/80'>{Math.round(protein * 100) / 100}p</span>
             <span className='text-purple-500/80'>{Math.round(carbs * 100) / 100}c</span>
@@ -78,7 +78,7 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
                 e.stopPropagation();
                 setShowActions(!showActions);
               }}
-              className='p-2 text-slate-500 hover:text-white hover:bg-surface-800 rounded-lg transition-colors md:hidden'
+              className='p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800 rounded-lg transition-colors md:hidden'
             >
               <MoreHorizontal size={18} />
             </button>
@@ -90,7 +90,7 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
                   className='fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] md:hidden'
                   onClick={() => setShowActions(false)}
                 />
-                <div className='absolute right-0 top-full mt-2 flex flex-col gap-1 bg-surface-950 border border-surface-800 shadow-2xl p-1.5 rounded-xl z-50 animate-in zoom-in-95 duration-200 min-w-[40px] md:hidden'>
+                <div className='absolute right-0 top-full mt-2 flex flex-col gap-1 bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-800 shadow-2xl p-1.5 rounded-xl z-50 animate-in zoom-in-95 duration-200 min-w-[40px] md:hidden'>
                   {onDuplicate && (
                     <button
                       onClick={() => {
@@ -184,21 +184,25 @@ const MealDetailCard: React.FC<MealDetailCardProps> = ({
 
       {/* Ingredients Panel */}
       {hasIngredients && expanded && (
-        <div className='border-t border-surface-800/60 bg-surface-950/30 px-4 py-3 space-y-2 animate-in slide-in-from-top-1 duration-200 rounded-b-2xl'>
+        <div className='border-t border-slate-200 dark:border-surface-800/60 bg-slate-50 dark:bg-surface-950/30 px-4 py-3 space-y-2 animate-in slide-in-from-top-1 duration-200 rounded-b-2xl transition-colors'>
           {ingredients.map((ing, idx) => (
             <div
               key={idx}
-              className='flex items-center justify-between text-[11px] py-1.5 border-b border-surface-800/30 last:border-0'
+              className='flex items-center justify-between text-[11px] py-1.5 border-b border-slate-100 dark:border-surface-800/30 last:border-0'
             >
               <div className='flex items-center gap-2 min-w-0 flex-1'>
-                <span className='text-slate-300 font-medium truncate'>{ing.name}</span>
+                <span className='text-slate-700 dark:text-slate-300 font-medium truncate'>
+                  {ing.name}
+                </span>
                 <span className='text-slate-600 text-[10px] shrink-0 font-mono'>{ing.amount}</span>
               </div>
               <div className='flex gap-3 font-mono text-[10px] shrink-0 ml-3 opacity-70'>
                 <span className='text-blue-400'>{Math.round(ing.p * 100) / 100}p</span>
                 <span className='text-purple-400'>{Math.round(ing.c * 100) / 100}c</span>
                 <span className='text-yellow-400'>{Math.round(ing.f * 100) / 100}f</span>
-                <span className='text-slate-300 font-bold ml-1'>{Math.round(ing.cal)}</span>
+                <span className='text-slate-700 dark:text-slate-300 font-bold ml-1'>
+                  {Math.round(ing.cal)}
+                </span>
               </div>
             </div>
           ))}

@@ -48,9 +48,9 @@ const InfoTooltip: React.FC<{ text: string }> = ({ text }) => {
         <Info size={10} />
       </button>
       {isVisible && (
-        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-surface-900/95 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 text-[10px] text-slate-300 pointer-events-none animate-in fade-in zoom-in-95 duration-200'>
+        <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-white/95 dark:bg-surface-900/95 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl shadow-xl z-50 text-[10px] text-slate-700 dark:text-slate-300 pointer-events-none animate-in fade-in zoom-in-95 duration-200 transition-colors'>
           {text}
-          <div className='absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-surface-900/95' />
+          <div className='absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-white/95 dark:border-t-surface-900/95 transition-colors' />
         </div>
       )}
     </div>
@@ -93,7 +93,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={weight}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setWeight(e.target.value)}
-          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
+          className='w-full bg-slate-50 dark:bg-surface-950/80 border border-slate-200 dark:border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-blue-500/50 dark:focus:ring-cyan-400/50 focus:bg-white dark:focus:bg-surface-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-700'
           placeholder='kg'
         />
       </div>
@@ -106,7 +106,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={reps}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setReps(e.target.value)}
-          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
+          className='w-full bg-slate-50 dark:bg-surface-950/80 border border-slate-200 dark:border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-blue-500/50 dark:focus:ring-cyan-400/50 focus:bg-white dark:focus:bg-surface-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-700'
           placeholder='0'
         />
       </div>
@@ -119,7 +119,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={sets}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setSets(e.target.value)}
-          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
+          className='w-full bg-slate-50 dark:bg-surface-950/80 border border-slate-200 dark:border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-blue-500/50 dark:focus:ring-cyan-400/50 focus:bg-white dark:focus:bg-surface-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-700'
         />
       </div>
       <div className='flex-1 min-w-0'>
@@ -131,7 +131,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           type='number'
           value={rpe}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setRpe(e.target.value)}
-          className='w-full bg-surface-950/80 border border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-white focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 focus:bg-surface-900 outline-none transition-all placeholder:text-slate-500 shadow-inner hover:border-surface-700'
+          className='w-full bg-slate-50 dark:bg-surface-950/80 border border-slate-200 dark:border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-blue-500/50 dark:focus:ring-cyan-400/50 focus:bg-white dark:focus:bg-surface-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-700'
           placeholder='1-10'
         />
       </div>
@@ -141,8 +141,8 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
           disabled={isDisabled}
           className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 active:scale-90 disabled:opacity-20 disabled:cursor-not-allowed ${
             justSaved
-              ? "bg-linear-to-br from-success-500 to-emerald-600 text-white shadow-lg shadow-success-500/20 border-none"
-              : "bg-linear-to-br from-primary-500 to-indigo-600 text-white shadow-lg shadow-primary-500/30 hover:from-primary-400 hover:to-indigo-500 hover:shadow-primary-500/40 border-none"
+              ? "bg-linear-to-br from-success-500 to-emerald-600 dark:from-success-500 dark:to-emerald-600 text-white shadow-md dark:shadow-lg shadow-success-500/20 border-none"
+              : "bg-linear-to-br from-blue-600 to-indigo-600 dark:from-primary-500 dark:to-indigo-600 text-white shadow-md dark:shadow-lg shadow-blue-500/30 dark:shadow-primary-500/30 hover:from-blue-500 hover:to-indigo-500 dark:hover:from-primary-400 dark:hover:to-indigo-500 hover:shadow-blue-500/40 dark:hover:shadow-primary-500/40 border-none"
           }`}
           title='Guardar serie'
         >

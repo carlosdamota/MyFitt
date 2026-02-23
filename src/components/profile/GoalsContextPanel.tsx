@@ -43,7 +43,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
   };
 
   return (
-    <div className='bg-surface-900/50 p-4 rounded-2xl border border-surface-800'>
+    <div className='bg-white dark:bg-surface-900/50 p-4 rounded-2xl border border-slate-200 dark:border-surface-800 transition-colors'>
       <div className='flex items-start justify-between gap-3 mb-4'>
         <h3 className='text-sm font-bold text-slate-400 uppercase flex items-center gap-2'>
           <Target size={16} /> Objetivos y Contexto
@@ -53,12 +53,12 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
 
       <div className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+          <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
             <label className='text-xs text-slate-500 mb-2 block'>Objetivo Principal</label>
             <select
               value={formData.goal}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => onChange("goal", e.target.value)}
-              className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
+              className='w-full bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-lg p-2.5 text-slate-900 dark:text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-600 cursor-pointer appearance-none'
             >
               <option value='muscle_gain'>Ganar Musculo (Hipertrofia)</option>
               <option value='strength'>Ganar Fuerza</option>
@@ -67,14 +67,14 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
             </select>
           </div>
 
-          <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+          <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
             <label className='text-xs text-slate-500 mb-2 block'>Nivel de Experiencia</label>
             <select
               value={formData.experienceLevel}
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 onChange("experienceLevel", e.target.value)
               }
-              className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
+              className='w-full bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-lg p-2.5 text-slate-900 dark:text-white text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-600 cursor-pointer appearance-none'
             >
               <option value='beginner'>Principiante (0-1 anos)</option>
               <option value='intermediate'>Intermedio (1-3 anos)</option>
@@ -83,7 +83,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           </div>
         </div>
 
-        <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+        <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
           <label className='text-xs text-slate-500 flex items-center gap-1'>
             <Calendar size={12} /> Dias Disponibles por Semana
           </label>
@@ -111,7 +111,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                   className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors relative h-10 ${
                     formData.availableDays === days
                       ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                      : "bg-surface-950 border-surface-700 text-slate-500 hover:border-surface-500 hover:bg-surface-900"
+                      : "bg-white dark:bg-surface-950 border-slate-200 dark:border-surface-700 text-slate-500 hover:border-slate-300 dark:hover:border-surface-500 hover:bg-slate-50 dark:hover:bg-surface-900"
                   }`}
                 >
                   {days}
@@ -126,7 +126,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           )}
         </div>
 
-        <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+        <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
           <label className='text-xs text-slate-500 flex items-center gap-1'>
             <Clock size={12} /> Tiempo Disponible por Sesion (minutos)
           </label>
@@ -139,7 +139,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                 className={`flex-1 py-2 rounded-lg text-sm font-bold border transition-colors ${
                   formData.dailyTimeMinutes === time
                     ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20"
-                    : "bg-surface-950 border-surface-700 text-slate-500 hover:border-surface-500 hover:bg-surface-900"
+                    : "bg-white dark:bg-surface-950 border-slate-200 dark:border-surface-700 text-slate-500 hover:border-slate-300 dark:hover:border-surface-500 hover:bg-slate-50 dark:hover:bg-surface-900"
                 }`}
               >
                 {time}
@@ -149,7 +149,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
         </div>
 
         {/* Training Architecture Section */}
-        <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+        <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
           <div className='flex items-center justify-between mb-3'>
             <label className='text-xs text-slate-500 flex items-center gap-1'>
               <Crown
@@ -174,7 +174,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                   onChange("trainingSplit", e.target.value)
                 }
                 disabled={!isPro}
-                className={`w-full bg-surface-950 border border-surface-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none ${!isPro ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`w-full bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-blue-500 outline-none transition-colors ${!isPro ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <option value='full_body'>Cuerpo Completo (Recomendado)</option>
                 <option value='push_pull_legs'>Push / Pull / Legs</option>
@@ -217,7 +217,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                       className={`py-2 rounded-lg border text-[10px] font-bold transition-all ${
                         isSelected
                           ? "border-blue-500 bg-blue-500/10 text-white shadow-lg shadow-blue-900/20"
-                          : "border-surface-800 bg-surface-950 text-slate-500 hover:border-surface-700"
+                          : "border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950 text-slate-500 hover:border-slate-300 dark:hover:border-surface-700"
                       }`}
                     >
                       {zone.label}
@@ -239,7 +239,7 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           </div>
         </div>
 
-        <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+        <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
           <div className='flex items-center justify-between gap-2'>
             <label className='text-xs text-slate-500 flex items-center gap-1'>
               <Dumbbell size={12} /> Equipamiento Disponible
@@ -254,8 +254,8 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
                   key={option.value}
                   className={`group flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-colors focus-within:ring-1 focus-within:ring-blue-400 select-none ${
                     isSelected
-                      ? "border-blue-500/50 bg-blue-500/10 text-blue-100 shadow-lg shadow-blue-900/10"
-                      : "border-surface-800 bg-surface-950/40 text-slate-300 hover:border-surface-600"
+                      ? "border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-100 shadow-lg shadow-blue-900/10"
+                      : "border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950/40 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-surface-600"
                   }`}
                 >
                   <input
@@ -282,14 +282,14 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           </div>
         </div>
 
-        <div className='rounded-xl border border-surface-800 bg-surface-950/60 p-3'>
+        <div className='rounded-xl border border-slate-200 dark:border-surface-800 bg-slate-50 dark:bg-surface-950/60 p-3 transition-colors'>
           <label className='text-xs text-slate-500 mb-2 flex items-center gap-1'>
             <AlertCircle size={12} /> Lesiones / Limitaciones
           </label>
           <textarea
             value={formData.injuries}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChange("injuries", e.target.value)}
-            className='w-full bg-surface-950 border border-surface-700 rounded-lg p-2 text-white text-sm focus:border-blue-500 outline-none h-16 resize-none'
+            className='w-full bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-blue-500 outline-none h-16 resize-none transition-colors'
             placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
           />
         </div>

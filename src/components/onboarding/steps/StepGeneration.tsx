@@ -48,7 +48,7 @@ export const StepGeneration: React.FC<StepGenerationProps> = ({
             {generationProgress || "Iniciando generación..."}
           </p>
 
-          <div className='w-full max-w-xs h-2 bg-slate-800 rounded-full overflow-hidden'>
+          <div className='w-full max-w-xs h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden transition-colors'>
             <div className='h-full bg-linear-to-r from-blue-500 to-purple-500 rounded-full animate-pulse w-full' />
           </div>
 
@@ -66,8 +66,10 @@ export const StepGeneration: React.FC<StepGenerationProps> = ({
             />
           </div>
 
-          <h2 className='text-2xl font-bold text-white mb-2'>¡Tu plan está listo! 🎉</h2>
-          <p className='text-sm text-slate-400 mb-8 max-w-sm'>
+          <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+            ¡Tu plan está listo! 🎉
+          </h2>
+          <p className='text-sm text-slate-500 dark:text-slate-400 mb-8 max-w-sm'>
             Hemos creado {formData.availableDays} rutinas personalizadas basadas en tu perfil. ¡Es
             hora de entrenar!
           </p>
@@ -93,8 +95,12 @@ export const StepGeneration: React.FC<StepGenerationProps> = ({
             />
           </div>
 
-          <h2 className='text-xl font-bold text-white mb-2'>Perfil guardado</h2>
-          <p className='text-sm text-slate-400 mb-2 max-w-sm'>{generationError}</p>
+          <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-2 transition-colors'>
+            Perfil guardado
+          </h2>
+          <p className='text-sm text-slate-500 dark:text-slate-400 mb-2 max-w-sm'>
+            {generationError}
+          </p>
           <p className='text-xs text-slate-500 mb-8'>
             Puedes generar tu primera rutina desde el Coach IA
           </p>

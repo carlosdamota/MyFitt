@@ -1,6 +1,12 @@
 @import "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap";
 @import "tailwindcss";
 
+/* Load custom colors, fonts, and animations from config */
+@config "../tailwind.config.js";
+
+/* Use class-based dark mode (.dark on <html>) instead of prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Estilos globales y paleta unificada */
 @theme {
   /* Hacemos que Tailwind conozca estas variables personalizadas para el branding (por defecto cyan-500) */
@@ -31,24 +37,20 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Fondo base premium oscuro (Soft Dark) */
-  background-color: #0b1120; /* softer slate-950 */
-  /* Texto general de buen contraste pero no blanco cegador */
-  color: #e2e8f0; /* slate-200 */
 }
 
-/* Fix browser autofill background turning white in dark mode */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
+/* Fix browser autofill background in dark mode */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 40px theme("colors.slate.950", #020617) inset !important;
   -webkit-text-fill-color: theme("colors.slate.100", #f1f5f9) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Fix select dropdown options background in dark mode */
-select option {
+.dark select option {
   background-color: theme("colors.slate.950", #020617);
   color: theme("colors.slate.100", #f1f5f9);
 }

@@ -102,7 +102,7 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequire
 
   return (
     <div className='space-y-6 pb-20 px-1 relative'>
-      <div className='grid grid-cols-2 gap-4 bg-surface-900/50 p-3 rounded-xl border border-surface-800'>
+      <div className='grid grid-cols-2 gap-4 bg-white dark:bg-surface-900/50 p-3 rounded-xl border border-slate-200 dark:border-surface-800 shadow-sm dark:shadow-none transition-colors'>
         <div>
           <label className='text-[10px] uppercase font-bold text-slate-500 mb-1 block'>
             Objetivo
@@ -110,7 +110,7 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequire
           <select
             value={profile?.goal || "muscle_gain"}
             onChange={handleGoalChange}
-            className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
+            className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-lg p-2.5 text-slate-900 dark:text-white text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-600 cursor-pointer appearance-none'
           >
             <option value='muscle_gain'>Ganar Músculo</option>
             <option value='fat_loss'>Perder Grasa</option>
@@ -123,7 +123,7 @@ const NutritionDashboard: React.FC<NutritionDashboardProps> = ({ user, onRequire
           <select
             value={profile?.dietType || "balanced"}
             onChange={handleDietChange}
-            className='w-full bg-surface-950 border border-surface-700/80 rounded-lg p-2.5 text-white text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-inner hover:border-surface-600 cursor-pointer appearance-none'
+            className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-lg p-2.5 text-slate-900 dark:text-white text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 outline-none transition-all shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-600 cursor-pointer appearance-none'
           >
             <option value='balanced'>Equilibrada</option>
             <option value='high_protein'>Alta en Proteína</option>

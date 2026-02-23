@@ -3,7 +3,7 @@ import { Shield, ArrowLeft, Mail } from "lucide-react";
 
 const Privacy = () => {
   return (
-    <div className='min-h-screen bg-slate-950 text-slate-200 p-6 md:p-12 font-sans'>
+    <div className='min-h-screen bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-200 p-6 md:p-12 font-sans transition-colors'>
       <div className='max-w-3xl mx-auto'>
         <a
           href='/'
@@ -19,12 +19,16 @@ const Privacy = () => {
               className='text-blue-400'
             />
           </div>
-          <h1 className='text-3xl md:text-4xl font-bold text-white'>Política de Privacidad</h1>
+          <h1 className='text-3xl md:text-4xl font-bold text-slate-900 dark:text-white transition-colors'>
+            Política de Privacidad
+          </h1>
         </div>
 
-        <div className='space-y-8 text-slate-300 leading-relaxed'>
+        <div className='space-y-8 text-slate-600 dark:text-slate-300 leading-relaxed'>
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>1. Responsable del Tratamiento</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              1. Responsable del Tratamiento
+            </h2>
             <p>
               El responsable del tratamiento de sus datos personales es:
               <br />
@@ -37,7 +41,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>2. Introducción</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              2. Introducción
+            </h2>
             <p>
               En FITTWIZ, la privacidad es una prioridad. Esta política describe cómo se recopila,
               usa y protege tu información personal cuando utilizas la aplicación, en cumplimiento
@@ -47,7 +53,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>3. Información que Recopilamos</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              3. Información que Recopilamos
+            </h2>
             <ul className='list-disc pl-5 space-y-2'>
               <li>
                 <strong>Información de Cuenta:</strong> Tu dirección de correo electrónico y ID de
@@ -70,7 +78,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>4. Base Legal y Finalidad</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              4. Base Legal y Finalidad
+            </h2>
             <p>Tratamos sus datos basándonos en:</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>
@@ -89,7 +99,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>5. Almacenamiento y Conservación</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              5. Almacenamiento y Conservación
+            </h2>
             <p>
               Tus datos se almacenan de forma segura en los servidores de{" "}
               <strong>Google Cloud Platform (Firebase)</strong> en regiones habilitadas.
@@ -103,7 +115,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>6. Destinatarios de los Datos</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              6. Destinatarios de los Datos
+            </h2>
             <p>
               Para prestar nuestros servicios, compartimos datos estrictamente necesarios con los
               siguientes proveedores (Encargados del Tratamiento):
@@ -125,7 +139,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>7. Tus Derechos</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              7. Tus Derechos
+            </h2>
             <p>Como usuario, tiene derecho a:</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
               <li>Acceder, rectificar o suprimir sus datos.</li>
@@ -141,7 +157,9 @@ const Privacy = () => {
           </section>
 
           <section>
-            <h2 className='text-xl font-bold text-white mb-4'>8. Contacto</h2>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              8. Contacto
+            </h2>
             <p className='mb-4'>
               Si tienes preguntas sobre esta política o quieres ejercer tus derechos, contáctanos
               en:
@@ -154,7 +172,7 @@ const Privacy = () => {
             </a>
           </section>
 
-          <div className='pt-8 border-t border-slate-800 text-sm text-slate-500'>
+          <div className='pt-8 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-500 transition-colors'>
             Última actualización: Febrero 2026
           </div>
         </div>

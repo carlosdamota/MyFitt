@@ -13,7 +13,7 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 bg-surface-900/90 backdrop-blur-lg border-t border-surface-800 p-4 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}
+      className={`fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-surface-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-surface-800 p-4 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-all duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}
       role='timer'
       aria-live='polite'
     >
@@ -23,7 +23,7 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
             Descanso Restante
           </span>
           <span
-            className={`text-4xl font-mono font-bold tracking-tighter ${timer < 10 ? "text-danger-500 animate-pulse" : "text-white"}`}
+            className={`text-4xl font-mono font-bold tracking-tighter ${timer < 10 ? "text-danger-500 animate-pulse" : "text-slate-900 dark:text-white transition-colors"}`}
           >
             {timer}
             <span className='text-lg text-slate-600'>s</span>

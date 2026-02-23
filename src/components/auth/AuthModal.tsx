@@ -104,12 +104,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
       title={getTitle()}
       className='max-w-md mx-auto'
     >
-      <div className='space-y-4 text-slate-200'>
+      <div className='space-y-4 text-slate-700 dark:text-slate-200 transition-colors'>
         <div className='flex justify-center'>
           <img
             src={mainLogo.src}
             alt={mainLogo.alt}
-            className='h-12 w-12 rounded-2xl border border-surface-700/70 bg-surface-900/80 p-1.5 object-contain'
+            className='h-12 w-12 rounded-2xl border border-slate-200 dark:border-surface-700/70 bg-white dark:bg-surface-900/80 p-1.5 object-contain transition-colors'
           />
         </div>
         {/* ─── Forgot Password View ─── */}
@@ -134,9 +134,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     className='text-emerald-400'
                   />
                 </div>
-                <p className='text-sm text-slate-200 font-semibold'>¡Email enviado!</p>
-                <p className='text-xs text-slate-400'>
-                  Revisa tu bandeja de entrada en <strong className='text-white'>{email}</strong>.
+                <p className='text-sm text-slate-700 dark:text-slate-200 font-semibold transition-colors'>
+                  ¡Email enviado!
+                </p>
+                <p className='text-xs text-slate-500 dark:text-slate-400 transition-colors'>
+                  Revisa tu bandeja de entrada en{" "}
+                  <strong className='text-slate-900 dark:text-white transition-colors'>
+                    {email}
+                  </strong>
+                  .
                   <br />
                   Sigue el enlace para restablecer tu contraseña.
                 </p>
@@ -157,8 +163,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 </p>
 
                 <div>
-                  <label className='block text-xs text-slate-300 font-semibold'>Email</label>
-                  <div className='flex items-center gap-2 bg-surface-900 border border-surface-700/80 rounded-xl px-3 py-2 focus-within:border-cyan-400/60 mt-1'>
+                  <label className='block text-xs text-slate-600 dark:text-slate-300 font-semibold transition-colors'>
+                    Email
+                  </label>
+                  <div className='flex items-center gap-2 bg-slate-50 dark:bg-surface-900 border border-slate-200 dark:border-surface-700/80 rounded-xl px-3 py-2 focus-within:border-cyan-400/60 mt-1 transition-colors'>
                     <Mail
                       size={14}
                       className='text-slate-400'
@@ -167,7 +175,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       type='email'
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
+                      className='flex-1 bg-transparent text-sm text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors'
                       placeholder='tu@email.com'
                       onKeyDown={(e) => e.key === "Enter" && handleForgotPassword()}
                     />
@@ -196,7 +204,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
                   mode === "login"
                     ? "bg-cyan-500 text-slate-900"
-                    : "bg-surface-800 text-slate-200 hover:bg-surface-700"
+                    : "bg-slate-100 dark:bg-surface-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-surface-700 transition-colors"
                 }`}
               >
                 Entrar
@@ -206,7 +214,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
                   mode === "signup"
                     ? "bg-amber-400 text-slate-900"
-                    : "bg-surface-800 text-slate-200 hover:bg-surface-700"
+                    : "bg-slate-100 dark:bg-surface-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-surface-700 transition-colors"
                 }`}
               >
                 Crear cuenta
@@ -215,10 +223,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
             <div className='space-y-4'>
               <div className='space-y-1.5'>
-                <label className='block text-xs text-slate-300 font-bold ml-1 uppercase tracking-wider'>
+                <label className='block text-xs text-slate-600 dark:text-slate-300 font-bold ml-1 uppercase tracking-wider transition-colors'>
                   Email
                 </label>
-                <div className='flex items-center gap-2 bg-surface-950 border border-surface-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-inner'>
+                <div className='flex items-center gap-2 bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-sm dark:shadow-inner'>
                   <Mail
                     size={16}
                     className='text-slate-500'
@@ -227,17 +235,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     type='email'
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
+                    className='flex-1 bg-transparent text-sm text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors'
                     placeholder='tu@email.com'
                   />
                 </div>
               </div>
 
               <div className='space-y-1.5'>
-                <label className='block text-xs text-slate-300 font-bold ml-1 uppercase tracking-wider'>
+                <label className='block text-xs text-slate-600 dark:text-slate-300 font-bold ml-1 uppercase tracking-wider transition-colors'>
                   Contraseña
                 </label>
-                <div className='flex items-center gap-2 bg-surface-950 border border-surface-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-inner'>
+                <div className='flex items-center gap-2 bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700/80 rounded-xl px-4 py-3 focus-within:border-cyan-400 mt-1 transition-all shadow-sm dark:shadow-inner'>
                   <Lock
                     size={16}
                     className='text-slate-500'
@@ -246,7 +254,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     type='password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className='flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500'
+                    className='flex-1 bg-transparent text-sm text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors'
                     placeholder='••••••••'
                     onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
                   />
@@ -271,7 +279,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* Checkbox for Signup Mode */}
             {mode === "signup" && (
-              <div className='flex items-start gap-2 bg-surface-950/50 p-3 rounded-xl border border-surface-800/50'>
+              <div className='flex items-start gap-2 bg-slate-50 dark:bg-surface-950/50 p-3 rounded-xl border border-slate-200 dark:border-surface-800/50 transition-colors'>
                 <input
                   type='checkbox'
                   id='terms'
@@ -320,21 +328,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
             </button>
 
             <div className='relative flex items-center py-4'>
-              <div className='flex-1 h-px bg-surface-800/60' />
-              <span className='px-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-slate-900 relative z-10'>
+              <div className='flex-1 h-px bg-slate-200 dark:bg-surface-800/60 transition-colors' />
+              <span className='px-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-white dark:bg-slate-900 relative z-10 transition-colors'>
                 O accede con
               </span>
-              <div className='flex-1 h-px bg-surface-800/60' />
+              <div className='flex-1 h-px bg-slate-200 dark:bg-surface-800/60 transition-colors' />
             </div>
 
             <button
               onClick={handleGoogle}
               disabled={loading}
-              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-surface-800 text-white hover:bg-surface-700 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.98] border border-surface-700/50'
+              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-surface-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-surface-700 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.98] border border-slate-200 dark:border-surface-700/50'
             >
               <Chrome
                 size={18}
-                className='text-white'
+                className='text-slate-700 dark:text-white transition-colors'
               />
               Continuar con Google
             </button>

@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import UpdateToast from "./components/common/UpdateToast";
 import NotificationManager from "./components/common/NotificationManager";
 import { ToastProvider } from "./hooks/useToast";
+import { ThemeProvider } from "./contexts/ThemeProvider";
 import "./index.css";
 
 import { HelmetProvider } from "react-helmet-async";
@@ -14,11 +15,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HelmetProvider>
       <ErrorBoundary>
-        <ToastProvider>
-          <RouterProvider router={router} />
-          <UpdateToast />
-          <NotificationManager />
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <RouterProvider router={router} />
+            <UpdateToast />
+            <NotificationManager />
+          </ToastProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </HelmetProvider>
   </React.StrictMode>,

@@ -43,10 +43,10 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
   }, [data, onRequireAuth]);
 
   return (
-    <div className='bg-surface-900/80 rounded-2xl border border-surface-800/50 overflow-hidden'>
+    <div className='bg-white/80 dark:bg-surface-900/80 rounded-2xl border border-slate-200 dark:border-surface-800/50 overflow-hidden transition-colors'>
       {/* Header */}
       <div className='flex items-center justify-between p-4 pb-0'>
-        <h3 className='text-xs text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider'>
+        <h3 className='text-xs text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-2 tracking-wider transition-colors'>
           <BarChart2
             size={14}
             className='text-blue-400'
@@ -75,7 +75,7 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
 
       {/* Chart */}
       <div className='h-44 w-full p-3'>
-        <div className='h-full w-full bg-surface-950/40 rounded-xl border border-surface-800/30 p-2'>
+        <div className='h-full w-full bg-slate-50 dark:bg-surface-950/40 rounded-xl border border-slate-200 dark:border-surface-800/30 p-2 transition-colors'>
           <SimpleChart
             points={data}
             height={200}
@@ -90,12 +90,12 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
 
       {/* AI Analysis */}
       {analysis && (
-        <div className='mx-4 mb-4 p-4 rounded-xl border border-indigo-500/30 bg-indigo-950/40 text-xs animate-in fade-in zoom-in-95 duration-200'>
-          <h4 className='font-bold text-indigo-300 mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider'>
+        <div className='mx-4 mb-4 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-950/40 text-xs animate-in fade-in zoom-in-95 duration-200 transition-colors'>
+          <h4 className='font-bold text-indigo-600 dark:text-indigo-300 mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider transition-colors'>
             <Sparkles size={12} />
             Veredicto IA
           </h4>
-          <div className='text-slate-300 whitespace-pre-wrap leading-relaxed text-[11px]'>
+          <div className='text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed text-[11px] transition-colors'>
             {analysis}
           </div>
         </div>

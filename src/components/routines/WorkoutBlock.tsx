@@ -39,11 +39,11 @@ const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
 }) => {
   return (
     <div className='relative'>
-      <div className='flex items-center justify-between mb-3 px-1'>
-        <span className='text-xs font-bold text-blue-400/80 uppercase tracking-widest pl-2 border-l-2 border-blue-500/50'>
+      <div className='flex items-center justify-between mb-3 px-1 transition-colors'>
+        <span className='text-xs font-bold text-blue-600 dark:text-blue-400/80 uppercase tracking-widest pl-2 border-l-2 border-blue-500/30 dark:border-blue-500/50 transition-colors'>
           BLOQUE {block.id} • {block.exercises.length > 1 ? "SUPERSERIE" : "SERIE"}
         </span>
-        <div className='flex items-center gap-2 bg-surface-900/80 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-lg border border-surface-800 backdrop-blur-sm'>
+        <div className='flex items-center gap-2 bg-blue-50 dark:bg-surface-900/80 text-blue-700 dark:text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-lg border border-blue-200 dark:border-surface-800 backdrop-blur-sm transition-colors'>
           <Clock size={12} />
           <span>{block.rest}s DESCANSO</span>
         </div>

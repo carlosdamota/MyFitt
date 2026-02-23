@@ -85,11 +85,11 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
   };
 
   return (
-    <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-5 space-y-4'>
+    <div className='rounded-2xl border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/40 p-5 space-y-4 shadow-sm dark:shadow-none transition-colors'>
       <div className='flex items-center justify-between gap-3'>
         <div>
           <p className='text-xs text-slate-500 uppercase tracking-wider'>Suscripcion</p>
-          <h3 className='text-xl font-bold text-white flex items-center gap-2'>
+          <h3 className='text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2'>
             {planLabel}
             {plan === "pro" && <Badge variant='primary'>Activo</Badge>}
           </h3>
@@ -133,11 +133,11 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
               id='sub-terms'
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className='mt-1 w-4 h-4 rounded border-surface-700 bg-surface-900 text-primary-500 focus:ring-primary-500/50 shrink-0'
+              className='mt-1 w-4 h-4 rounded border-slate-300 dark:border-surface-700 bg-slate-50 dark:bg-surface-900 text-primary-500 focus:ring-primary-500/50 shrink-0'
             />
             <label
               htmlFor='sub-terms'
-              className='text-[11px] text-slate-300 leading-tight'
+              className='text-[11px] text-slate-700 dark:text-slate-300 leading-tight'
             >
               Acepto las{" "}
               <a

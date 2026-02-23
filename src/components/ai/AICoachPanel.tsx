@@ -61,10 +61,12 @@ const GeneratedRoutinesHistory: React.FC<{
         {programs.slice(0, 3).map((prog, idx) => (
           <div
             key={idx}
-            className='bg-surface-900/30 border border-surface-800 rounded-xl p-3 flex items-center justify-between'
+            className='bg-white dark:bg-surface-900/30 border border-slate-200 dark:border-surface-800 rounded-xl p-3 flex items-center justify-between transition-colors'
           >
             <div>
-              <h4 className='text-sm font-bold text-slate-300'>{prog.title}</h4>
+              <h4 className='text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors'>
+                {prog.title}
+              </h4>
               <div className='flex gap-2 text-[10px] text-slate-500 mt-0.5'>
                 <span>{new Date(prog.date).toLocaleDateString()}</span>
                 <span>•</span>
@@ -117,14 +119,18 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
   if (!formData) {
     return (
       <div className='space-y-4'>
-        <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-5'>
+        <div className='rounded-2xl border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/40 p-5 transition-colors'>
           <div className='flex items-center gap-3'>
             <div className='p-2 rounded-xl bg-emerald-500/10 text-emerald-300'>
               <Sparkles size={18} />
             </div>
             <div>
-              <h3 className='text-base font-semibold text-white'>Activa tu AI Coach</h3>
-              <p className='text-sm text-slate-400'>Completa tu perfil para generar rutinas.</p>
+              <h3 className='text-base font-semibold text-slate-900 dark:text-white transition-colors'>
+                Activa tu AI Coach
+              </h3>
+              <p className='text-sm text-slate-500 dark:text-slate-400'>
+                Completa tu perfil para generar rutinas.
+              </p>
             </div>
           </div>
         </div>
@@ -145,10 +151,12 @@ const AICoachPanel: React.FC<AICoachPanelProps> = ({
 
   return (
     <div className='space-y-5 pb-12'>
-      <div className='rounded-2xl border border-surface-800 bg-surface-900/40 p-4 flex items-center justify-between gap-3'>
+      <div className='rounded-2xl border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900/40 p-4 flex items-center justify-between gap-3 transition-colors'>
         <div>
           <p className='text-xs text-slate-400 uppercase tracking-wider'>AI Coach</p>
-          <p className='text-sm text-slate-300'>La IA usa tu perfil actual para generar rutinas.</p>
+          <p className='text-sm text-slate-500 dark:text-slate-300'>
+            La IA usa tu perfil actual para generar rutinas.
+          </p>
         </div>
         <Button
           variant='secondary'

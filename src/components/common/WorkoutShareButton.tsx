@@ -105,9 +105,11 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   return (
     <div className='space-y-4'>
       <div className='space-y-2'>
-        <p className='text-xs text-slate-400'>Vista previa editable</p>
+        <p className='text-xs text-slate-500 dark:text-slate-400 transition-colors'>
+          Vista previa editable
+        </p>
 
-        <div className='relative overflow-hidden rounded-xl border border-slate-800'>
+        <div className='relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 transition-colors'>
           {previewImage ? (
             <img
               src={previewImage}
@@ -115,7 +117,7 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
               className='w-full'
             />
           ) : (
-            <div className='flex h-64 items-center justify-center bg-slate-900 text-sm text-slate-500'>
+            <div className='flex h-64 items-center justify-center bg-slate-50 dark:bg-slate-900 text-sm text-slate-400 dark:text-slate-500 transition-colors'>
               Generando vista previa...
             </div>
           )}
@@ -233,14 +235,14 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
         </div>
       </div>
 
-      {error && <p className='text-xs text-red-400'>{error}</p>}
+      {error && <p className='text-xs text-red-600 dark:text-red-400 transition-colors'>{error}</p>}
 
       <div className='grid grid-cols-5 gap-2'>
         <button
           onClick={handleDownload}
           disabled={isGenerating}
           title='Descargar'
-          className='flex items-center justify-center rounded-xl bg-slate-800 py-3 text-white disabled:opacity-50'
+          className='flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 py-3 text-slate-700 dark:text-white disabled:opacity-50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors'
         >
           {isGenerating ? (
             <Loader2
@@ -254,21 +256,21 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
         <button
           onClick={() => openSocialShare("instagram")}
           title='Instagram'
-          className='flex items-center justify-center rounded-xl bg-slate-800 py-3 text-white'
+          className='flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 py-3 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors'
         >
           <Instagram size={16} />
         </button>
         <button
           onClick={() => openSocialShare("facebook")}
           title='Facebook'
-          className='flex items-center justify-center rounded-xl bg-slate-800 py-3 text-white'
+          className='flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 py-3 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors'
         >
           <Facebook size={16} />
         </button>
         <button
           onClick={() => openSocialShare("x")}
           title='X / Twitter'
-          className='flex items-center justify-center rounded-xl bg-slate-800 py-3 text-white'
+          className='flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 py-3 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors'
         >
           <Twitter size={16} />
         </button>
@@ -276,7 +278,7 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
           onClick={handleShare}
           disabled={isGenerating}
           title='Compartir en otras apps'
-          className='flex items-center justify-center rounded-xl bg-blue-600 py-3 text-white disabled:opacity-50'
+          className='flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-500 py-3 text-white disabled:opacity-50 transition-colors'
         >
           {isGenerating ? (
             <Loader2
@@ -289,7 +291,7 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
         </button>
       </div>
 
-      <p className='flex items-center gap-2 text-xs text-slate-500'>
+      <p className='flex items-center gap-2 text-xs text-slate-600 dark:text-slate-500 transition-colors'>
         <Smartphone size={14} />
         {capabilities.canShareFiles
           ? "Puedes compartir directo en apps compatibles."
