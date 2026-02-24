@@ -3,6 +3,7 @@ import { Trash2, AlertTriangle, X, Loader, MessageSquare, ChevronRight } from "l
 import { Button } from "../ui/Button";
 import type { User } from "firebase/auth";
 import { auth } from "../../config/firebase";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -42,6 +43,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

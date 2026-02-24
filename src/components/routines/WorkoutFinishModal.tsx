@@ -1,6 +1,7 @@
 import React from "react";
 import { Share2, X, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface WorkoutFinishModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ const WorkoutFinishModal: React.FC<WorkoutFinishModalProps> = ({
   routineTitle,
 }) => {
   const { success } = useToast();
+
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

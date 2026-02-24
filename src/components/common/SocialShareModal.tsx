@@ -1,8 +1,18 @@
-import React, { useMemo, useRef, useState } from "react";
-import { X, Share2 } from "lucide-react";
-import { SocialShareCard, type ShareCardTheme } from "./SocialShareCard";
-import { WorkoutShareButton } from "./WorkoutShareButton";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X, Share2, Loader2 } from "lucide-react";
+import { SocialShareCard } from "./SocialShareCard";
 import type { WorkoutLogEntry } from "../../types";
+import type { WorkoutImageFormat, WorkoutImageAsset } from "../../utils/generateWorkoutImage";
+import { useShareWorkout } from "../../hooks/useShareWorkout";
+import { useToast } from "../../hooks/useToast";
+
+// Refactor: Modular imports
+import { THEMES } from "./social-share/constants";
+import { buildHashtags } from "./social-share/utils";
+import { SidePanelTab } from "./social-share/types";
+import { EditorPanel } from "./social-share/EditorPanel";
+import { Toolbar } from "./social-share/Toolbar";
+import { ActionButtons } from "./social-share/ActionButtons";
 
 interface SocialShareModalProps {
   isOpen: boolean;
@@ -12,36 +22,6 @@ interface SocialShareModalProps {
   duration?: string;
 }
 
-const THEME_PRESETS: Record<string, ShareCardTheme> = {
-  default: {
-    backgroundColor: "#121212",
-    primaryTextColor: "#ffffff",
-    secondaryTextColor: "#71717a",
-    accentColor: "#3b82f6",
-  },
-  cobalt: {
-    backgroundColor: "#0a1023",
-    primaryTextColor: "#f8fafc",
-    secondaryTextColor: "#93c5fd",
-    accentColor: "#38bdf8",
-  },
-  sunset: {
-    backgroundColor: "#2b0a0f",
-    primaryTextColor: "#fff7ed",
-    secondaryTextColor: "#fdba74",
-    accentColor: "#fb7185",
-  },
-};
-
-const THEME_OPTIONS = [
-  { key: "default", label: "Default" },
-  { key: "cobalt", label: "Cobalt" },
-  { key: "sunset", label: "Sunset" },
-];
-
-const STICKERS = ["", "🔥", "💪", "⚡", "🏆", "🚀", "😤"];
-const STICKER_POSITIONS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
-
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   isOpen,
   onClose,
@@ -50,47 +30,152 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   duration = "N/A",
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [presetKey, setPresetKey] = useState<keyof typeof THEME_PRESETS>("default");
-  const [sticker, setSticker] = useState<string>("");
-  const [stickerPosition, setStickerPosition] =
-    useState<(typeof STICKER_POSITIONS)[number]>("top-left");
+  const previewRef = useRef<HTMLDivElement>(null);
 
-  const theme = THEME_PRESETS[presetKey];
-  const totalVolume = logs.reduce((acc, log) => acc + (log.volume || 0), 0);
+  /* editing state */
+  const [themeKey, setThemeKey] = useState("dark");
+  const [sticker, setSticker] = useState("");
+  const [stickerPos, setStickerPos] = useState({ x: 80, y: 10 });
+  const [format, setFormat] = useState<WorkoutImageFormat>("feed");
+  const [tab, setTab] = useState<SidePanelTab>(null);
+  const [isToolbarOpen, setIsToolbarOpen] = useState(true);
+
+  /* drag state */
+  const [dragging, setDragging] = useState(false);
+  const offset = useRef({ x: 0, y: 0 });
+
+  /* share logic */
+  const {
+    isGenerating,
+    previewImage,
+    error,
+    capabilities,
+    generate,
+    share,
+    download,
+    copyToClipboard,
+  } = useShareWorkout();
+
+  const [asset, setAsset] = useState<WorkoutImageAsset | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { success: toast$, error: toastErr } = useToast();
+
+  const theme = THEMES[themeKey];
+  const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
   const totalExercises = logs.length;
 
+  const hashtags = useMemo(() => buildHashtags(logs, totalExercises), [logs, totalExercises]);
   const shareText = useMemo(() => {
-    if (duration !== "N/A") {
-      return `He completado un entrenamiento de ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg de volumen.`;
-    }
-    return `He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen total.`;
-  }, [duration, totalExercises, totalVolume]);
+    const base =
+      duration !== "N/A"
+        ? `💪 He completado ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg.`
+        : `💪 He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen.`;
+    return `${base}\n\n${hashtags}`;
+  }, [duration, totalExercises, totalVolume, hashtags]);
 
-  const previewToken = `${presetKey}-${sticker || "none"}-${stickerPosition}`;
+  const token = `${themeKey}-${sticker || "·"}-${Math.round(stickerPos.x)}-${Math.round(stickerPos.y)}-${format}`;
+
+  const ensureAsset = useCallback(async () => {
+    if (!cardRef.current) return null;
+    const img = await generate(cardRef.current, format);
+    if (img) setAsset(img);
+    return img;
+  }, [generate, format]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setAsset(null);
+    void ensureAsset();
+  }, [token, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  const handleShare = async () => {
+    const a = asset ?? (await ensureAsset());
+    if (!a) return;
+    await share(a, { title: "Mi Entrenamiento en FITTWIZ", text: shareText });
+  };
+
+  const handleDownload = async () => {
+    const a = asset ?? (await ensureAsset());
+    if (!a) return;
+    download(a);
+    toast$("Imagen descargada");
+  };
+
+  const handleCopy = async () => {
+    const a = asset ?? (await ensureAsset());
+    if (!a) return;
+    const r = await copyToClipboard(a);
+    if (r === "copied") {
+      setCopied(true);
+      toast$("Copiada al portapapeles");
+      setTimeout(() => setCopied(false), 2000);
+    } else toastErr("No se pudo copiar. Descarga la imagen.");
+  };
+
+  /* drag & drop logic */
+  const onPtrDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDragging(true);
+    const r = previewRef.current!.getBoundingClientRect();
+    offset.current = {
+      x: e.clientX - r.left - (stickerPos.x / 100) * r.width,
+      y: e.clientY - r.top - (stickerPos.y / 100) * r.height,
+    };
+  };
+
+  const onPtrMove = (e: React.PointerEvent) => {
+    if (!dragging) return;
+    const r = previewRef.current!.getBoundingClientRect();
+    const x = Math.max(2, Math.min(98, ((e.clientX - r.left - offset.current.x) / r.width) * 100));
+    const y = Math.max(2, Math.min(98, ((e.clientY - r.top - offset.current.y) / r.height) * 100));
+    setStickerPos({ x, y });
+  };
+
+  const onPtrUp = () => setDragging(false);
 
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 p-4 backdrop-blur-sm transition-colors'>
-      <div className='flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950 shadow-xl dark:shadow-2xl transition-colors'>
-        {/* Header */}
-        <div className='flex items-center justify-between border-b border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-950 px-4 py-3 transition-colors'>
-          <h2 className='flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white transition-colors'>
-            <Share2
-              size={18}
-              className='text-blue-400'
-            />
-            Compartir Entrenamiento
+    <div className='fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 dark:bg-black/80 backdrop-blur-md'>
+      <div className='flex max-h-[95vh] sm:max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] shadow-2xl'>
+        {/* ─── Header ─── */}
+        <div className='flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-white/5'>
+          <h2 className='flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white'>
+            <div className='flex items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15 p-1.5'>
+              <Share2
+                size={14}
+                className='text-blue-600 dark:text-blue-400'
+              />
+            </div>
+            Compartir Rutina
           </h2>
           <button
             onClick={onClose}
-            className='text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors'
+            className='flex items-center justify-center rounded-full bg-slate-200/50 dark:bg-white/5 p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all'
           >
-            <X size={20} />
+            <X size={14} />
           </button>
         </div>
 
-        <div className='absolute left-0 top-0 -z-50 h-0 w-0 overflow-hidden opacity-0 pointer-events-none'>
+        {/* ─── Offscreen card ─── */}
+        <div
+          className='fixed -left-[9999px] top-0 pointer-events-none'
+          aria-hidden='true'
+        >
           <SocialShareCard
             ref={cardRef}
             date={date}
@@ -100,28 +185,114 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             duration={duration}
             theme={theme}
             sticker={sticker || null}
-            stickerPosition={stickerPosition}
+            stickerPosition={stickerPos}
           />
         </div>
 
-        <div className='flex-1 space-y-4 overflow-y-auto bg-slate-50 dark:bg-surface-950/50 p-6 transition-colors'>
-          <WorkoutShareButton
-            captureRef={cardRef}
-            shareTitle='Mi Entrenamiento en FITTWIZ'
-            shareText={shareText}
-            previewToken={previewToken}
-            themeOptions={THEME_OPTIONS}
-            selectedThemeKey={presetKey}
-            onThemeChange={(key) => setPresetKey(key as keyof typeof THEME_PRESETS)}
-            stickerOptions={STICKERS}
-            selectedSticker={sticker}
-            onStickerChange={setSticker}
-            stickerPositionOptions={Array.from(STICKER_POSITIONS)}
-            selectedStickerPosition={stickerPosition}
-            onStickerPositionChange={(position) =>
-              setStickerPosition(position as (typeof STICKER_POSITIONS)[number])
-            }
+        {/* ─── Main body ─── */}
+        <div className='flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-4'>
+          <div className='relative'>
+            {/* Preview container */}
+            <div
+              ref={previewRef}
+              className='overflow-hidden rounded-2xl ring-1 ring-slate-200 dark:ring-white/10 select-none bg-slate-100 dark:bg-[#1a1a24]'
+              style={{ touchAction: "none" }}
+              onPointerMove={onPtrMove}
+              onPointerUp={onPtrUp}
+            >
+              {previewImage ? (
+                <img
+                  src={previewImage}
+                  alt='Preview'
+                  className='w-full pointer-events-none shadow-sm'
+                  draggable={false}
+                />
+              ) : (
+                <div className='flex h-72 items-center justify-center text-sm text-slate-500'>
+                  <div className='flex flex-col items-center gap-3'>
+                    <Loader2
+                      className='animate-spin text-blue-500'
+                      size={24}
+                    />
+                    <span className='text-xs font-medium tracking-wide'>Generando imagen...</span>
+                  </div>
+                </div>
+              )}
+
+              {sticker && previewImage && (
+                <div
+                  onPointerDown={onPtrDown}
+                  className={`absolute text-4xl sm:text-5xl leading-none select-none transition-[filter] ${
+                    dragging
+                      ? "cursor-grabbing drop-shadow-[0_0_15px_rgba(59,130,246,.8)]"
+                      : "cursor-grab drop-shadow-md"
+                  }`}
+                  style={{
+                    left: `${stickerPos.x}%`,
+                    top: `${stickerPos.y}%`,
+                    transform: `translate(-50%, -50%) scale(${dragging ? 1.2 : 1})`,
+                    touchAction: "none",
+                    transition: dragging ? "none" : "transform .15s cubic-bezier(0.4, 0, 0.2, 1)",
+                    zIndex: 15,
+                  }}
+                >
+                  {sticker}
+                </div>
+              )}
+
+              {sticker && previewImage && !dragging && (
+                <div className='absolute top-3 inset-x-0 flex justify-center pointer-events-none z-20'>
+                  <span className='rounded-full bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-white/70 shadow-lg'>
+                    Arrastra el emoji para moverlo
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* ─── Floating side toolbar ─── */}
+            <Toolbar
+              tab={tab}
+              setTab={setTab}
+              isToolbarOpen={isToolbarOpen}
+              setIsToolbarOpen={setIsToolbarOpen}
+            />
+          </div>
+
+          {/* Expandable Editor Panel (Themes, Stickers, Format) */}
+          <EditorPanel
+            tab={tab}
+            setTab={setTab}
+            themeKey={themeKey}
+            setThemeKey={setThemeKey}
+            format={format}
+            setFormat={setFormat}
+            sticker={sticker}
+            setSticker={setSticker}
+            setStickerPos={setStickerPos}
           />
+
+          {error && (
+            <p className='text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-3 border border-red-500/20'>
+              {error}
+            </p>
+          )}
+
+          {/* Action buttons */}
+          <ActionButtons
+            handleShare={handleShare}
+            handleDownload={handleDownload}
+            handleCopy={handleCopy}
+            isGenerating={isGenerating}
+            canShareFiles={capabilities.canShareFiles}
+            canWriteClipboard={capabilities.canWriteClipboard}
+            copied={copied}
+          />
+
+          <p className='text-center text-[10px] uppercase font-bold tracking-widest text-slate-600 pb-1'>
+            {capabilities.canShareFiles
+              ? "IG, WhatsApp, X, Tiktok..."
+              : "Descarga y sube a tus redes"}
+          </p>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Sparkles, Loader } from "lucide-react";
 import type { NutritionLogEntry } from "../../types";
 import { parseNutritionLog } from "../../api/gemini";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface RefineMealModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ const RefineMealModal: React.FC<RefineMealModalProps> = ({ isOpen, onClose, meal
   const [instruction, setInstruction] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useScrollLock(isOpen);
 
   if (!isOpen || !meal) return null;
 
