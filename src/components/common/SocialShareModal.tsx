@@ -82,13 +82,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     return img;
   }, [generate, format]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    setAsset(null);
-    void ensureAsset();
-  }, [token, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Bloquear scroll del body cuando el modal está abierto
+  // Bloquear el scroll del body mientras el modal está abierto
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -99,6 +93,12 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setAsset(null);
+    void ensureAsset();
+  }, [token, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleShare = async () => {
     const a = asset ?? (await ensureAsset());
@@ -150,8 +150,8 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 dark:bg-black/80 backdrop-blur-md'>
-      <div className='flex max-h-[95vh] sm:max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] shadow-2xl'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/80 backdrop-blur-md'>
+      <div className='flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] shadow-2xl'>
         {/* ─── Header ─── */}
         <div className='flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-white/5'>
           <h2 className='flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white'>
@@ -196,7 +196,6 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             <div
               ref={previewRef}
               className='overflow-hidden rounded-2xl ring-1 ring-slate-200 dark:ring-white/10 select-none bg-slate-100 dark:bg-[#1a1a24]'
-              style={{ touchAction: "none" }}
               onPointerMove={onPtrMove}
               onPointerUp={onPtrUp}
             >
@@ -276,8 +275,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
               {error}
             </p>
           )}
+        </div>
 
-          {/* Action buttons */}
+        <div className='p-4 sm:p-5 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#0c0c14] shrink-0'>
           <ActionButtons
             handleShare={handleShare}
             handleDownload={handleDownload}
@@ -287,8 +287,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             canWriteClipboard={capabilities.canWriteClipboard}
             copied={copied}
           />
-
-          <p className='text-center text-[10px] uppercase font-bold tracking-widest text-slate-600 pb-1'>
+          <p className='text-center text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-3'>
             {capabilities.canShareFiles
               ? "IG, WhatsApp, X, Tiktok..."
               : "Descarga y sube a tus redes"}
