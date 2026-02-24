@@ -9,7 +9,14 @@ import type { DashboardContext } from "../layouts/DashboardLayout";
 export default function StatsPage() {
   const { user, onRequireAuth } = useOutletContext<DashboardContext>();
 
-  const { workoutLogs, coachAdvice, saveCoachAdvice } = useWorkoutLogs(user);
+  const {
+    workoutLogs,
+    coachAdvice,
+    saveCoachAdvice,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useWorkoutLogs(user);
   const { profile } = useProfile(user);
   const { routines } = useRoutines(user);
 
@@ -22,6 +29,9 @@ export default function StatsPage() {
       userWeight={profile?.weight || 70}
       routines={routines}
       onRequireAuth={onRequireAuth}
+      fetchNextPage={fetchNextPage}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
     />
   );
 }

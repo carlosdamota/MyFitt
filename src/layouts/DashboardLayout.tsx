@@ -9,6 +9,7 @@ import { useEntitlement } from "../hooks/useEntitlement";
 import { useTimer } from "../hooks/useTimer";
 import { useProfile } from "../hooks/useProfile";
 import { useRoutines } from "../hooks/useRoutines";
+import { useLegacyLogsMigration } from "../hooks/useLegacyLogsMigration";
 
 // Layout components
 import Header from "../components/layout/Header";
@@ -43,6 +44,9 @@ function DashboardLayoutContent() {
   const isPro = plan === "pro";
   const navigate = useNavigate();
   const { openProUpgradeModal, closeProUpgradeModal, showProModal } = useProUpgrade();
+
+  // Lazy migrate legacy logs to subcollections without freezing UI
+  useLegacyLogsMigration(user);
 
   const { profile, loading: profileLoading, saveProfile } = useProfile(user);
 

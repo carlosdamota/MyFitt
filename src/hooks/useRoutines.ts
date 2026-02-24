@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import {
   collection,
   getDocs,
@@ -10,6 +11,7 @@ import {
   limit,
   deleteDoc,
 } from "firebase/firestore";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { db, appId } from "../config/firebase";
 import { routineData as defaultRoutineData } from "../data/routines";
 import type { User } from "firebase/auth";
@@ -87,7 +89,7 @@ export const useRoutines = (user: User | null): UseRoutinesReturn => {
       );
 
       // Actualizar estado local
-      setRoutines((prev) => ({
+      setRoutines((prev: RoutineData) => ({
         ...prev,
         [routineId]: routineData,
       }));
@@ -120,7 +122,7 @@ export const useRoutines = (user: User | null): UseRoutinesReturn => {
       });
 
       const newId = newRoutineRef.id;
-      setRoutines((prev) => ({
+      setRoutines((prev: RoutineData) => ({
         ...prev,
         [newId]: { ...routineData, title: routineName },
       }));
@@ -147,7 +149,7 @@ export const useRoutines = (user: User | null): UseRoutinesReturn => {
       await deleteDoc(docRef);
 
       // Eliminación local
-      setRoutines((prev) => {
+      setRoutines((prev: RoutineData) => {
         const updated = { ...prev };
         delete updated[routineId];
         return updated;

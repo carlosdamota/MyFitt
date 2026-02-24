@@ -1,0 +1,85 @@
+--- src/hooks/useRoutines.ts
++++ src/hooks/useRoutines.ts
+@@ -1,4 +1,4 @@
+-import { useState, useEffect } from "react";
+ import {
+   collection,
+   getDocs,
+@@ -10,6 +10,7 @@
+   limit,
+   deleteDoc,
+ } from "firebase/firestore";
++import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+ import { db, appId } from "../config/firebase";
+ import { routineData as defaultRoutineData } from "../data/routines";
+ import type { User } from "firebase/auth";
+@@ -27,47 +28,24 @@
+ 
+ export const useRoutines = (user: User | null): UseRoutinesReturn => {
+-  // Start empty - defaults will be loaded only if user has NO saved routines
+-  const [routines, setRoutines] = useState<RoutineData>({});
+-  const [loading, setLoading] = useState<boolean>(true);
+-  const [error, setError] = useState<string | null>(null);
++  const queryClient = useQueryClient();
+ 
+-  useEffect(() => {
+-    if (!user || !db) {
+-      // No user - show defaults for demo/guest mode
+-      setRoutines(defaultRoutineData);
+-      setLoading(false);
+-      return;
+-    }
++  const {
++    data: routines = defaultRoutineData,
++    isLoading: loading,
++    error: queryError,
++  } = useQuery({
++    queryKey: ["routines", user?.uid],
++    queryFn: async (): Promise<RoutineData> => {
++      if (!user || !db) return defaultRoutineData;
+ 
+-    const fetchRoutines = async (): Promise<void> => {
+-      try {
+-        setLoading(true);
+-        const routinesRef = collection(db!, "artifacts", appId, "users", user!.uid, "routines");
+-        // Limit to 20 routines (more than enough for a weekly schedule + extras)
+-        const q = query(routinesRef, limit(20));
+-        const querySnapshot = await getDocs(q);
++      const routinesRef = collection(db, "artifacts", appId, "users", user.uid, "routines");
++      const q = query(routinesRef, limit(20));
++      const querySnapshot = await getDocs(q);
+ 
+-        // Always include default routines (isDefault: true) + user's generated routines
+-        // Defaults cannot be deleted, user routines can
+-        const userRoutines: RoutineData = {};
+-        querySnapshot.forEach((docSnap) => {
+-          userRoutines[docSnap.id] = docSnap.data() as Routine;
+-        });
++      const userRoutines: RoutineData = {};
++      querySnapshot.forEach((docSnap) => {
++        userRoutines[docSnap.id] = docSnap.data() as Routine;
++      });
+ 
+-        // Merge: defaults first, then user routines (user routines with same ID override defaults)
+-        setRoutines({ ...defaultRoutineData, ...userRoutines });
+-      } catch (err) {
+-        console.error("Error fetching routines:", err);
+-        setError("Error cargando rutinas personalizadas");
+-        // Fallback a default en caso de error
+-        setRoutines(defaultRoutineData);
+-      } finally {
+-        setLoading(false);
+-      }
+-    };
++      return { ...defaultRoutineData, ...userRoutines };
++    },
++    staleTime: 5 * 60 * 1000,
++  });
+ 
+-    fetchRoutines();
+-  }, [user]);
++  const error = queryError ? "Error cargando rutinas" : null;
+ 
+   const saveRoutine = async (
+@@ -74,27 +52,22 @@
+   ): Promise<boolean | undefined> => {
