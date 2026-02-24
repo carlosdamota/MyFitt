@@ -22,9 +22,15 @@ export const useShareWorkout = () => {
       typeof navigator.canShare === "function" &&
       navigator.canShare({ files: [new File([""], "x.txt", { type: "text/plain" })] });
 
+    const canWriteClipboard =
+      typeof navigator !== "undefined" &&
+      !!navigator.clipboard &&
+      typeof ClipboardItem !== "undefined";
+
     return {
       canUseNavigatorShare,
       canShareFiles,
+      canWriteClipboard,
       isMobile:
         typeof window !== "undefined" &&
         window.matchMedia &&
@@ -32,24 +38,21 @@ export const useShareWorkout = () => {
     };
   }, []);
 
-  const generate = useCallback(
-    async (target: HTMLElement, format: WorkoutImageFormat) => {
-      setError(null);
-      setIsGenerating(true);
-      try {
-        const images = await generateWorkoutImage(target, { formats: [format] });
-        const image = images[format];
-        setPreviewImage(image.dataUrl);
-        return image;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "unknown_generation_error");
-        return null;
-      } finally {
-        setIsGenerating(false);
-      }
-    },
-    [],
-  );
+  const generate = useCallback(async (target: HTMLElement, format: WorkoutImageFormat) => {
+    setError(null);
+    setIsGenerating(true);
+    try {
+      const images = await generateWorkoutImage(target, { formats: [format] });
+      const image = images[format];
+      setPreviewImage(image.dataUrl);
+      return image;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "unknown_generation_error");
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
 
   const download = useCallback((asset: WorkoutImageAsset) => {
     const link = document.createElement("a");
@@ -57,6 +60,22 @@ export const useShareWorkout = () => {
     link.download = asset.file.name;
     link.click();
   }, []);
+
+  const copyToClipboard = useCallback(
+    async (asset: WorkoutImageAsset): Promise<"copied" | "failed"> => {
+      try {
+        if (!capabilities.canWriteClipboard) {
+          return "failed";
+        }
+        const item = new ClipboardItem({ "image/png": asset.blob });
+        await navigator.clipboard.write([item]);
+        return "copied";
+      } catch {
+        return "failed";
+      }
+    },
+    [capabilities.canWriteClipboard],
+  );
 
   const share = useCallback(
     async (asset: WorkoutImageAsset, payload: SharePayload) => {
@@ -79,5 +98,6 @@ export const useShareWorkout = () => {
     generate,
     share,
     download,
+    copyToClipboard,
   };
 };

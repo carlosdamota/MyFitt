@@ -1,4 +1,4 @@
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 
 export type WorkoutImageFormat = "feed" | "story";
 
@@ -23,22 +23,40 @@ const FORMAT_DIMENSIONS: Record<WorkoutImageFormat, { width: number; height: num
   story: { width: 1080, height: 1920 },
 };
 
-const canvasToBlob = (canvas: HTMLCanvasElement): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error("unable_to_generate_blob"));
-        return;
-      }
-      resolve(blob);
-    }, "image/png");
-  });
-};
-
-const dataUrlToBlob = async (dataUrl: string) => {
+const dataUrlToBlob = async (dataUrl: string): Promise<Blob> => {
   const response = await fetch(dataUrl);
   return response.blob();
 };
+
+/**
+ * Pre-resolve all <img> elements to base64 so html-to-image doesn't fail
+ * trying to fetch relative/absolute URLs from the off-screen container.
+ */
+async function inlineImages(node: HTMLElement): Promise<void> {
+  const imgs = node.querySelectorAll<HTMLImageElement>("img");
+  const tasks = Array.from(imgs).map(async (img) => {
+    const src = img.src || img.getAttribute("src");
+    if (!src || src.startsWith("data:")) return; // already inlined
+    try {
+      const resp = await fetch(src, { mode: "cors" });
+      if (!resp.ok) throw new Error(`${resp.status}`);
+      const blob = await resp.blob();
+      const reader = new FileReader();
+      await new Promise<void>((resolve, reject) => {
+        reader.onload = () => {
+          img.src = reader.result as string;
+          resolve();
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      // If we can't load the image, hide it gracefully rather than crash
+      img.style.display = "none";
+    }
+  });
+  await Promise.all(tasks);
+}
 
 export const generateWorkoutImage = async (
   target: HTMLElement,
@@ -49,87 +67,76 @@ export const generateWorkoutImage = async (
     scale = 2,
   }: GenerateWorkoutImageOptions = {},
 ): Promise<Record<WorkoutImageFormat, WorkoutImageAsset>> => {
-  const rect = target.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width));
-  const height = Math.max(1, Math.round(rect.height));
+  const computedStyle = window.getComputedStyle(target);
+  const width = parseInt(computedStyle.width, 10) || target.scrollWidth || 1080;
+  const height = parseInt(computedStyle.height, 10) || target.scrollHeight || 1350;
 
-  const captureRoot = document.createElement("div");
-  captureRoot.style.position = "fixed";
-  captureRoot.style.left = "-10000px";
-  captureRoot.style.top = "0";
-  captureRoot.style.pointerEvents = "none";
-  captureRoot.style.opacity = "0";
-  captureRoot.style.width = `${width}px`;
-  captureRoot.style.height = `${height}px`;
-  captureRoot.style.background = backgroundColor;
+  // Pre-inline all images to avoid cross-origin fetch failures inside html-to-image
+  await inlineImages(target);
 
-  const clone = target.cloneNode(true) as HTMLElement;
-  clone.style.width = `${width}px`;
-  clone.style.height = `${height}px`;
-  clone.style.transform = "none";
-
-  captureRoot.appendChild(clone);
-  document.body.appendChild(captureRoot);
-
-  try {
-    const sourceCanvas = await html2canvas(clone, {
-      backgroundColor,
-      useCORS: true,
-      allowTaint: true,
-      scale,
-      width,
-      height,
-      windowWidth: width,
-      windowHeight: height,
-      logging: false,
-    });
-
-    const assets = {} as Record<WorkoutImageFormat, WorkoutImageAsset>;
-
-    for (const format of formats) {
-      const { width: targetWidth, height: targetHeight } = FORMAT_DIMENSIONS[format];
-      const outputCanvas = document.createElement("canvas");
-      outputCanvas.width = targetWidth;
-      outputCanvas.height = targetHeight;
-
-      const context = outputCanvas.getContext("2d");
-      if (!context) throw new Error("unable_to_get_canvas_context");
-
-      context.fillStyle = backgroundColor;
-      context.fillRect(0, 0, targetWidth, targetHeight);
-
-      const sourceRatio = sourceCanvas.width / sourceCanvas.height;
-      const targetRatio = targetWidth / targetHeight;
-
-      let drawWidth = targetWidth;
-      let drawHeight = targetHeight;
-      if (sourceRatio > targetRatio) {
-        drawHeight = targetWidth / sourceRatio;
-      } else {
-        drawWidth = targetHeight * sourceRatio;
+  const sourceDataUrl = await toPng(target, {
+    width,
+    height,
+    backgroundColor,
+    pixelRatio: scale,
+    cacheBust: false, // disable — we already inlined everything
+    skipAutoScale: true,
+    canvasWidth: width * scale,
+    canvasHeight: height * scale,
+    skipFonts: false,
+    // Silently skip any node that causes errors (e.g., external SVG filters)
+    filter: (node) => {
+      if (node instanceof HTMLElement) {
+        // Skip link/meta elements that may cause issues
+        if (["LINK", "META", "SCRIPT"].includes(node.tagName)) return false;
       }
+      return true;
+    },
+  });
 
-      const offsetX = Math.round((targetWidth - drawWidth) / 2);
-      const offsetY = Math.round((targetHeight - drawHeight) / 2);
+  const sourceImage = new Image();
+  sourceImage.src = sourceDataUrl;
+  await new Promise<void>((resolve, reject) => {
+    sourceImage.onload = () => resolve();
+    sourceImage.onerror = () => reject(new Error("unable_to_load_source_image"));
+  });
 
-      context.drawImage(sourceCanvas, offsetX, offsetY, drawWidth, drawHeight);
+  const assets = {} as Record<WorkoutImageFormat, WorkoutImageAsset>;
 
-      const dataUrl = outputCanvas.toDataURL("image/png");
-      const blob = (await canvasToBlob(outputCanvas).catch(async () => dataUrlToBlob(dataUrl))) as Blob;
-      const file = new File([blob], `${fileNameBase}-${format}.png`, { type: "image/png" });
+  for (const format of formats) {
+    const { width: targetWidth, height: targetHeight } = FORMAT_DIMENSIONS[format];
+    const outputCanvas = document.createElement("canvas");
+    outputCanvas.width = targetWidth;
+    outputCanvas.height = targetHeight;
 
-      assets[format] = {
-        format,
-        blob,
-        file,
-        dataUrl,
-        width: targetWidth,
-        height: targetHeight,
-      };
+    const context = outputCanvas.getContext("2d");
+    if (!context) throw new Error("unable_to_get_canvas_context");
+
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, targetWidth, targetHeight);
+
+    const sourceRatio = sourceImage.naturalWidth / sourceImage.naturalHeight;
+    const targetRatio = targetWidth / targetHeight;
+
+    let drawWidth = targetWidth;
+    let drawHeight = targetHeight;
+    if (sourceRatio > targetRatio) {
+      drawHeight = targetWidth / sourceRatio;
+    } else {
+      drawWidth = targetHeight * sourceRatio;
     }
 
-    return assets;
-  } finally {
-    document.body.removeChild(captureRoot);
+    const offsetX = Math.round((targetWidth - drawWidth) / 2);
+    const offsetY = Math.round((targetHeight - drawHeight) / 2);
+
+    context.drawImage(sourceImage, offsetX, offsetY, drawWidth, drawHeight);
+
+    const dataUrl = outputCanvas.toDataURL("image/png");
+    const blob = await dataUrlToBlob(dataUrl);
+    const file = new File([blob], `${fileNameBase}-${format}.png`, { type: "image/png" });
+
+    assets[format] = { format, blob, file, dataUrl, width: targetWidth, height: targetHeight };
   }
+
+  return assets;
 };

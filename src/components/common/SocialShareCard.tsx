@@ -18,7 +18,7 @@ interface SocialShareCardProps {
   duration?: string;
   theme?: ShareCardTheme;
   sticker?: string | null;
-  stickerPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  stickerPosition?: { x: number; y: number };
 }
 
 const DEFAULT_THEME: ShareCardTheme = {
@@ -37,19 +37,10 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
       totalExercises,
       theme = DEFAULT_THEME,
       sticker,
-      stickerPosition = "top-left",
+      stickerPosition = { x: 50, y: 50 },
     },
     ref,
   ) => {
-    const stickerPositionStyles: Record<
-      NonNullable<SocialShareCardProps["stickerPosition"]>,
-      Record<string, string>
-    > = {
-      "top-left": { top: "40px", left: "46px" },
-      "top-right": { top: "40px", right: "46px" },
-      "bottom-left": { bottom: "180px", left: "46px" },
-      "bottom-right": { bottom: "180px", right: "46px" },
-    };
     const formatDate = (dateString: string) => {
       try {
         if (!dateString) return "";
@@ -89,16 +80,21 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           <div
             style={{
               position: "absolute",
-              ...stickerPositionStyles[stickerPosition],
+              left: `${stickerPosition.x}%`,
+              top: `${stickerPosition.y}%`,
+              transform: "translate(-50%, -50%)",
               fontSize: "72px",
               lineHeight: 1,
+              pointerEvents: "none",
             }}
           >
             {sticker}
           </div>
         )}
 
-        <div style={{ marginBottom: "50px", borderBottom: "1px solid #27272a", paddingBottom: "30px" }}>
+        <div
+          style={{ marginBottom: "50px", borderBottom: "1px solid #27272a", paddingBottom: "30px" }}
+        >
           <div
             style={{
               display: "flex",
@@ -152,7 +148,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               >
                 {totalVolume > 0 ? `${(totalVolume / 1000).toFixed(1)}k` : "0"}
               </h3>
-              <span style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}>
+              <span
+                style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}
+              >
                 kg
               </span>
             </div>
@@ -182,7 +180,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               >
                 {totalExercises}
               </h3>
-              <span style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}>
+              <span
+                style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}
+              >
                 Ex
               </span>
             </div>
@@ -275,7 +275,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     minWidth: "90px",
                   }}
                 >
-                  <span style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}>
+                  <span
+                    style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}
+                  >
                     {(log.weight ?? 0) > 0 ? log.weight : "BW"}
                   </span>
                   <span
@@ -297,7 +299,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     minWidth: "120px",
                   }}
                 >
-                  <span style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}>
+                  <span
+                    style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}
+                  >
                     {log.sets} x {log.reps}
                   </span>
                   <span

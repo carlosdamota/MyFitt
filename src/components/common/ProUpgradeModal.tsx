@@ -14,6 +14,7 @@ import { createCheckoutSession } from "../../api/billing";
 import { auth } from "../../config/firebase";
 import { getIdToken } from "firebase/auth";
 import { Button } from "../ui/Button";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface ProUpgradeModalProps {
   isOpen: boolean;
@@ -58,6 +59,8 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

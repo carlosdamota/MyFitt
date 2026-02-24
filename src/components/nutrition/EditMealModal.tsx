@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, Trash2, Plus } from "lucide-react";
 import type { NutritionLogEntry, Ingredient } from "../../types";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface EditMealModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ const EditMealModal: React.FC<EditMealModalProps> = ({ isOpen, onClose, meal, on
       });
     }
   }, [meal]);
+
+  useScrollLock(isOpen);
 
   if (!isOpen || !meal) return null;
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, ReactNode } from "react";
 import { X } from "lucide-react";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface ModalProps {
   isOpen: boolean;
@@ -27,14 +28,14 @@ const Modal: React.FC<ModalProps> = ({
     };
     if (isOpen) {
       document.addEventListener("keydown", handleEscape);
-      // Prevent body scroll
-      document.body.style.overflow = "hidden";
     }
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
+
+  // Lock scroll
+  useScrollLock(isOpen);
 
   // Focus trap (basic)
   useEffect(() => {
