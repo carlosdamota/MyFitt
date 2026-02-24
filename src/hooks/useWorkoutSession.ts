@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
@@ -27,6 +28,7 @@ export interface UseWorkoutSessionReturn {
 }
 
 export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn => {
+  const queryClient = useQueryClient();
   const [pendingLogs, setPendingLogs] = useState<WorkoutLogs>({});
   const [startedAt, setStartedAt] = useState<string | null>(null);
 
@@ -122,9 +124,12 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
 
         // 2. Update lastWorkoutDate on profile (for re-engagement schedulers)
         const profileRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "profile");
-        await setDoc(profileRef, { lastWorkoutDate: new Date() }, { merge: true });
+        await setDoc(profileRef, { lastWorkoutDate: new Date().toISOString() }, { merge: true });
 
-        // 3. Clear local state
+        // 3. Invalidate TanStack query so the UI re-fetches the actual Firestore data
+        await queryClient.invalidateQueries({ queryKey: ["workout_sessions", user.uid] });
+
+        // 4. Clear local state
         setPendingLogs({});
         setStartedAt(null);
         localStorage.removeItem(STORAGE_KEY);

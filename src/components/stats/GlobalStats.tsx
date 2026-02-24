@@ -13,11 +13,14 @@ import WeeklyCoach from "./WeeklyCoach";
 interface GlobalStatsProps {
   logs: WorkoutLogs;
   onClose: () => void;
-  coachHistory: string;
-  onSaveAdvice: (advice: string) => void;
   userWeight: string | number;
   routines: RoutineData;
+  coachHistory: string;
+  onSaveAdvice: (advice: string) => void;
   onRequireAuth?: () => void;
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
 }
 
 interface AggregatedDataPoint {
@@ -34,6 +37,9 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   userWeight,
   routines,
   onRequireAuth,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 }) => {
   const [viewMode, setViewMode] = useState<"charts" | "logs" | "weekly">("charts");
 
@@ -186,6 +192,9 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
             <LogViewer
               logs={logs}
               userWeight={userWeight}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
             />
           </div>
         )}

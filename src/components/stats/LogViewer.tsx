@@ -3,18 +3,25 @@ import { FileText, Download, Share2, Calendar } from "lucide-react";
 import { isBodyweightExercise } from "../../utils/stats";
 import type { WorkoutLogs, WorkoutLogEntry } from "../../types";
 import { SocialShareModal } from "../common/SocialShareModal";
-
 interface LogViewerProps {
   logs: WorkoutLogs;
   userWeight: string | number;
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
 }
 
 interface FlatLogEntry extends WorkoutLogEntry {
   exercise: string;
   volume: number;
 }
-
-const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
+const LogViewer: React.FC<LogViewerProps> = ({
+  logs,
+  userWeight,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+}) => {
   const flatLogs = useMemo(() => {
     let allLogs: FlatLogEntry[] = [];
     Object.entries(logs).forEach(([exercise, entries]) => {
@@ -170,6 +177,18 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs, userWeight }) => {
             </div>
           );
         })}
+
+        {hasNextPage && (
+          <div className='flex justify-center pt-4'>
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className='text-sm font-bold text-primary-500 hover:text-primary-600 disabled:opacity-50 transition-colors'
+            >
+              {isFetchingNextPage ? "Cargando..." : "Cargar más antiguo"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Share Modal */}
