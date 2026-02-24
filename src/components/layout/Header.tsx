@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className='bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-slate-200 dark:border-surface-800 p-3 md:p-4 sticky top-0 z-20 transition-colors'>
+      <header className='bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-slate-200 dark:border-surface-800 p-3 md:p-4 sticky top-0 z-10 transition-colors'>
         <div className='flex justify-between items-center'>
           {/* Logo & Streak */}
           <div className='flex items-center gap-3'>

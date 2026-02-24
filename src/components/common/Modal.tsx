@@ -60,7 +60,7 @@ const Modal: React.FC<ModalProps> = ({
         onClick={onClose}
       />
       <div
-        className={`relative w-full max-w-lg bg-white dark:bg-surface-950 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-xl dark:shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col max-h-[90vh] transition-colors ${className}`}
+        className={`relative w-full max-w-lg bg-white dark:bg-surface-950 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-xl dark:shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col max-h-[85vh] transition-colors ${className}`}
       >
         <div className='bg-white dark:bg-surface-950 p-4 pl-6 flex justify-between items-center border-b border-slate-200 dark:border-surface-800 transition-colors'>
           <h2

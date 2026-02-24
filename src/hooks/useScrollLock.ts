@@ -7,15 +7,7 @@ import { useEffect } from "react";
  */
 export function useScrollLock(isOpen: boolean) {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    // Cleanup function en caso de que el componente se desmonte mientras está abierto
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    // Restaurado: No bloqueamos el scroll del body por petición del usuario
+    // ya que el scroll interno del modal no funcionaba correctamente en móvil.
   }, [isOpen]);
 }
