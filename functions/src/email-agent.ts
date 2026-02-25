@@ -6,7 +6,7 @@ import { Resend } from "resend";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import type { Request, Response } from "express";
-import { getPostHogClient } from "./utils/posthog";
+import { getPostHogClient } from "./utils/posthog.js";
 
 // ─── Types ──────────────────────────────────────────────────────────
 interface EmailAgentDeps {

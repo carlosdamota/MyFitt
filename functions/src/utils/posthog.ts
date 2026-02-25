@@ -18,7 +18,7 @@ export const getPostHogClient = () => {
     }
 
     posthogClient = new PostHog(apiKey, {
-      host: "https://us.i.posthog.com",
+      host: process.env.POSTHOG_HOST || "https://eu.i.posthog.com",
       flushAt: 1,
       flushInterval: 0,
     });
