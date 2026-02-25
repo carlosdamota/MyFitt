@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import type { Request, Response } from "express";
+import { getPostHogClient } from "./utils/posthog";
 
 // ─── Types ──────────────────────────────────────────────────────────
 interface EmailAgentDeps {
@@ -320,6 +321,18 @@ export const createEmailAgentFunctions = ({
       html: wrapWithFittwizTemplate(content.body_html, skipOptOutCheck, content.subject),
       headers,
     });
+
+    if (userId) {
+      const ph = getPostHogClient();
+      ph.capture({
+        distinctId: userId,
+        event: "email_sent",
+        properties: {
+          subject: content.subject,
+          type: skipOptOutCheck ? "security" : "marketing",
+        },
+      });
+    }
   };
 
   /** Call Gemini to generate email content */

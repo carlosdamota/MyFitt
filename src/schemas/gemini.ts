@@ -165,7 +165,11 @@ export const UserProfileSchema = z.object({
   equipment: z.union([z.string(), z.array(z.string())]),
   trainingSplit: z.string().optional(),
   focusAreas: z.array(z.string()).optional(),
-  injuries: z.string().optional(),
+  injuries: z
+    .string()
+    .max(200, "Máximo 200 caracteres permitidos")
+    .regex(/^[^<>{}\[\]]*$/, "Caracteres < > { } [ ] no están permitidos por seguridad")
+    .optional(),
   weight: z.number(),
   height: z.number(),
   age: z.number().optional(),

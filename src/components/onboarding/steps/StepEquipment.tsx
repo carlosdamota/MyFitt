@@ -137,8 +137,9 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               handleChange("injuries", e.target.value)
             }
+            maxLength={200}
             className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none h-16 resize-none transition-colors'
-            placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
+            placeholder='Ej. Dolor lumbar, hombro derecho sensible... (Máx. 200 carácteres)'
           />
         </div>
       </div>

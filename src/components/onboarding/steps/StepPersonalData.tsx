@@ -40,6 +40,8 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
               }
               className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='75'
+              min={30}
+              max={300}
             />
           </div>
           <div>
@@ -55,6 +57,8 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
               }
               className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='180'
+              min={100}
+              max={250}
             />
           </div>
         </div>
@@ -71,6 +75,8 @@ export const StepPersonalData: React.FC<StepPersonalDataProps> = ({ formData, ha
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
               className='w-full bg-white dark:bg-surface-900/80 border border-slate-200 dark:border-surface-700/80 rounded-xl p-3 text-slate-900 dark:text-white text-sm focus:border-primary-400/60 outline-none transition-colors'
               placeholder='30'
+              min={13}
+              max={120}
             />
           </div>
           <div>

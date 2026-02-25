@@ -8,6 +8,7 @@ import { generateFullProgram } from "../../api/gemini";
 import { logEvent } from "../../utils/analytics";
 import { AiError } from "../../api/ai";
 import { Button } from "../ui/Button";
+import { PersonalDataSchema } from "../../schemas/validation";
 
 import { TOTAL_STEPS, formatEquipment, MOTIVATIONAL_PHRASES, FREE_MAX_DAYS } from "./constants";
 import { StepPersonalData } from "./steps/StepPersonalData";
@@ -82,7 +83,11 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ user, onComplete, o
   const canProceed = (): boolean => {
     switch (step) {
       case 0:
-        return !!(formData.weight && formData.height && formData.age);
+        return PersonalDataSchema.safeParse({
+          age: formData.age,
+          height: formData.height,
+          weight: formData.weight,
+        }).success;
       case 1:
         return !!(formData.goal && formData.experienceLevel);
       case 2:
