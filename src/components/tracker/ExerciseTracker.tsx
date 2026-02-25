@@ -4,7 +4,7 @@ import { History, Trophy, Play } from "lucide-react";
 import { calculatePersonalBests, isNewRecord, isBodyweightExercise } from "../../utils/stats";
 import { useProfile } from "../../hooks/useProfile";
 import type { User } from "firebase/auth";
-import type { WorkoutLogEntry } from "../../types";
+import type { WorkoutLogEntry, UserStats } from "../../types";
 
 // Sub-components
 import SmartSuggestion from "./SmartSuggestion";
@@ -17,6 +17,7 @@ interface ExerciseTrackerProps {
   onSave: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   onDelete: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   history: WorkoutLogEntry[];
+  stats: UserStats | null;
   onTimerReset: (duration?: number) => void;
   restTime?: number;
   user: User | null;
@@ -41,6 +42,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   onSave,
   onDelete,
   history,
+  stats,
   onTimerReset,
   restTime,
   user,
@@ -62,7 +64,14 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   const [newRecordAlert, setNewRecordAlert] = useState<string | null>(null);
 
   // Calcular PBs históricos
-  const personalBests = useMemo(() => calculatePersonalBests(history), [history]);
+  const personalBests = useMemo(() => {
+    // Si tenemos stats del backend para este ejercicio, las usamos.
+    if (stats?.personalBests?.[exerciseName]) {
+      return stats.personalBests[exerciseName];
+    }
+    // Fallback: calcularlas localmente (necesario para los récords que ganes hoy antes de que el backend procese)
+    return calculatePersonalBests(history);
+  }, [history, stats, exerciseName]);
 
   // Lógica de Sobrecarga Progresiva
   const smartSuggestion = useMemo((): SuggestionData | null => {

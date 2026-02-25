@@ -1,9 +1,10 @@
 import React from "react";
 import { CheckCircle, ChevronDown, Circle, Info } from "lucide-react";
 import type { User } from "firebase/auth";
-import type { Exercise, WorkoutLogEntry, WorkoutLogs } from "../../types";
+import type { Exercise, WorkoutLogEntry, WorkoutLogs, UserStats } from "../../types";
 import ExerciseTracker from "../tracker/ExerciseTracker";
 import ExerciseVisual from "./ExerciseVisual";
+import { useNormalizedExercises } from "../../hooks/useNormalizedExercises";
 
 interface ExerciseCardProps {
   dayKey: string;
@@ -13,6 +14,7 @@ interface ExerciseCardProps {
   isCompleted: boolean;
   isExpanded: boolean;
   workoutLogs: WorkoutLogs;
+  stats: UserStats | null;
   user: User | null;
   onToggleComplete: (dayKey: string, exerciseName: string, isManual?: boolean) => void;
   onToggleExpanded: () => void;
@@ -31,6 +33,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   isCompleted,
   isExpanded,
   workoutLogs,
+  stats,
   user,
   onToggleComplete,
   onToggleExpanded,
@@ -40,6 +43,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onRequireAuth,
   isTimerRunning,
 }) => {
+  const { data: normalizedExercises } = useNormalizedExercises();
+  const normalizedData = exercise.normalizedId
+    ? normalizedExercises?.[exercise.normalizedId]
+    : undefined;
+
+  const displayName = normalizedData?.name || exercise.name;
+  const displaySvg = normalizedData?.svgIcon || exercise.svg;
+
   const cardClasses = `relative overflow-hidden rounded-3xl border transition-all duration-300 ${
     isCompleted
       ? "bg-slate-50 dark:bg-surface-950/40 border-slate-200 dark:border-surface-800/50 opacity-60 grayscale"
@@ -91,7 +102,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                       : "text-slate-900 dark:text-slate-100"
                   }`}
                 >
-                  {exercise.name}
+                  {displayName}
                 </h3>
                 <div className='flex items-center gap-2 mt-1'>
                   {exercise.sets && (
@@ -126,8 +137,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <div className='mt-5 pt-5 border-t border-slate-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-300 transition-colors'>
             <div className='w-full h-48 bg-slate-50 dark:bg-surface-950/50 rounded-xl border border-slate-200 dark:border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4 transition-colors'>
               <ExerciseVisual
-                name={exercise.name}
-                svg={exercise.svg}
+                name={displayName}
+                svg={displaySvg}
                 svgIcon={exercise.svg_icon}
               />
               <div className='absolute inset-0 bg-linear-to-t from-white/80 dark:from-surface-900/80 via-transparent to-transparent pointer-events-none transition-colors' />
@@ -150,6 +161,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               onSave={onSaveLog}
               onDelete={onDeleteLog}
               history={workoutLogs[exercise.name] || []}
+              stats={stats}
               onTimerReset={onResetTimer}
               restTime={restTime}
               user={user}

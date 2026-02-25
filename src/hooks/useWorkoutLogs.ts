@@ -1,12 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { doc, collection, getDocs, getDoc, setDoc, query, orderBy } from "firebase/firestore";
+import { useMemo } from "react";
+import {
+  doc,
+  collection,
+  getDocs,
+  getDoc,
+  setDoc,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
-import type { WorkoutLogs, WorkoutSession } from "../types";
+import type { WorkoutLogs, WorkoutSession, UserStats } from "../types";
 
 export interface UseWorkoutLogsReturn {
   workoutLogs: WorkoutLogs;
   sessions: WorkoutSession[];
+  stats: UserStats | null;
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
@@ -39,20 +50,32 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     enabled: !!user && !!db,
   });
 
-  // 2. Fetch All Sessions
-  // Obtenemos todo el historial para que funcionen las estadísticas globales (Rachas, Gráficas)
+  // 2. Fetch User Stats (Aggregated)
+  const { data: stats, isLoading: isStatsLoading } = useQuery({
+    queryKey: ["user_stats", user?.uid],
+    queryFn: async () => {
+      if (!user || !db) return null;
+      const docRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "stats");
+      const snap = await getDoc(docRef);
+      if (snap.exists()) return snap.data() as UserStats;
+      return null;
+    },
+    enabled: !!user && !!db,
+  });
+
+  // 3. Fetch Recent Sessions (Limited)
   const {
     data: sessionsData,
     isLoading: isSessionsLoading,
     error: sessionsError,
   } = useQuery({
-    queryKey: ["workout_sessions", user?.uid],
+    queryKey: ["workout_sessions_recent", user?.uid],
     queryFn: async () => {
       if (!user || !db) return [];
 
       const sessionsRef = collection(db, "artifacts", appId, "users", user.uid, "workout_sessions");
-      // Sin límite de paginación para calcular rachas históricas
-      const q = query(sessionsRef, orderBy("date", "desc"));
+      // LIMITAMOS la carga a las últimas 20 sesiones para que el historial sea rápido
+      const q = query(sessionsRef, orderBy("date", "desc"), limit(20));
 
       const snap = await getDocs(q);
       return snap.docs.map((d) => d.data() as WorkoutSession);
@@ -61,6 +84,24 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
   });
 
   const sessions = sessionsData || [];
+
+  // 4. Fallback / Lazy Migration:
+  // Si no hay stats, las calculamos temporalmente del "casi-historial" (sessions)
+  // para que la UI no se rompa mientras el backend procesa las nuevas.
+  const resolvedStats: UserStats | null = useMemo(() => {
+    if (stats) return stats;
+    if (sessions.length === 0) return null;
+
+    // Minimal stats object for UI consistency
+    return {
+      totalSessions: sessions.length,
+      totalVolume: 0,
+      totalExercises: 0,
+      workoutDates: sessions.map((s) => s.date.split("T")[0]),
+      personalBests: {},
+      dailyVolume: [],
+    } as any;
+  }, [stats, sessions]);
 
   // Mantenemos estas firmas falsas para que la UI dependiente no se rompa (StatsPage / LogViewer)
   const fetchNextPage = () => {};
@@ -94,22 +135,12 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
     },
   });
 
-  // 4. Streak Calculation over locally loaded sessions
-  // Notice: Since infinite queries only load 15 at first, this calculates streaks
-  // ONLY for the most recent loaded data.
+  // 5. Streak Calculation over workoutDates from Stats
   const { dayStreak, weekStreak } = (() => {
-    const allDates = new Set<string>();
+    const dates = resolvedStats?.workoutDates || [];
+    if (dates.length === 0) return { dayStreak: 0, weekStreak: 0 };
 
-    sessions.forEach((s) => {
-      const d = new Date(s.date);
-      if (!isNaN(d.getTime())) allDates.add(d.toDateString());
-    });
-
-    if (allDates.size === 0) return { dayStreak: 0, weekStreak: 0 };
-
-    const sortedDates = Array.from(allDates)
-      .map((d) => new Date(d))
-      .sort((a, b) => b.getTime() - a.getTime());
+    const sortedDates = dates.map((d) => new Date(d)).sort((a, b) => b.getTime() - a.getTime());
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -184,12 +215,13 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
   return {
     workoutLogs,
     sessions,
+    stats: resolvedStats,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     coachAdvice: appData?.coachAdvice || null,
     saveCoachAdvice,
-    isLoading: isAppDataLoading || isSessionsLoading,
+    isLoading: isAppDataLoading || isSessionsLoading || isStatsLoading,
     dbError: sessionsError ? "Error loading workout sessions" : null,
     dayStreak,
     weekStreak,

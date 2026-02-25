@@ -9,6 +9,7 @@ import { createShareImageFunction } from "./share-image-function.js";
 import { createEmailAgentFunctions } from "./email-agent.js";
 import { createPushAgentFunctions } from "./push-agent.js";
 import { createAccountDeletionFunctions } from "./account-deletion.js";
+import { createUpdateUserStatsFunction } from "./user-stats.js";
 
 initializeApp();
 
@@ -18,9 +19,11 @@ const auth = getAuth();
 const APP_ID = process.env.FITTWIZ_APP_ID ?? process.env.FITMANUAL_APP_ID ?? "fitmanual-default";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL_DEFAULT =
-  process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
+const GEMINI_MODEL_FAST = process.env.GEMINI_MODEL_FAST ?? "gemini-2.5-flash-lite";
 const GEMINI_MODEL_NUTRITION_FREE = process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
-const GEMINI_MODEL_NUTRITION_PRO = process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-2.5-flash";
+const GEMINI_MODEL_NUTRITION_PRO =
+  process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
 const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
 
@@ -63,6 +66,7 @@ export const aiGenerate = createAiGenerateFunction({
   appId: APP_ID,
   geminiApiKey: GEMINI_API_KEY,
   geminiDefaultModel: GEMINI_MODEL_DEFAULT,
+  geminiFastModel: GEMINI_MODEL_FAST,
   geminiNutritionModelFree: GEMINI_MODEL_NUTRITION_FREE,
   geminiNutritionModelPro: GEMINI_MODEL_NUTRITION_PRO,
   quotas: {
@@ -128,4 +132,8 @@ export const createShareImage = createShareImageFunction({
   auth,
   appId: APP_ID,
   webOrigin: WEB_ORIGIN,
+});
+
+export const updateUserStats = createUpdateUserStatsFunction({
+  appId: APP_ID,
 });

@@ -1,7 +1,7 @@
 import React from "react";
 import { Clock } from "lucide-react";
 import type { User } from "firebase/auth";
-import type { RoutineBlock, WorkoutLogEntry, WorkoutLogs } from "../../types";
+import type { RoutineBlock, WorkoutLogEntry, WorkoutLogs, UserStats } from "../../types";
 import ExerciseCard from "./ExerciseCard";
 
 interface WorkoutBlockProps {
@@ -12,6 +12,7 @@ interface WorkoutBlockProps {
   expandedExerciseId: string | null;
   onSetExpandedExerciseId: (id: string | null) => void;
   workoutLogs: WorkoutLogs;
+  stats: UserStats | null;
   user: User | null;
   onToggleComplete: (dayKey: string, exerciseName: string) => void;
   onSaveLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
@@ -29,6 +30,7 @@ const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
   expandedExerciseId,
   onSetExpandedExerciseId,
   workoutLogs,
+  stats,
   user,
   onToggleComplete,
   onSaveLog,
@@ -65,6 +67,7 @@ const WorkoutBlock: React.FC<WorkoutBlockProps> = ({
               isCompleted={!!completedExercises[completionKey]}
               isExpanded={isExpanded}
               workoutLogs={workoutLogs}
+              stats={stats}
               user={user}
               onToggleComplete={onToggleComplete}
               onToggleExpanded={() => onSetExpandedExerciseId(isExpanded ? null : expandedId)}

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { TrendingUp, ArrowLeft, Trophy, Dumbbell, Flame } from "lucide-react";
 import LogViewer from "./LogViewer";
 import { isBodyweightExercise } from "../../utils/stats";
-import type { WorkoutLogs, RoutineData } from "../../types";
+import type { WorkoutLogs, RoutineData, UserStats } from "../../types";
 import { Button } from "../ui/Button";
 
 // Sub-components
@@ -12,6 +12,7 @@ import WeeklyCoach from "./WeeklyCoach";
 
 interface GlobalStatsProps {
   logs: WorkoutLogs;
+  stats: UserStats | null;
   onClose: () => void;
   userWeight: string | number;
   routines: RoutineData;
@@ -31,6 +32,7 @@ interface AggregatedDataPoint {
 
 const GlobalStats: React.FC<GlobalStatsProps> = ({
   logs,
+  stats,
   onClose,
   coachHistory,
   onSaveAdvice,
@@ -44,6 +46,16 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   const [viewMode, setViewMode] = useState<"charts" | "logs" | "weekly">("charts");
 
   const aggregatedData = useMemo(() => {
+    // Si tenemos las estadísticas pre-calculadas del backend, las usamos directamente.
+    // Esto ahorra procesar miles de logs en el cliente.
+    if (stats?.dailyVolume && stats.dailyVolume.length > 0) {
+      return stats.dailyVolume.map((d) => ({
+        date: d.date,
+        val: d.volume,
+        count: 0, // No se usa actualmente en la UI de gráficas
+      }));
+    }
+
     const dateMap: Record<string, AggregatedDataPoint> = {};
     Object.entries(logs).forEach(([exName, exerciseLogs]) => {
       exerciseLogs.forEach((log) => {
@@ -59,11 +71,12 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
     return Object.values(dateMap).sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
-  }, [logs]);
+  }, [logs, stats]);
 
-  const totalSessions = aggregatedData.length;
-  const totalVolumeAllTime = aggregatedData.reduce((acc, curr) => acc + curr.val, 0);
-  const totalExercises = Object.keys(logs).length;
+  const totalSessions = stats?.totalSessions ?? aggregatedData.length;
+  const totalVolumeAllTime =
+    stats?.totalVolume ?? aggregatedData.reduce((acc, curr) => acc + curr.val, 0);
+  const totalExercises = stats?.totalExercises ?? Object.keys(logs).length;
 
   const tabs = [
     {

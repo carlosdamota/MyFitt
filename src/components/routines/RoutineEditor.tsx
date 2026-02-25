@@ -34,6 +34,7 @@ import type { Routine, Exercise, RoutineBlock } from "../../types";
 import ExerciseIcon from "../icons/ExerciseIcons";
 import { getExerciseIcon } from "../../utils/exerciseIcons";
 
+import { useNormalizedExercises } from "../../hooks/useNormalizedExercises";
 import { SortableExerciseItem } from "./SortableExerciseItem";
 
 interface RoutineEditorProps {
@@ -70,6 +71,8 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const { data: normalizedExercises } = useNormalizedExercises();
 
   const handleDragEnd = (event: DragEndEvent, blockIndex: number): void => {
     const { active, over } = event;
@@ -139,15 +142,14 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
   const updateExercise = (
     blockIndex: number,
     exerciseIndex: number,
-    field: keyof Exercise,
-    value: string,
+    updates: Partial<Exercise>,
   ): void => {
-    const newBlocks = [...routine.blocks];
-    newBlocks[blockIndex].exercises[exerciseIndex] = {
-      ...newBlocks[blockIndex].exercises[exerciseIndex],
-      [field]: value,
-    };
-    setRoutine((prev) => ({ ...prev, blocks: newBlocks }));
+    setRoutine((prev) => {
+      const newBlocks = [...prev.blocks];
+      const currentEx = newBlocks[blockIndex].exercises[exerciseIndex];
+      newBlocks[blockIndex].exercises[exerciseIndex] = { ...currentEx, ...updates };
+      return { ...prev, blocks: newBlocks };
+    });
   };
 
   const handleShare = async () => {
@@ -337,6 +339,17 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
           </button>
         </div>
       </div>
+
+      {normalizedExercises && (
+        <datalist id='normalized-exercises-list'>
+          {Object.values(normalizedExercises).map((ex) => (
+            <option
+              key={ex.id}
+              value={ex.name}
+            />
+          ))}
+        </datalist>
+      )}
     </div>
   );
 };

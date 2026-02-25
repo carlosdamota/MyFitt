@@ -8,8 +8,19 @@ export type { User } from "firebase/auth";
 // Routine Types
 // ============================================
 
+export interface NormalizedExercise {
+  id: string;
+  name: string;
+  aliases: string[];
+  muscleGroup: string;
+  equipment: EquipmentOption[];
+  svgIcon?: string;
+  imageUrl?: string;
+}
+
 export interface Exercise {
   name: string;
+  normalizedId?: string;
   reps: string;
   sets?: number;
   intensity?: string; // e.g., "RPE 8"
@@ -80,6 +91,34 @@ export interface WorkoutSession {
   duration?: string; // e.g. "45:32"
   routineTitle?: string;
   logs: WorkoutLogs; // { exerciseName: [entries] }
+}
+
+// ============================================
+// Stats Types
+// ============================================
+
+export interface PersonalBest {
+  weight: number;
+  reps: number;
+  date: string;
+}
+
+export interface UserStats {
+  totalSessions: number;
+  totalVolume: number;
+  totalExercises: number;
+  workoutDates: string[];
+  personalBests: {
+    [exerciseName: string]: {
+      low?: PersonalBest;
+      mid?: PersonalBest;
+      high?: PersonalBest;
+    };
+  };
+  dailyVolume: {
+    date: string;
+    volume: number;
+  }[];
 }
 
 // ============================================
