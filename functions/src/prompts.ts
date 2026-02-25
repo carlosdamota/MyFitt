@@ -61,57 +61,44 @@ Devuelve SOLO un objeto JSON valido con la siguiente estructura, sin markdown:
     }
   ]
 }
-Reglas importantes:
-1. **ARQUITECTURA (ESTRICTO)**: Debes generar EXACTAMENTE ${totalDays} dias siguiendo el split: ${(profile as any).trainingSplit ?? "full_body"}.
-   - full_body: Todo el cuerpo en cada sesion.
-   - push_pull_legs: Dia 1: Empuje (Push), Dia 2: Traccion (Pull), Dia 3: Pierna (Legs).
-   - upper_lower: Alterna Tren Superior y Tren Inferior.
-   - body_part: Distribucion clasica por grupos musculares.
-2. **ENFOQUE**: Prioriza las siguientes áreas: ${JSON.stringify((profile as any).focusAreas ?? [])}. Añade mas ejercicios o volumen a estas zonas.
-3. **VOLUMEN, DURACION Y SERIES**: La sesion debe durar ${dailyTime} minutos.
-   - **TIEMPO vs VOLUMEN**: Calcula que cada serie + descanso toma ~2 minutos de media.
-     - Suma total: (Total Series * 2 min) no debe exceder ${dailyTime} min (+5% margen).
-   - **SESIONES CORTAS (<= 20 min)**:
-     - Prioriza ejercicios compuestos (multiarticulares).
-     - Reduce descansos a 30-45s para aumentar densidad.
-     - Maximo 6-8 series TOTALES en toda la sesion.
-   - **SESIONES LARGAS (>= 60 min)**:
-     - DEBES usar superseries (2+ ejercicios por bloque) para maximizar volumen.
-     - Rango de series: 3-4 series por ejercicio compuesto, 2-3 por aislamiento.
-4. **INTENSIDAD Y CALORIAS**:
-   - "intensity": Usa RPE (6-10) o RIR. Ej: "RPE 8" o "RIR 2". Ajusta segun el objetivo (Fuerza=RPE alto, Metabolico=RPE medio).
-   - "estimatedCalories": Calcula calorias totales del dia basandote en duracion y modo (Metabolic vs Heavy), usando MET promedio 3.5 a 6.
-5. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
-6. **WARMUP**: El texto del calentamiento debe ser ESPECIFICO al "type" de la sesion (ej: si es "legs", no sugieras rotaciones de hombro, enfocate en cadera/rodillas).
-7. Elige el valor "svg" mas apropiado segun el ejercicio:
-   - pullup: dominadas, chin-ups
-   - floor_press: press de pecho, press de suelo
-   - pushup_feet_elevated: flexiones, push-ups
-   - one_arm_row: remos, rows
-   - plank: planchas, isometricos
-   - deadbug: ejercicios de core en suelo
-   - glute_bridge: puentes de gluteo, hip thrust
-   - goblet_squat: sentadillas con peso
-   - rdl: peso muerto rumano
-   - calf_raise_bilateral: pantorrillas
-   - face_pull: tirantes, face pulls
-   - bicep_curl: curl de biceps
-   - tricep_extension: extensiones de triceps
-   - shoulder_press: press de hombros
-   - leg_raise: elevaciones de piernas
-   - dumbbell: ejercicios generales con mancuernas
-   - barbell: ejercicios generales con barra
-   - bodyweight: ejercicios de peso corporal generales
-8. **EQUIPAMIENTO (ESTRICTO)**:
-   - Revisa el campo "equipment": ${JSON.stringify((profile as any).equipment ?? [])}.
-   - NUNCA sugieras equipamiento que el usuario no tiene.
-9. **SEGURIDAD Y LESIONES (CRÍTICO)**:
-   - Analiza el campo "injuries" del perfil del usuario.
-   - Evita ejercicios que agraven las lesiones indicadas.
-10. No incluyas campos adicionales ni texto fuera del JSON.`;
+64: Reglas importantes:
+65: 1. **INSTRUCCIONES MANUALES DEL USUARIO (PRIORIDAD ABSOLUTA)**:
+66:    - Analiza el campo "injuries" del perfil. Los usuarios usan este campo como CAJA DE TEXTO LIBRE para escribir PETICIONES, musculos deseados, o lesiones reales.
+67:    - Si el usuario dice "quiero piernas", "enfocate en x", "hazme esto", DEBES OBEDECER ESTA PETICION por encima de la regla del "Split".
+68:    - Si menciona dolor o lesión real, EVITA ejercicios que agraven esa zona.
+69: 2. **ARQUITECTURA Y SPLIT**: Si el usuario NO pide nada específico arriba, sigue estrictamente el split: ${(profile as any).trainingSplit ?? "full_body"}.
+70: 3. **ENFOQUE SECUNDARIO**: Prioriza áreas: ${JSON.stringify((profile as any).focusAreas ?? [])} si es posible y no contradice las instrucciones manuales.
+71: 4. **VOLUMEN ESTRICTO Y DURACION (${dailyTime} min)**:
+72:    - DEBES ajustar la cantidad de ejercicios y series para que encaje EXACTAMENTE en ${dailyTime} minutos (asume 2.5 min por cada serie + descanso).
+73:      - Para <= 30 min: MÁXIMO 4 a 5 ejercicios en total, 2-3 series cada uno (10-14 series en total). Usa superseries obligatorias para ahorrar tiempo.
+74:      - Para 45 min: 5 a 6 ejercicios, 3 series cada uno (15-18 series en total).
+75:      - Para >= 60 min: 6 a 8 ejercicios, 3-4 series cada uno (18-24 series en total).
+76:    - ES CRÍTICO NO pasarse de las series totales indicadas o la rutina será irrealista para el tiempo pedido.
+77: 5. **INTENSIDAD Y CALORIAS**:
+78:    - "intensity": Usa RPE (6-10) o RIR. Ej: "RPE 8" o "RIR 2".
+79:    - "estimatedCalories": Calcula calorias totales basandote en duracion y modo.
+80: 6. "instructions": Array de strings con 3-4 pasos breves para realizar el ejercicio correctamente.
+81: 7. **WARMUP**: El texto del calentamiento debe ser ESPECIFICO a lo que vas a entrenar hoy.
+82: 8. Elige el valor "svg" mas apropiado segun el catalogo soportado: pullup, floor_press, pushup_feet_elevated, one_arm_row, plank, deadbug, glute_bridge, side_squat, goblet_squat, rdl, calf_raise_bilateral, face_pull, bicep_curl, tricep_extension, shoulder_press, leg_raise, dumbbell, barbell, bodyweight.
+83: 9. **EQUIPAMIENTO (ESTRICTO)**:
+84:    - Revisa el campo "equipment": ${JSON.stringify((profile as any).equipment ?? [])}.
+85:    - NUNCA sugieras maquinas del gimnasio si el usuario selecciono "Solo mancuernas" o "Peso corporal".
+86: 10. No incluyas campos adicionales ni texto fuera del JSON.`;
       return {
         system,
         user: `Genera un programa de ${totalDays} dias para este perfil: ${JSON.stringify(profile)}`,
+      };
+    }
+    case "exercise_mapping": {
+      const generatedNames = payload.generatedNames as string[];
+      const catalog = payload.catalog as any[];
+      const system = `Eres un experto en fitness. Tu tarea es mapear una lista de ejercicios generados por IA a una base de datos estandarizada.
+Devuelve SOLO un JSON valido, sin markdown, que sea un objeto (diccionario) donde la clave es el nombre generado y el valor es el "id" oficial del catalogo que mejor coincida. Si no hay coincidencia razonable o el ejercicio no existe, el valor debe ser null.
+Catalogo oficial:
+${JSON.stringify(catalog)}`;
+      return {
+        system,
+        user: `Mapea estos ejercicios: ${JSON.stringify(generatedNames)}`,
       };
     }
     case "exercise_instructions": {

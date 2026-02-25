@@ -5,17 +5,13 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Exercise } from "../../types";
 import ExerciseIcon from "../icons/ExerciseIcons";
 import { getExerciseIcon } from "../../utils/exerciseIcons";
+import { useNormalizedExercises } from "../../hooks/useNormalizedExercises";
 
 export interface SortableExerciseItemProps {
   exercise: Exercise;
   exIndex: number;
   blockIndex: number;
-  updateExercise: (
-    blockIndex: number,
-    exIndex: number,
-    field: keyof Exercise,
-    value: string,
-  ) => void;
+  updateExercise: (blockIndex: number, exIndex: number, updates: Partial<Exercise>) => void;
   removeExercise: (blockIndex: number, exIndex: number) => void;
 }
 
@@ -29,6 +25,29 @@ export const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: `ex-${blockIndex}-${exIndex}`,
   });
+
+  const { data: normalizedExercises } = useNormalizedExercises();
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+
+    let matchId = "";
+    if (normalizedExercises) {
+      const match = Object.values(normalizedExercises).find(
+        (ex) =>
+          ex.name.toLowerCase() === val.toLowerCase() ||
+          ex.aliases.some((a) => a.toLowerCase() === val.toLowerCase()),
+      );
+      if (match) {
+        matchId = match.id;
+      }
+    }
+
+    updateExercise(blockIndex, exIndex, {
+      name: val,
+      ...(matchId ? { normalizedId: matchId } : { normalizedId: undefined }),
+    });
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -74,8 +93,9 @@ export const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
           })()}
           <input
             type='text'
+            list='normalized-exercises-list'
             value={exercise.name}
-            onChange={(e) => updateExercise(blockIndex, exIndex, "name", e.target.value)}
+            onChange={handleNameChange}
             className='w-full bg-transparent border-b border-transparent focus:border-blue-500 outline-none text-sm text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 transition-colors'
             placeholder='Nombre del ejercicio'
           />
@@ -88,7 +108,7 @@ export const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
           <input
             type='text'
             value={exercise.reps}
-            onChange={(e) => updateExercise(blockIndex, exIndex, "reps", e.target.value)}
+            onChange={(e) => updateExercise(blockIndex, exIndex, { reps: e.target.value })}
             className='w-full bg-transparent border-b border-transparent focus:border-blue-500 outline-none text-xs text-slate-600 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 transition-colors'
             placeholder='Reps (ej. 10-12)'
           />
@@ -101,7 +121,7 @@ export const SortableExerciseItem: React.FC<SortableExerciseItemProps> = ({
           <input
             type='text'
             value={exercise.note ?? ""}
-            onChange={(e) => updateExercise(blockIndex, exIndex, "note", e.target.value)}
+            onChange={(e) => updateExercise(blockIndex, exIndex, { note: e.target.value })}
             className='w-full bg-transparent border-b border-transparent focus:border-blue-500 outline-none text-xs text-slate-500 dark:text-slate-400 placeholder-slate-400 dark:placeholder-slate-600 transition-colors'
             placeholder='Notas técnicas...'
           />

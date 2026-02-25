@@ -6,7 +6,7 @@ import ProUpgradeCta from "./ProUpgradeCta";
 import RoutineInfoSection from "./RoutineInfoSection";
 import WorkoutBlock from "./WorkoutBlock";
 import type { User } from "firebase/auth";
-import type { Routine, WorkoutLogs, WorkoutLogEntry } from "../../types";
+import type { Routine, WorkoutLogs, WorkoutLogEntry, UserStats } from "../../types";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import { useStopwatch } from "../../hooks/useStopwatch";
 import { useTimer } from "../../hooks/useTimer";
@@ -24,6 +24,7 @@ interface WorkoutDayProps {
   onSaveLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   onDeleteLog: (exerciseName: string, entry: WorkoutLogEntry) => Promise<void>;
   workoutLogs: WorkoutLogs;
+  stats: UserStats | null;
   user: User | null;
   onRequireAuth?: () => void;
   isPro?: boolean;
@@ -39,6 +40,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   onSaveLog,
   onDeleteLog,
   workoutLogs,
+  stats,
   user,
   onRequireAuth,
   isPro,
@@ -230,6 +232,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               expandedExerciseId={expandedExerciseId}
               onSetExpandedExerciseId={setExpandedExerciseId}
               workoutLogs={workoutLogs}
+              stats={stats}
               user={user}
               onToggleComplete={handleToggleComplete}
               onSaveLog={onSaveLog}

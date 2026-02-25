@@ -35,9 +35,23 @@ const WeightSchema = z.preprocess((value) => {
 
 const RepsSchema = z.union([z.string(), z.number()]).transform((value) => String(value));
 
+// Schema for a normalized exercise in the dictionary
+export const NormalizedExerciseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  aliases: z.array(z.string()),
+  muscleGroup: z.string(),
+  equipment: z.array(z.string()),
+  svgIcon: z.string().optional(),
+  imageUrl: z.string().optional(),
+});
+export type NormalizedExercise = z.infer<typeof NormalizedExerciseSchema>;
+
 // Schema for exercise in a routine block
 export const ExerciseSchema = z.object({
   name: z.string(),
+  normalizedId: z.string().optional().describe("ID of the matching normalized exercise"),
+
   reps: RepsSchema.describe('Rep range, e.g., "10-12"'),
   sets: z.number().optional().describe("Number of sets"),
   intensity: z.string().optional().describe('Intensity, e.g., "RPE 8"'),

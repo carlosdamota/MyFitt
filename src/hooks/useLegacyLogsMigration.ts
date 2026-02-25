@@ -12,14 +12,17 @@ export const useLegacyLogsMigration = (user: User | null) => {
   useEffect(() => {
     if (!user || !db || isMigrating || migrationDone) return;
 
+    let isMounted = true; // Protect against unmounted state updates
+
     const performMigration = async () => {
       try {
+        if (!isMounted) return;
         setIsMigrating(true);
         const legacyRef = doc(db!, "artifacts", appId, "users", user.uid, "app_data", "logs");
         const docSnap = await getDoc(legacyRef);
 
         if (!docSnap.exists()) {
-          setMigrationDone(true);
+          if (isMounted) setMigrationDone(true);
           return;
         }
 
@@ -27,7 +30,7 @@ export const useLegacyLogsMigration = (user: User | null) => {
 
         // 1. Check if it's already migrated
         if (data.migratedToSessions) {
-          setMigrationDone(true);
+          if (isMounted) setMigrationDone(true);
           return;
         }
 
@@ -51,7 +54,7 @@ export const useLegacyLogsMigration = (user: User | null) => {
             migratedToSessions: true,
           };
           await setDoc(legacyRef, cleanMetadata);
-          setMigrationDone(true);
+          if (isMounted) setMigrationDone(true);
           return;
         }
 
@@ -103,6 +106,7 @@ export const useLegacyLogsMigration = (user: User | null) => {
           });
 
           // In the VERY LAST chunk, we update the legacy `app_data/logs`
+          // or if the loop is naturally ending
           if (i + CHUNK_SIZE >= sessionItems.length) {
             const cleanMetadata = {
               coachAdvice: data.coachAdvice || null,
@@ -114,16 +118,24 @@ export const useLegacyLogsMigration = (user: User | null) => {
           await batch.commit();
         }
 
-        setMigrationDone(true);
+        if (isMounted) setMigrationDone(true);
       } catch (error) {
         console.error("Error migrating legacy logs:", error);
-        setMigrationError("Error procesando historial de entrenamientos antiguos.");
+        if (isMounted) {
+          // Very important: if permission denied, we MUST mark as done or it loops infinitely
+          setMigrationDone(true);
+          setMigrationError("Error procesando historial de entrenamientos antiguos.");
+        }
       } finally {
-        setIsMigrating(false);
+        if (isMounted) setIsMigrating(false);
       }
     };
 
     performMigration();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, isMigrating, migrationDone]);
 
   return { isMigrating, migrationError, migrationDone };

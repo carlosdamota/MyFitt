@@ -10,10 +10,29 @@ import {
   normalizeProgram,
 } from "./ai-normalizers.js";
 import { buildPrompt } from "./prompts.js";
-import { NutritionLogSchema, GeneratedProgramSchema } from "./schemas.js";
+import { NutritionLogSchema, GeneratedProgramSchema, type GeneratedProgram } from "./schemas.js";
 import { billingCollection } from "./data.js";
 import { type PlanType, type Quotas, consumeQuota, releaseQuota } from "./utils/quota.js";
 import { type GeminiPart, type GeminiTool, callGemini, getImagePart } from "./utils/gemini.js";
+
+// Cache normalized exercises to avoid querying Firestore on every routine generation
+let cachedNormalizedExercises: Array<{ id: string; name: string; aliases: string[] }> | null = null;
+let lastCacheTime = 0;
+
+async function getNormalizedExercises(db: Firestore) {
+  const now = Date.now();
+  // Cache for 1 hour
+  if (cachedNormalizedExercises && now - lastCacheTime < 1000 * 60 * 60) {
+    return cachedNormalizedExercises;
+  }
+  const snap = await db.collection("normalized_exercises").get();
+  cachedNormalizedExercises = snap.docs.map((d) => {
+    const data = d.data();
+    return { id: d.id, name: data.name, aliases: data.aliases || [] };
+  });
+  lastCacheTime = now;
+  return cachedNormalizedExercises;
+}
 
 interface AiFunctionDeps {
   db: Firestore;
@@ -21,6 +40,7 @@ interface AiFunctionDeps {
   appId: string;
   geminiApiKey: string;
   geminiDefaultModel: string;
+  geminiFastModel: string;
   geminiNutritionModelFree: string;
   geminiNutritionModelPro: string;
   quotas: Quotas;
@@ -34,6 +54,7 @@ export const createAiGenerateFunction = ({
   appId,
   geminiApiKey,
   geminiDefaultModel,
+  geminiFastModel,
   geminiNutritionModelFree,
   geminiNutritionModelPro,
   quotas,
@@ -137,19 +158,68 @@ export const createAiGenerateFunction = ({
           } else if (task === "routine_program") {
             const totalDays = Number(payload.totalDays ?? 3);
             const validated = GeneratedProgramSchema.safeParse(parsed ?? {});
+
+            let programObj: GeneratedProgram | null = null;
+
             if (validated.success) {
-              validatedData = { text: JSON.stringify(validated.data) };
+              programObj = validated.data;
             } else {
               const normalized = normalizeProgram(parsed, totalDays);
               const normalizedResult = GeneratedProgramSchema.safeParse(normalized);
               if (normalizedResult.success) {
-                validatedData = { text: JSON.stringify(normalizedResult.data) };
+                programObj = normalizedResult.data;
               } else {
                 const fallback = buildFallbackProgram(totalDays);
                 const fallbackResult = GeneratedProgramSchema.safeParse(fallback);
                 if (!fallbackResult.success) throw new Error("ai_validation_failed");
-                validatedData = { text: JSON.stringify(fallbackResult.data) };
+                programObj = fallbackResult.data;
               }
+            }
+
+            // Normalization Step (Mapping to known exercises)
+            if (programObj) {
+              try {
+                const exerciseNames = new Set<string>();
+                programObj.days.forEach((day) => {
+                  day.blocks.forEach((block) => {
+                    block.exercises.forEach((ex) => exerciseNames.add(ex.name));
+                  });
+                });
+
+                const uniqueNames = Array.from(exerciseNames);
+                if (uniqueNames.length > 0) {
+                  const catalog = await getNormalizedExercises(db);
+                  const { system: mapSystem, user: mapUser } = buildPrompt("exercise_mapping", {
+                    generatedNames: uniqueNames,
+                    catalog,
+                  });
+
+                  // We use flash-lite for extreme speed in mapping
+                  const mappingText = await callGemini({
+                    geminiApiKey,
+                    geminiDefaultModel: geminiFastModel, // Uses the fast model assigned (8B / Flash-Lite)
+                    parts: [{ text: mapUser }],
+                    systemInstruction: mapSystem,
+                  });
+
+                  const mappingDict = parseJsonWithFixes(mappingText);
+
+                  programObj.days.forEach((day) => {
+                    day.blocks.forEach((block) => {
+                      block.exercises.forEach((ex) => {
+                        const mappedId = mappingDict[ex.name];
+                        if (mappedId) {
+                          ex.normalizedId = mappedId;
+                        }
+                      });
+                    });
+                  });
+                }
+              } catch (mappingError) {
+                console.error("AI Mapping failed, continuing with unmapped routine", mappingError);
+              }
+
+              validatedData = { text: JSON.stringify(programObj) };
             }
           }
         } catch {

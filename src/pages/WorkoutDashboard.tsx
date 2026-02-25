@@ -25,7 +25,7 @@ export default function WorkoutDashboard() {
   const { success } = useToast();
 
   const { profile } = useProfile(user);
-  const { workoutLogs, dayStreak, weekStreak } = useWorkoutLogs(user);
+  const { workoutLogs, stats, dayStreak, weekStreak } = useWorkoutLogs(user);
   const { pendingLogs, addLog, removeLog, flushSession, clearSession } = useWorkoutSession(user);
   const {
     routines,
@@ -136,6 +136,7 @@ export default function WorkoutDashboard() {
         onSaveLog={handleSaveLog}
         onDeleteLog={handleDeleteLog}
         workoutLogs={mergedLogs}
+        stats={stats}
         user={user}
         onRequireAuth={onRequireAuth}
         onFlushSession={flushSession}
