@@ -38,21 +38,24 @@ export const useShareWorkout = () => {
     };
   }, []);
 
-  const generate = useCallback(async (target: HTMLElement, format: WorkoutImageFormat) => {
-    setError(null);
-    setIsGenerating(true);
-    try {
-      const images = await generateWorkoutImage(target, { formats: [format] });
-      const image = images[format];
-      setPreviewImage(image.dataUrl);
-      return image;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "unknown_generation_error");
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
+  const generate = useCallback(
+    async (target: HTMLElement, format: WorkoutImageFormat, fileNameBase?: string) => {
+      setError(null);
+      setIsGenerating(true);
+      try {
+        const images = await generateWorkoutImage(target, { formats: [format], fileNameBase });
+        const image = images[format];
+        setPreviewImage(image.dataUrl);
+        return image;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "unknown_generation_error");
+        return null;
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [],
+  );
 
   const download = useCallback((asset: WorkoutImageAsset) => {
     const link = document.createElement("a");

@@ -63,24 +63,29 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   const theme = THEMES[themeKey];
   const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
   const totalExercises = logs.length;
+  const totalReps = logs.reduce((s, l) => s + (l.sets ?? 0) * (l.reps ?? 0), 0);
 
   const hashtags = useMemo(() => buildHashtags(logs, totalExercises), [logs, totalExercises]);
   const shareText = useMemo(() => {
     const base =
       duration !== "N/A"
-        ? `💪 He completado ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg.`
-        : `💪 He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen.`;
+        ? `💪 He completado ${totalExercises} ejercicios en ${duration} con ${totalVolume}kg y ${totalReps} reps.`
+        : `💪 He registrado ${totalExercises} ejercicios con ${totalVolume}kg de volumen y ${totalReps} reps.`;
     return `${base}\n\n${hashtags}`;
-  }, [duration, totalExercises, totalVolume, hashtags]);
+  }, [duration, totalExercises, totalVolume, totalReps, hashtags]);
+
+  const fileNameBase = useMemo(() => {
+    return `fittwiz-workout-${date}`;
+  }, [date]);
 
   const token = `${themeKey}-${sticker || "·"}-${Math.round(stickerPos.x)}-${Math.round(stickerPos.y)}-${format}`;
 
   const ensureAsset = useCallback(async () => {
     if (!cardRef.current) return null;
-    const img = await generate(cardRef.current, format);
+    const img = await generate(cardRef.current, format, fileNameBase);
     if (img) setAsset(img);
     return img;
-  }, [generate, format]);
+  }, [generate, format, fileNameBase]);
 
   // Bloquear el scroll del body mientras el modal está abierto
   useEffect(() => {
@@ -182,8 +187,10 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             logs={logs}
             totalVolume={totalVolume}
             totalExercises={totalExercises}
+            totalReps={totalReps}
             duration={duration}
             theme={theme}
+            format={format}
             sticker={sticker || null}
             stickerPosition={stickerPos}
           />
