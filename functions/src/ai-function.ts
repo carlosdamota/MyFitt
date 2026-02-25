@@ -14,6 +14,7 @@ import { NutritionLogSchema, GeneratedProgramSchema, type GeneratedProgram } fro
 import { billingCollection } from "./data.js";
 import { type PlanType, type Quotas, consumeQuota, releaseQuota } from "./utils/quota.js";
 import { type GeminiPart, type GeminiTool, callGemini, getImagePart } from "./utils/gemini.js";
+import { getPostHogClient } from "./utils/posthog.js";
 
 // Cache normalized exercises to avoid querying Firestore on every routine generation
 let cachedNormalizedExercises: Array<{ id: string; name: string; aliases: string[] }> | null = null;
@@ -132,6 +133,7 @@ export const createAiGenerateFunction = ({
           ? [{ google_search: {} }]
           : undefined;
 
+        const startTime = Date.now();
         const text = await callGemini({
           geminiApiKey,
           geminiDefaultModel,
@@ -140,6 +142,24 @@ export const createAiGenerateFunction = ({
           model: modelForTask,
           tools,
         });
+        const durationMs = Date.now() - startTime;
+
+        // Track consumption in PostHog
+        try {
+          const ph = getPostHogClient();
+          ph.capture({
+            distinctId: uid,
+            event: "ai_generation",
+            properties: {
+              task,
+              model: modelForTask || geminiDefaultModel,
+              duration_ms: durationMs,
+              plan,
+            },
+          });
+        } catch (phError) {
+          console.error("Failed to track AI generation in PostHog:", phError);
+        }
 
         let validatedData: { text: string } = { text };
         try {

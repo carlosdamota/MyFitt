@@ -1,5 +1,6 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { getFirestore } from "firebase-admin/firestore";
+import { getPostHogClient } from "./utils/posthog.js";
 
 /**
  * Personal Best structure (mirrors frontend)
@@ -125,6 +126,21 @@ export const createUpdateUserStatsFunction = (params: { appId: string }) => {
 
         transaction.set(statsRef, stats, { merge: true });
       });
+
+      // Track Firebase workload proxy in PostHog
+      try {
+        const ph = getPostHogClient();
+        ph.capture({
+          distinctId: userId,
+          event: "stats_aggregated",
+          properties: {
+            session_id: event.params.sessionId,
+            exercises_count: Object.keys(sessionData.logs || {}).length,
+          },
+        });
+      } catch (phError) {
+        console.error("Failed to track stats aggregation in PostHog:", phError);
+      }
     },
   );
 };
