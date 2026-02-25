@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import type { Request, Response } from "express";
+import { getPostHogClient } from "./utils/posthog.js";
 
 // ─── Types ──────────────────────────────────────────────────────────
 interface EmailAgentDeps {
@@ -62,10 +63,18 @@ export const createEmailAgentFunctions = ({
     title: string,
     ctaText: string = "ABRIR FITTWIZ",
   ): string => {
-    // Ensure webOrigin doesn't have a trailing slash
-    const cleanOrigin = webOrigin.replace(/\/$/, "");
-    const appUrl = `${cleanOrigin}/#/dashboard`;
-    const settingsUrl = `${cleanOrigin}/#/profile`;
+    // WEB_ORIGIN can be a comma-separated list of URLs. Select the first valid origin.
+    const allowedOrigins = webOrigin
+      .split(",")
+      .map((url) => url.trim().replace(/\/$/, ""))
+      .filter(Boolean);
+    const cleanOrigin =
+      allowedOrigins.find((o) => o.includes("fittwiz.app")) ||
+      allowedOrigins.find((o) => o.startsWith("https://") && !o.includes("localhost")) ||
+      allowedOrigins[0] ||
+      "https://fittwiz.app";
+    const appUrl = `${cleanOrigin}/app`;
+    const settingsUrl = `${cleanOrigin}/app/profile`;
 
     // Email clients often strip <style> tags when translating. All styles must be inline.
     const containerStyle =
@@ -287,8 +296,16 @@ export const createEmailAgentFunctions = ({
       }
     }
 
-    const cleanOrigin = webOrigin.replace(/\/$/, "");
-    const settingsUrl = `${cleanOrigin}/#/profile`;
+    const allowedOrigins = webOrigin
+      .split(",")
+      .map((url) => url.trim().replace(/\/$/, ""))
+      .filter(Boolean);
+    const cleanOrigin =
+      allowedOrigins.find((o) => o.includes("fittwiz.app")) ||
+      allowedOrigins.find((o) => o.startsWith("https://") && !o.includes("localhost")) ||
+      allowedOrigins[0] ||
+      "https://fittwiz.app";
+    const settingsUrl = `${cleanOrigin}/app/profile`;
     const headers: Record<string, string> = {};
 
     // Add List-Unsubscribe header for commercial emails (email clients use this natively)
@@ -304,6 +321,18 @@ export const createEmailAgentFunctions = ({
       html: wrapWithFittwizTemplate(content.body_html, skipOptOutCheck, content.subject),
       headers,
     });
+
+    if (userId) {
+      const ph = getPostHogClient();
+      ph.capture({
+        distinctId: userId,
+        event: "email_sent",
+        properties: {
+          subject: content.subject,
+          type: skipOptOutCheck ? "security" : "marketing",
+        },
+      });
+    }
   };
 
   /** Call Gemini to generate email content */
@@ -416,8 +445,8 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
         }
 
         const content = await generateEmailContent(
-          `New user: ${name}`,
-          "Write a high-energy welcome email. Introduce FITTWIZ as the most advanced AI-powered workout companion. Emphasize that we're going to transform their fitness journey together. Include a clear and motivating CTA to open the app and start their first session.",
+          `New user welcome email`,
+          "Write a high-energy welcome email IN SPANISH. Introduce FITTWIZ as the most advanced AI-powered workout companion. Emphasize that we're going to transform their fitness journey together. Include a clear and motivating CTA to open the app and start their first session. CRITICAL: DO NOT use or infer any names, address the user generally (e.g., 'Hola atleta', 'Bienvenido/a').",
         );
 
         await sendEmail(email, content);

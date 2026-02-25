@@ -13,6 +13,7 @@ import {
   type User,
 } from "firebase/auth";
 import { auth } from "../config/firebase";
+import posthog from "posthog-js";
 
 // Declare global variable injected at runtime
 declare const __initial_auth_token: string | undefined;
@@ -42,6 +43,14 @@ export const useAuth = (): UseAuthReturn => {
         auth,
         (currentUser) => {
           setUser(currentUser);
+
+          if (currentUser && !currentUser.isAnonymous) {
+            posthog.identify(currentUser.uid, {
+              email: currentUser.email,
+              name: currentUser.displayName,
+            });
+          }
+
           // Si hay un token inicial y no hay usuario, intentar login custom
           if (!currentUser && typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
             signInWithCustomToken(auth!, __initial_auth_token).catch((e: Error) => {
@@ -118,6 +127,7 @@ export const useAuth = (): UseAuthReturn => {
 
   const logout = async (): Promise<void> => {
     if (!auth) return;
+    posthog.reset();
     await signOut(auth);
   };
 

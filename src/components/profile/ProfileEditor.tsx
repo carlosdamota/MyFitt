@@ -13,6 +13,7 @@ import ThemeToggle from "../common/ThemeToggle";
 import DeleteAccountModal from "./DeleteAccountModal";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
+import { PersonalDataSchema } from "../../schemas/validation";
 
 interface ProfileEditorProps {
   user: FirebaseUser | null;
@@ -29,7 +30,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { info } = useToast();
+  const { info, error } = useToast();
 
   useEffect(() => {
     if (profile) {
@@ -45,6 +46,18 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     if (e) e.preventDefault();
     if (!formData) return;
+
+    const validationResult = PersonalDataSchema.safeParse({
+      age: formData.age,
+      height: formData.height,
+      weight: formData.weight,
+    });
+
+    if (!validationResult.success) {
+      error(validationResult.error.issues[0].message);
+      return;
+    }
+
     setIsSaving(true);
     const success = await saveProfile(formData);
     if (success) {
@@ -56,6 +69,18 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
 
   const handleSaveClick = async (): Promise<void> => {
     if (!formData) return;
+
+    const validationResult = PersonalDataSchema.safeParse({
+      age: formData.age,
+      height: formData.height,
+      weight: formData.weight,
+    });
+
+    if (!validationResult.success) {
+      error(validationResult.error.issues[0].message);
+      return;
+    }
+
     setIsSaving(true);
     const success = await saveProfile(formData);
     if (success) {

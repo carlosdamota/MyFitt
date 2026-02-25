@@ -4,6 +4,7 @@ import type { Auth } from "firebase-admin/auth";
 import type { Request, Response } from "express";
 import type Stripe from "stripe";
 import { billingCollection } from "./data.js";
+import { getPostHogClient } from "./utils/posthog.js";
 
 type PlanType = "free" | "pro";
 
@@ -88,11 +89,35 @@ export const createStripeWebhookFunction = ({
           case "checkout.session.completed": {
             const session = event.data.object as Stripe.Checkout.Session;
             if (session.customer) {
-              await updatePlanForCustomer(
-                String(session.customer),
-                true,
-                String(session.subscription),
-              );
+              const customerId = String(session.customer);
+              await updatePlanForCustomer(customerId, true, String(session.subscription));
+
+              // Track Revenue in PostHog
+              try {
+                const userQuery = await db
+                  .collectionGroup("billing")
+                  .where("stripeCustomerId", "==", customerId)
+                  .limit(1)
+                  .get();
+
+                if (!userQuery.empty) {
+                  const uid = userQuery.docs[0].ref.parent.parent?.id;
+                  if (uid) {
+                    const ph = getPostHogClient();
+                    ph.capture({
+                      distinctId: uid,
+                      event: "payment_succeeded",
+                      properties: {
+                        amount: (session.amount_total || 0) / 100, // Normalize cents to units
+                        currency: session.currency,
+                        checkout_session_id: session.id,
+                      },
+                    });
+                  }
+                }
+              } catch (phError) {
+                console.error("Failed to track payment in PostHog:", phError);
+              }
             }
             break;
           }
@@ -101,7 +126,35 @@ export const createStripeWebhookFunction = ({
           case "customer.subscription.deleted": {
             const subscription = event.data.object as Stripe.Subscription;
             const isActive = subscription.status === "active" || subscription.status === "trialing";
-            await updatePlanForCustomer(String(subscription.customer), isActive, subscription.id);
+            const customerId = String(subscription.customer);
+            await updatePlanForCustomer(customerId, isActive, subscription.id);
+
+            // Track Subscription Change in PostHog
+            try {
+              const userQuery = await db
+                .collectionGroup("billing")
+                .where("stripeCustomerId", "==", customerId)
+                .limit(1)
+                .get();
+
+              if (!userQuery.empty) {
+                const uid = userQuery.docs[0].ref.parent.parent?.id;
+                if (uid) {
+                  const ph = getPostHogClient();
+                  ph.capture({
+                    distinctId: uid,
+                    event: "subscription_status_changed",
+                    properties: {
+                      status: subscription.status,
+                      is_active: isActive,
+                      subscription_id: subscription.id,
+                    },
+                  });
+                }
+              }
+            } catch (phError) {
+              console.error("Failed to track subscription change in PostHog:", phError);
+            }
             break;
           }
           default:

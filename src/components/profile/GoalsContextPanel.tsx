@@ -289,8 +289,9 @@ const GoalsContextPanel: React.FC<GoalsContextPanelProps> = ({
           <textarea
             value={formData.injuries}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChange("injuries", e.target.value)}
+            maxLength={200}
             className='w-full bg-white dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-blue-500 outline-none h-16 resize-none transition-colors'
-            placeholder='Ej. Dolor lumbar, hombro derecho sensible...'
+            placeholder='Ej. Dolor lumbar, hombro derecho sensible... (Máx. 200 carácteres)'
           />
         </div>
       </div>

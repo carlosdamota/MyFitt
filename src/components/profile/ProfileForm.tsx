@@ -46,6 +46,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               }
               className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 75'
+              min={30}
+              max={300}
             />
           </div>
           <div>
@@ -60,6 +62,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               }
               className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 180'
+              min={100}
+              max={250}
             />
           </div>
         </div>
@@ -73,6 +77,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("age", e.target.value)}
               className='w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-700 rounded-lg p-2 text-slate-900 dark:text-white text-sm focus:border-primary-500 outline-none'
               placeholder='Ej. 30'
+              min={13}
+              max={120}
             />
           </div>
           <div>

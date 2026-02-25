@@ -4,6 +4,7 @@ import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
 import type { WorkoutLogs, WorkoutLogEntry } from "../types";
+import posthog from "posthog-js";
 
 const STORAGE_KEY = "myfitt_pending_session";
 
@@ -76,7 +77,12 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
     });
 
     // Start session timestamp on first log
-    setStartedAt((prev) => prev || new Date().toISOString());
+    setStartedAt((prev) => {
+      if (!prev) {
+        posthog.capture("workout_started");
+      }
+      return prev || new Date().toISOString();
+    });
   }, []);
 
   // ── Remove a log from the local buffer ──
@@ -133,6 +139,11 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
         setPendingLogs({});
         setStartedAt(null);
         localStorage.removeItem(STORAGE_KEY);
+
+        posthog.capture("workout_completed", {
+          duration: metadata.duration || null,
+          routine_title: metadata.routineTitle || null,
+        });
       } catch (e) {
         console.error("Session flush error", e);
         // Don't clear local state on error — data is preserved for retry

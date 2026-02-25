@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import Modal from "../common/Modal";
 import { mainLogo } from "../../branding/logoConfig";
+import { PasswordSchema } from "../../schemas/validation";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -35,6 +36,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setError("Completa email y contraseña.");
       return;
     }
+
+    if (mode === "signup") {
+      const result = PasswordSchema.safeParse(password);
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
     try {

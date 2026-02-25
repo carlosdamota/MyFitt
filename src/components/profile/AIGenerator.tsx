@@ -8,6 +8,7 @@ import type { ProfileFormData } from "../../types";
 import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
 import { useEntitlement } from "../../hooks/useEntitlement";
+import posthog from "posthog-js";
 
 // Motivational phrases for loading state
 const MOTIVATIONAL_PHRASES = [
@@ -123,6 +124,12 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       const daysToGenerate = formData.availableDays || 3;
       setGenerationProgress("Generando programa completo con inteligencia artificial...");
 
+      posthog.capture("ai_routine_requested", {
+        days_requested: daysToGenerate,
+        goal: formData.goal,
+        experience: formData.experienceLevel,
+      });
+
       const program = await generateFullProgram({
         weight: parseFloat(formData.weight) || 70,
         height: parseFloat(formData.height) || 170,
@@ -171,6 +178,11 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       setGenSuccess(true);
       setGenerationProgress("¡Plan Completado!");
       logEvent("Routine", "Generated Program", `${daysToGenerate} days`);
+
+      posthog.capture("ai_routine_generated", {
+        total_days: program.days.length,
+        program_name: program.programName,
+      });
 
       setTimeout(() => {
         setGenSuccess(false);
