@@ -1,6 +1,7 @@
 import React from "react";
-import { Dumbbell, Activity } from "lucide-react";
+import { Dumbbell, Activity, Target, Zap, TrendingUp } from "lucide-react";
 import type { WorkoutLogEntry } from "../../types";
+import type { WorkoutImageFormat } from "../../utils/generateWorkoutImage";
 import { iconLogo } from "../../branding/logoConfig";
 
 export interface ShareCardTheme {
@@ -15,8 +16,10 @@ interface SocialShareCardProps {
   logs: (WorkoutLogEntry & { exercise: string; volume: number })[];
   totalVolume: number;
   totalExercises: number;
+  totalReps?: number;
   duration?: string;
   theme?: ShareCardTheme;
+  format?: WorkoutImageFormat;
   sticker?: string | null;
   stickerPosition?: { x: number; y: number };
 }
@@ -33,14 +36,17 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
     {
       date,
       logs,
-      totalVolume,
-      totalExercises,
       theme = DEFAULT_THEME,
+      format = "feed",
       sticker,
       stickerPosition = { x: 50, y: 50 },
     },
     ref,
   ) => {
+    const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
+    const totalExercises = logs.length;
+    const totalReps = logs.reduce((s, l) => s + (l.sets ?? 0) * (l.reps ?? 0), 0);
+
     const formatDate = (dateString: string) => {
       try {
         if (!dateString) return "";
@@ -49,7 +55,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
         return d.toLocaleDateString("es-ES", {
           weekday: "long",
           day: "numeric",
-          month: "short",
+          month: "long",
           year: "numeric",
         });
       } catch {
@@ -57,25 +63,58 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
       }
     };
 
+    const getGradient = (bgColor: string) => {
+      // Create a subtle gradient for depth
+      return `linear-gradient(135deg, ${bgColor} 0%, #000000 100%)`;
+    };
+
     return (
       <div
         ref={ref}
         id='social-share-card'
         style={{
-          backgroundColor: theme.backgroundColor,
+          background: getGradient(theme.backgroundColor),
           color: theme.primaryTextColor,
           fontFamily: "'Inter', sans-serif",
           width: "1080px",
-          height: "1350px",
+          height: format === "story" ? "1920px" : "1350px",
           display: "flex",
           flexDirection: "column",
-          padding: "60px",
+          padding: format === "story" ? "80px 70px" : "55px 65px",
           boxSizing: "border-box",
           position: "relative",
           overflow: "hidden",
         }}
         className='font-sans'
       >
+        {/* Subtle background decoration */}
+        <div
+          style={{
+            position: "absolute",
+            top: "-100px",
+            right: "-100px",
+            width: "500px",
+            height: "500px",
+            borderRadius: "50%",
+            background: `${theme.accentColor}15`,
+            filter: "blur(100px)",
+            zIndex: 0,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "20%",
+            left: "-100px",
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            background: `${theme.accentColor}08`,
+            filter: "blur(60px)",
+            zIndex: 0,
+          }}
+        />
+
         {sticker && (
           <div
             style={{
@@ -86,132 +125,262 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
               fontSize: "72px",
               lineHeight: 1,
               pointerEvents: "none",
+              zIndex: 30,
             }}
           >
             {sticker}
           </div>
         )}
 
+        {/* Header */}
         <div
-          style={{ marginBottom: "50px", borderBottom: "1px solid #27272a", paddingBottom: "30px" }}
+          style={{
+            marginBottom: "40px",
+            position: "relative",
+            zIndex: 10,
+          }}
         >
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "flex-end",
-              marginBottom: "20px",
+              alignItems: "center",
             }}
           >
             <div>
-              <h2
-                style={{
-                  color: theme.secondaryTextColor,
-                  marginBottom: "8px",
-                  fontSize: "24px",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}
               >
-                Session Summary
-              </h2>
+                <Activity
+                  size={22}
+                  color={theme.accentColor}
+                />
+                <span
+                  style={{
+                    color: theme.secondaryTextColor,
+                    fontSize: "18px",
+                    fontWeight: "700",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.2em",
+                  }}
+                >
+                  RESUMEN DE SESIÓN
+                </span>
+              </div>
               <h1
                 style={{
                   color: theme.primaryTextColor,
                   lineHeight: 1.1,
-                  fontSize: "48px",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
+                  fontSize: "52px",
+                  fontWeight: "900",
+                  textTransform: "capitalize",
+                  margin: 0,
                 }}
               >
                 {formatDate(date)}
               </h1>
             </div>
-            <div style={{ color: theme.accentColor }}>
-              <Activity size={56} />
+            <div
+              style={{
+                width: "90px",
+                height: "90px",
+                borderRadius: "28px",
+                backgroundColor: `${theme.accentColor}15`,
+                border: `1px solid ${theme.accentColor}30`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: theme.accentColor,
+              }}
+            >
+              <TrendingUp size={42} />
             </div>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "80px", marginBottom: "50px" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-              <h3
+        {/* Stats Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: "25px",
+            marginBottom: "45px",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
+          {/* Total Volume */}
+          <div
+            style={{
+              backgroundColor: "#ffffff05",
+              backdropFilter: "blur(10px)",
+              border: "1px solid #ffffff10",
+              borderRadius: "32px",
+              padding: "25px 30px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+            }}
+          >
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "2px" }}
+            >
+              <Zap
+                size={20}
+                color={theme.accentColor}
+              />
+              <span
                 style={{
-                  color: theme.primaryTextColor,
-                  margin: 0,
-                  lineHeight: 1,
-                  fontSize: "110px",
-                  fontWeight: "900",
+                  color: theme.secondaryTextColor,
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
                 }}
               >
-                {totalVolume > 0 ? `${(totalVolume / 1000).toFixed(1)}k` : "0"}
-              </h3>
-              <span
-                style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}
-              >
-                kg
+                Volumen
               </span>
             </div>
-            <p
-              style={{
-                color: theme.secondaryTextColor,
-                fontSize: "24px",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                marginTop: "8px",
-              }}
-            >
-              Total Volume
-            </p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+              <span style={{ fontSize: "68px", fontWeight: "900", lineHeight: 1 }}>
+                {totalVolume > 0
+                  ? totalVolume < 1000
+                    ? totalVolume
+                    : `${(totalVolume / 1000).toFixed(1)}k`
+                  : "0"}
+              </span>
+              <span
+                style={{ color: theme.secondaryTextColor, fontSize: "24px", fontWeight: "700" }}
+              >
+                KG
+              </span>
+            </div>
           </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-              <h3
+
+          {/* Exercises */}
+          <div
+            style={{
+              backgroundColor: "#ffffff05",
+              backdropFilter: "blur(10px)",
+              border: "1px solid #ffffff10",
+              borderRadius: "32px",
+              padding: "25px 30px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+            }}
+          >
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "2px" }}
+            >
+              <Dumbbell
+                size={20}
+                color={theme.accentColor}
+              />
+              <span
                 style={{
-                  color: theme.primaryTextColor,
-                  margin: 0,
-                  lineHeight: 1,
-                  fontSize: "110px",
-                  fontWeight: "900",
+                  color: theme.secondaryTextColor,
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
                 }}
               >
+                Ejercicios
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+              <span style={{ fontSize: "68px", fontWeight: "900", lineHeight: 1 }}>
                 {totalExercises}
-              </h3>
+              </span>
               <span
-                style={{ color: theme.secondaryTextColor, fontSize: "36px", fontWeight: "bold" }}
+                style={{ color: theme.secondaryTextColor, fontSize: "24px", fontWeight: "700" }}
               >
-                Ex
+                EX
               </span>
             </div>
-            <p
-              style={{
-                color: theme.secondaryTextColor,
-                fontSize: "24px",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                marginTop: "8px",
-              }}
+          </div>
+
+          {/* Total Reps */}
+          <div
+            style={{
+              backgroundColor: "#ffffff05",
+              backdropFilter: "blur(10px)",
+              border: "1px solid #ffffff10",
+              borderRadius: "32px",
+              padding: "25px 30px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+            }}
+          >
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "2px" }}
             >
-              Exercises
-            </p>
+              <Target
+                size={20}
+                color={theme.accentColor}
+              />
+              <span
+                style={{
+                  color: theme.secondaryTextColor,
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                Reps
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+              <span style={{ fontSize: "68px", fontWeight: "900", lineHeight: 1 }}>
+                {totalReps >= 1000 ? `${(totalReps / 1000).toFixed(1)}k` : totalReps}
+              </span>
+              <span
+                style={{ color: theme.secondaryTextColor, fontSize: "24px", fontWeight: "700" }}
+              >
+                TOT
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px" }}>
-          {logs.slice(0, 7).map((log, i) => (
+        {/* Exercise List */}
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
+          <h3
+            style={{
+              color: theme.secondaryTextColor,
+              fontSize: "18px",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.15em",
+              marginBottom: "2px",
+            }}
+          >
+            Principales Ejercicios
+          </h3>
+
+          {logs.slice(0, 8).map((log, i) => (
             <div
               key={i}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                paddingBottom: "24px",
-                borderBottom: "1px solid #27272a",
-                minHeight: "80px",
+                padding: "16px 24px",
+                backgroundColor: "#ffffff03",
+                borderRadius: "20px",
+                border: "1px solid #ffffff08",
               }}
             >
               <div
@@ -220,45 +389,40 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   alignItems: "center",
                   flex: 1,
                   overflow: "hidden",
-                  marginRight: "32px",
                 }}
               >
                 <div
                   style={{
-                    backgroundColor: "#18181b",
-                    padding: "16px",
-                    borderRadius: "16px",
-                    flexShrink: 0,
+                    backgroundColor: `${theme.accentColor}10`,
+                    padding: "10px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: "20px",
                   }}
                 >
                   <Dumbbell
-                    size={32}
-                    color={theme.secondaryTextColor}
+                    size={24}
+                    color={theme.accentColor}
                   />
                 </div>
 
                 <div
                   style={{
-                    marginLeft: "24px",
                     flex: 1,
                     minWidth: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
                   }}
                 >
                   <h3
                     style={{
                       color: theme.primaryTextColor,
-                      lineHeight: "1.4",
-                      marginBottom: "0px",
-                      fontSize: "28px",
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
+                      fontSize: "26px",
+                      fontWeight: "800",
+                      margin: 0,
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      paddingBottom: "2px",
                     }}
                   >
                     {log.exercise}
@@ -266,118 +430,133 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "40px", flexShrink: 0, textAlign: "right" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    minWidth: "90px",
-                  }}
-                >
-                  <span
-                    style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}
+              <div style={{ display: "flex", gap: "35px", alignItems: "center" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div
+                    style={{ color: theme.primaryTextColor, fontSize: "28px", fontWeight: "900" }}
                   >
-                    {(log.weight ?? 0) > 0 ? log.weight : "BW"}
-                  </span>
-                  <span
+                    {log.sets}×{log.reps}
+                  </div>
+                  <div
                     style={{
                       color: theme.secondaryTextColor,
                       fontSize: "14px",
-                      fontWeight: "bold",
+                      fontWeight: "700",
                       textTransform: "uppercase",
                     }}
                   >
-                    kg
-                  </span>
+                    Reps
+                  </div>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    minWidth: "120px",
-                  }}
-                >
-                  <span
-                    style={{ color: theme.primaryTextColor, fontSize: "32px", fontWeight: "bold" }}
-                  >
-                    {log.sets} x {log.reps}
-                  </span>
-                  <span
+                <div style={{ textAlign: "right", minWidth: "100px" }}>
+                  <div style={{ color: theme.accentColor, fontSize: "28px", fontWeight: "900" }}>
+                    {(log.weight ?? 0) > 0 ? `${log.weight}kg` : "BW"}
+                  </div>
+                  <div
                     style={{
                       color: theme.secondaryTextColor,
                       fontSize: "14px",
-                      fontWeight: "bold",
+                      fontWeight: "700",
                       textTransform: "uppercase",
                     }}
                   >
-                    Sets x Reps
-                  </span>
+                    Peso
+                  </div>
                 </div>
               </div>
             </div>
           ))}
 
-          {logs.length > 7 && (
-            <p
+          {logs.length > 8 && (
+            <div
               style={{
-                color: theme.secondaryTextColor,
-                fontSize: "24px",
-                fontStyle: "italic",
-                marginTop: "8px",
+                marginTop: "5px",
                 textAlign: "center",
+                padding: "10px",
+                backgroundColor: "#ffffff03",
+                borderRadius: "16px",
+                border: "1px dashed #ffffff15",
               }}
             >
-              + {logs.length - 7} more exercises...
-            </p>
+              <span
+                style={{
+                  color: theme.secondaryTextColor,
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  fontStyle: "italic",
+                }}
+              >
+                + {logs.length - 8} ejercicios más en esta sesión
+              </span>
+            </div>
           )}
         </div>
 
+        {/* Footer */}
         <div
           style={{
             marginTop: "auto",
-            paddingTop: "40px",
+            paddingTop: "35px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            position: "relative",
+            zIndex: 10,
           }}
         >
-          <div
-            style={{
-              height: "8px",
-              width: "120px",
-              borderRadius: "4px",
-              backgroundColor: theme.accentColor,
-            }}
-          ></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{
+                height: "5px",
+                width: "140px",
+                borderRadius: "3px",
+                backgroundColor: theme.accentColor,
+              }}
+            ></div>
+            <span
+              style={{
+                color: theme.secondaryTextColor,
+                fontSize: "14px",
+                fontWeight: "700",
+                letterSpacing: "0.1em",
+              }}
+            >
+              GENERADO POR FITTWIZ
+            </span>
+          </div>
 
-          <div style={{ textAlign: "right", display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ textAlign: "right", display: "flex", alignItems: "center", gap: "15px" }}>
+            <div style={{ textAlign: "right" }}>
+              <h3
+                className='text-3xl font-black italic uppercase tracking-tighter'
+                style={{ color: theme.primaryTextColor, margin: 0, lineHeight: 1 }}
+              >
+                FITTWIZ
+              </h3>
+              <p
+                style={{
+                  color: theme.secondaryTextColor,
+                  margin: 0,
+                  fontSize: "18px",
+                  fontWeight: "600",
+                }}
+              >
+                fittwiz.app
+              </p>
+            </div>
             <img
               src={iconLogo.src}
               alt={iconLogo.alt}
               style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "12px",
+                width: "56px",
+                height: "56px",
+                borderRadius: "16px",
                 objectFit: "contain",
-                backgroundColor: "#020617",
-                border: "1px solid #334155",
-                padding: "6px",
+                backgroundColor: "#000",
+                border: "2px solid #ffffff15",
+                padding: "7px",
               }}
             />
-            <h3
-              className='text-3xl font-black italic uppercase tracking-tighter'
-              style={{ color: theme.primaryTextColor }}
-            >
-              FITTWIZ
-            </h3>
-            <p
-              className='text-lg font-medium'
-              style={{ color: theme.secondaryTextColor }}
-            >
-              fittwiz.app
-            </p>
           </div>
         </div>
       </div>
