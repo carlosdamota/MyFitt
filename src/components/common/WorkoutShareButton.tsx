@@ -34,9 +34,9 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   const [copied, setCopied] = useState(false);
   const { success: showSuccess, error: showError } = useToast();
 
-  const ensureAsset = async () => {
+  const ensureAsset = async (mode: "preview" | "export" = "preview") => {
     if (!captureRef.current) return null;
-    const image = await generate(captureRef.current, format);
+    const image = await generate(captureRef.current, format, undefined, { mode });
     if (image) setCachedAsset(image);
     return image;
   };
@@ -44,25 +44,25 @@ export const WorkoutShareButton: React.FC<WorkoutShareButtonProps> = ({
   useEffect(() => {
     if (!captureRef.current) return;
     setCachedAsset(null);
-    void ensureAsset();
+    void ensureAsset("preview");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [format, captureRef, previewToken]);
 
   const handleShare = async () => {
-    const image = cachedAsset ?? (await ensureAsset());
+    const image = cachedAsset ?? (await ensureAsset("export"));
     if (!image) return;
     await share(image, { title: shareTitle, text: shareText });
   };
 
   const handleDownload = async () => {
-    const image = cachedAsset ?? (await ensureAsset());
+    const image = cachedAsset ?? (await ensureAsset("export"));
     if (!image) return;
     download(image);
     showSuccess("Imagen descargada");
   };
 
   const handleCopy = async () => {
-    const image = cachedAsset ?? (await ensureAsset());
+    const image = cachedAsset ?? (await ensureAsset("export"));
     if (!image) return;
     const result = await copyToClipboard(image);
     if (result === "copied") {

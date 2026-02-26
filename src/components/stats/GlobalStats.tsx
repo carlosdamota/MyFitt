@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { TrendingUp, ArrowLeft, Trophy, Dumbbell, Flame } from "lucide-react";
 import LogViewer from "./LogViewer";
 import { isBodyweightExercise } from "../../utils/stats";
-import type { WorkoutLogs, RoutineData, UserStats } from "../../types";
+import type { WorkoutLogs, RoutineData, UserStats, WorkoutSession } from "../../types";
 import { Button } from "../ui/Button";
 
 // Sub-components
@@ -12,6 +12,7 @@ import WeeklyCoach from "./WeeklyCoach";
 
 interface GlobalStatsProps {
   logs: WorkoutLogs;
+  sessions: WorkoutSession[];
   stats: UserStats | null;
   onClose: () => void;
   userWeight: string | number;
@@ -32,6 +33,7 @@ interface AggregatedDataPoint {
 
 const GlobalStats: React.FC<GlobalStatsProps> = ({
   logs,
+  sessions,
   stats,
   onClose,
   coachHistory,
@@ -203,7 +205,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
         ) : (
           <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-3xl p-4 overflow-hidden transition-colors'>
             <LogViewer
-              logs={logs}
+              sessions={sessions}
               userWeight={userWeight}
               fetchNextPage={fetchNextPage}
               hasNextPage={hasNextPage}

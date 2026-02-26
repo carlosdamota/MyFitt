@@ -11,9 +11,11 @@ interface EditorPanelProps {
   setThemeKey: (key: string) => void;
   format: WorkoutImageFormat;
   setFormat: (format: WorkoutImageFormat) => void;
-  sticker: string;
-  setSticker: (sticker: string) => void;
-  setStickerPos: (pos: { x: number; y: number }) => void;
+  stickers: import("../../../utils/social-share/types").StickerData[];
+  onAddSticker: (emoji: string) => void;
+  onClearStickers: () => void;
+  selectedId: string | null;
+  onRemoveSticker: (id: string) => void;
 }
 
 export const EditorPanel: React.FC<EditorPanelProps> = ({
@@ -23,9 +25,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   setThemeKey,
   format,
   setFormat,
-  sticker,
-  setSticker,
-  setStickerPos,
+  stickers,
+  onAddSticker,
+  onClearStickers,
+  selectedId,
+  onRemoveSticker,
 }) => {
   if (!tab) return null;
 
@@ -71,7 +75,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                       ? "ring-2 ring-slate-900 dark:ring-white scale-110 shadow-lg"
                       : "ring-1 ring-black/10 dark:ring-white/20 group-hover:ring-black/30 dark:group-hover:ring-white/50"
                   }`}
-                  style={{ background: p.preview }}
+                  style={{
+                    background: p.preview,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
                 >
                   {themeKey === key && (
                     <div className='h-full w-full flex items-center justify-center bg-black/20 rounded-full'>
@@ -132,31 +140,38 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
         >
           <div className='flex gap-3 px-2 items-center w-max min-w-full'>
             <button
-              onClick={() => setSticker("")}
+              onClick={onClearStickers}
+              disabled={stickers.length === 0}
               className={`shrink-0 flex items-center justify-center rounded-xl h-10 px-3 text-xs font-medium transition-all ${
-                !sticker
-                  ? "bg-slate-800 text-white dark:bg-white/20"
-                  : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                stickers.length === 0
+                  ? "opacity-50 grayscale cursor-not-allowed bg-slate-100 dark:bg-white/5 text-slate-400"
+                  : "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20"
               }`}
             >
               <X
                 size={14}
                 className='mr-1'
               />{" "}
-              Sin emoji
+              Borrar todos
             </button>
+            {selectedId && (
+              <button
+                onClick={() => onRemoveSticker(selectedId)}
+                className='shrink-0 flex items-center justify-center rounded-xl h-10 px-3 text-xs font-medium transition-all bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+              >
+                <X
+                  size={14}
+                  className='mr-1'
+                />{" "}
+                Borrar seleccionado
+              </button>
+            )}
+            <div className='w-px h-6 bg-slate-200 dark:bg-white/10 mx-1' />
             {STICKERS.map((s) => (
               <button
                 key={s}
-                onClick={() => {
-                  setSticker(s);
-                  if (!sticker) setStickerPos({ x: 80, y: 10 });
-                }}
-                className={`shrink-0 flex items-center justify-center rounded-xl h-10 w-10 text-xl transition-all ${
-                  sticker === s
-                    ? "bg-blue-100 dark:bg-blue-500/25 ring-1 ring-blue-400 scale-110 shadow-lg shadow-blue-500/20"
-                    : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
-                }`}
+                onClick={() => onAddSticker(s)}
+                className='shrink-0 flex items-center justify-center rounded-xl h-10 w-10 text-xl transition-all bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-110 active:scale-95'
               >
                 {s}
               </button>
