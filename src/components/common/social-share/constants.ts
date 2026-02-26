@@ -41,6 +41,24 @@ export const THEMES: Record<string, ThemePreset> = {
     preview: "linear-gradient(135deg,#1a0a2e,#3b1f6e)",
     label: "Violet",
   },
+  snow: {
+    backgroundColor: "#ffffff",
+    primaryTextColor: "#1e293b",
+    secondaryTextColor: "#64748b",
+    accentColor: "#3b82f6",
+    isLight: true,
+    preview: "linear-gradient(135deg,#ffffff,#f1f5f9)",
+    label: "Snow",
+  },
+  soft: {
+    backgroundColor: "#f8fafc",
+    primaryTextColor: "#0f172a",
+    secondaryTextColor: "#64748b",
+    accentColor: "#6366f1",
+    isLight: true,
+    preview: "linear-gradient(135deg,#f8fafc,#e2e8f0)",
+    label: "Soft",
+  },
 };
 
 export const STICKERS = [

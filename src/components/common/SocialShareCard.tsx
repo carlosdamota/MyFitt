@@ -9,6 +9,7 @@ export interface ShareCardTheme {
   primaryTextColor: string;
   secondaryTextColor: string;
   accentColor: string;
+  isLight?: boolean;
 }
 
 interface SocialShareCardProps {
@@ -52,12 +53,10 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
         if (!dateString) return "";
         const d = new Date(dateString);
         if (Number.isNaN(d.getTime())) return dateString;
-        return d.toLocaleDateString("es-ES", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
       } catch {
         return dateString;
       }
@@ -65,8 +64,16 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
 
     const getGradient = (bgColor: string) => {
       // Create a subtle gradient for depth
+      if (theme.isLight) {
+        return `linear-gradient(135deg, ${bgColor} 0%, #f1f5f9 100%)`;
+      }
       return `linear-gradient(135deg, ${bgColor} 0%, #000000 100%)`;
     };
+
+    const glassBg = theme.isLight ? "#00000005" : "#ffffff05";
+    const glassBorder = theme.isLight ? "#00000010" : "#ffffff10";
+    const itemBg = theme.isLight ? "#00000003" : "#ffffff03";
+    const itemBorder = theme.isLight ? "#00000008" : "#ffffff08";
 
     return (
       <div
@@ -212,9 +219,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {/* Total Volume */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
+              backgroundColor: glassBg,
               backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
+              border: `1px solid ${glassBorder}`,
               borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
@@ -260,9 +267,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {/* Exercises */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
+              backgroundColor: glassBg,
               backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
+              border: `1px solid ${glassBorder}`,
               borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
@@ -304,9 +311,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {/* Total Reps */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
+              backgroundColor: glassBg,
               backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
+              border: `1px solid ${glassBorder}`,
               borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
@@ -378,9 +385,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "16px 24px",
-                backgroundColor: "#ffffff03",
+                backgroundColor: itemBg,
                 borderRadius: "20px",
-                border: "1px solid #ffffff08",
+                border: `1px solid ${itemBorder}`,
               }}
             >
               <div
@@ -473,9 +480,9 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 marginTop: "5px",
                 textAlign: "center",
                 padding: "10px",
-                backgroundColor: "#ffffff03",
+                backgroundColor: itemBg,
                 borderRadius: "16px",
-                border: "1px dashed #ffffff15",
+                border: `1px dashed ${itemBorder}`,
               }}
             >
               <span
@@ -552,8 +559,8 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 height: "56px",
                 borderRadius: "16px",
                 objectFit: "contain",
-                backgroundColor: "#000",
-                border: "2px solid #ffffff15",
+                backgroundColor: theme.isLight ? "#f1f5f9" : "#000",
+                border: theme.isLight ? "2px solid #00000010" : "2px solid #ffffff15",
                 padding: "7px",
               }}
             />

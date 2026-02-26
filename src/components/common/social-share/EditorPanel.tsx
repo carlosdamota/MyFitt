@@ -66,7 +66,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 className='flex flex-col items-center gap-1.5 shrink-0 group'
               >
                 <div
-                  className={`h-10 w-10 rounded-full transition-all duration-200 ${
+                  className={`h-10 w-10 rounded-full border border-black/5 dark:border-white/10 transition-all duration-200 ${
                     themeKey === key
                       ? "ring-2 ring-slate-900 dark:ring-white scale-110 shadow-lg"
                       : "ring-1 ring-black/10 dark:ring-white/20 group-hover:ring-black/30 dark:group-hover:ring-white/50"
