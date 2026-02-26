@@ -23,7 +23,11 @@ export interface UseWorkoutSessionReturn {
   /** Remove a log entry from the local buffer (no Firestore write) */
   removeLog: (exerciseName: string, logToRemove: WorkoutLogEntry) => void;
   /** Flush the entire session to Firestore as a single write */
-  flushSession: (metadata: { duration?: string; routineTitle?: string }) => Promise<void>;
+  flushSession: (metadata: {
+    duration?: string;
+    routineTitle?: string;
+    rating?: number;
+  }) => Promise<void>;
   /** Discard the current session without saving */
   clearSession: () => void;
 }
@@ -102,7 +106,7 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
 
   // ── Flush: single Firestore write with the whole session ──
   const flushSession = useCallback(
-    async (metadata: { duration?: string; routineTitle?: string }) => {
+    async (metadata: { duration?: string; routineTitle?: string; rating?: number }) => {
       if (!user || !db) return;
 
       const currentLogs = pendingLogsRef.current;
@@ -125,6 +129,7 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
           date: sessionDate,
           duration: metadata.duration || null,
           routineTitle: metadata.routineTitle || null,
+          rating: metadata.rating || null,
           logs: currentLogs,
         });
 
@@ -132,8 +137,13 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
         const profileRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "profile");
         await setDoc(profileRef, { lastWorkoutDate: new Date().toISOString() }, { merge: true });
 
-        // 3. Invalidate TanStack query so the UI re-fetches the actual Firestore data
-        await queryClient.invalidateQueries({ queryKey: ["workout_sessions", user.uid] });
+        // 3. Invalidate TanStack queries so the UI re-fetches the actual Firestore data
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["workout_sessions", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["workout_sessions_recent", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["user_stats", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["appData", user.uid] }),
+        ]);
 
         // 4. Clear local state
         setPendingLogs({});
@@ -143,6 +153,7 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
         posthog.capture("workout_completed", {
           duration: metadata.duration || null,
           routine_title: metadata.routineTitle || null,
+          rating: metadata.rating || null,
         });
       } catch (e) {
         console.error("Session flush error", e);
