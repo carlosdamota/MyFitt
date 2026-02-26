@@ -120,8 +120,44 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     setShowConfirmFinish(true);
   };
 
+  const [sessionSummary, setSessionSummary] = useState<
+    (WorkoutLogEntry & { exercise: string; volume: number })[]
+  >([]);
+
   const handleConfirmFinish = async () => {
     setShowConfirmFinish(false);
+
+    // Prepare session summary for social share before flushing
+    const today = new Date().toDateString();
+    const summary: (WorkoutLogEntry & { exercise: string; volume: number })[] = [];
+    if (routine.blocks) {
+      routine.blocks.forEach((block) => {
+        block.exercises.forEach((ex) => {
+          const logs = workoutLogs[ex.name] || [];
+          const todayLogs = logs.filter((l) => new Date(l.date).toDateString() === today);
+          todayLogs.forEach((log) => {
+            summary.push({
+              ...log,
+              exercise: ex.name,
+              volume: (log.weight || 0) * (log.sets || 0) * (log.reps || 0),
+            });
+          });
+        });
+      });
+    }
+
+    // Deduplicate/group to best set per exercise for cleaner card
+    const uniqueEntriesMap = new Map<
+      string,
+      WorkoutLogEntry & { exercise: string; volume: number }
+    >();
+    summary.forEach((e) => {
+      const existing = uniqueEntriesMap.get(e.exercise);
+      if (!existing || e.volume > existing.volume) {
+        uniqueEntriesMap.set(e.exercise, e);
+      }
+    });
+    setSessionSummary(Array.from(uniqueEntriesMap.values()));
 
     if (!onFlushSession) {
       setShowSocialShare(true);
@@ -328,57 +364,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         onClose={() => setShowSocialShare(false)}
         date={new Date().toISOString()} // Or just use current date
         duration={formatTime(time)}
-        logs={(() => {
-          // Gather logs for *this routine's exercises* for *today*
-          // We need to look at workoutLogs[dayKey]? But wait, workoutLogs structure is Record<exerciseName, WorkoutLogEntry[]>
-          // We want the logs meant for display.
-          const today = new Date().toDateString();
-          const entries: (WorkoutLogEntry & { exercise: string; volume: number })[] = [];
-
-          if (routine.blocks) {
-            routine.blocks.forEach((block) => {
-              block.exercises.forEach((ex) => {
-                const logs = workoutLogs[ex.name] || [];
-                // Find logs from today? Or just the last one?
-                // Usually social share shows the metrics of what you JUST did.
-                // Assuming the user logged data *today*.
-                const todayLogs = logs.filter((l) => new Date(l.date).toDateString() === today);
-
-                // If multiple sets, maybe aggregate? The SocialShareCard expects one entry per exercise usually?
-                // Or maybe it Lists sets x reps.
-                // Let's summarize: Max weight used? Total Reps?
-                // Providing the "best" set or valid sets.
-                // For simplicity, let's take the last log entry if exists, or aggregate volume.
-
-                todayLogs.forEach((log) => {
-                  entries.push({
-                    ...log,
-                    exercise: ex.name,
-                    volume: (log.weight || 0) * (log.sets || 0) * (log.reps || 0),
-                  });
-                });
-              });
-            });
-          }
-
-          // Deduplicate? If users logged multiple times for same exercise?
-          // Let's just take the most recent one per exercise for the card to keep it clean,
-          // OR let the card handle the list. The card map shows all logs passed.
-          // Limit to unique exercises for cleaner card?
-          // Let's group by exercise name and take the one with highest volume.
-          const uniqueEntriesMap = new Map<
-            string,
-            WorkoutLogEntry & { exercise: string; volume: number }
-          >();
-          entries.forEach((e) => {
-            const existing = uniqueEntriesMap.get(e.exercise);
-            if (!existing || e.volume > existing.volume) {
-              uniqueEntriesMap.set(e.exercise, e);
-            }
-          });
-
-          return Array.from(uniqueEntriesMap.values());
-        })()}
+        logs={sessionSummary}
       />
 
       {/* Rest Timer Overlay */}
