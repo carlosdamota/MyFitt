@@ -1,11 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { resolveSocialShareEngine } from "../config/socialShare";
 import { trackSocialShareGeneration } from "../utils/socialShareTelemetry";
-import {
-  generateWorkoutImage,
-  type WorkoutImageAsset,
-  type WorkoutImageFormat,
-} from "../utils/generateWorkoutImage";
+import { type WorkoutImageAsset, type WorkoutImageFormat } from "../utils/generateWorkoutImage";
+import { generateSocialShareAsset } from "../utils/social-share/renderer";
 
 interface SharePayload {
   title: string;
@@ -59,12 +56,15 @@ export const useShareWorkout = () => {
       const scale = mode === "preview" ? 1.25 : 2;
 
       try {
-        const images = await generateWorkoutImage(target, { formats: [format], fileNameBase, scale });
-        const image = images[format];
+        const result = await generateSocialShareAsset(
+          { target, format, fileNameBase, scale },
+          engine,
+        );
+        const image = result.asset;
         setPreviewImage(image.dataUrl);
 
         trackSocialShareGeneration({
-          engine,
+          engine: result.engine,
           format,
           mode,
           durationMs: Math.round(performance.now() - startedAt),
