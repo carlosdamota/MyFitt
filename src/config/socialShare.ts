@@ -15,7 +15,7 @@ export const resolveSocialShareEngine = (): SocialShareEngine => {
     if (isSocialShareEngine(stored)) return stored;
   }
 
-  return "dom";
+  return "konva";
 };
 
 export const getSocialShareStorageKey = () => STORAGE_KEY;

@@ -1,4 +1,10 @@
 import { ThemePreset } from "./types";
+import bananaBg1 from "../../../assets/social-share/nano_banana_fitness_bg_1.png";
+import bananaBg2 from "../../../assets/social-share/nano_banana_fitness_bg_2.png";
+import bananaBg3 from "../../../assets/social-share/nano_banana_fitness_bg_3.png";
+import fitnessBg1 from "../../../assets/social-share/fitness-gym.png";
+import fitnessBg2 from "../../../assets/social-share/fitness-mat.png";
+import fitnessBg3 from "../../../assets/social-share/fitness-weights.png";
 
 export const THEMES: Record<string, ThemePreset> = {
   dark: {
@@ -9,14 +15,6 @@ export const THEMES: Record<string, ThemePreset> = {
     preview: "linear-gradient(135deg,#121212,#1e293b)",
     label: "Dark",
   },
-  cobalt: {
-    backgroundColor: "#0a1023",
-    primaryTextColor: "#f8fafc",
-    secondaryTextColor: "#93c5fd",
-    accentColor: "#38bdf8",
-    preview: "linear-gradient(135deg,#0a1023,#1e3a5f)",
-    label: "Cobalt",
-  },
   sunset: {
     backgroundColor: "#2b0a0f",
     primaryTextColor: "#fff7ed",
@@ -24,14 +22,6 @@ export const THEMES: Record<string, ThemePreset> = {
     accentColor: "#fb7185",
     preview: "linear-gradient(135deg,#2b0a0f,#4c1d2d)",
     label: "Sunset",
-  },
-  emerald: {
-    backgroundColor: "#0a1f1a",
-    primaryTextColor: "#ecfdf5",
-    secondaryTextColor: "#6ee7b7",
-    accentColor: "#34d399",
-    preview: "linear-gradient(135deg,#0a1f1a,#064e3b)",
-    label: "Emerald",
   },
   violet: {
     backgroundColor: "#1a0a2e",
@@ -41,15 +31,6 @@ export const THEMES: Record<string, ThemePreset> = {
     preview: "linear-gradient(135deg,#1a0a2e,#3b1f6e)",
     label: "Violet",
   },
-  snow: {
-    backgroundColor: "#ffffff",
-    primaryTextColor: "#1e293b",
-    secondaryTextColor: "#64748b",
-    accentColor: "#3b82f6",
-    isLight: true,
-    preview: "linear-gradient(135deg,#ffffff,#f1f5f9)",
-    label: "Snow",
-  },
   soft: {
     backgroundColor: "#f8fafc",
     primaryTextColor: "#0f172a",
@@ -58,6 +39,61 @@ export const THEMES: Record<string, ThemePreset> = {
     isLight: true,
     preview: "linear-gradient(135deg,#f8fafc,#e2e8f0)",
     label: "Soft",
+  },
+  fitness1: {
+    backgroundColor: "#111827",
+    primaryTextColor: "#ffffff",
+    secondaryTextColor: "#9ca3af",
+    accentColor: "#3b82f6",
+    backgroundImage: fitnessBg1,
+    preview: `url(${fitnessBg1})`,
+    label: "Professional Gym",
+  },
+  fitness2: {
+    backgroundColor: "#2d3748",
+    primaryTextColor: "#f7fafc",
+    secondaryTextColor: "#a0aec0",
+    accentColor: "#48bb78",
+    backgroundImage: fitnessBg2,
+    preview: `url(${fitnessBg2})`,
+    label: "Zen Studio",
+  },
+  fitness3: {
+    backgroundColor: "#1a202c",
+    primaryTextColor: "#ffffff",
+    secondaryTextColor: "#718096",
+    accentColor: "#e53e3e",
+    backgroundImage: fitnessBg3,
+    preview: `url(${fitnessBg3})`,
+    label: "Power Weights",
+  },
+  banana1: {
+    backgroundColor: "#1a1a1a",
+    primaryTextColor: "#ffffff",
+    secondaryTextColor: "#fbbf24",
+    accentColor: "#f59e0b",
+    backgroundImage: bananaBg1,
+    preview: `url(${bananaBg1})`,
+    label: "Nano Fitness",
+  },
+  banana2: {
+    backgroundColor: "#000000",
+    primaryTextColor: "#fef3c7",
+    secondaryTextColor: "#fcd34d",
+    accentColor: "#fbbf24",
+    backgroundImage: bananaBg2,
+    preview: `url(${bananaBg2})`,
+    label: "Nano Abstract",
+  },
+  banana3: {
+    backgroundColor: "#fffbeb",
+    primaryTextColor: "#78350f",
+    secondaryTextColor: "#92400e",
+    accentColor: "#d97706",
+    isLight: true,
+    backgroundImage: bananaBg3,
+    preview: `url(${bananaBg3})`,
+    label: "Nano Cute",
   },
 };
 

@@ -3,6 +3,7 @@ import { resolveSocialShareEngine } from "../config/socialShare";
 import { trackSocialShareGeneration } from "../utils/socialShareTelemetry";
 import { type WorkoutImageAsset, type WorkoutImageFormat } from "../utils/generateWorkoutImage";
 import { generateSocialShareAsset } from "../utils/social-share/renderer";
+import { type SocialShareData } from "../utils/social-share/types";
 
 interface SharePayload {
   title: string;
@@ -11,6 +12,7 @@ interface SharePayload {
 
 interface GenerateOptions {
   mode?: "preview" | "export";
+  data?: SocialShareData;
 }
 
 export const useShareWorkout = () => {
@@ -57,7 +59,7 @@ export const useShareWorkout = () => {
 
       try {
         const result = await generateSocialShareAsset(
-          { target, format, fileNameBase, scale },
+          { target, format, fileNameBase, scale, data: options.data },
           engine,
         );
         const image = result.asset;

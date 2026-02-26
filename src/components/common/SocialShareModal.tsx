@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X, Share2, Loader2 } from "lucide-react";
 import { SocialShareCard } from "./SocialShareCard";
+import { InteractiveSocialCard } from "./social-share/InteractiveSocialCard";
 import type { WorkoutLogEntry } from "../../types";
 import type { WorkoutImageFormat, WorkoutImageAsset } from "../../utils/generateWorkoutImage";
 import { useShareWorkout } from "../../hooks/useShareWorkout";
@@ -13,6 +14,7 @@ import { SidePanelTab } from "./social-share/types";
 import { EditorPanel } from "./social-share/EditorPanel";
 import { Toolbar } from "./social-share/Toolbar";
 import { ActionButtons } from "./social-share/ActionButtons";
+import { formatDate } from "../../utils/social-share/engines/constants";
 
 interface SocialShareModalProps {
   isOpen: boolean;
@@ -34,18 +36,46 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   /* editing state */
   const [themeKey, setThemeKey] = useState("dark");
-  const [sticker, setSticker] = useState("");
-  const [stickerPos, setStickerPos] = useState({ x: 80, y: 10 });
+  const [stickers, setStickers] = useState<import("../../utils/social-share/types").StickerData[]>(
+    [],
+  );
+  const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const [format, setFormat] = useState<WorkoutImageFormat>("feed");
   const [tab, setTab] = useState<SidePanelTab>(null);
   const [isToolbarOpen, setIsToolbarOpen] = useState(true);
 
-  /* drag state */
-  const [dragging, setDragging] = useState(false);
-  const offset = useRef({ x: 0, y: 0 });
-  const dragBounds = useRef({ left: 0, top: 0, width: 1, height: 1 });
-  const frameRef = useRef<number | null>(null);
-  const pendingPosRef = useRef<{ x: number; y: number } | null>(null);
+  const addSticker = useCallback((emoji: string) => {
+    const newSticker: import("../../utils/social-share/types").StickerData = {
+      id: Math.random().toString(36).substring(7),
+      emoji,
+      x: 50,
+      y: 50,
+      scale: 1,
+      rotation: 0,
+    };
+    setStickers((prev) => [...prev, newSticker]);
+    setSelectedStickerId(newSticker.id);
+  }, []);
+
+  const updateSticker = useCallback(
+    (id: string, updates: Partial<import("../../utils/social-share/types").StickerData>) => {
+      setStickers((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+    },
+    [],
+  );
+
+  const removeSticker = useCallback(
+    (id: string) => {
+      setStickers((prev) => prev.filter((s) => s.id !== id));
+      if (selectedStickerId === id) setSelectedStickerId(null);
+    },
+    [selectedStickerId],
+  );
+
+  const clearStickers = useCallback(() => {
+    setStickers([]);
+    setSelectedStickerId(null);
+  }, []);
 
   /* share logic */
   const {
@@ -81,16 +111,42 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     return `fittwiz-workout-${date}`;
   }, [date]);
 
-  const token = `${themeKey}-${sticker || "·"}-${Math.round(stickerPos.x)}-${Math.round(stickerPos.y)}-${format}`;
+  const token = useMemo(() => {
+    return `${themeKey}-${format}-${JSON.stringify(stickers)}`;
+  }, [themeKey, format, stickers]);
 
   const ensureAsset = useCallback(
     async (mode: "preview" | "export" = "preview") => {
       if (!cardRef.current) return null;
-      const img = await generate(cardRef.current, format, fileNameBase, { mode });
+
+      const data = {
+        date,
+        logs,
+        totalVolume,
+        totalExercises,
+        totalReps,
+        duration,
+        theme,
+        stickers,
+      };
+
+      const img = await generate(cardRef.current, format, fileNameBase, { mode, data });
       if (img) setAsset(img);
       return img;
     },
-    [generate, format, fileNameBase],
+    [
+      generate,
+      format,
+      fileNameBase,
+      date,
+      logs,
+      totalVolume,
+      totalExercises,
+      totalReps,
+      duration,
+      theme,
+      stickers,
+    ],
   );
 
   // Bloquear el scroll del body mientras el modal está abierto
@@ -107,18 +163,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    if (dragging) return;
     setAsset(null);
     void ensureAsset("preview");
-  }, [token, isOpen, dragging]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    return () => {
-      if (frameRef.current !== null) {
-        cancelAnimationFrame(frameRef.current);
-      }
-    };
-  }, []);
+  }, [token, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleShare = async () => {
     const a = asset ?? (await ensureAsset("export"));
@@ -142,53 +189,6 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       toast$("Copiada al portapapeles");
       setTimeout(() => setCopied(false), 2000);
     } else toastErr("No se pudo copiar. Descarga la imagen.");
-  };
-
-  /* drag & drop logic */
-  const onPtrDown = (e: React.PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    setDragging(true);
-    const r = previewRef.current!.getBoundingClientRect();
-    dragBounds.current = {
-      left: r.left,
-      top: r.top,
-      width: r.width,
-      height: r.height,
-    };
-    offset.current = {
-      x: e.clientX - r.left - (stickerPos.x / 100) * r.width,
-      y: e.clientY - r.top - (stickerPos.y / 100) * r.height,
-    };
-  };
-
-  const onPtrMove = (e: React.PointerEvent) => {
-    if (!dragging) return;
-    const r = dragBounds.current;
-    const x = Math.max(2, Math.min(98, ((e.clientX - r.left - offset.current.x) / r.width) * 100));
-    const y = Math.max(2, Math.min(98, ((e.clientY - r.top - offset.current.y) / r.height) * 100));
-    pendingPosRef.current = { x, y };
-
-    if (frameRef.current !== null) return;
-    frameRef.current = requestAnimationFrame(() => {
-      frameRef.current = null;
-      if (pendingPosRef.current) {
-        setStickerPos(pendingPosRef.current);
-      }
-    });
-  };
-
-  const onPtrUp = () => {
-    if (frameRef.current !== null) {
-      cancelAnimationFrame(frameRef.current);
-      frameRef.current = null;
-    }
-    if (pendingPosRef.current) {
-      setStickerPos(pendingPosRef.current);
-      pendingPosRef.current = null;
-    }
-    setDragging(false);
   };
 
   if (!isOpen) return null;
@@ -230,8 +230,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             duration={duration}
             theme={theme}
             format={format}
-            sticker={sticker || null}
-            stickerPosition={stickerPos}
+            stickers={stickers}
           />
         </div>
 
@@ -241,54 +240,36 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             {/* Preview container */}
             <div
               ref={previewRef}
-              className='overflow-hidden rounded-2xl ring-1 ring-slate-200 dark:ring-white/10 select-none bg-slate-100 dark:bg-[#1a1a24]'
-              onPointerMove={onPtrMove}
-              onPointerUp={onPtrUp}
+              className='overflow-hidden rounded-2xl ring-1 ring-slate-200 dark:ring-white/10 select-none bg-slate-100 dark:bg-[#1a1a24] flex justify-center items-center p-0'
+              style={{
+                aspectRatio: format === "story" ? "9/16" : "4/5",
+                width: "100%",
+              }}
             >
-              {previewImage ? (
-                <img
-                  src={previewImage}
-                  alt='Preview'
-                  className='w-full pointer-events-none shadow-sm'
-                  draggable={false}
-                />
-              ) : (
-                <div className='flex h-72 items-center justify-center text-sm text-slate-500'>
-                  <div className='flex flex-col items-center gap-3'>
-                    <Loader2
-                      className='animate-spin text-blue-500'
-                      size={24}
-                    />
-                    <span className='text-xs font-medium tracking-wide'>Generando imagen...</span>
-                  </div>
-                </div>
-              )}
-
-              {sticker && previewImage && (
-                <div
-                  onPointerDown={onPtrDown}
-                  className={`absolute text-4xl sm:text-5xl leading-none select-none transition-[filter] ${
-                    dragging
-                      ? "cursor-grabbing drop-shadow-[0_0_15px_rgba(59,130,246,.8)]"
-                      : "cursor-grab drop-shadow-md"
-                  }`}
-                  style={{
-                    left: `${stickerPos.x}%`,
-                    top: `${stickerPos.y}%`,
-                    transform: `translate(-50%, -50%) scale(${dragging ? 1.2 : 1})`,
-                    touchAction: "none",
-                    transition: dragging ? "none" : "transform .15s cubic-bezier(0.4, 0, 0.2, 1)",
-                    zIndex: 15,
+              <div className='w-full h-full flex items-center justify-center overflow-hidden'>
+                <InteractiveSocialCard
+                  data={{
+                    date: formatDate(date),
+                    logs,
+                    totalVolume,
+                    totalExercises,
+                    totalReps,
+                    duration,
+                    theme,
+                    stickers,
                   }}
-                >
-                  {sticker}
-                </div>
-              )}
+                  format={format}
+                  selectedId={selectedStickerId}
+                  onSelect={setSelectedStickerId}
+                  onStickersChange={setStickers}
+                  onRemove={removeSticker}
+                />
+              </div>
 
-              {sticker && previewImage && !dragging && (
+              {stickers.length > 0 && (
                 <div className='absolute top-3 inset-x-0 flex justify-center pointer-events-none z-20'>
                   <span className='rounded-full bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-white/70 shadow-lg'>
-                    Arrastra el emoji para moverlo
+                    Toca un emoji para editarlo
                   </span>
                 </div>
               )}
@@ -311,9 +292,11 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             setThemeKey={setThemeKey}
             format={format}
             setFormat={setFormat}
-            sticker={sticker}
-            setSticker={setSticker}
-            setStickerPos={setStickerPos}
+            stickers={stickers}
+            onAddSticker={addSticker}
+            onClearStickers={clearStickers}
+            selectedId={selectedStickerId}
+            onRemoveSticker={removeSticker}
           />
 
           {error && (
