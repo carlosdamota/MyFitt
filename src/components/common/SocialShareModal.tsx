@@ -83,12 +83,15 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   const token = `${themeKey}-${sticker || "·"}-${Math.round(stickerPos.x)}-${Math.round(stickerPos.y)}-${format}`;
 
-  const ensureAsset = useCallback(async () => {
-    if (!cardRef.current) return null;
-    const img = await generate(cardRef.current, format, fileNameBase);
-    if (img) setAsset(img);
-    return img;
-  }, [generate, format, fileNameBase]);
+  const ensureAsset = useCallback(
+    async (mode: "preview" | "export" = "preview") => {
+      if (!cardRef.current) return null;
+      const img = await generate(cardRef.current, format, fileNameBase, { mode });
+      if (img) setAsset(img);
+      return img;
+    },
+    [generate, format, fileNameBase],
+  );
 
   // Bloquear el scroll del body mientras el modal está abierto
   useEffect(() => {
@@ -106,7 +109,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     if (!isOpen) return;
     if (dragging) return;
     setAsset(null);
-    void ensureAsset();
+    void ensureAsset("preview");
   }, [token, isOpen, dragging]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -118,20 +121,20 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   }, []);
 
   const handleShare = async () => {
-    const a = asset ?? (await ensureAsset());
+    const a = asset ?? (await ensureAsset("export"));
     if (!a) return;
     await share(a, { title: "Mi Entrenamiento en FITTWIZ", text: shareText });
   };
 
   const handleDownload = async () => {
-    const a = asset ?? (await ensureAsset());
+    const a = asset ?? (await ensureAsset("export"));
     if (!a) return;
     download(a);
     toast$("Imagen descargada");
   };
 
   const handleCopy = async () => {
-    const a = asset ?? (await ensureAsset());
+    const a = asset ?? (await ensureAsset("export"));
     if (!a) return;
     const r = await copyToClipboard(a);
     if (r === "copied") {

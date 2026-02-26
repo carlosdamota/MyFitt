@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
+import { resolveSocialShareEngine } from "../config/socialShare";
+import { trackSocialShareGeneration } from "../utils/socialShareTelemetry";
 import {
   generateWorkoutImage,
   type WorkoutImageAsset,
@@ -10,10 +12,15 @@ interface SharePayload {
   text: string;
 }
 
+interface GenerateOptions {
+  mode?: "preview" | "export";
+}
+
 export const useShareWorkout = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const engine = useMemo(() => resolveSocialShareEngine(), []);
 
   const capabilities = useMemo(() => {
     const canUseNavigatorShare = typeof navigator !== "undefined" && !!navigator.share;
@@ -39,13 +46,30 @@ export const useShareWorkout = () => {
   }, []);
 
   const generate = useCallback(
-    async (target: HTMLElement, format: WorkoutImageFormat, fileNameBase?: string) => {
+    async (
+      target: HTMLElement,
+      format: WorkoutImageFormat,
+      fileNameBase?: string,
+      options: GenerateOptions = {},
+    ) => {
       setError(null);
       setIsGenerating(true);
+      const startedAt = performance.now();
+      const mode = options.mode ?? "preview";
+      const scale = mode === "preview" ? 1.25 : 2;
+
       try {
-        const images = await generateWorkoutImage(target, { formats: [format], fileNameBase });
+        const images = await generateWorkoutImage(target, { formats: [format], fileNameBase, scale });
         const image = images[format];
         setPreviewImage(image.dataUrl);
+
+        trackSocialShareGeneration({
+          engine,
+          format,
+          mode,
+          durationMs: Math.round(performance.now() - startedAt),
+        });
+
         return image;
       } catch (err) {
         setError(err instanceof Error ? err.message : "unknown_generation_error");
@@ -54,7 +78,7 @@ export const useShareWorkout = () => {
         setIsGenerating(false);
       }
     },
-    [],
+    [engine],
   );
 
   const download = useCallback((asset: WorkoutImageAsset) => {
