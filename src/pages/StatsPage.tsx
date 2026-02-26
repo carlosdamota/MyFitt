@@ -11,6 +11,7 @@ export default function StatsPage() {
 
   const {
     workoutLogs,
+    sessions,
     stats,
     coachAdvice,
     saveCoachAdvice,
@@ -24,6 +25,7 @@ export default function StatsPage() {
   return (
     <GlobalStats
       logs={workoutLogs}
+      sessions={sessions}
       stats={stats}
       onClose={() => window.history.back()}
       coachHistory={coachAdvice || ""}

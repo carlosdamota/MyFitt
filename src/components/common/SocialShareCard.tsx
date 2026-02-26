@@ -21,6 +21,7 @@ interface SocialShareCardProps {
   totalExercises: number;
   totalReps?: number;
   duration?: string;
+  routineTitle?: string;
   theme?: ShareCardTheme;
   format?: WorkoutImageFormat;
   stickers?: import("../../utils/social-share/types").StickerData[];
@@ -34,7 +35,7 @@ const DEFAULT_THEME: ShareCardTheme = {
 };
 
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
-  ({ date, logs, theme = DEFAULT_THEME, format = "feed", stickers = [] }, ref) => {
+  ({ date, logs, routineTitle, theme = DEFAULT_THEME, format = "feed", stickers = [] }, ref) => {
     const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
     const totalExercises = logs.length;
     const totalReps = logs.reduce((s, l) => s + (l.sets ?? 0) * (l.reps ?? 0), 0);
@@ -174,7 +175,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     letterSpacing: "0.2em",
                   }}
                 >
-                  RESUMEN DE SESIÓN
+                  {routineTitle ? formatDate(date) : "RESUMEN DE SESIÓN"}
                 </span>
               </div>
               <h1
@@ -187,7 +188,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   margin: 0,
                 }}
               >
-                {formatDate(date)}
+                {routineTitle || formatDate(date)}
               </h1>
             </div>
             <div

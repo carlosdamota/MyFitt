@@ -22,6 +22,7 @@ interface SocialShareModalProps {
   date: string;
   logs: (WorkoutLogEntry & { exercise: string; volume: number })[];
   duration?: string;
+  routineTitle?: string;
 }
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
@@ -30,6 +31,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   date,
   logs,
   duration = "N/A",
+  routineTitle,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -228,6 +230,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             totalExercises={totalExercises}
             totalReps={totalReps}
             duration={duration}
+            routineTitle={routineTitle}
             theme={theme}
             format={format}
             stickers={stickers}
@@ -255,6 +258,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
                     totalExercises,
                     totalReps,
                     duration,
+                    routineTitle,
                     theme,
                     stickers,
                   }}

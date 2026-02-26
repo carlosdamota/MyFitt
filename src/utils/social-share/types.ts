@@ -20,6 +20,7 @@ export interface SocialShareData {
   totalExercises: number;
   totalReps: number;
   duration: string;
+  routineTitle?: string;
   theme: ShareCardTheme;
   stickers: StickerData[];
 }

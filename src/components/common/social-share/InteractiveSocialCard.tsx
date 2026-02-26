@@ -176,7 +176,7 @@ export const InteractiveSocialCard: React.FC<InteractiveSocialCardProps> = ({
           <Text
             x={paddingX}
             y={paddingY}
-            text='RESUMEN DE SESIÓN'
+            text={data.routineTitle ? data.date : "RESUMEN DE SESIÓN"}
             fontSize={18}
             fontFamily='Sora'
             fontWeight='700'
@@ -186,7 +186,7 @@ export const InteractiveSocialCard: React.FC<InteractiveSocialCardProps> = ({
           <Text
             x={paddingX}
             y={paddingY + 30}
-            text={data.date}
+            text={data.routineTitle || data.date}
             fontSize={52}
             fontFamily='Sora'
             fontWeight='900'
