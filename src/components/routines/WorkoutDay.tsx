@@ -28,7 +28,11 @@ interface WorkoutDayProps {
   user: User | null;
   onRequireAuth?: () => void;
   isPro?: boolean;
-  onFlushSession?: (metadata: { duration?: string; routineTitle?: string }) => Promise<void>;
+  onFlushSession?: (metadata: {
+    duration?: string;
+    routineTitle?: string;
+    rating?: number;
+  }) => Promise<void>;
   onClearSession?: () => void;
 }
 
@@ -83,6 +87,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const { time, isRunning, toggle, stop, formatTime, reset } = useStopwatch();
   const { plan } = useEntitlement(user);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  const [selectedRating, setSelectedRating] = useState<number | undefined>(undefined);
   const [showSocialShare, setShowSocialShare] = useState(false);
   const flushTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -186,6 +191,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         await onFlushSession({
           duration: formatTime(time),
           routineTitle: routine?.title,
+          rating: selectedRating,
         });
       } catch (e) {
         error("Error guardando la sesión. Tus datos están seguros localmente.");
@@ -330,13 +336,48 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
               <h3 className='text-2xl font-black text-slate-900 dark:text-white mb-3 tracking-tight transition-colors'>
                 ¿Terminar entrenamiento?
               </h3>
-              <p className='text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8 transition-colors'>
+              <p className='text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 transition-colors'>
                 Has entrenado durante{" "}
                 <span className='inline-block px-2 py-0.5 bg-slate-100 dark:bg-surface-800 rounded-lg text-blue-600 dark:text-primary-400 font-bold border border-slate-200 dark:border-surface-700/50 transition-colors'>
                   {formatTime(time)}
                 </span>
                 . ¿Quieres finalizar y guardar tu progreso?
               </p>
+
+              {/* Feedback Selector */}
+              <div className='mb-8'>
+                <p className='text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4'>
+                  ¿Cómo te has sentido?
+                </p>
+                <div className='flex justify-between items-center gap-2'>
+                  {[
+                    { value: 1, emoji: "😞", label: "Agotado" },
+                    { value: 2, emoji: "😐", label: "Bien" },
+                    { value: 3, emoji: "😊", label: "¡Top!" },
+                  ].map((rating) => (
+                    <button
+                      key={rating.value}
+                      onClick={() => setSelectedRating(rating.value)}
+                      className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-300 ${
+                        selectedRating === rating.value
+                          ? "bg-primary-500/10 border-primary-500/50 scale-105 shadow-lg shadow-primary-500/10"
+                          : "bg-slate-50 dark:bg-surface-800/30 border-slate-200 dark:border-surface-700/50 opacity-60 hover:opacity-100 hover:bg-slate-100 dark:hover:bg-surface-800"
+                      }`}
+                    >
+                      <span className='text-2xl mb-1'>{rating.emoji}</span>
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-tight ${
+                          selectedRating === rating.value
+                            ? "text-primary-500"
+                            : "text-slate-400 dark:text-slate-500"
+                        }`}
+                      >
+                        {rating.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <div className='flex gap-3'>
                 <Button

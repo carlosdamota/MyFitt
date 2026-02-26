@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+
+const STOPWATCH_STORAGE_KEY = "myfitt_stopwatch_state";
 
 export interface UseStopwatchReturn {
   time: number;
@@ -10,34 +12,105 @@ export interface UseStopwatchReturn {
   formatTime: (timeInSeconds: number) => string;
 }
 
+export interface StopwatchState {
+  offset: number;
+  startTime: number | null;
+  isRunning: boolean;
+}
+
 export const useStopwatch = (initialTime: number = 0): UseStopwatchReturn => {
   const [time, setTime] = useState<number>(initialTime);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const startTimeRef = useRef<number | null>(null);
+  const offsetRef = useRef<number>(initialTime);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Recover from localStorage on mount ──
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STOPWATCH_STORAGE_KEY);
+      if (saved) {
+        const parsed: StopwatchState = JSON.parse(saved);
+        offsetRef.current = parsed.offset;
+        startTimeRef.current = parsed.startTime;
+        setIsRunning(parsed.isRunning);
+        // Initial calculation
+        if (parsed.startTime && parsed.isRunning) {
+          setTime(parsed.offset + Math.floor((Date.now() - parsed.startTime) / 1000));
+        } else {
+          setTime(parsed.offset);
+        }
+      }
+    } catch {
+      localStorage.removeItem(STOPWATCH_STORAGE_KEY);
+    }
+  }, []);
+
+  // ── Persist to localStorage on changes ──
+  useEffect(() => {
+    const state: StopwatchState = {
+      offset: offsetRef.current,
+      startTime: startTimeRef.current,
+      isRunning: isRunning,
+    };
+    if (state.offset > 0 || state.isRunning) {
+      localStorage.setItem(STOPWATCH_STORAGE_KEY, JSON.stringify(state));
+    } else {
+      localStorage.removeItem(STOPWATCH_STORAGE_KEY);
+    }
+  }, [isRunning, time]); // Using time as a proxy for offset updates during interval
+
+  const calculateElapsed = useCallback(() => {
+    if (!startTimeRef.current) return offsetRef.current;
+    return offsetRef.current + Math.floor((Date.now() - startTimeRef.current) / 1000);
+  }, []);
+
+  const updateTime = useCallback(() => {
+    setTime(calculateElapsed());
+  }, [calculateElapsed]);
 
   useEffect(() => {
     if (isRunning) {
-      intervalRef.current = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
-      }, 1000);
-    } else if (!isRunning && intervalRef.current) {
-      clearInterval(intervalRef.current);
+      if (!startTimeRef.current) {
+        startTimeRef.current = Date.now();
+      }
+      updateTime();
+      intervalRef.current = setInterval(updateTime, 1000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (startTimeRef.current) {
+        offsetRef.current = calculateElapsed();
+        startTimeRef.current = null;
+      }
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isRunning, updateTime, calculateElapsed]);
+
+  // Handle Page Visibility to sync timer when coming back from background
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && isRunning) {
+        updateTime();
       }
     };
-  }, [isRunning]);
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [isRunning, updateTime]);
 
   const start = () => setIsRunning(true);
   const stop = () => setIsRunning(false);
   const reset = () => {
     setIsRunning(false);
+    startTimeRef.current = null;
+    offsetRef.current = 0;
     setTime(0);
+    localStorage.removeItem(STOPWATCH_STORAGE_KEY);
   };
-  const toggle = () => setIsRunning(!isRunning);
+  const toggle = () => setIsRunning((prev) => !prev);
 
   const formatTime = (timeInSeconds: number): string => {
     const hours = Math.floor(timeInSeconds / 3600);

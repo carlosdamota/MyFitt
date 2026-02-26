@@ -3,12 +3,15 @@ import { Dumbbell, Activity, Target, Zap, TrendingUp } from "lucide-react";
 import type { WorkoutLogEntry } from "../../types";
 import type { WorkoutImageFormat } from "../../utils/generateWorkoutImage";
 import { iconLogo } from "../../branding/logoConfig";
+import { cn } from "../ui/Button";
 
 export interface ShareCardTheme {
   backgroundColor: string;
   primaryTextColor: string;
   secondaryTextColor: string;
   accentColor: string;
+  isLight?: boolean;
+  backgroundImage?: string;
 }
 
 interface SocialShareCardProps {
@@ -18,10 +21,10 @@ interface SocialShareCardProps {
   totalExercises: number;
   totalReps?: number;
   duration?: string;
+  routineTitle?: string;
   theme?: ShareCardTheme;
   format?: WorkoutImageFormat;
-  sticker?: string | null;
-  stickerPosition?: { x: number; y: number };
+  stickers?: import("../../utils/social-share/types").StickerData[];
 }
 
 const DEFAULT_THEME: ShareCardTheme = {
@@ -32,17 +35,7 @@ const DEFAULT_THEME: ShareCardTheme = {
 };
 
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
-  (
-    {
-      date,
-      logs,
-      theme = DEFAULT_THEME,
-      format = "feed",
-      sticker,
-      stickerPosition = { x: 50, y: 50 },
-    },
-    ref,
-  ) => {
+  ({ date, logs, routineTitle, theme = DEFAULT_THEME, format = "feed", stickers = [] }, ref) => {
     const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
     const totalExercises = logs.length;
     const totalReps = logs.reduce((s, l) => s + (l.sets ?? 0) * (l.reps ?? 0), 0);
@@ -52,12 +45,10 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
         if (!dateString) return "";
         const d = new Date(dateString);
         if (Number.isNaN(d.getTime())) return dateString;
-        return d.toLocaleDateString("es-ES", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
       } catch {
         return dateString;
       }
@@ -65,17 +56,22 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
 
     const getGradient = (bgColor: string) => {
       // Create a subtle gradient for depth
+      if (theme.isLight) {
+        return `linear-gradient(135deg, ${bgColor} 0%, #f1f5f9 100%)`;
+      }
       return `linear-gradient(135deg, ${bgColor} 0%, #000000 100%)`;
     };
+
+    const glassBg = theme.isLight ? "#00000005" : "#ffffff05";
+    const glassBorder = theme.isLight ? "#00000010" : "#ffffff10";
+    const itemBg = theme.isLight ? "#00000003" : "#ffffff03";
+    const itemBorder = theme.isLight ? "#00000008" : "#ffffff08";
 
     return (
       <div
         ref={ref}
         id='social-share-card'
         style={{
-          background: getGradient(theme.backgroundColor),
-          color: theme.primaryTextColor,
-          fontFamily: "'Inter', sans-serif",
           width: "1080px",
           height: format === "story" ? "1920px" : "1350px",
           display: "flex",
@@ -84,9 +80,23 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           boxSizing: "border-box",
           position: "relative",
           overflow: "hidden",
+          background: theme.backgroundImage
+            ? `url(${theme.backgroundImage}) center/cover no-repeat`
+            : getGradient(theme.backgroundColor),
         }}
         className='font-sans'
       >
+        {/* Background Image Overlay */}
+        {theme.backgroundImage && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: theme.isLight ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.3)",
+              zIndex: 0,
+            }}
+          />
+        )}
         {/* Subtle background decoration */}
         <div
           style={{
@@ -115,22 +125,23 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           }}
         />
 
-        {sticker && (
+        {stickers.map((s) => (
           <div
+            key={s.id}
             style={{
               position: "absolute",
-              left: `${stickerPosition.x}%`,
-              top: `${stickerPosition.y}%`,
-              transform: "translate(-50%, -50%)",
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              transform: `translate(-50%, -50%) scale(${s.scale}) rotate(${s.rotation}deg)`,
               fontSize: "72px",
               lineHeight: 1,
               pointerEvents: "none",
               zIndex: 30,
             }}
           >
-            {sticker}
+            {s.emoji}
           </div>
-        )}
+        ))}
 
         {/* Header */}
         <div
@@ -164,7 +175,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                     letterSpacing: "0.2em",
                   }}
                 >
-                  RESUMEN DE SESIÓN
+                  {routineTitle ? formatDate(date) : "RESUMEN DE SESIÓN"}
                 </span>
               </div>
               <h1
@@ -177,7 +188,7 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                   margin: 0,
                 }}
               >
-                {formatDate(date)}
+                {routineTitle || formatDate(date)}
               </h1>
             </div>
             <div
@@ -200,22 +211,25 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
 
         {/* Stats Grid */}
         <div
+          className={cn(
+            "relative z-10 w-full rounded-[32px] p-8 mb-8 grid grid-cols-3 gap-[25px]",
+            theme.backgroundImage
+              ? theme.isLight
+                ? "bg-white/85 border border-black/10 shadow-lg backdrop-blur-sm"
+                : "bg-black/60 border border-white/10 shadow-lg backdrop-blur-sm"
+              : theme.isLight
+                ? "bg-black/2 border border-black/5"
+                : "bg-white/2 border border-white/5",
+          )}
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
             gap: "25px",
-            marginBottom: "45px",
-            position: "relative",
-            zIndex: 10,
           }}
         >
           {/* Total Volume */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
-              backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
-              borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
               flexDirection: "column",
@@ -260,10 +274,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {/* Exercises */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
-              backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
-              borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
               flexDirection: "column",
@@ -304,10 +314,6 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {/* Total Reps */}
           <div
             style={{
-              backgroundColor: "#ffffff05",
-              backdropFilter: "blur(10px)",
-              border: "1px solid #ffffff10",
-              borderRadius: "32px",
               padding: "25px 30px",
               display: "flex",
               flexDirection: "column",
@@ -373,15 +379,16 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
           {logs.slice(0, 8).map((log, i) => (
             <div
               key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "16px 24px",
-                backgroundColor: "#ffffff03",
-                borderRadius: "20px",
-                border: "1px solid #ffffff08",
-              }}
+              className={cn(
+                "flex items-center justify-between p-4 rounded-2xl border",
+                theme.backgroundImage
+                  ? theme.isLight
+                    ? "bg-white/80 border-black/10 backdrop-blur-sm"
+                    : "bg-black/50 border-white/10 backdrop-blur-sm"
+                  : theme.isLight
+                    ? "bg-black/2 border-black/4"
+                    : "bg-white/2 border-white/4",
+              )}
             >
               <div
                 style={{
@@ -473,9 +480,23 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 marginTop: "5px",
                 textAlign: "center",
                 padding: "10px",
-                backgroundColor: "#ffffff03",
+                backgroundColor: theme.backgroundImage
+                  ? theme.isLight
+                    ? "rgba(255,255,255,0.8)"
+                    : "rgba(0,0,0,0.5)"
+                  : theme.isLight
+                    ? "rgba(0,0,0,0.03)"
+                    : "rgba(255,255,255,0.03)",
                 borderRadius: "16px",
-                border: "1px dashed #ffffff15",
+                border: `1px dashed ${
+                  theme.backgroundImage
+                    ? theme.isLight
+                      ? "rgba(0,0,0,0.1)"
+                      : "rgba(255,255,255,0.1)"
+                    : theme.isLight
+                      ? "rgba(0,0,0,0.08)"
+                      : "rgba(255,255,255,0.08)"
+                }`,
               }}
             >
               <span
@@ -552,8 +573,8 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 height: "56px",
                 borderRadius: "16px",
                 objectFit: "contain",
-                backgroundColor: "#000",
-                border: "2px solid #ffffff15",
+                backgroundColor: theme.isLight ? "#f1f5f9" : "#000",
+                border: theme.isLight ? "2px solid #00000010" : "2px solid #ffffff15",
                 padding: "7px",
               }}
             />
