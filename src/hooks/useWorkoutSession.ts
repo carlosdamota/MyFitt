@@ -132,8 +132,13 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
         const profileRef = doc(db, "artifacts", appId, "users", user.uid, "app_data", "profile");
         await setDoc(profileRef, { lastWorkoutDate: new Date().toISOString() }, { merge: true });
 
-        // 3. Invalidate TanStack query so the UI re-fetches the actual Firestore data
-        await queryClient.invalidateQueries({ queryKey: ["workout_sessions", user.uid] });
+        // 3. Invalidate TanStack queries so the UI re-fetches the actual Firestore data
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["workout_sessions", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["workout_sessions_recent", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["user_stats", user.uid] }),
+          queryClient.invalidateQueries({ queryKey: ["appData", user.uid] }),
+        ]);
 
         // 4. Clear local state
         setPendingLogs({});
