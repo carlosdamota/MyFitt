@@ -43,6 +43,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   /* drag state */
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
+  const dragBounds = useRef({ left: 0, top: 0, width: 1, height: 1 });
+  const frameRef = useRef<number | null>(null);
+  const pendingPosRef = useRef<{ x: number; y: number } | null>(null);
 
   /* share logic */
   const {
@@ -101,9 +104,18 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    if (dragging) return;
     setAsset(null);
     void ensureAsset();
-  }, [token, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token, isOpen, dragging]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    return () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
+  }, []);
 
   const handleShare = async () => {
     const a = asset ?? (await ensureAsset());
@@ -136,6 +148,12 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setDragging(true);
     const r = previewRef.current!.getBoundingClientRect();
+    dragBounds.current = {
+      left: r.left,
+      top: r.top,
+      width: r.width,
+      height: r.height,
+    };
     offset.current = {
       x: e.clientX - r.left - (stickerPos.x / 100) * r.width,
       y: e.clientY - r.top - (stickerPos.y / 100) * r.height,
@@ -144,13 +162,31 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
 
   const onPtrMove = (e: React.PointerEvent) => {
     if (!dragging) return;
-    const r = previewRef.current!.getBoundingClientRect();
+    const r = dragBounds.current;
     const x = Math.max(2, Math.min(98, ((e.clientX - r.left - offset.current.x) / r.width) * 100));
     const y = Math.max(2, Math.min(98, ((e.clientY - r.top - offset.current.y) / r.height) * 100));
-    setStickerPos({ x, y });
+    pendingPosRef.current = { x, y };
+
+    if (frameRef.current !== null) return;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      if (pendingPosRef.current) {
+        setStickerPos(pendingPosRef.current);
+      }
+    });
   };
 
-  const onPtrUp = () => setDragging(false);
+  const onPtrUp = () => {
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+    if (pendingPosRef.current) {
+      setStickerPos(pendingPosRef.current);
+      pendingPosRef.current = null;
+    }
+    setDragging(false);
+  };
 
   if (!isOpen) return null;
 
