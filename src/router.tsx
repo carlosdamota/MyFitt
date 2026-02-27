@@ -5,10 +5,10 @@ import { createBrowserRouter, Navigate } from "react-router";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 // Public pages
-import Landing from "./pages/Landing";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Legal from "./pages/Legal";
+const Landing = lazyImport(() => import("./pages/Landing"));
+const Privacy = lazyImport(() => import("./pages/Privacy"));
+const Terms = lazyImport(() => import("./pages/Terms"));
+const Legal = lazyImport(() => import("./pages/Legal"));
 
 // App pages (lazy-loaded for code splitting)
 import { lazyImport } from "./utils/lazyImport";
@@ -37,10 +37,38 @@ function SuspenseWrapper({ children }: { children: React.ReactNode }) {
 
 export const router = createBrowserRouter([
   // Public routes
-  { path: "/", Component: Landing },
-  { path: "/privacy", Component: Privacy },
-  { path: "/terms", Component: Terms },
-  { path: "/legal", Component: Legal },
+  {
+    path: "/",
+    element: (
+      <SuspenseWrapper>
+        <Landing />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/privacy",
+    element: (
+      <SuspenseWrapper>
+        <Privacy />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/terms",
+    element: (
+      <SuspenseWrapper>
+        <Terms />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/legal",
+    element: (
+      <SuspenseWrapper>
+        <Legal />
+      </SuspenseWrapper>
+    ),
+  },
 
   // App routes (with shared dashboard layout)
   {

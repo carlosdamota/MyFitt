@@ -15,7 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import AuthModal from "../components/auth/AuthModal";
+const AuthModal = React.lazy(() => import("../components/auth/AuthModal"));
 import { createCheckoutSession } from "../api/billing";
 import { iconLogo, socialPreview } from "../branding/logoConfig";
 import { Button } from "../components/ui/Button";
@@ -141,17 +141,19 @@ const Landing: React.FC = () => {
         <script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
       </Helmet>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={() => {
-          setShowAuthModal(false);
-          navigate("/app");
-        }}
-        loginWithGoogle={loginWithGoogle}
-        loginWithEmail={loginWithEmail}
-        signupWithEmail={signupWithEmail}
-      />
+      <React.Suspense fallback={null}>
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            navigate("/app");
+          }}
+          loginWithGoogle={loginWithGoogle}
+          loginWithEmail={loginWithEmail}
+          signupWithEmail={signupWithEmail}
+        />
+      </React.Suspense>
 
       <div
         className='fixed inset-0 z-0 pointer-events-none overflow-hidden'
@@ -172,6 +174,8 @@ const Landing: React.FC = () => {
                 src={iconLogo.src}
                 alt={iconLogo.alt}
                 className='w-5 h-5 md:w-6 md:h-6'
+                loading='eager'
+                fetchPriority='high'
               />
               <span className='text-slate-900 dark:text-white hidden sm:inline font-black italic tracking-tighter text-xl'>
                 FITTWIZ
