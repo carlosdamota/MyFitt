@@ -6,7 +6,8 @@ import type { User } from "firebase/auth";
 import type { WorkoutLogs, WorkoutLogEntry } from "../types";
 import posthog from "posthog-js";
 
-const STORAGE_KEY = "myfitt_pending_session";
+const BASE_STORAGE_KEY = "myfitt_pending_session";
+const getStorageKey = (uid: string) => `${BASE_STORAGE_KEY}_${uid}`;
 
 interface PendingSession {
   logs: WorkoutLogs;
@@ -41,35 +42,53 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
   const pendingLogsRef = useRef(pendingLogs);
   pendingLogsRef.current = pendingLogs;
 
-  // ── Recover from localStorage on mount ──
+  // ── Recover from localStorage when user is available ──
   useEffect(() => {
+    if (!user) {
+      setPendingLogs({});
+      setStartedAt(null);
+      return;
+    }
+
+    const storageKey = getStorageKey(user.uid);
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed: PendingSession = JSON.parse(saved);
         if (parsed.logs && Object.keys(parsed.logs).length > 0) {
           setPendingLogs(parsed.logs);
           setStartedAt(parsed.startedAt);
+        } else {
+          setPendingLogs({});
+          setStartedAt(null);
         }
+      } else {
+        setPendingLogs({});
+        setStartedAt(null);
       }
     } catch {
       // Corrupted data, ignore
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey);
+      setPendingLogs({});
+      setStartedAt(null);
     }
-  }, []);
+  }, [user]);
 
   // ── Persist to localStorage on every change ──
   useEffect(() => {
+    if (!user) return;
+
+    const storageKey = getStorageKey(user.uid);
     if (Object.keys(pendingLogs).length > 0) {
       const session: PendingSession = {
         logs: pendingLogs,
         startedAt: startedAt || new Date().toISOString(),
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      localStorage.setItem(storageKey, JSON.stringify(session));
     } else {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, [pendingLogs, startedAt]);
+  }, [pendingLogs, startedAt, user]);
 
   // ── Add a log to the local buffer ──
   const addLog = useCallback((exerciseName: string, entry: WorkoutLogEntry) => {
@@ -148,7 +167,7 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
         // 4. Clear local state
         setPendingLogs({});
         setStartedAt(null);
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(getStorageKey(user.uid));
 
         posthog.capture("workout_completed", {
           duration: metadata.duration || null,
@@ -166,10 +185,11 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
 
   // ── Discard session ──
   const clearSession = useCallback(() => {
+    if (!user) return;
     setPendingLogs({});
     setStartedAt(null);
-    localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    localStorage.removeItem(getStorageKey(user.uid));
+  }, [user]);
 
   const isSessionActive = Object.keys(pendingLogs).length > 0;
 

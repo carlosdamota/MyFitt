@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Flame, Dumbbell, Shield, Trophy } from "lucide-react";
+import { Flame, Dumbbell, Shield, Trophy, X } from "lucide-react";
 import WorkoutProgressHeader from "./WorkoutProgressHeader";
 import RoutineHeroCard from "./RoutineHeroCard";
 import ProUpgradeCta from "./ProUpgradeCta";
@@ -84,9 +84,10 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     }
   };
   // Timer & Sharing Logic
-  const { time, isRunning, toggle, stop, formatTime, reset } = useStopwatch();
+  const { time, isRunning, toggle, stop, formatTime, reset } = useStopwatch(0, user?.uid);
   const { plan } = useEntitlement(user);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [selectedRating, setSelectedRating] = useState<number | undefined>(undefined);
   const [showSocialShare, setShowSocialShare] = useState(false);
   const flushTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -98,7 +99,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     resetTimer: resetRestTimer,
     toggleTimer: toggleRestTimer,
     setTimer: setRestTimer,
-  } = useTimer(0);
+  } = useTimer(0, user?.uid);
   const [showRestTimer, setShowRestTimer] = useState(false);
 
   const handleStartRest = (duration: number = 60) => {
@@ -110,6 +111,21 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const handleCloseRestTimer = () => {
     setShowRestTimer(false);
     resetRestTimer(0);
+  };
+
+  const handleCancelWorkout = () => {
+    setShowConfirmCancel(true);
+  };
+
+  const confirmCancelWorkout = () => {
+    setShowConfirmCancel(false);
+    stop(); // stopwatch
+    reset(); // clear stopwatch local
+    resetRestTimer(0); // clear rest timer local
+    if (onClearSession) {
+      onClearSession(); // clear pending logs local
+    }
+    info("Entrenamiento cancelado y descartado.");
   };
 
   // Validation: Can only stop if at least one exercise is done
@@ -245,6 +261,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         isRunning={isRunning}
         onToggle={toggle}
         onStop={handleStopTimer}
+        onCancel={time > 0 || completedCount > 0 ? handleCancelWorkout : undefined}
         className='mb-8'
       />
 
@@ -313,6 +330,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         isRunning={isRunning}
         onToggle={toggle}
         onStop={handleStopTimer}
+        onCancel={time > 0 || completedCount > 0 ? handleCancelWorkout : undefined}
         className='mb-8'
       />
 
@@ -392,6 +410,45 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
                   className='flex-1 py-3 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-primary-500 dark:to-indigo-500 hover:from-blue-500 hover:to-indigo-500 dark:hover:from-primary-400 dark:hover:to-indigo-400 text-white rounded-xl font-bold shadow-md dark:shadow-shadow-lg shadow-blue-500/25 dark:shadow-primary-500/25 transition-all outline-none border-none'
                 >
                   Terminar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancellation Dialog */}
+      {showConfirmCancel && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 dark:bg-surface-950/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 transition-colors'>
+          <div className='relative bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700/50 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-xl dark:shadow-2xl overflow-hidden transition-colors'>
+            <div className='relative z-10'>
+              <div className='w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6 shadow-inner'>
+                <X
+                  size={28}
+                  className='text-red-400'
+                />
+              </div>
+              <h3 className='text-2xl font-black text-slate-900 dark:text-white mb-3 tracking-tight transition-colors'>
+                ¿Cancelar entrenamiento?
+              </h3>
+              <p className='text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 transition-colors'>
+                Esto borrará todo el progreso de esta sesión y reiniciará los cronómetros. Esta
+                acción no se puede deshacer.
+              </p>
+
+              <div className='flex gap-3'>
+                <Button
+                  variant='ghost'
+                  onClick={() => setShowConfirmCancel(false)}
+                  className='flex-1 py-3 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-surface-800/50 hover:bg-slate-200 dark:hover:bg-surface-700 rounded-xl font-bold transition-all border border-slate-200 dark:border-surface-700/50'
+                >
+                  No, seguir
+                </Button>
+                <Button
+                  onClick={confirmCancelWorkout}
+                  className='flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-md shadow-red-500/25 transition-all outline-none border-none'
+                >
+                  Sí, cancelar
                 </Button>
               </div>
             </div>

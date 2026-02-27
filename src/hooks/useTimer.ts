@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const TIMER_STORAGE_KEY = "myfitt_rest_timer_state";
+const BASE_TIMER_STORAGE_KEY = "myfitt_rest_timer_state";
+const getTimerStorageKey = (uid?: string) =>
+  uid ? `${BASE_TIMER_STORAGE_KEY}_${uid}` : BASE_TIMER_STORAGE_KEY;
 
 export interface UseTimerReturn {
   timer: number;
@@ -16,16 +18,17 @@ export interface TimerState {
   isRunning: boolean;
 }
 
-export const useTimer = (initialTime: number = 60): UseTimerReturn => {
+export const useTimer = (initialTime: number = 60, userId?: string): UseTimerReturn => {
   const [timer, setTimer] = useState<number>(initialTime);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const endTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Recover from localStorage on mount ──
+  // ── Recover from localStorage when userId is available ──
   useEffect(() => {
+    const storageKey = getTimerStorageKey(userId);
     try {
-      const saved = localStorage.getItem(TIMER_STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed: TimerState = JSON.parse(saved);
         endTimeRef.current = parsed.endTime;
@@ -37,25 +40,31 @@ export const useTimer = (initialTime: number = 60): UseTimerReturn => {
         } else {
           setTimer(parsed.timer);
         }
+      } else {
+        // Reset to initial if no saved state for this user
+        setTimer(initialTime);
+        setIsTimerRunning(false);
+        endTimeRef.current = null;
       }
     } catch {
-      localStorage.removeItem(TIMER_STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, []);
+  }, [userId, initialTime]);
 
   // ── Persist to localStorage on changes ──
   useEffect(() => {
+    const storageKey = getTimerStorageKey(userId);
     const state: TimerState = {
       timer: timer,
       endTime: endTimeRef.current,
       isRunning: isTimerRunning,
     };
     if (state.isRunning || (state.timer > 0 && state.timer !== initialTime)) {
-      localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     } else {
-      localStorage.removeItem(TIMER_STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, [isTimerRunning, timer, initialTime]);
+  }, [isTimerRunning, timer, initialTime, userId]);
 
   const calculateRemaining = useCallback(() => {
     if (!endTimeRef.current) return 0;
