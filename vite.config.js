@@ -53,4 +53,18 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/storage"],
+          konva: ["konva", "react-konva"],
+          vendor: ["react", "react-dom", "react-router", "@tanstack/react-query"],
+          ui: ["lucide-react"],
+          analytics: ["posthog-js"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

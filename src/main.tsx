@@ -14,10 +14,22 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 
-posthog.init(import.meta.env.VITE_POSTHOG_KEY || "", {
-  api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
-  person_profiles: "identified_only",
-});
+// Delay PostHog initialization to prioritize first paint
+const initPostHog = () => {
+  posthog.init(import.meta.env.VITE_POSTHOG_KEY || "", {
+    api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
+    person_profiles: "identified_only",
+    capture_pageview: false, // We'll handle this manually or let the provider do it later
+  });
+};
+
+if (typeof window !== "undefined") {
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(initPostHog);
+  } else {
+    setTimeout(initPostHog, 1000);
+  }
+}
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

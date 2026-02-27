@@ -34,7 +34,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-50 ring-offset-white dark:ring-offset-surface-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2";
+      "inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-50 ring-offset-white dark:ring-offset-surface-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2";
 
     const variants = {
       primary:

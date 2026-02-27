@@ -64,7 +64,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     <Button
       variant={tone === "accent" ? "primary" : "secondary"}
       onClick={onClick}
-      className='w-full h-auto py-3 rounded-2xl'
+      className='w-full h-auto py-3'
       rightIcon={<ArrowRight size={16} />}
     >
       {cta}

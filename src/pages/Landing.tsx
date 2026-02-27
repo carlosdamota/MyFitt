@@ -15,7 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import AuthModal from "../components/auth/AuthModal";
+const AuthModal = React.lazy(() => import("../components/auth/AuthModal"));
 import { createCheckoutSession } from "../api/billing";
 import { iconLogo, socialPreview } from "../branding/logoConfig";
 import { Button } from "../components/ui/Button";
@@ -141,17 +141,19 @@ const Landing: React.FC = () => {
         <script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
       </Helmet>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={() => {
-          setShowAuthModal(false);
-          navigate("/app");
-        }}
-        loginWithGoogle={loginWithGoogle}
-        loginWithEmail={loginWithEmail}
-        signupWithEmail={signupWithEmail}
-      />
+      <React.Suspense fallback={null}>
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            navigate("/app");
+          }}
+          loginWithGoogle={loginWithGoogle}
+          loginWithEmail={loginWithEmail}
+          signupWithEmail={signupWithEmail}
+        />
+      </React.Suspense>
 
       <div
         className='fixed inset-0 z-0 pointer-events-none overflow-hidden'
@@ -172,6 +174,8 @@ const Landing: React.FC = () => {
                 src={iconLogo.src}
                 alt={iconLogo.alt}
                 className='w-5 h-5 md:w-6 md:h-6'
+                loading='eager'
+                fetchPriority='high'
               />
               <span className='text-slate-900 dark:text-white hidden sm:inline font-black italic tracking-tighter text-xl'>
                 FITTWIZ
@@ -260,7 +264,7 @@ const Landing: React.FC = () => {
               <Button
                 size='lg'
                 onClick={onLogin}
-                className='group w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl shadow-xl shadow-primary-900/20'
+                className='group w-full sm:w-auto text-lg px-8 py-4 h-auto shadow-xl shadow-primary-900/20'
                 rightIcon={
                   <ArrowRight className='group-hover:translate-x-1 transition-transform' />
                 }
@@ -278,7 +282,7 @@ const Landing: React.FC = () => {
                   variant='outline'
                   size='lg'
                   onClick={onExplore}
-                  className='w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl bg-white/60 dark:bg-surface-900/60'
+                  className='w-full sm:w-auto text-lg px-8 py-4 h-auto bg-white/60 dark:bg-surface-900/60'
                 >
                   Ver rutinas demo
                 </Button>
@@ -614,7 +618,7 @@ const Landing: React.FC = () => {
           <Button
             size='lg'
             onClick={onLogin}
-            className='px-8 py-4 h-auto rounded-2xl text-lg'
+            className='px-8 py-4 h-auto text-lg'
             rightIcon={<ArrowRight size={18} />}
           >
             {user ? "Ir al panel" : "Crear mi cuenta"}
