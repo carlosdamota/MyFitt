@@ -25,13 +25,24 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
         <Dumbbell size={120} />
       </div>
 
-      <div className='flex justify-between items-start mb-4 relative z-10'>
-        <div>
-          <h2 className='text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight tracking-tight transition-colors'>
-            {routine.title}
-          </h2>
-          <div className='flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-400 font-medium'>
-            <div className='flex items-center gap-1.5'>
+      <div className='flex justify-between items-start mb-3 sm:mb-4 relative z-10'>
+        <div className='w-full'>
+          {routine.title.includes(":") ? (
+            <>
+              <p className='text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 transition-colors'>
+                {routine.title.split(":")[0].trim()}
+              </p>
+              <h2 className='text-xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight tracking-tight transition-colors'>
+                {routine.title.split(":")[1].trim()}
+              </h2>
+            </>
+          ) : (
+            <h2 className='text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight tracking-tight transition-colors'>
+              {routine.title}
+            </h2>
+          )}
+          <div className='flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm text-slate-400 font-medium'>
+            <div className='flex items-center gap-1.5 shrink-0'>
               <Activity
                 size={14}
                 className='text-blue-400'
@@ -39,7 +50,7 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
               <span>{routine.focus}</span>
             </div>
             <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-surface-700 transition-colors' />
-            <div className='flex items-center gap-1.5'>
+            <div className='flex items-center gap-1.5 shrink-0'>
               <Clock
                 size={14}
                 className='text-purple-400'
@@ -49,7 +60,7 @@ const RoutineHeroCard: React.FC<RoutineHeroCardProps> = ({
             {routine.estimatedCalories && (
               <>
                 <span className='hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-surface-700 transition-colors' />
-                <div className='flex items-center gap-1.5'>
+                <div className='flex items-center gap-1.5 shrink-0'>
                   <Flame
                     size={14}
                     className='text-orange-400'
