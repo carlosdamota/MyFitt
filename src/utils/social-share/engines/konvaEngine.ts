@@ -256,7 +256,7 @@ export const generateWithKonvaEngine = async (
   const exerciseYStart = exerciseLabelY + 35;
   const { itemHeight, itemGap } = LAYOUT;
 
-  logs.slice(0, 8).forEach((log, i) => {
+  logs.slice(0, 8).forEach((log: any, i: number) => {
     const y = exerciseYStart + i * (itemHeight + itemGap);
 
     layer.add(
@@ -482,7 +482,7 @@ export const generateWithKonvaEngine = async (
 
   // 7. Stickers (Top layer)
   if (stickers && stickers.length > 0) {
-    stickers.forEach((s) => {
+    stickers.forEach((s: any) => {
       const stickerText = new Konva.Text({
         x: (s.x / 100) * width,
         y: (s.y / 100) * height,

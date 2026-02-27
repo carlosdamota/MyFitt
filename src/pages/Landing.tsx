@@ -260,7 +260,7 @@ const Landing: React.FC = () => {
               <Button
                 size='lg'
                 onClick={onLogin}
-                className='group w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl shadow-xl shadow-primary-900/20'
+                className='group w-full sm:w-auto text-lg px-8 py-4 h-auto shadow-xl shadow-primary-900/20'
                 rightIcon={
                   <ArrowRight className='group-hover:translate-x-1 transition-transform' />
                 }
@@ -278,7 +278,7 @@ const Landing: React.FC = () => {
                   variant='outline'
                   size='lg'
                   onClick={onExplore}
-                  className='w-full sm:w-auto text-lg px-8 py-4 h-auto rounded-2xl bg-white/60 dark:bg-surface-900/60'
+                  className='w-full sm:w-auto text-lg px-8 py-4 h-auto bg-white/60 dark:bg-surface-900/60'
                 >
                   Ver rutinas demo
                 </Button>
@@ -614,7 +614,7 @@ const Landing: React.FC = () => {
           <Button
             size='lg'
             onClick={onLogin}
-            className='px-8 py-4 h-auto rounded-2xl text-lg'
+            className='px-8 py-4 h-auto text-lg'
             rightIcon={<ArrowRight size={18} />}
           >
             {user ? "Ir al panel" : "Crear mi cuenta"}
