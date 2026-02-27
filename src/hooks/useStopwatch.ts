@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const STOPWATCH_STORAGE_KEY = "myfitt_stopwatch_state";
+const BASE_STOPWATCH_STORAGE_KEY = "myfitt_stopwatch_state";
+const getStopwatchStorageKey = (uid?: string) =>
+  uid ? `${BASE_STOPWATCH_STORAGE_KEY}_${uid}` : BASE_STOPWATCH_STORAGE_KEY;
 
 export interface UseStopwatchReturn {
   time: number;
@@ -18,17 +20,18 @@ export interface StopwatchState {
   isRunning: boolean;
 }
 
-export const useStopwatch = (initialTime: number = 0): UseStopwatchReturn => {
+export const useStopwatch = (initialTime: number = 0, userId?: string): UseStopwatchReturn => {
   const [time, setTime] = useState<number>(initialTime);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const startTimeRef = useRef<number | null>(null);
   const offsetRef = useRef<number>(initialTime);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Recover from localStorage on mount ──
+  // ── Recover from localStorage when userId is available ──
   useEffect(() => {
+    const storageKey = getStopwatchStorageKey(userId);
     try {
-      const saved = localStorage.getItem(STOPWATCH_STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed: StopwatchState = JSON.parse(saved);
         offsetRef.current = parsed.offset;
@@ -40,25 +43,32 @@ export const useStopwatch = (initialTime: number = 0): UseStopwatchReturn => {
         } else {
           setTime(parsed.offset);
         }
+      } else {
+        // Reset if no saved state for this user
+        setTime(initialTime);
+        setIsRunning(false);
+        startTimeRef.current = null;
+        offsetRef.current = initialTime;
       }
     } catch {
-      localStorage.removeItem(STOPWATCH_STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, []);
+  }, [userId, initialTime]);
 
   // ── Persist to localStorage on changes ──
   useEffect(() => {
+    const storageKey = getStopwatchStorageKey(userId);
     const state: StopwatchState = {
       offset: offsetRef.current,
       startTime: startTimeRef.current,
       isRunning: isRunning,
     };
     if (state.offset > 0 || state.isRunning) {
-      localStorage.setItem(STOPWATCH_STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     } else {
-      localStorage.removeItem(STOPWATCH_STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     }
-  }, [isRunning, time]); // Using time as a proxy for offset updates during interval
+  }, [isRunning, time, userId]); // Using time as a proxy for offset updates during interval
 
   const calculateElapsed = useCallback(() => {
     if (!startTimeRef.current) return offsetRef.current;
@@ -108,7 +118,7 @@ export const useStopwatch = (initialTime: number = 0): UseStopwatchReturn => {
     startTimeRef.current = null;
     offsetRef.current = 0;
     setTime(0);
-    localStorage.removeItem(STOPWATCH_STORAGE_KEY);
+    localStorage.removeItem(getStopwatchStorageKey(userId));
   };
   const toggle = () => setIsRunning((prev) => !prev);
 

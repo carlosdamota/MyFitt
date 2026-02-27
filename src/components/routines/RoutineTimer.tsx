@@ -1,11 +1,12 @@
 import React from "react";
-import { Play, Pause, Square, Timer } from "lucide-react";
+import { Play, Pause, Square, Timer, X } from "lucide-react";
 
 interface RoutineTimerProps {
   timeFormatted: string;
   isRunning: boolean;
   onToggle: () => void;
   onStop: () => void;
+  onCancel?: () => void;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
   isRunning,
   onToggle,
   onStop,
+  onCancel,
   className = "",
 }) => {
   return (
@@ -72,6 +74,17 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
             fill='currentColor'
           />
         </button>
+
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            className='p-3 rounded-xl bg-slate-500/10 text-slate-400 hover:bg-slate-500/20 border border-slate-500/20 transition-all active:scale-95'
+            aria-label='Cancelar y descartar'
+            title='Cancelar entrenamiento'
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
     </div>
   );

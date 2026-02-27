@@ -12,6 +12,7 @@ interface SetEntryFormProps {
   setRpe: (val: string) => void;
   onSave: () => Promise<void>;
   isSaving: boolean;
+  isTimeBased?: boolean;
 }
 
 const InfoTooltip: React.FC<{ text: string }> = ({ text }) => {
@@ -68,6 +69,7 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
   setRpe,
   onSave,
   isSaving,
+  isTimeBased = false,
 }) => {
   const [justSaved, setJustSaved] = useState(false);
   const isDisabled = isSaving || !weight || !reps;
@@ -99,15 +101,21 @@ const SetEntryForm: React.FC<SetEntryFormProps> = ({
       </div>
       <div className='flex-1 min-w-0'>
         <label className={labelClasses}>
-          Reps
-          <InfoTooltip text='Repeticiones completas realizadas con buena técnica.' />
+          {isTimeBased ? "Segs" : "Reps"}
+          <InfoTooltip
+            text={
+              isTimeBased
+                ? "Segundos realizados manteniendo la posición o el esfuerzo."
+                : "Repeticiones completas realizadas con buena técnica."
+            }
+          />
         </label>
         <input
           type='number'
           value={reps}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setReps(e.target.value)}
           className='w-full bg-slate-50 dark:bg-surface-950/80 border border-slate-200 dark:border-surface-800 rounded-lg px-2.5 py-2.5 text-[11px] sm:text-xs text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-blue-500/50 dark:focus:ring-cyan-400/50 focus:bg-white dark:focus:bg-surface-900 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm dark:shadow-inner hover:border-slate-300 dark:hover:border-surface-700'
-          placeholder='0'
+          placeholder={isTimeBased ? "0s" : "0"}
         />
       </div>
       <div className='flex-1 min-w-0'>

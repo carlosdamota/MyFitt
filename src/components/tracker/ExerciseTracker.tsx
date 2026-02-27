@@ -23,6 +23,8 @@ interface ExerciseTrackerProps {
   user: User | null;
   isLastInBlock: boolean;
   configuredReps?: string;
+  configuredSets?: string;
+  intensity?: string;
   instructions?: string[];
   onMarkComplete?: () => void;
   onUnmarkComplete?: () => void;
@@ -48,6 +50,8 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   user,
   isLastInBlock,
   configuredReps,
+  configuredSets,
+  intensity,
   instructions,
   onMarkComplete,
   onUnmarkComplete,
@@ -73,9 +77,41 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
     return calculatePersonalBests(history);
   }, [history, stats, exerciseName]);
 
-  // Lógica de Sobrecarga Progresiva
+  // Detectar si el ejercicio es por tiempo (basado en el objetivo de la rutina)
+  const isTimeBased = useMemo(() => {
+    if (!configuredReps) return false;
+    const lowerReps = configuredReps.toLowerCase();
+    return lowerReps.includes("seg") || lowerReps.includes("min") || /\d+\s*s\b/.test(lowerReps);
+  }, [configuredReps]);
+
+  // Lógica de Sobrecarga Progresiva o Sugerencia Inicial
   const smartSuggestion = useMemo((): SuggestionData | null => {
-    if (!history || history.length === 0) return null;
+    // CASO 1: No hay historial - Sugerir basado en objetivos de la rutina
+    if (!history || history.length === 0) {
+      if (!configuredReps) return null;
+
+      // Intentar extraer el número máximo de reps si es un rango (ej. "10-12" -> 12)
+      const repsMatch = configuredReps.match(/(\d+)(?!.*\d)/);
+      const suggestedReps = repsMatch ? parseInt(repsMatch[1]) : 12;
+
+      // Detectar si es peso corporal para sugerir 0kg
+      const isBW = isBodyweightExercise(exerciseName);
+      const suggestedWeight = isBW ? 0 : 0; // Por ahora 0 si no hay historial, pero marcamos la intención
+
+      const unit = isTimeBased ? "Segs" : "Reps";
+      let text = `Objetivo: ${suggestedReps} ${unit}`;
+      if (intensity) text += ` (${intensity})`;
+      if (isBW) text += " • Peso corporal";
+
+      return {
+        weight: suggestedWeight,
+        reps: suggestedReps,
+        text: text,
+        type: "steady",
+      };
+    }
+
+    // CASO 2: Hay historial - Lógica de Sobrecarga Progresiva
     const lastLog = [...history].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     )[0];
@@ -96,7 +132,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
       return {
         weight: lastWeight,
         reps: lastReps + 1,
-        text: `Buen ritmo. Busca ${lastReps + 1} reps`,
+        text: `Buen ritmo. Busca ${lastReps + 1} ${isTimeBased ? "segs" : "reps"}`,
         type: "reps",
       };
     if (lastRpe >= 9.5)
@@ -107,7 +143,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
         type: "steady",
       };
     return { weight: lastWeight, reps: lastReps, text: "Mantén el ritmo actual", type: "steady" };
-  }, [history]);
+  }, [history, configuredReps, intensity, exerciseName]);
 
   const handleApplySuggestion = (): void => {
     if (!smartSuggestion) return;
@@ -241,6 +277,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
               setRpe={setRpe}
               onSave={handleSave}
               isSaving={isSaving}
+              isTimeBased={isTimeBased}
             />
           </div>
           <div className='absolute inset-0 flex items-center justify-center'>
@@ -267,6 +304,7 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
           setRpe={setRpe}
           onSave={handleSave}
           isSaving={isSaving}
+          isTimeBased={isTimeBased}
         />
       )}
 

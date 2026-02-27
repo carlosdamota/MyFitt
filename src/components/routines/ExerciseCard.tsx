@@ -104,17 +104,26 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 >
                   {displayName}
                 </h3>
-                <div className='flex items-center gap-2 mt-1'>
+                <div className='flex items-center gap-1.5 mt-1.5 flex-wrap'>
                   {exercise.sets && (
-                    <span className='text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-surface-800/50 px-2 py-0.5 rounded border border-slate-200 dark:border-surface-700 transition-colors'>
-                      {exercise.sets} SERIES
+                    <span className='text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-surface-800/50 px-2 py-0.5 rounded-full border border-slate-200 dark:border-surface-700 transition-colors uppercase tracking-tight'>
+                      {exercise.sets} Ser.
                     </span>
                   )}
-                  <span className='text-xs font-mono text-blue-600 dark:text-primary-400 bg-blue-50 dark:bg-primary-900/20 px-2 py-0.5 rounded border border-blue-200 dark:border-primary-500/20 transition-colors'>
-                    {exercise.reps} REPS
-                  </span>
+                  {(() => {
+                    const repsValue = exercise.reps.toLowerCase();
+                    const isTime =
+                      repsValue.includes("seg") ||
+                      repsValue.includes("min") ||
+                      /\d+\s*s\b/.test(repsValue);
+                    return (
+                      <span className='text-[10px] font-bold text-blue-600 dark:text-primary-400 bg-blue-50 dark:bg-primary-950/30 px-2 py-0.5 rounded-full border border-blue-200 dark:border-primary-500/20 transition-colors uppercase tracking-tight'>
+                        {exercise.reps} {!isTime && "Reps"}
+                      </span>
+                    );
+                  })()}
                   {exercise.intensity && (
-                    <span className='text-[10px] font-bold text-amber-600 dark:text-warning-500/80 bg-amber-50 dark:bg-warning-900/10 px-1.5 py-0.5 rounded border border-amber-200 dark:border-warning-500/20 transition-colors'>
+                    <span className='text-[10px] font-bold text-amber-600 dark:text-warning-500/80 bg-amber-50 dark:bg-warning-900/10 px-2 py-0.5 rounded-full border border-amber-200 dark:border-warning-500/20 transition-colors uppercase tracking-tight'>
                       {exercise.intensity}
                     </span>
                   )}
@@ -167,6 +176,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               user={user}
               isLastInBlock={isLastInBlock}
               configuredReps={exercise.reps}
+              configuredSets={exercise.sets?.toString()}
+              intensity={exercise.intensity}
               instructions={exercise.instructions}
               isTimerRunning={isTimerRunning}
               onMarkComplete={() => {
