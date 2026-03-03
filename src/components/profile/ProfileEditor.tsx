@@ -13,6 +13,7 @@ import ThemeToggle from "../common/ThemeToggle";
 import DeleteAccountModal from "./DeleteAccountModal";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
+import { APP_VERSION } from "../../config/version";
 import { PersonalDataSchema } from "../../schemas/validation";
 
 interface ProfileEditorProps {
@@ -172,7 +173,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           }}
           className='text-[10px] text-slate-400 dark:text-slate-700 font-mono cursor-default select-none active:text-slate-500 transition-colors'
         >
-          v1.0.0
+          v{APP_VERSION}
         </p>
       </div>
 
