@@ -14,6 +14,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../config/firebase";
 import posthog from "posthog-js";
+import { removeNotificationToken } from "../utils/notifications";
 
 // Declare global variable injected at runtime
 declare const __initial_auth_token: string | undefined;
@@ -127,7 +128,11 @@ export const useAuth = (): UseAuthReturn => {
 
   const logout = async (): Promise<void> => {
     if (!auth) return;
+    const currentUid = auth.currentUser?.uid;
     posthog.reset();
+    if (currentUid) {
+      await removeNotificationToken(currentUid);
+    }
     await signOut(auth);
   };
 
