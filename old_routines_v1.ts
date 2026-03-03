@@ -20,32 +20,30 @@ export const routineData: RoutineData = {
     cooldown: { text: "Estiramiento Pectoral en marco puerta + Colgarse de barra (Dorsal)" },
     blocks: [
       {
-        id: "A (Tracción Dominante)",
+        id: "A (Empuje)",
         rest: 90,
         exercises: [
           {
-            exerciseId: "pullups",
-            name: "Dominadas (Pull-ups)",
-            reps: "3x Fallo",
-            note: "Enfoque en espalda y postura. Si no puedes, usa banda.",
-            svg: "pullup",
-            muscleGroup: "Espalda",
-          },
-          {
-            name: "Press de Banca Suelo (Mancuernas)",
+            name: "Press de Banca Suelo",
             reps: "3x 8-10",
             note: "Pesado. Controla bajada.",
-            svg: "dumbbell",
+            svg: "floor_press",
+            muscleGroup: "Pecho",
+          },
+          {
+            name: "Flexiones Pies Elevados",
+            reps: "3x Fallo",
+            note: "Core tenso.",
+            svg: "pushup_feet_elevated",
             muscleGroup: "Pecho",
           },
         ],
       },
       {
-        id: "B (Complemento)",
+        id: "B (Tracción)",
         rest: 90,
         exercises: [
           {
-            exerciseId: "dumbbell_shoulder_press",
             name: "Press Militar Mancuernas",
             reps: "3x 8-10",
             note: "Controlar bajada. No arquear espalda.",
@@ -53,12 +51,11 @@ export const routineData: RoutineData = {
             muscleGroup: "Hombro",
           },
           {
-            exerciseId: "pushups",
-            name: "Flexiones Pies Elevados",
-            reps: "3x Fallo",
-            note: "Core tenso.",
-            svg: "pushup_feet_elevated",
-            muscleGroup: "Pecho",
+            name: "Remo con Mancuerna",
+            reps: "3x 10-12",
+            note: "Sin dolor de hombro.",
+            svg: "one_arm_row",
+            muscleGroup: "Espalda",
           },
         ],
       },
@@ -87,7 +84,6 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "plank",
             name: "Plancha Abdominal",
             reps: "3x 45-60s",
             note: "Aprieta glúteo y abdomen.",
@@ -95,7 +91,6 @@ export const routineData: RoutineData = {
             muscleGroup: "Abdomen",
           },
           {
-            exerciseId: "deadbug",
             name: "Dead Bug",
             reps: "3x 12-15",
             note: "Espalda baja pegada al suelo.",
@@ -109,7 +104,6 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "glute_bridge",
             name: "Puente de Glúteo",
             reps: "3x 15-20",
             note: "Sube cadera, aprieta culo.",
@@ -149,7 +143,6 @@ export const routineData: RoutineData = {
         rest: 90,
         exercises: [
           {
-            exerciseId: "goblet_squat",
             name: "Sentadilla Goblet",
             reps: "3x 12-15",
             note: "Mancuerna al pecho. Baja profundo.",
@@ -157,7 +150,6 @@ export const routineData: RoutineData = {
             muscleGroup: "Pierna",
           },
           {
-            exerciseId: "romanian_deadlift",
             name: "Peso Muerto Rumano",
             reps: "3x 12-15",
             note: "Dos piernas a la vez. Culo atrás.",
@@ -171,7 +163,6 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "lunges",
             name: "Zancadas con Mancuerna",
             reps: "3x 10/lado",
             note: "Paso largo.",
@@ -179,7 +170,6 @@ export const routineData: RoutineData = {
             muscleGroup: "Pierna",
           },
           {
-            exerciseId: "seated_calf_raise",
             name: "Sóleo en Pared",
             reps: "3x 15",
             note: "Rodillas flexionadas.",
@@ -210,37 +200,33 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "pullups",
-            name: "Dominadas (Chin-ups)",
-            reps: "3x Fallo",
-            note: "Agarre supino. Foco en postura.",
-            svg: "chinup",
-            muscleGroup: "Espalda",
-          },
-          {
-            exerciseId: "face_pull",
             name: "Face Pulls",
             reps: "3x 15-20",
-            note: "Tira a la frente. Core activo.",
+            note: "Tira a la frente. Aguanta 1s.",
             svg: "face_pull",
             muscleGroup: "Espalda",
           },
-        ],
-      },
-      {
-        id: "B (Corrección)",
-        rest: 60,
-        exercises: [
           {
-            exerciseId: "dumbbell_rear_delt_fly",
             name: "Remo Pájaro",
             reps: "3x 15-20",
             note: "Abre brazos en cruz.",
             svg: "rear_delt_fly",
             muscleGroup: "Espalda",
           },
+        ],
+      },
+      {
+        id: "B (Detalle)",
+        rest: 60,
+        exercises: [
           {
-            exerciseId: "lateral_raises",
+            name: "Curl Martillo",
+            reps: "3x 12-15",
+            note: "Para el codo.",
+            svg: "hammer_curl",
+            muscleGroup: "Brazos",
+          },
+          {
             name: "Elevaciones Laterales",
             reps: "3x 15-20",
             note: "Codos suben, manos bajan.",
@@ -271,7 +257,6 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "dumbbell_bicep_curl",
             name: "Curl de Bíceps",
             reps: "3x 12-15",
             note: "Supinación.",
@@ -279,7 +264,6 @@ export const routineData: RoutineData = {
             muscleGroup: "Brazos",
           },
           {
-            exerciseId: "overhead_tricep_extension",
             name: "Extensión Tríceps",
             reps: "3x 12-15",
             note: "Codo al techo.",
@@ -293,7 +277,6 @@ export const routineData: RoutineData = {
         rest: 60,
         exercises: [
           {
-            exerciseId: "dumbbell_shoulder_press",
             name: "Press Hombros Sentado",
             reps: "3x 10-12",
             note: "Ligero.",
@@ -301,7 +284,6 @@ export const routineData: RoutineData = {
             muscleGroup: "Hombro",
           },
           {
-            exerciseId: "leg_raises_floor",
             name: "Elevación de Piernas",
             reps: "3x 15",
             note: "Extra abdomen.",
@@ -336,21 +318,18 @@ export const routineData: RoutineData = {
         rest: 120,
         exercises: [
           {
-            exerciseId: "goblet_squat",
             name: "Sentadilla (o Goblet)",
             reps: "3x 8-10",
             svg: "goblet_squat",
             muscleGroup: "Pierna",
           },
           {
-            exerciseId: "barbell_bench_press",
             name: "Press Banca (o Flexiones)",
             reps: "3x 8-10",
             svg: "pushup",
             muscleGroup: "Pecho",
           },
           {
-            exerciseId: "dumbbell_row",
             name: "Remo con Mancuerna",
             reps: "3x 10-12",
             svg: "one_arm_row",
@@ -380,21 +359,18 @@ export const routineData: RoutineData = {
         rest: 120,
         exercises: [
           {
-            exerciseId: "romanian_deadlift",
             name: "Peso Muerto Rumano",
             reps: "3x 10-12",
             svg: "rdl_bilateral",
             muscleGroup: "Pierna",
           },
           {
-            exerciseId: "dumbbell_shoulder_press",
             name: "Press Militar (Mancuernas)",
             reps: "3x 8-10",
             svg: "shoulder_press",
             muscleGroup: "Hombro",
           },
           {
-            exerciseId: "pullups",
             name: "Dominadas (o Jalón)",
             reps: "3x Fallo/12",
             svg: "pullup",
@@ -429,27 +405,9 @@ export const routineData: RoutineData = {
         id: "Principal",
         rest: 90,
         exercises: [
-          {
-            exerciseId: "lunges",
-            name: "Zancadas (Lunge)",
-            reps: "3x 10/pierna",
-            svg: "lunge",
-            muscleGroup: "Pierna",
-          },
-          {
-            exerciseId: "chest_dips",
-            name: "Fondos (Dips) o Banco",
-            reps: "3x Fallo",
-            svg: "dips",
-            muscleGroup: "Pecho",
-          },
-          {
-            exerciseId: "face_pull",
-            name: "Face Pulls",
-            reps: "3x 15",
-            svg: "face_pull",
-            muscleGroup: "Espalda",
-          },
+          { name: "Zancadas (Lunge)", reps: "3x 10/pierna", svg: "lunge", muscleGroup: "Pierna" },
+          { name: "Fondos (Dips) o Banco", reps: "3x Fallo", svg: "dips", muscleGroup: "Pecho" },
+          { name: "Face Pulls", reps: "3x 15", svg: "face_pull", muscleGroup: "Espalda" },
         ],
       },
     ],
@@ -477,15 +435,8 @@ export const routineData: RoutineData = {
         id: "A",
         rest: 120,
         exercises: [
+          { name: "Press Banca", reps: "3x 6-8", svg: "bench_press", muscleGroup: "Pecho" },
           {
-            exerciseId: "barbell_bench_press",
-            name: "Press Banca",
-            reps: "3x 6-8",
-            svg: "bench_press",
-            muscleGroup: "Pecho",
-          },
-          {
-            exerciseId: "barbell_row",
             name: "Remo Barra/Mancuerna",
             reps: "3x 8-10",
             svg: "barbell_row",
@@ -514,20 +465,8 @@ export const routineData: RoutineData = {
         id: "A",
         rest: 120,
         exercises: [
-          {
-            exerciseId: "barbell_squat",
-            name: "Sentadilla",
-            reps: "3x 6-8",
-            svg: "squat",
-            muscleGroup: "Pierna",
-          },
-          {
-            exerciseId: "romanian_deadlift",
-            name: "Peso Muerto Rumano",
-            reps: "3x 8-10",
-            svg: "rdl",
-            muscleGroup: "Pierna",
-          },
+          { name: "Sentadilla", reps: "3x 6-8", svg: "squat", muscleGroup: "Pierna" },
+          { name: "Peso Muerto Rumano", reps: "3x 8-10", svg: "rdl", muscleGroup: "Pierna" },
         ],
       },
     ],
@@ -551,22 +490,9 @@ export const routineData: RoutineData = {
         id: "A",
         rest: 60,
         exercises: [
+          { name: "Press Militar", reps: "3x 10-12", svg: "overhead_press", muscleGroup: "Hombro" },
+          { name: "Chin Ups (Dominadas)", reps: "3x Fallo", svg: "chinup", muscleGroup: "Espalda" },
           {
-            exerciseId: "overhead_press",
-            name: "Press Militar",
-            reps: "3x 10-12",
-            svg: "overhead_press",
-            muscleGroup: "Hombro",
-          },
-          {
-            exerciseId: "pullups",
-            name: "Chin Ups (Dominadas)",
-            reps: "3x Fallo",
-            svg: "chinup",
-            muscleGroup: "Espalda",
-          },
-          {
-            exerciseId: "lateral_raises",
             name: "Elevaciones Laterales",
             reps: "3x 15",
             svg: "lateral_raise",
@@ -595,27 +521,9 @@ export const routineData: RoutineData = {
         id: "A",
         rest: 60,
         exercises: [
-          {
-            exerciseId: "leg_press",
-            name: "Prensa (o Zancada)",
-            reps: "3x 12-15",
-            svg: "leg_press",
-            muscleGroup: "Pierna",
-          },
-          {
-            exerciseId: "leg_curl_seated",
-            name: "Curl Femoral",
-            reps: "3x 12-15",
-            svg: "leg_curl",
-            muscleGroup: "Pierna",
-          },
-          {
-            exerciseId: "standing_calf_raise",
-            name: "Gemelo De Pie",
-            reps: "4x 15",
-            svg: "calf_raise",
-            muscleGroup: "Pierna",
-          },
+          { name: "Prensa (o Zancada)", reps: "3x 12-15", svg: "leg_press", muscleGroup: "Pierna" },
+          { name: "Curl Femoral", reps: "3x 12-15", svg: "leg_curl", muscleGroup: "Pierna" },
+          { name: "Gemelo De Pie", reps: "4x 15", svg: "calf_raise", muscleGroup: "Pierna" },
         ],
       },
     ],

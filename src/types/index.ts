@@ -21,6 +21,7 @@ export interface ExerciseMedia {
 export interface NormalizedExercise {
   id: string;
   name: string;
+  nameEn?: string;
   aliases: string[];
   muscleGroup: string;
   equipment: EquipmentOption[];

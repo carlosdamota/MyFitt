@@ -49,6 +49,7 @@ export const ExerciseMediaSchema = z.object({
 export const NormalizedExerciseSchema = z.object({
   id: z.string(),
   name: z.string(),
+  nameEn: z.string().optional(),
   aliases: z.array(z.string()),
   muscleGroup: z.string(),
   equipment: z.array(z.string()),
