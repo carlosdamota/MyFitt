@@ -8,6 +8,16 @@ export type { User } from "firebase/auth";
 // Routine Types
 // ============================================
 
+export interface ExerciseMedia {
+  id: string;
+  exerciseId: string;
+  type: "image" | "video" | "gif" | "svg";
+  url: string;
+  source?: string;
+  variant?: "male" | "female" | "neutral";
+  thumbnailUrl?: string;
+}
+
 export interface NormalizedExercise {
   id: string;
   name: string;
@@ -16,9 +26,18 @@ export interface NormalizedExercise {
   equipment: EquipmentOption[];
   svgIcon?: string;
   imageUrl?: string;
+  gifUrl?: string;
+  gifSource?: string;
+  exerciseDbId?: string;
+  targetMuscle?: string;
+  secondaryMuscles?: string[];
+  instructions?: string[];
+  media?: ExerciseMedia[];
+  primaryMediaId?: string;
 }
 
 export interface Exercise {
+  exerciseId?: string;
   name: string;
   normalizedId?: string;
   reps: string;

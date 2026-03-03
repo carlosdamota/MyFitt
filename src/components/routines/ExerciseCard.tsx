@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { CheckCircle, ChevronDown, Circle, Info } from "lucide-react";
 import type { User } from "firebase/auth";
 import type { Exercise, WorkoutLogEntry, WorkoutLogs, UserStats } from "../../types";
 import ExerciseTracker from "../tracker/ExerciseTracker";
 import ExerciseVisual from "./ExerciseVisual";
 import { useNormalizedExercises } from "../../hooks/useNormalizedExercises";
+import { findExerciseByName } from "../../utils/exerciseMatcher";
 
 interface ExerciseCardProps {
   dayKey: string;
@@ -44,12 +45,21 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   isTimerRunning,
 }) => {
   const { data: normalizedExercises } = useNormalizedExercises();
-  const normalizedData = exercise.normalizedId
-    ? normalizedExercises?.[exercise.normalizedId]
-    : undefined;
+
+  // Priority: exerciseId → normalizedId → fuzzy name match
+  const normalizedData = useMemo(() => {
+    if (!normalizedExercises) return undefined;
+    const lookupId = exercise.exerciseId || exercise.normalizedId;
+    if (lookupId && normalizedExercises[lookupId]) {
+      return normalizedExercises[lookupId];
+    }
+    // Fallback: fuzzy match by exercise name
+    return findExerciseByName(exercise.name, normalizedExercises);
+  }, [normalizedExercises, exercise.exerciseId, exercise.normalizedId, exercise.name]);
 
   const displayName = normalizedData?.name || exercise.name;
   const displaySvg = normalizedData?.svgIcon || exercise.svg;
+  const displayImageUrl = normalizedData?.gifUrl || normalizedData?.imageUrl || undefined;
 
   const cardClasses = `relative overflow-hidden rounded-3xl border transition-all duration-300 ${
     isCompleted
@@ -144,13 +154,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
         {isExpanded && (
           <div className='mt-5 pt-5 border-t border-slate-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-300 transition-colors'>
-            <div className='w-full h-48 bg-slate-50 dark:bg-surface-950/50 rounded-xl border border-slate-200 dark:border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4 transition-colors'>
+            <div className='w-full h-48 bg-slate-100 dark:bg-surface-950 rounded-xl border border-slate-200 dark:border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4 transition-colors'>
               <ExerciseVisual
                 name={displayName}
                 svg={displaySvg}
                 svgIcon={exercise.svg_icon}
+                imageUrl={displayImageUrl}
               />
-              <div className='absolute inset-0 bg-linear-to-t from-white/80 dark:from-surface-900/80 via-transparent to-transparent pointer-events-none transition-colors' />
             </div>
 
             {exercise.note && (

@@ -17,10 +17,18 @@ import { type GeminiPart, type GeminiTool, callGemini, getImagePart } from "./ut
 import { getPostHogClient } from "./utils/posthog.js";
 
 // Cache normalized exercises to avoid querying Firestore on every routine generation
-let cachedNormalizedExercises: Array<{ id: string; name: string; aliases: string[] }> | null = null;
+interface CachedExercise {
+  id: string;
+  name: string;
+  aliases: string[];
+  equipment: string[];
+  muscleGroup: string;
+  targetMuscle?: string;
+}
+let cachedNormalizedExercises: CachedExercise[] | null = null;
 let lastCacheTime = 0;
 
-async function getNormalizedExercises(db: Firestore) {
+async function getNormalizedExercises(db: Firestore): Promise<CachedExercise[]> {
   const now = Date.now();
   // Cache for 1 hour
   if (cachedNormalizedExercises && now - lastCacheTime < 1000 * 60 * 60) {
@@ -29,7 +37,14 @@ async function getNormalizedExercises(db: Firestore) {
   const snap = await db.collection("normalized_exercises").get();
   cachedNormalizedExercises = snap.docs.map((d) => {
     const data = d.data();
-    return { id: d.id, name: data.name, aliases: data.aliases || [] };
+    return {
+      id: d.id,
+      name: data.name,
+      aliases: data.aliases || [],
+      equipment: data.equipment || [],
+      muscleGroup: data.muscleGroup || "",
+      targetMuscle: data.targetMuscle || "",
+    };
   });
   lastCacheTime = now;
   return cachedNormalizedExercises;
@@ -110,6 +125,18 @@ export const createAiGenerateFunction = ({
             });
             return;
           }
+        }
+
+        // For routine_program: inject filtered exercise catalog into prompt
+        if (task === "routine_program") {
+          const catalog = await getNormalizedExercises(db);
+          const userEquipment = ((payload.profile as any)?.equipment ?? []) as string[];
+          // Filter catalog by user equipment overlap
+          const filtered =
+            userEquipment.length > 0
+              ? catalog.filter((ex) => ex.equipment.some((eq) => userEquipment.includes(eq)))
+              : catalog;
+          payload.exerciseCatalog = filtered;
         }
 
         const { system, user } = buildPrompt(task, payload);
@@ -196,48 +223,18 @@ export const createAiGenerateFunction = ({
               }
             }
 
-            // Normalization Step (Mapping to known exercises)
+            // Post-process: copy exerciseId → normalizedId for backward compatibility
             if (programObj) {
-              try {
-                const exerciseNames = new Set<string>();
-                programObj.days.forEach((day) => {
-                  day.blocks.forEach((block) => {
-                    block.exercises.forEach((ex) => exerciseNames.add(ex.name));
+              programObj.days.forEach((day) => {
+                day.blocks.forEach((block) => {
+                  block.exercises.forEach((ex) => {
+                    // If AI provided exerciseId, use it as normalizedId
+                    if ((ex as any).exerciseId && !ex.normalizedId) {
+                      ex.normalizedId = (ex as any).exerciseId;
+                    }
                   });
                 });
-
-                const uniqueNames = Array.from(exerciseNames);
-                if (uniqueNames.length > 0) {
-                  const catalog = await getNormalizedExercises(db);
-                  const { system: mapSystem, user: mapUser } = buildPrompt("exercise_mapping", {
-                    generatedNames: uniqueNames,
-                    catalog,
-                  });
-
-                  // We use flash-lite for extreme speed in mapping
-                  const mappingText = await callGemini({
-                    geminiApiKey,
-                    geminiDefaultModel: geminiFastModel, // Uses the fast model assigned (8B / Flash-Lite)
-                    parts: [{ text: mapUser }],
-                    systemInstruction: mapSystem,
-                  });
-
-                  const mappingDict = parseJsonWithFixes(mappingText);
-
-                  programObj.days.forEach((day) => {
-                    day.blocks.forEach((block) => {
-                      block.exercises.forEach((ex) => {
-                        const mappedId = mappingDict[ex.name];
-                        if (mappedId) {
-                          ex.normalizedId = mappedId;
-                        }
-                      });
-                    });
-                  });
-                }
-              } catch (mappingError) {
-                console.error("AI Mapping failed, continuing with unmapped routine", mappingError);
-              }
+              });
 
               validatedData = { text: JSON.stringify(programObj) };
             }

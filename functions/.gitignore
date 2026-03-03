@@ -5,4 +5,5 @@ node_modules
 *.log
 *_debug.log
 src/scripts/
+scripts/
 serviceAccount.json
