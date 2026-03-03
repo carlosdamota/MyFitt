@@ -141,6 +141,17 @@ export const createEmailAgentFunctions = ({
     return template;
   };
 
+  /** Safely parse a Firestore Timestamp OR an ISO date string into a Date object */
+  const parseDate = (val: unknown): Date | null => {
+    if (!val) return null;
+    if (typeof val === "string") {
+      const d = new Date(val);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof (val as any).toDate === "function") return (val as any).toDate();
+    return null;
+  };
+
   const hashString = (value: string): number => {
     let hash = 0;
     for (let i = 0; i < value.length; i++) {
@@ -484,10 +495,10 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
         const profile = profileSnap.data();
         if (!profile || !profile.email || profile.emailOptOut) continue;
 
-        const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
+        const lastWorkout = parseDate(profile.lastWorkoutDate);
         if (!lastWorkout || lastWorkout >= sevenDaysAgo) continue;
 
-        const lastSentAt = profile.reengagementLastSentAt?.toDate?.() ?? null;
+        const lastSentAt = parseDate(profile.reengagementLastSentAt);
         if (lastSentAt && Date.now() - lastSentAt.getTime() < cooldownMs) {
           skippedCooldown++;
           continue;
@@ -566,10 +577,10 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
         const profile = profileSnap.data();
         if (!profile || profile.pushEnabled === false) continue;
 
-        const lastWorkout = profile.lastWorkoutDate?.toDate?.() ?? null;
+        const lastWorkout = parseDate(profile.lastWorkoutDate);
         if (!lastWorkout || lastWorkout >= threeDaysAgo) continue;
 
-        const lastPushAt = profile.reengagementPushLastSentAt?.toDate?.() ?? null;
+        const lastPushAt = parseDate(profile.reengagementPushLastSentAt);
         if (lastPushAt && Date.now() - lastPushAt.getTime() < pushCooldownMs) {
           skippedCooldown++;
           continue;
@@ -655,20 +666,16 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
         if (!profile || profile.pushEnabled === false || profile.onboardingCompleted !== true)
           continue;
 
-        const hasWorkout = Boolean(profile.lastWorkoutDate?.toDate?.());
+        const hasWorkout = Boolean(parseDate(profile.lastWorkoutDate));
         if (hasWorkout) continue;
 
-        const updatedAtRaw = profile.updatedAt;
-        const updatedAt =
-          typeof updatedAtRaw === "string"
-            ? new Date(updatedAtRaw)
-            : (updatedAtRaw?.toDate?.() ?? null);
-        if (!updatedAt || Number.isNaN(updatedAt.getTime())) continue;
+        const updatedAt = parseDate(profile.updatedAt);
+        if (!updatedAt) continue;
 
         const now = new Date();
         if (now.getTime() - updatedAt.getTime() < onboardingGraceMs) continue;
 
-        const lastNudgeAt = profile.firstWorkoutNudgeLastSentAt?.toDate?.() ?? null;
+        const lastNudgeAt = parseDate(profile.firstWorkoutNudgeLastSentAt);
         if (lastNudgeAt && now.getTime() - lastNudgeAt.getTime() < nudgeCooldownMs) {
           skippedCooldown++;
           continue;
@@ -757,9 +764,9 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
 
         // Verify account age (must be between 24h and 48h old)
         // If not found in profile, try to fetch from auth record
-        let createdAtRaw = profile?.createdAt;
         let authEmail = profile?.email;
         let authName = profile?.displayName;
+        let createdAtRaw = profile?.createdAt;
 
         if (!createdAtRaw || !authEmail) {
           try {
@@ -773,12 +780,8 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
           }
         }
 
-        const createdAt =
-          typeof createdAtRaw === "string"
-            ? new Date(createdAtRaw)
-            : (createdAtRaw?.toDate?.() ?? null);
-
-        if (!createdAt || Number.isNaN(createdAt.getTime())) continue;
+        const createdAt = parseDate(createdAtRaw);
+        if (!createdAt) continue;
 
         // Skip if they are too new (less than 24h) or too old (more than 48h)
         if (createdAt > oneDayAgo || createdAt < twoDaysAgo) continue;
