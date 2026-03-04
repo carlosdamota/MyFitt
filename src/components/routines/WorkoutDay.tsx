@@ -90,6 +90,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [selectedRating, setSelectedRating] = useState<number | undefined>(undefined);
   const [showSocialShare, setShowSocialShare] = useState(false);
+  const [finalTime, setFinalTime] = useState<number>(0);
   const flushTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rest Timer Logic
@@ -130,14 +131,12 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
 
   // Validation: Can only stop if at least one exercise is done
   const handleStopTimer = () => {
-    // We need to calculate completedCount first, or access it from the render scope.
-    // Since completedCount is derived below, let's use a ref or just move the derivation up?
-    // Better to move the derivation up.
     if (completedCount === 0) {
       error("¡Completa al menos un ejercicio antes de terminar!");
       return;
     }
     stop();
+    setFinalTime(time);
     setShowConfirmFinish(true);
   };
 
@@ -460,9 +459,12 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
       <SocialShareModal
         isOpen={showSocialShare}
         onClose={() => setShowSocialShare(false)}
-        date={new Date().toISOString()} // Or just use current date
-        duration={formatTime(time)}
+        date={new Date().toISOString()}
+        duration={formatTime(finalTime)}
+        durationSeconds={finalTime}
         logs={sessionSummary}
+        routineTitle={routine?.title}
+        rating={selectedRating}
       />
 
       {/* Rest Timer Overlay */}

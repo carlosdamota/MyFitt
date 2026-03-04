@@ -21,6 +21,11 @@ export interface UserProfile {
   coachPersonality?: AiPersonality;
   nutritionPersonality?: AiPersonality;
   updatedAt?: string;
+  strava?: {
+    linked: boolean;
+    athleteId?: number;
+    athleteName?: string;
+  };
 }
 
 export interface UseProfileReturn {

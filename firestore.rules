@@ -48,7 +48,8 @@ service cloud.firestore {
               "pushEnabled",
               "lastWorkoutDate",
               "coachPersonality",
-              "nutritionPersonality"
+              "nutritionPersonality",
+              "strava"
             ])
           : false;
     }

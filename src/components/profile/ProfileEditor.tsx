@@ -1,10 +1,11 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { Dumbbell, Loader, Check, Trash2, Sparkles } from "lucide-react";
+import { Dumbbell, Loader, Check, Trash2, Sparkles, Link, Unlink } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "../ui/Button";
 import { useProfile } from "../../hooks/useProfile";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import { useToast } from "../../hooks/useToast";
+import { useStrava } from "../../hooks/useStrava";
 import RoutineManager from "../routines/RoutineManager";
 import ProfileForm from "./ProfileForm";
 import SubscriptionPanel from "./SubscriptionPanel";
@@ -33,7 +34,15 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showChangelog, setShowChangelog] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { info, error } = useToast();
+  const { info, error, success: toast$ } = useToast();
+  const {
+    isLinked: stravaLinked,
+    athleteName: stravaAthlete,
+    isConnecting: stravaConnecting,
+    isDisconnecting: stravaDisconnecting,
+    connect: stravaConnect,
+    disconnect: stravaDisconnect,
+  } = useStrava({ user, profile });
 
   // Sync profile to formData only on initial load or reset
   useEffect(() => {
@@ -153,9 +162,88 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           <NotificationSettings user={user} />
 
           {/* Apariencia — compact */}
-          <div className='bg-white dark:bg-surface-900/40 border border-slate-200 dark:border-surface-800/60 rounded-xl px-4 py-3 flex items-center justify-between shadow-none transition-colors'>
+          <div className='bg-white dark:bg-surface-900/40 border border-slate-200 dark:border-surface-800/60 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 shadow-none transition-colors'>
             <p className='text-sm font-semibold text-slate-700 dark:text-slate-300'>Apariencia</p>
             <ThemeToggle />
+          </div>
+        </div>
+
+        {/* ── Integraciones ─────────────────────────── */}
+        <div className='space-y-3'>
+          <p className='text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest px-1'>
+            Integraciones
+          </p>
+
+          <div className='bg-white dark:bg-surface-900/40 border border-slate-200 dark:border-surface-800/60 rounded-xl px-4 py-3 shadow-none transition-colors'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='flex items-center justify-center w-8 h-8 rounded-lg bg-[#FC4C02]/10'>
+                  <svg
+                    viewBox='0 0 24 24'
+                    className='w-4 h-4 text-[#FC4C02]'
+                    fill='currentColor'
+                  >
+                    <path d='M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169' />
+                  </svg>
+                </div>
+                <div>
+                  <p className='text-sm font-semibold text-slate-700 dark:text-slate-300'>Strava</p>
+                  {stravaLinked && stravaAthlete && (
+                    <p className='text-[11px] text-slate-500 dark:text-slate-400'>
+                      {stravaAthlete}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {stravaLinked ? (
+                <button
+                  onClick={async () => {
+                    await stravaDisconnect();
+                    toast$("Strava desconectado");
+                  }}
+                  disabled={stravaDisconnecting}
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-all disabled:opacity-50'
+                >
+                  {stravaDisconnecting ? (
+                    <Loader
+                      size={12}
+                      className='animate-spin'
+                    />
+                  ) : (
+                    <Unlink size={12} />
+                  )}
+                  Desconectar
+                </button>
+              ) : (
+                <button
+                  onClick={stravaConnect}
+                  disabled={stravaConnecting}
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-[#FC4C02] hover:bg-[#e04402] px-3 py-1.5 text-xs font-bold text-white transition-all disabled:opacity-50 shadow-sm'
+                >
+                  {stravaConnecting ? (
+                    <Loader
+                      size={12}
+                      className='animate-spin'
+                    />
+                  ) : (
+                    <svg
+                      viewBox='0 0 24 24'
+                      className='w-3 h-3'
+                      fill='currentColor'
+                    >
+                      <path d='M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169' />
+                    </svg>
+                  )}
+                  Connect with Strava
+                </button>
+              )}
+            </div>
+            {stravaLinked && (
+              <p className='text-[10px] text-slate-400 dark:text-slate-500 mt-2 text-right'>
+                Powered by Strava
+              </p>
+            )}
           </div>
         </div>
 

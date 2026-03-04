@@ -146,6 +146,7 @@ export const createAiGenerateFunction = ({
         const isNutritionTask = task === "nutrition_parse";
         const isRoutineTask = task === "routine_program";
         const isVolumeTrendTask = task === "volume_trend";
+        const isStravaSummaryTask = task === "strava_summary";
 
         let modelForTask: string | undefined = undefined;
 
@@ -153,7 +154,7 @@ export const createAiGenerateFunction = ({
           modelForTask = plan === "pro" ? geminiNutritionModelPro : geminiNutritionModelFree;
         } else if (isRoutineTask) {
           modelForTask = plan === "pro" ? geminiProModel : geminiDefaultModel;
-        } else if (isVolumeTrendTask) {
+        } else if (isVolumeTrendTask || isStravaSummaryTask) {
           modelForTask = geminiFastModel;
         }
 

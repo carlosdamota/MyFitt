@@ -64,6 +64,11 @@ const Terms = () => {
               <li>No debes usar el servicio para ninguna actividad ilegal o no autorizada.</li>
               <li>No debes intentar interferir con el funcionamiento adecuado del servicio.</li>
               <li>Eres responsable de mantener la seguridad de tu cuenta y contraseña.</li>
+              <li>
+                Al utilizar integraciones de terceros (como Strava), aceptas también los términos de
+                servicio y políticas de privacidad de dichos terceros. FITTWIZ no se responsabiliza
+                de los servicios, contenidos o prácticas de privacidad de terceros.
+              </li>
             </ul>
           </section>
 
@@ -83,13 +88,71 @@ const Terms = () => {
             </h2>
             <p>
               Al crear una cuenta con nosotros, garantizas que la información que proporcionas es
-              que violen estos términos.
+              precisa, completa y actual. Eres responsable de todas las actividades que ocurran bajo
+              tu cuenta y te comprometes a no permitir el acceso de terceros no autorizados. Nos
+              reservamos el derecho de suspender o eliminar cuentas que violen estos términos.
             </p>
           </section>
 
           <section>
             <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
-              5. Condiciones de Suscripción
+              5. Contenido Generado por Inteligencia Artificial
+            </h2>
+            <p>
+              FITTWIZ utiliza inteligencia artificial para generar rutinas de entrenamiento
+              personalizadas y descripciones de sesiones. Ten en cuenta lo siguiente:
+            </p>
+            <ul className='list-disc pl-5 space-y-2 mt-2'>
+              <li>
+                Las rutinas y textos generados por IA son <strong>orientativos</strong> y no
+                constituyen asesoramiento médico ni deportivo profesional.
+              </li>
+              <li>
+                FITTWIZ no garantiza la exactitud, idoneidad ni seguridad del contenido generado por
+                IA para tu situación personal.
+              </li>
+              <li>
+                Tus datos de entrenamiento{" "}
+                <strong>
+                  no se utilizan para entrenar ni mejorar modelos de inteligencia artificial
+                </strong>{" "}
+                de terceros. Solo se envían estadísticas anonimizadas para generar el contenido
+                solicitado.
+              </li>
+              <li>
+                Eres responsable de evaluar si el contenido generado es adecuado para tu nivel de
+                condición física y estado de salud.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              6. Compartir en Redes Sociales
+            </h2>
+            <p>
+              FITTWIZ ofrece la posibilidad de compartir resúmenes de tus entrenamientos en redes
+              sociales y en plataformas deportivas como Strava:
+            </p>
+            <ul className='list-disc pl-5 space-y-2 mt-2'>
+              <li>
+                Las imágenes de resumen se generan <strong>localmente en tu dispositivo</strong>.
+                FITTWIZ no publica contenido en tu nombre sin tu acción explícita.
+              </li>
+              <li>
+                La sincronización con Strava requiere tu autorización expresa y se realiza solo
+                cuando tú decides compartir una sesión específica.
+              </li>
+              <li>
+                Eres el único responsable del contenido que publiques en plataformas de terceros a
+                través de la funcionalidad de compartir de FITTWIZ.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
+              7. Condiciones de Suscripción
             </h2>
             <p>FITTWIZ ofrece un plan gratuito y un plan Pro de pago.</p>
             <ul className='list-disc pl-5 space-y-2 mt-2'>
@@ -116,7 +179,7 @@ const Terms = () => {
 
           <section>
             <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
-              6. Limitación de Responsabilidad
+              8. Limitación de Responsabilidad
             </h2>
             <p>
               En ningún caso el desarrollador de FITTWIZ será responsable por daños indirectos,
@@ -128,7 +191,7 @@ const Terms = () => {
 
           <section>
             <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
-              7. Ley Aplicable y Jurisdicción
+              9. Ley Aplicable y Jurisdicción
             </h2>
             <p>
               Estos Términos se regirán e interpretarán de acuerdo con las leyes de{" "}
@@ -142,7 +205,7 @@ const Terms = () => {
 
           <section>
             <h2 className='text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors'>
-              8. Cambios
+              10. Cambios
             </h2>
             <p>
               El desarrollador se reserva el derecho de modificar estos Términos. Notificaremos los
@@ -151,7 +214,7 @@ const Terms = () => {
           </section>
 
           <div className='pt-8 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-500 transition-colors'>
-            Última actualización: Febrero 2026
+            Última actualización: Marzo 2026
           </div>
         </div>
       </div>
