@@ -110,6 +110,7 @@ export interface WorkoutSession {
   date: string; // ISO date
   duration?: string; // e.g. "45:32"
   routineTitle?: string;
+  rating?: number; // 1-5 satisfaction rating
   logs: WorkoutLogs; // { exerciseName: [entries] }
 }
 

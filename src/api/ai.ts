@@ -7,7 +7,8 @@ export type AiTask =
   | "volume_trend"
   | "weekly_coach"
   | "nutrition_parse"
-  | "routine_program";
+  | "routine_program"
+  | "strava_summary";
 
 export interface AiResponse {
   text: string;

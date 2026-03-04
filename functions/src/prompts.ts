@@ -207,6 +207,21 @@ Devuelve SOLO texto plano (formatea tu respuesta dividiéndola visualmente en un
       };
     }
 
+    case "strava_summary": {
+      const statsObj = (payload.stats as any) || {};
+      const stats = JSON.stringify(statsObj);
+      const system = `Eres un creador de contenido fitness divertido y motivador.
+Tu tarea es escribir una breve descripción (1 o 2 párrafos cortos como máximo) para una actividad de Strava de un entrenamiento de fuerza.
+1. Hazlo entretenido, usa emojis, y destaca el esfuerzo basándote en los datos proporcionados (volumen total, repeticiones, cantidad de ejercicios).
+2. Si los datos incluyen un nivel de satisfacción o rating ('rating' del 1 al 5), inclúyelo mencionando qué tan bien se sintió el entrenamiento.
+3. Usa un ESPAÑOL NEUTRO. No uses hashtags.
+4. Devuelve SOLO el texto de la descripción, sin formato markdown extra ni JSON.`;
+      return {
+        system,
+        user: `Genera una descripción de Strava para este entrenamiento: ${stats}`,
+      };
+    }
+
     default:
       throw new Error("unknown_task");
   }

@@ -9,6 +9,7 @@ const Landing = lazyImport(() => import("./pages/Landing"));
 const Privacy = lazyImport(() => import("./pages/Privacy"));
 const Terms = lazyImport(() => import("./pages/Terms"));
 const Legal = lazyImport(() => import("./pages/Legal"));
+const StravaCallback = lazyImport(() => import("./pages/StravaCallback"));
 
 // App pages (lazy-loaded for code splitting)
 import { lazyImport } from "./utils/lazyImport";
@@ -66,6 +67,14 @@ export const router = createBrowserRouter([
     element: (
       <SuspenseWrapper>
         <Legal />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/integrations/strava/callback",
+    element: (
+      <SuspenseWrapper>
+        <StravaCallback />
       </SuspenseWrapper>
     ),
   },

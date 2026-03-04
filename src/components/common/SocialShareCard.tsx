@@ -34,8 +34,19 @@ const DEFAULT_THEME: ShareCardTheme = {
   accentColor: "#3b82f6",
 };
 
+/** Extrae el subtítulo de la rutina: quita prefijos de programa y "Día X" */
+const getDisplayTitle = (title?: string): string | undefined => {
+  if (!title) return undefined;
+  // Quitar prefijo de programa seguido de ":" o " - "
+  let t = title.replace(/^[^:\-]+[:\-]\s*/i, "").trim();
+  // Quitar "Día X:" o "Day X:"
+  t = t.replace(/^(D[íi]a|Day)\s*\d+[:\s-]*/i, "").trim();
+  return t || title;
+};
+
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(
   ({ date, logs, routineTitle, theme = DEFAULT_THEME, format = "feed", stickers = [] }, ref) => {
+    const displayTitle = getDisplayTitle(routineTitle);
     const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
     const totalExercises = logs.length;
     const totalReps = logs.reduce((s, l) => s + (l.sets ?? 0) * (l.reps ?? 0), 0);
@@ -182,13 +193,17 @@ export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardP
                 style={{
                   color: theme.primaryTextColor,
                   lineHeight: 1.1,
-                  fontSize: "52px",
+                  fontSize: displayTitle && displayTitle.length > 28 ? "38px" : "52px",
                   fontWeight: "900",
                   textTransform: "capitalize",
                   margin: 0,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "820px",
                 }}
               >
-                {routineTitle || formatDate(date)}
+                {displayTitle || formatDate(date)}
               </h1>
             </div>
             <div

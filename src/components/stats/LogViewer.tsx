@@ -54,6 +54,8 @@ const LogViewer: React.FC<LogViewerProps> = ({
     date: string;
     logs: FlatLogEntry[];
     title?: string;
+    rating?: number;
+    duration?: string;
   } | null>(null);
 
   const flattenSessionLogs = (sessionLogs: Record<string, WorkoutLogEntry[]>): FlatLogEntry[] => {
@@ -163,6 +165,8 @@ const LogViewer: React.FC<LogViewerProps> = ({
                         date: session.date,
                         logs: flatLogs,
                         title: session.routineTitle,
+                        rating: session.rating,
+                        duration: session.duration,
                       })
                     }
                     className='text-slate-400 hover:text-primary-400 transition-colors p-2 rounded-xl hover:bg-primary-500/10'
@@ -241,7 +245,9 @@ const LogViewer: React.FC<LogViewerProps> = ({
           onClose={() => setShareData(null)}
           date={shareData.date}
           logs={shareData.logs}
+          duration={shareData.duration}
           routineTitle={shareData.title}
+          rating={shareData.rating}
         />
       )}
     </div>

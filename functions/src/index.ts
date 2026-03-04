@@ -10,6 +10,11 @@ import { createEmailAgentFunctions } from "./email-agent.js";
 import { createPushAgentFunctions } from "./push-agent.js";
 import { createAccountDeletionFunctions } from "./account-deletion.js";
 import { createUpdateUserStatsFunction } from "./user-stats.js";
+import {
+  createStravaExchangeTokenFunction,
+  createStravaSyncWorkoutFunction,
+  createStravaDisconnectFunction,
+} from "./strava-functions.js";
 
 initializeApp();
 
@@ -27,6 +32,8 @@ const GEMINI_MODEL_NUTRITION_PRO =
   process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
 const FREE_MAX_DAYS = Number(process.env.FREE_MAX_DAYS ?? "2");
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? "";
+const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID ?? "";
+const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET ?? "";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
@@ -139,3 +146,18 @@ export const createShareImage = createShareImageFunction({
 export const updateUserStats = createUpdateUserStatsFunction({
   appId: APP_ID,
 });
+
+// --- Strava Integration ---
+
+const stravaDeps = {
+  db,
+  auth,
+  appId: APP_ID,
+  webOrigin: WEB_ORIGIN,
+  stravaClientId: STRAVA_CLIENT_ID,
+  stravaClientSecret: STRAVA_CLIENT_SECRET,
+};
+
+export const stravaExchangeToken = createStravaExchangeTokenFunction(stravaDeps);
+export const stravaSyncWorkout = createStravaSyncWorkoutFunction(stravaDeps);
+export const stravaDisconnect = createStravaDisconnectFunction(stravaDeps);

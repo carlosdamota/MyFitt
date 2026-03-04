@@ -10,6 +10,14 @@ import { iconLogo } from "../../../branding/logoConfig";
 import { type StickerData, type SocialShareData } from "../../../utils/social-share/types";
 import Konva from "konva";
 
+/** Extrae el subtítulo de la rutina: quita prefijos de programa y "Día X" */
+const getDisplayTitle = (title?: string): string | undefined => {
+  if (!title) return undefined;
+  let t = title.replace(/^[^:\-]+[:\-]\s*/i, "").trim();
+  t = t.replace(/^(D[íi]a|Day)\s*\d+[:\s-]*/i, "").trim();
+  return t || title;
+};
+
 interface InteractiveSocialCardProps {
   data: SocialShareData;
   format: WorkoutImageFormat;
@@ -29,6 +37,7 @@ export const InteractiveSocialCard: React.FC<InteractiveSocialCardProps> = ({
 }) => {
   const { width, height } = FORMAT_DIMENSIONS[format];
   const { theme, logs } = data;
+  const displayTitle = getDisplayTitle(data.routineTitle);
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const transformerRef = useRef<Konva.Transformer>(null);
@@ -186,11 +195,14 @@ export const InteractiveSocialCard: React.FC<InteractiveSocialCardProps> = ({
           <Text
             x={paddingX}
             y={paddingY + 30}
-            text={data.routineTitle || data.date}
-            fontSize={52}
+            text={displayTitle || data.date}
+            fontSize={displayTitle && displayTitle.length > 24 ? 38 : 52}
             fontFamily='Sora'
             fontWeight='900'
             fill={theme.primaryTextColor}
+            width={width - paddingX * 2 - 110}
+            ellipsis={true}
+            wrap='none'
           />
 
           {/* Trending Box */}

@@ -97,7 +97,7 @@ const Legal = () => {
           </section>
 
           <div className='pt-8 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-500 transition-colors'>
-            Última actualización: Febrero 2026
+            Última actualización: Marzo 2026
           </div>
         </div>
       </div>

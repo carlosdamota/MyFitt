@@ -6,6 +6,10 @@ import type { WorkoutLogEntry } from "../../types";
 import type { WorkoutImageFormat, WorkoutImageAsset } from "../../utils/generateWorkoutImage";
 import { useShareWorkout } from "../../hooks/useShareWorkout";
 import { useToast } from "../../hooks/useToast";
+import { useAuth } from "../../hooks/useAuth";
+import { useProfile } from "../../hooks/useProfile";
+import { useStrava } from "../../hooks/useStrava";
+import { callAI } from "../../api/ai";
 
 // Refactor: Modular imports
 import { THEMES } from "./social-share/constants";
@@ -22,7 +26,9 @@ interface SocialShareModalProps {
   date: string;
   logs: (WorkoutLogEntry & { exercise: string; volume: number })[];
   duration?: string;
+  durationSeconds?: number;
   routineTitle?: string;
+  rating?: number;
 }
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
@@ -31,7 +37,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   date,
   logs,
   duration = "N/A",
+  durationSeconds,
   routineTitle,
+  rating,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -94,6 +102,15 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   const [asset, setAsset] = useState<WorkoutImageAsset | null>(null);
   const [copied, setCopied] = useState(false);
   const { success: toast$, error: toastErr } = useToast();
+
+  const { user } = useAuth();
+  const { profile } = useProfile(user);
+  const {
+    isLinked: stravaLinked,
+    isSyncing: stravaSyncing,
+    syncWorkout,
+  } = useStrava({ user, profile });
+  const [stravaSynced, setStravaSynced] = useState(false);
 
   const theme = THEMES[themeKey];
   const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
@@ -191,6 +208,73 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       toast$("Copiada al portapapeles");
       setTimeout(() => setCopied(false), 2000);
     } else toastErr("No se pudo copiar. Descarga la imagen.");
+  };
+
+  const handleStravaSync = async () => {
+    try {
+      let seconds = durationSeconds ?? 3600; // Por defecto 1 hora
+
+      // Fallback a parsear el string si durationSeconds no existe
+      if (durationSeconds === undefined && duration && duration !== "N/A") {
+        const matchDigits = duration.match(/\d+/g);
+        if (matchDigits) {
+          if (matchDigits.length === 1) {
+            // Asume que son minutos (ej: "45 min")
+            seconds = parseInt(matchDigits[0]) * 60;
+          } else if (matchDigits.length === 2) {
+            // Formato mm:ss
+            seconds = parseInt(matchDigits[0]) * 60 + parseInt(matchDigits[1]);
+          } else if (matchDigits.length >= 3) {
+            // Formato hh:mm:ss
+            seconds =
+              parseInt(matchDigits[0]) * 3600 +
+              parseInt(matchDigits[1]) * 60 +
+              parseInt(matchDigits[2]);
+          }
+        }
+      }
+
+      let descriptionToUse = shareText;
+      let finalTitle = routineTitle || `Entrenamiento en FittWiz`;
+
+      // Build a human-readable duration string for the AI
+      const durationMinutes = Math.floor(seconds / 60);
+      const durationSecs = seconds % 60;
+      const humanDuration =
+        durationMinutes >= 60
+          ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}min`
+          : durationMinutes > 0
+            ? `${durationMinutes} min ${durationSecs > 0 ? `${durationSecs}s` : ""}`
+            : `${durationSecs} segundos`;
+
+      try {
+        const aiSummary = await callAI("strava_summary", {
+          stats: {
+            title: finalTitle,
+            totalExercises,
+            totalVolume,
+            totalReps,
+            duration: humanDuration,
+            rating,
+          },
+        });
+        if (aiSummary && aiSummary.text) {
+          descriptionToUse = aiSummary.text;
+        }
+      } catch (err) {
+        console.warn("AI Strava summary failed, using fallback.", err);
+      }
+
+      await syncWorkout({
+        name: finalTitle,
+        elapsed_time: seconds,
+        description: descriptionToUse,
+      });
+      setStravaSynced(true);
+      toast$("¡Entrenamiento sincronizado con Strava!");
+    } catch (err) {
+      toastErr(err instanceof Error ? err.message : "Error al sincronizar con Strava");
+    }
   };
 
   if (!isOpen) return null;
@@ -319,6 +403,10 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             canShareFiles={capabilities.canShareFiles}
             canWriteClipboard={capabilities.canWriteClipboard}
             copied={copied}
+            stravaLinked={stravaLinked}
+            stravaSyncing={stravaSyncing}
+            stravaSynced={stravaSynced}
+            onStravaSync={handleStravaSync}
           />
           <p className='text-center text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-3'>
             {capabilities.canShareFiles
