@@ -170,10 +170,16 @@ export const getWeeklyStats = (
   userWeightStr: string | number,
 ): WeeklyStats => {
   const now = new Date();
-  const oneWeekAgo = new Date(now);
-  oneWeekAgo.setDate(now.getDate() - 7);
-  const twoWeeksAgo = new Date(now);
-  twoWeeksAgo.setDate(now.getDate() - 14);
+
+  // Calculate Monday of the current week
+  const dayOfWeek = now.getDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const startOfCurrentWeek = new Date(now);
+  startOfCurrentWeek.setHours(0, 0, 0, 0);
+  startOfCurrentWeek.setDate(now.getDate() + diffToMonday);
+
+  const startOfPreviousWeek = new Date(startOfCurrentWeek);
+  startOfPreviousWeek.setDate(startOfCurrentWeek.getDate() - 7);
 
   const userWeight = parseFloat(String(userWeightStr)) || 70;
 
@@ -211,7 +217,7 @@ export const getWeeklyStats = (
       // Para calistenia sin lastre (0kg), el volumen es 0.
       const volume = weight * reps * sets;
 
-      if (logDate >= oneWeekAgo) {
+      if (logDate >= startOfCurrentWeek) {
         // Esta semana
         currentWeekDays.add(logDate.toDateString());
         totalVolume += volume;
@@ -226,7 +232,7 @@ export const getWeeklyStats = (
         if (exerciseToMuscle[exName]) {
           musclesWorked.add(exerciseToMuscle[exName]);
         }
-      } else if (logDate >= twoWeeksAgo && logDate < oneWeekAgo) {
+      } else if (logDate >= startOfPreviousWeek && logDate < startOfCurrentWeek) {
         // Semana anterior
         previousWeekVolume += volume;
 

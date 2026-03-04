@@ -154,6 +154,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       const programId = `prog_${Date.now()}`;
 
       // Save each day
+      let firstRoutineId: string | null = null;
       for (let i = 0; i < program.days.length; i++) {
         const dayRoutine = program.days[i];
         setGenerationProgress(`Guardando día ${i + 1}: ${dayRoutine.title}...`);
@@ -165,7 +166,7 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           `Rutina ${i + 1}`;
         const cleanTitle = `${program.programName || "Programa"}: ${titleParts}`;
 
-        await createRoutine(cleanTitle, {
+        const newId = await createRoutine(cleanTitle, {
           ...dayRoutine,
           title: cleanTitle,
           programId: programId,
@@ -173,6 +174,12 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           dayNumber: i + 1,
           totalDays: program.days.length,
         });
+        if (i === 0 && newId) firstRoutineId = newId;
+      }
+
+      // Activate the first routine of the new program so the dashboard shows it
+      if (firstRoutineId) {
+        await saveProfile({ activeRoutineId: firstRoutineId });
       }
 
       setGenSuccess(true);

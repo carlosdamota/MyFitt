@@ -6,15 +6,15 @@ import { useWorkoutLogs } from "../hooks/useWorkoutLogs";
 import { useWorkoutSession } from "../hooks/useWorkoutSession";
 import { useProfile } from "../hooks/useProfile";
 import { useRoutines } from "../hooks/useRoutines";
+import { useToast } from "../hooks/useToast";
 
 import RoutineTabs from "../components/routines/RoutineTabs";
 import WorkoutDay from "../components/routines/WorkoutDay";
 import RoutineEditor from "../components/routines/RoutineEditor";
 
 import type { DashboardContext } from "../layouts/DashboardLayout";
-import type { WorkoutLogs as WorkoutLogsType } from "../types";
+import type { WorkoutLogs as WorkoutLogsType, RoutineData } from "../types";
 import WeeklyProgress from "../components/dashboard/WeeklyProgress";
-import { useToast } from "../hooks/useToast";
 
 export default function WorkoutDashboard() {
   const { user, isPro, onRequireAuth } = useOutletContext<DashboardContext>();
@@ -69,23 +69,38 @@ export default function WorkoutDashboard() {
     }
   }, [user, routinesLoading, searchParams]);
 
-  // Sync active tab with profile's active routine
+  // Sync active tab: URL param takes priority, then profile's active routine
   useEffect(() => {
+    const routineParam = searchParams.get("routine");
+    if (routineParam && routines[routineParam]) {
+      setActiveTab(routineParam);
+      return;
+    }
     if (profile?.activeRoutineId && routines[profile.activeRoutineId]) {
       setActiveTab(profile.activeRoutineId);
     }
-  }, [profile?.activeRoutineId, routines]);
+  }, [profile?.activeRoutineId, routines, searchParams]);
 
+  // Determinar la rutina actual basada en la pestaña activa
+  const currentRoutine = routines[activeTab] || Object.values(routines)[0];
+
+  // Filtrar las rutinas que pertenecen al mismo programa que la rutina actual
   const programRoutines = useMemo(() => {
-    const activeData = routines[activeTab];
-    if (!activeData) return routines;
-    if (activeData.programId) {
-      return Object.fromEntries(
-        Object.entries(routines).filter(([, r]) => r.programId === activeData.programId),
-      );
+    if (!currentRoutine || !routines) return {};
+
+    // Si la rutina actual tiene un programId, filtramos por él.
+    // Si no tiene (rutinas libres de RoutinesPage), devolvemos solo esa.
+    if (currentRoutine.programId) {
+      return Object.entries(routines).reduce((acc, [id, r]) => {
+        if (r.programId === currentRoutine.programId) {
+          acc[id] = r;
+        }
+        return acc;
+      }, {} as RoutineData);
     }
-    return Object.fromEntries(Object.entries(routines).filter(([, r]) => !r.programId));
-  }, [routines, activeTab]);
+
+    return { [activeTab]: currentRoutine };
+  }, [currentRoutine, routines, activeTab]);
 
   // Wrap addLog/removeLog to match the existing onSaveLog/onDeleteLog signatures
   const handleSaveLog = useCallback(
@@ -112,8 +127,6 @@ export default function WorkoutDashboard() {
       </div>
     );
   }
-
-  const currentRoutine = routines[activeTab] || Object.values(routines)[0];
 
   return (
     <>

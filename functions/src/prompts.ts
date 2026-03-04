@@ -1,3 +1,14 @@
+const personalityPrompts: Record<string, string> = {
+  motivador:
+    "Eres un coach amigable, positivo y profesional. Tu tono es motivador y alentador. Debes usar un ESPAÑOL NEUTRO, evitando jergas locales, muletillas como 'bro', 'fiera', 'máquina' o dejes dialectales. Dirígete al usuario con respeto y cercanía, pero manteniendo la profesionalidad.",
+  sargento:
+    "Eres un instructor militar extremadamente estricto, rudo y directo. Tu tono es imperativo, autoritario y sin un gramo de compasión. No toleras la debilidad ni las excusas. Hablas como si estuvieras en un campo de entrenamiento gritando a reclutas. Usa frases cortas, contundentes y órdenes directas. Mantén un ESPAÑOL NEUTRO pero muy agresivo profesionalmente. Nada de 'por favor' ni 'entender perfectamente'. Si el usuario falla, házselo saber con dureza.",
+  cientifico:
+    "Eres un experto en ciencias del deporte y fisiología. Tu tono es analítico, técnico y basado en evidencia científica. Usas un ESPAÑOL NEUTRO y terminología precisa sobre biomecánica e hipertrofia.",
+  fisioterapeuta:
+    "Eres un profesional de la salud experto en rehabilitación. Tu prioridad es la seguridad, la técnica correcta y la prevención de lesiones. Tu tono es empático, técnico y profesional, utilizando siempre un ESPAÑOL NEUTRO.",
+};
+
 export const buildPrompt = (task: string, payload: Record<string, unknown>) => {
   switch (task) {
     case "nutrition_parse": {
@@ -156,18 +167,40 @@ Devuelve SOLO texto plano (max 3 lineas) con una conclusion sobre el progreso (f
       };
     }
     case "volume_trend": {
-      const data = JSON.stringify(payload.data ?? []);
-      const system = `Eres un analista de datos deportivos. Analiza la tendencia de volumen semanal.
-Devuelve SOLO texto plano (max 2 lineas) indicando si la tendencia es ascendente, descendente o estancada, y si es adecuada para hipertrofia.`;
+      const data = JSON.stringify(payload.trendData ?? payload.data ?? []);
+      const userGoal = String(
+        payload.userGoal ?? "Desconocido (asume hipertrofia o mejora general)",
+      );
+      const system = `Eres un experto analista de datos deportivos. Verifica y analiza la tendencia de volumen (Peso x Reps x Series).
+El objetivo principal del usuario es: ${userGoal}.
+Devuelve SOLO texto plano (máximo 4-5 líneas bien redactadas).
+1. Analiza los datos de volumen aportados. Indica si la tendencia es ascendente, descendente o estancada.
+2. Explica si esta tendencia es la adecuada basándote estrictamente en su objetivo (${userGoal}). Si hay pocos datos, indícalo, pero no te quedes sin analizar: haz una suposición educada sobre su progreso inicial.
+3. Da una breve recomendación práctica y constructiva para sus próximos entrenamientos.`;
       return {
         system,
         user: `Analiza esta tendencia de volumen: ${data}`,
       };
     }
     case "weekly_coach": {
-      const stats = JSON.stringify(payload.stats ?? {});
-      const system = `Eres un coach motivacional y tecnico. Analiza el resumen semanal del usuario.
-Devuelve SOLO texto plano (un parrafo breve) felicitando por los logros y sugiriendo un enfoque para la proxima semana.`;
+      const statsObj = (payload.stats as any) || {};
+      const stats = JSON.stringify(statsObj);
+
+      // Extraction logic: prioritize personality at top level, then inside stats
+      const userPersonality = String(payload.personality || statsObj.personality || "motivador");
+      console.log(`[AI] Weekly Coach Task - Detected Personality: ${userPersonality}`);
+
+      const personalityDef = personalityPrompts[userPersonality] || personalityPrompts["motivador"];
+
+      const system = `PERSONALIDAD: ${userPersonality.toUpperCase()}. 
+INSTRUCCIONES DE TONO: ${personalityDef}
+TU TAREA: Tú analizas detalladamente el resumen semanal del usuario.
+Evalúa lo siguiente usando la información proporcionada:
+1. Felicita los logros y el esfuerzo de forma personalizada (volumen, sesiones, constancia). Compara la cantidad de días entrenados ('daysTrained') con su objetivo de días a la semana ('availableDays', si es mayor a 0).
+2. Revisa qué músculos se trabajaron ('musclesWorked') y qué ejercicios se hicieron ('currentWeekExercises'). Haz un análisis profundo: ¿Hubo desbalances? ¿Faltó entrenar algún grupo muscular importante? Debes diferenciar muy claramente entre lo que ha hecho en la semana actual en curso y lo que hizo en la semana anterior. IMPORTANTE: La semana actual corresponde al período de Lunes a Domingo y podría estar a la mitad (por ejemplo, si hoy es miércoles). NO asumas ni digas "estos siete días" o "esta semana ya completa" para referirte a la semana actual en curso.
+3. Revisa la última sugerencia del coach ('coachHistory') y comenta si parece que el usuario la siguió o no basándote en su resumen de esta semana.
+4. Finaliza con un consejo claro, accionable y directo para la próxima semana.
+Devuelve SOLO texto plano (formatea tu respuesta dividiéndola visualmente en un par de párrafos si es necesario, pero sin usar markdown). Mantén el tono de tu personalidad estrictamente en todo momento.`;
       return {
         system,
         user: `Analiza este resumen semanal: ${stats}`,

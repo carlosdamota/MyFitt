@@ -10,8 +10,10 @@ interface WeeklyCoachProps {
   routines: RoutineData;
   userWeight: string | number;
   coachHistory: string;
+  coachPersonality?: string;
   onSaveAdvice: (advice: string) => void;
   onRequireAuth?: () => void;
+  availableDays?: number;
 }
 
 const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
@@ -19,8 +21,10 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
   routines,
   userWeight,
   coachHistory,
+  coachPersonality,
   onSaveAdvice,
   onRequireAuth,
+  availableDays,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [report, setReport] = useState<string | null>(null);
@@ -30,19 +34,22 @@ const WeeklyCoach: React.FC<WeeklyCoachProps> = ({
     setLoading(true);
     setQuotaMessage(null);
     const stats = getWeeklyStats(logs, routines, userWeight);
+    const payload = {
+      stats: {
+        daysTrained: stats.daysTrained,
+        trainingDates: stats.trainingDates,
+        totalVolume: stats.totalVolume,
+        previousWeekVolume: stats.previousWeekVolume,
+        musclesWorked: stats.musclesWorked,
+        currentWeekExercises: stats.currentWeekExercises,
+        coachHistory: coachHistory || "Ninguno",
+        personality: coachPersonality || "motivador",
+        availableDays: availableDays || 0,
+      },
+    };
 
     try {
-      const response = await callAI("weekly_coach", {
-        stats: {
-          daysTrained: stats.daysTrained,
-          trainingDates: stats.trainingDates,
-          totalVolume: stats.totalVolume,
-          previousWeekVolume: stats.previousWeekVolume,
-          musclesWorked: stats.musclesWorked,
-          currentWeekExercises: stats.currentWeekExercises,
-          coachHistory: coachHistory || "Ninguno",
-        },
-      });
+      const response = await callAI("weekly_coach", payload);
       setReport(response.text);
       onSaveAdvice(response.text);
     } catch (e) {

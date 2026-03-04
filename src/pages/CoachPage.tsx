@@ -12,7 +12,7 @@ export default function CoachPage() {
       user={user}
       onRequireAuth={onRequireAuth}
       onShowProfile={() => navigate("/app/profile")}
-      onShowRoutines={() => navigate("/app")}
+      onShowRoutines={() => navigate("/app/routines")}
       isPro={isPro}
     />
   );

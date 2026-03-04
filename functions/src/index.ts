@@ -20,7 +20,8 @@ const APP_ID = process.env.FITTWIZ_APP_ID ?? process.env.FITMANUAL_APP_ID ?? "fi
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_MODEL_DEFAULT =
   process.env.GEMINI_MODEL_DEFAULT ?? process.env.GEMINI_MODEL ?? "gemini-3-flash-preview";
-const GEMINI_MODEL_FAST = process.env.GEMINI_MODEL_FAST ?? "gemini-2.5-flash-lite";
+const GEMINI_MODEL_FAST = process.env.GEMINI_MODEL_FAST ?? "gemini-3.1-flash-lite-preview";
+const GEMINI_MODEL_PRO = process.env.GEMINI_MODEL_PRO ?? "gemini-3.1-pro-preview";
 const GEMINI_MODEL_NUTRITION_FREE = process.env.GEMINI_MODEL_NUTRITION_FREE ?? "gemini-2.5-flash";
 const GEMINI_MODEL_NUTRITION_PRO =
   process.env.GEMINI_MODEL_NUTRITION_PRO ?? "gemini-3-flash-preview";
@@ -67,6 +68,7 @@ export const aiGenerate = createAiGenerateFunction({
   geminiApiKey: GEMINI_API_KEY,
   geminiDefaultModel: GEMINI_MODEL_DEFAULT,
   geminiFastModel: GEMINI_MODEL_FAST,
+  geminiProModel: GEMINI_MODEL_PRO,
   geminiNutritionModelFree: GEMINI_MODEL_NUTRITION_FREE,
   geminiNutritionModelPro: GEMINI_MODEL_NUTRITION_PRO,
   quotas: {

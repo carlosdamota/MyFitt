@@ -6,10 +6,11 @@ import { Button } from "../ui/Button";
 
 interface DailyVolumeChartProps {
   data: { date: string; val: number; count: number }[];
+  userGoal?: string;
   onRequireAuth?: () => void;
 }
 
-const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth }) => {
+const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, userGoal, onRequireAuth }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [quotaMessage, setQuotaMessage] = useState<string | null>(null);
@@ -26,7 +27,7 @@ const DailyVolumeChart: React.FC<DailyVolumeChartProps> = ({ data, onRequireAuth
 
     try {
       const trendData = data.map((d) => ({ fecha: d.date, volumen: d.val }));
-      const resp = await callAI("volume_trend", { trendData });
+      const resp = await callAI("volume_trend", { trendData, userGoal });
       setAnalysis(resp.text);
     } catch (e) {
       if (e instanceof AiError && e.code === "quota_exceeded") {

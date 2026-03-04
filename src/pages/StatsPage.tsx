@@ -29,8 +29,11 @@ export default function StatsPage() {
       stats={stats}
       onClose={() => window.history.back()}
       coachHistory={coachAdvice || ""}
+      coachPersonality={profile?.coachPersonality || "motivador"}
+      userGoal={profile?.goal}
       onSaveAdvice={saveCoachAdvice}
       userWeight={profile?.weight || 70}
+      availableDays={profile?.availableDays}
       routines={routines}
       onRequireAuth={onRequireAuth}
       fetchNextPage={fetchNextPage}

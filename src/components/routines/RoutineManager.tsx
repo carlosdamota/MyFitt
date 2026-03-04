@@ -30,8 +30,10 @@ const RoutineManager: React.FC<RoutineManagerProps> = ({
 
   const handleSetActive = async (routineId: string) => {
     if (activeRoutineId === routineId) return;
-    await saveProfile({ activeRoutineId: routineId });
+    // Navigate immediately — don't block on save
     if (onSelectRoutine) onSelectRoutine(routineId);
+    // Save to profile (best-effort, URL param is the primary mechanism)
+    saveProfile({ activeRoutineId: routineId });
   };
 
   const handleDelete = async (routineId: string) => {
