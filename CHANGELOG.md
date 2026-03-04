@@ -2,6 +2,16 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.9] - 2026-03-04
+
+- **Cambio**: Integración completa con Strava y sincronización de actividades.
+- **Para qué**: Ahora puedes conectar tu cuenta de Strava para sincronizar tus entrenamientos automáticamente. Se ha añadido el botón "Compartir en Strava" en el resumen de sesión y se han actualizado las políticas de privacidad y branding para cumplir con los requisitos de producción de Strava.
+
+## [1.0.8] - 2026-03-04
+
+- **Cambio**: Fix: persistencia de personalidad del coach en cuentas antiguas + reglas de Firestore.
+- **Para qué**: Las cuentas creadas antes de la funcionalidad de personalidad no podían guardar cambios en el perfil. Se descubrió que los campos escritos por el servidor (`outreachLastSentAt`, etc.) no estaban en la whitelist de las reglas de seguridad, bloqueando toda escritura desde el cliente. Ahora se auto-migran los campos de personalidad y las reglas permiten guardar correctamente.
+
 ## [1.0.7] - 2026-03-04
 
 - **Cambio**: Mejoras de UX mobile en la página de Perfil + sección Novedades.

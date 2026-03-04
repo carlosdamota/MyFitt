@@ -87,9 +87,23 @@ export const useProfile = (user: User | null): UseProfileReturn => {
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as Partial<UserProfile>;
+
+          // Auto-migrate legacy accounts missing personality fields
+          const patch: Record<string, string> = {};
+          if (!data.coachPersonality) patch.coachPersonality = defaultProfile.coachPersonality!;
+          if (!data.nutritionPersonality)
+            patch.nutritionPersonality = defaultProfile.nutritionPersonality!;
+
+          if (Object.keys(patch).length > 0) {
+            setDoc(profileRef, patch, { merge: true }).catch((e) =>
+              console.warn("[useProfile] Auto-migration failed:", e),
+            );
+          }
+
           setProfile({
             ...defaultProfile,
             ...data,
+            ...patch, // Apply patch immediately so UI reflects it
             equipment: normalizeEquipment(data.equipment),
           });
         } else {
