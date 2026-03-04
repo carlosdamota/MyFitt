@@ -12,6 +12,13 @@ interface ChangelogEntry {
 // Parsed from CHANGELOG.md — update alongside the file
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.0.7",
+    date: "2026-03-04",
+    change: "Mejoras de UX mobile en Perfil",
+    reason:
+      "El botón Guardar es sticky en mobile, las secciones Notificaciones y Apariencia son más discretas, y se ocultan descripciones del Coach en móvil para ahorrar espacio.",
+  },
+  {
     version: "1.0.6",
     date: "2026-03-04",
     change: "Rediseño de Entrenadores Inteligentes",
