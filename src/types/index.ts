@@ -198,6 +198,8 @@ export interface RateLimitData {
 // User Profile Types
 // ============================================
 
+export type AiPersonality = "motivador" | "sargento" | "cientifico" | "fisioterapeuta";
+
 export type EquipmentOption =
   | "gym_full"
   | "home_gym"
@@ -227,6 +229,8 @@ export interface ProfileFormData {
   focusAreas?: FocusArea[];
   injuries: string;
   onboardingCompleted?: boolean;
+  coachPersonality?: AiPersonality;
+  nutritionPersonality?: AiPersonality;
 }
 
 export interface UserProfile extends ProfileFormData {

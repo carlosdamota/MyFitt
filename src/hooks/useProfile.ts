@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
-import type { EquipmentOption } from "../types";
+import type { EquipmentOption, AiPersonality } from "../types";
 
 export interface UserProfile {
   weight: string | number;
@@ -18,6 +18,8 @@ export interface UserProfile {
   injuries: string;
   onboardingCompleted?: boolean;
   activeRoutineId?: string;
+  coachPersonality?: AiPersonality;
+  nutritionPersonality?: AiPersonality;
   updatedAt?: string;
 }
 
@@ -42,6 +44,8 @@ const defaultProfile: UserProfile = {
   injuries: "",
   onboardingCompleted: false,
   activeRoutineId: undefined,
+  coachPersonality: "motivador",
+  nutritionPersonality: "motivador",
 };
 
 const normalizeEquipment = (value: unknown): EquipmentOption[] => {

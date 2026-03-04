@@ -23,7 +23,7 @@ service cloud.firestore {
 
     function isValidAppData(docId) {
       return docId == "logs"
-        ? request.resource.data.keys().hasOnly(["logs", "coachAdvice", "updatedAt"])
+        ? request.resource.data.keys().hasAll(["updatedAt"]) && request.resource.data.keys().hasOnly(["logs", "coachAdvice", "updatedAt"])
         : docId == "profile"
           ? request.resource.data.keys().hasOnly([
               "weight",
@@ -46,7 +46,9 @@ service cloud.firestore {
               "displayName",
               "emailOptOut",
               "pushEnabled",
-              "lastWorkoutDate"
+              "lastWorkoutDate",
+              "coachPersonality",
+              "nutritionPersonality"
             ])
           : false;
     }

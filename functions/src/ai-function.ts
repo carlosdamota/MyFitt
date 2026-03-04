@@ -57,6 +57,7 @@ interface AiFunctionDeps {
   geminiApiKey: string;
   geminiDefaultModel: string;
   geminiFastModel: string;
+  geminiProModel: string;
   geminiNutritionModelFree: string;
   geminiNutritionModelPro: string;
   quotas: Quotas;
@@ -71,6 +72,7 @@ export const createAiGenerateFunction = ({
   geminiApiKey,
   geminiDefaultModel,
   geminiFastModel,
+  geminiProModel,
   geminiNutritionModelFree,
   geminiNutritionModelPro,
   quotas,
@@ -142,8 +144,18 @@ export const createAiGenerateFunction = ({
         const { system, user } = buildPrompt(task, payload);
 
         const isNutritionTask = task === "nutrition_parse";
-        const nutritionModel = plan === "pro" ? geminiNutritionModelPro : geminiNutritionModelFree;
-        const modelForTask = isNutritionTask ? nutritionModel : undefined;
+        const isRoutineTask = task === "routine_program";
+        const isVolumeTrendTask = task === "volume_trend";
+
+        let modelForTask: string | undefined = undefined;
+
+        if (isNutritionTask) {
+          modelForTask = plan === "pro" ? geminiNutritionModelPro : geminiNutritionModelFree;
+        } else if (isRoutineTask) {
+          modelForTask = plan === "pro" ? geminiProModel : geminiDefaultModel;
+        } else if (isVolumeTrendTask) {
+          modelForTask = geminiFastModel;
+        }
 
         const parts: GeminiPart[] = [{ text: user }];
         if (isNutritionTask && plan === "pro") {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { Dumbbell, Loader, Check, Trash2 } from "lucide-react";
+import { Dumbbell, Loader, Check, Trash2, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "../ui/Button";
 import { useProfile } from "../../hooks/useProfile";
@@ -11,6 +11,7 @@ import SubscriptionPanel from "./SubscriptionPanel";
 import NotificationSettings from "./NotificationSettings";
 import ThemeToggle from "../common/ThemeToggle";
 import DeleteAccountModal from "./DeleteAccountModal";
+import ChangelogModal from "./ChangelogModal";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ProfileFormData } from "../../types";
 import { APP_VERSION } from "../../config/version";
@@ -30,14 +31,18 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
   const [showRoutineManager, setShowRoutineManager] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [showChangelog, setShowChangelog] = useState<boolean>(false);
   const navigate = useNavigate();
   const { info, error } = useToast();
 
+  // Sync profile to formData only on initial load or reset
   useEffect(() => {
-    if (profile) {
+    if (!profile) {
+      setFormData(null);
+    } else if (!formData) {
       setFormData(profile as ProfileFormData);
     }
-  }, [profile]);
+  }, [profile, formData]);
 
   const handleChange = (field: keyof ProfileFormData, value: any): void => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
@@ -97,104 +102,159 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
     );
 
   return (
-    <div className='space-y-6 pb-20 px-1'>
-      <ProfileForm
-        formData={formData}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        isSaving={isSaving}
-        isGenerating={false}
-        savedSuccess={savedSuccess}
-        isPro={isPro}
-      />
-
-      <Button
-        onClick={handleSaveClick}
-        disabled={isSaving}
-        className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 ${savedSuccess ? "bg-success-600 hover:bg-success-600 text-white shadow-success-900/20" : ""}`}
-        variant='primary'
-        leftIcon={
-          isSaving ? (
-            <Loader
-              size={18}
-              className='animate-spin'
-            />
-          ) : savedSuccess ? (
-            <Check size={18} />
-          ) : undefined
-        }
-      >
-        {savedSuccess ? "Guardado" : "Guardar Perfil"}
-      </Button>
-
-      <SubscriptionPanel
-        user={user}
-        onRequireAuth={onRequireAuth}
-      />
-
-      <NotificationSettings user={user} />
-
-      <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-5 mb-6 shadow-sm dark:shadow-xl transition-colors'>
-        <h3 className='text-sm font-semibold text-slate-800 dark:text-white mb-4'>Apariencia</h3>
-        <ThemeToggle />
-      </div>
-
-      <div className='mt-4 pt-4 border-t border-slate-200 dark:border-surface-800 text-center transition-colors'>
-        <Button
-          variant='ghost'
-          onClick={() => setShowRoutineManager(true)}
-          className='w-full sm:w-auto mx-auto'
-          leftIcon={<Dumbbell size={16} />}
-        >
-          Gestionar Mis Rutinas Guardadas
-        </Button>
-      </div>
-
-      {showRoutineManager && (
-        <RoutineManager
-          user={user}
-          onClose={() => setShowRoutineManager(false)}
+    <>
+      {/* ── Main scrollable content ─────────────────────────── */}
+      <div className='space-y-6 pb-24 sm:pb-6 px-1'>
+        <ProfileForm
+          formData={formData}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          isSaving={isSaving}
+          isGenerating={false}
+          savedSuccess={savedSuccess}
+          isPro={isPro}
         />
-      )}
 
-      {/* Secret Developer Mode Trigger */}
-      <div className='mt-8 text-center'>
-        <p
-          onClick={() => {
-            const newCount = ((window as any)._devTapCount =
-              ((window as any)._devTapCount || 0) + 1);
-            if (newCount === 7) {
-              const currentOptOut = localStorage.getItem("fittwiz_analytics_optout") === "true";
-              const newState = !currentOptOut;
-              localStorage.setItem("fittwiz_analytics_optout", String(newState));
-              info(`Modo Desarrollador: Analytics ${newState ? "DESACTIVADO" : "ACTIVADO"}`);
-              (window as any)._devTapCount = 0;
+        {/* Save button — hidden on mobile (rendered sticky below) */}
+        <div className='hidden sm:block'>
+          <Button
+            onClick={handleSaveClick}
+            disabled={isSaving}
+            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 ${savedSuccess ? "bg-success-600 hover:bg-success-600 text-white shadow-success-900/20" : ""}`}
+            variant='primary'
+            leftIcon={
+              isSaving ? (
+                <Loader
+                  size={18}
+                  className='animate-spin'
+                />
+              ) : savedSuccess ? (
+                <Check size={18} />
+              ) : undefined
             }
-          }}
-          className='text-[10px] text-slate-400 dark:text-slate-700 font-mono cursor-default select-none active:text-slate-500 transition-colors'
-        >
-          v{APP_VERSION}
-        </p>
+          >
+            {savedSuccess ? "Guardado" : "Guardar Perfil"}
+          </Button>
+        </div>
+
+        {/* ── Subscription ─────────────────────────── */}
+        <SubscriptionPanel
+          user={user}
+          onRequireAuth={onRequireAuth}
+        />
+
+        {/* ── Secondary settings (lower visual weight) ─────────────────────────── */}
+        <div className='space-y-3'>
+          <p className='text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest px-1'>
+            Ajustes
+          </p>
+
+          {/* Notificaciones — compact */}
+          <NotificationSettings user={user} />
+
+          {/* Apariencia — compact */}
+          <div className='bg-white dark:bg-surface-900/40 border border-slate-200 dark:border-surface-800/60 rounded-xl px-4 py-3 flex items-center justify-between shadow-none transition-colors'>
+            <p className='text-sm font-semibold text-slate-700 dark:text-slate-300'>Apariencia</p>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        {/* ── Routine manager ─────────────────────────── */}
+        <div className='pt-2 border-t border-slate-200 dark:border-surface-800 text-center transition-colors'>
+          <Button
+            variant='ghost'
+            onClick={() => setShowRoutineManager(true)}
+            className='w-full sm:w-auto mx-auto'
+            leftIcon={<Dumbbell size={16} />}
+          >
+            Gestionar Mis Rutinas Guardadas
+          </Button>
+        </div>
+
+        {showRoutineManager && (
+          <RoutineManager
+            user={user}
+            onClose={() => setShowRoutineManager(false)}
+          />
+        )}
+
+        {/* ── Footer: version + changelog link ─────────────────────────── */}
+        <div className='mt-6 text-center space-y-1'>
+          <button
+            onClick={() => setShowChangelog(true)}
+            className='inline-flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-primary-400 dark:text-slate-600 dark:hover:text-primary-400 transition-colors group'
+          >
+            <span
+              className='font-mono'
+              onClick={(e) => {
+                // Secret dev tap: 7 taps on the version text toggles analytics opt-out
+                const newCount = ((window as any)._devTapCount =
+                  ((window as any)._devTapCount || 0) + 1);
+                if (newCount === 7) {
+                  const currentOptOut = localStorage.getItem("fittwiz_analytics_optout") === "true";
+                  const newState = !currentOptOut;
+                  localStorage.setItem("fittwiz_analytics_optout", String(newState));
+                  info(`Modo Desarrollador: Analytics ${newState ? "DESACTIVADO" : "ACTIVADO"}`);
+                  (window as any)._devTapCount = 0;
+                }
+                e.stopPropagation();
+              }}
+            >
+              v{APP_VERSION}
+            </span>
+            <span className='text-slate-300 dark:text-slate-700'>·</span>
+            <Sparkles
+              size={11}
+              className='text-primary-400 opacity-60 group-hover:opacity-100 transition-opacity'
+            />
+            <span>Novedades</span>
+          </button>
+          <p className='text-[9px] text-slate-300 dark:text-slate-700'>FittWiz © 2026</p>
+        </div>
+
+        {/* ── Danger Zone ─────────────────────────── */}
+        {user && (
+          <div className='mt-4 pt-4 border-t border-danger-500/20'>
+            <Button
+              variant='danger'
+              onClick={() => setShowDeleteModal(true)}
+              className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2'
+              leftIcon={<Trash2 size={16} />}
+            >
+              Eliminar mi cuenta
+            </Button>
+            <p className='text-[11px] text-slate-500 dark:text-slate-600 text-center mt-2 transition-colors'>
+              Se eliminarán todos tus datos de forma irreversible.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Danger Zone — Delete Account */}
-      {user && (
-        <div className='mt-6 pt-6 border-t border-danger-500/20'>
+      {/* ── Sticky Save Button (mobile only) ─────────────────────────── */}
+      <div className='sm:hidden fixed bottom-16 left-0 right-0 z-30 px-4 pb-2 pointer-events-none'>
+        <div className='pointer-events-auto'>
           <Button
-            variant='danger'
-            onClick={() => setShowDeleteModal(true)}
-            className='w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2'
-            leftIcon={<Trash2 size={16} />}
+            onClick={handleSaveClick}
+            disabled={isSaving}
+            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-black/20 ${savedSuccess ? "bg-success-600 hover:bg-success-600 text-white" : ""}`}
+            variant='primary'
+            leftIcon={
+              isSaving ? (
+                <Loader
+                  size={18}
+                  className='animate-spin'
+                />
+              ) : savedSuccess ? (
+                <Check size={18} />
+              ) : undefined
+            }
           >
-            Eliminar mi cuenta
+            {savedSuccess ? "Guardado ✓" : "Guardar Perfil"}
           </Button>
-          <p className='text-[11px] text-slate-500 dark:text-slate-600 text-center mt-2 transition-colors'>
-            Se eliminarán todos tus datos de forma irreversible.
-          </p>
         </div>
-      )}
+      </div>
 
-      {/* Delete Account Modal */}
+      {/* ── Modals ─────────────────────────── */}
       {user && (
         <DeleteAccountModal
           isOpen={showDeleteModal}
@@ -206,7 +266,12 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           }}
         />
       )}
-    </div>
+
+      <ChangelogModal
+        isOpen={showChangelog}
+        onClose={() => setShowChangelog(false)}
+      />
+    </>
   );
 };
 

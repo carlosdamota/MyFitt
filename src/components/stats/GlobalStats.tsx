@@ -16,13 +16,16 @@ interface GlobalStatsProps {
   stats: UserStats | null;
   onClose: () => void;
   userWeight: string | number;
+  userGoal?: string;
   routines: RoutineData;
   coachHistory: string;
+  coachPersonality?: string;
   onSaveAdvice: (advice: string) => void;
   onRequireAuth?: () => void;
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  availableDays?: number;
 }
 
 interface AggregatedDataPoint {
@@ -37,6 +40,8 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   stats,
   onClose,
   coachHistory,
+  coachPersonality,
+  userGoal,
   onSaveAdvice,
   userWeight,
   routines,
@@ -44,6 +49,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  availableDays,
 }) => {
   const [viewMode, setViewMode] = useState<"charts" | "logs" | "weekly">("charts");
 
@@ -184,6 +190,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
           <>
             <DailyVolumeChart
               data={aggregatedData}
+              userGoal={userGoal}
               onRequireAuth={onRequireAuth}
             />
             <MuscleFocusChart
@@ -198,8 +205,10 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({
               routines={routines}
               userWeight={userWeight}
               coachHistory={coachHistory}
+              coachPersonality={coachPersonality}
               onSaveAdvice={onSaveAdvice}
               onRequireAuth={onRequireAuth}
+              availableDays={availableDays}
             />
           </div>
         ) : (
