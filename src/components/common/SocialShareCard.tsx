@@ -4,6 +4,7 @@ import type { WorkoutLogEntry } from "../../types";
 import type { WorkoutImageFormat } from "../../utils/generateWorkoutImage";
 import { iconLogo } from "../../branding/logoConfig";
 import { cn } from "../ui/Button";
+import { getDisplayTitle } from "./social-share/utils";
 
 export interface ShareCardTheme {
   backgroundColor: string;
@@ -32,16 +33,6 @@ const DEFAULT_THEME: ShareCardTheme = {
   primaryTextColor: "#ffffff",
   secondaryTextColor: "#71717a",
   accentColor: "#3b82f6",
-};
-
-/** Extrae el subtítulo de la rutina: quita prefijos de programa y "Día X" */
-const getDisplayTitle = (title?: string): string | undefined => {
-  if (!title) return undefined;
-  // Quitar prefijo de programa seguido de ":" o " - "
-  let t = title.replace(/^[^:\-]+[:\-]\s*/i, "").trim();
-  // Quitar "Día X:" o "Day X:"
-  t = t.replace(/^(D[íi]a|Day)\s*\d+[:\s-]*/i, "").trim();
-  return t || title;
 };
 
 export const SocialShareCard = React.forwardRef<HTMLDivElement, SocialShareCardProps>(

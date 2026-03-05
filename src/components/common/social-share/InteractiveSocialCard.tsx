@@ -9,14 +9,7 @@ import {
 import { iconLogo } from "../../../branding/logoConfig";
 import { type StickerData, type SocialShareData } from "../../../utils/social-share/types";
 import Konva from "konva";
-
-/** Extrae el subtítulo de la rutina: quita prefijos de programa y "Día X" */
-const getDisplayTitle = (title?: string): string | undefined => {
-  if (!title) return undefined;
-  let t = title.replace(/^[^:\-]+[:\-]\s*/i, "").trim();
-  t = t.replace(/^(D[íi]a|Day)\s*\d+[:\s-]*/i, "").trim();
-  return t || title;
-};
+import { getDisplayTitle } from "./utils";
 
 interface InteractiveSocialCardProps {
   data: SocialShareData;

@@ -13,7 +13,7 @@ import { callAI } from "../../api/ai";
 
 // Refactor: Modular imports
 import { THEMES } from "./social-share/constants";
-import { buildHashtags } from "./social-share/utils";
+import { buildHashtags, getDisplayTitle } from "./social-share/utils";
 import { SidePanelTab } from "./social-share/types";
 import { EditorPanel } from "./social-share/EditorPanel";
 import { Toolbar } from "./social-share/Toolbar";
@@ -235,7 +235,9 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       }
 
       let descriptionToUse = shareText;
-      let finalTitle = routineTitle || `Entrenamiento en FittWiz`;
+      let parsedTitle = getDisplayTitle(routineTitle);
+      let finalTitle = parsedTitle || `Entrenamiento en FittWiz`;
+      console.log("[StravaSync] Using title:", finalTitle);
 
       // Build a human-readable duration string for the AI
       const durationMinutes = Math.floor(seconds / 60);
