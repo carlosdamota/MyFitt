@@ -5,6 +5,7 @@ import type { Auth } from "firebase-admin/auth";
 import type Stripe from "stripe";
 import { getAllowedOrigins, isOriginAllowed, setCors, sendJson, requireAuth } from "./http.js";
 import { billingCollection } from "./data.js";
+import type { MonitoringEventInput } from "./monitoring-functions.js";
 
 interface AccountDeletionDeps {
   db: Firestore;
@@ -12,6 +13,7 @@ interface AccountDeletionDeps {
   appId: string;
   stripe: Stripe;
   webOrigin: string;
+  enqueueMonitoringEvent?: (event: MonitoringEventInput) => Promise<void>;
 }
 
 /** Recursively delete all documents in a subcollection */
@@ -105,6 +107,7 @@ export const createAccountDeletionFunctions = ({
   appId,
   stripe,
   webOrigin,
+  enqueueMonitoringEvent,
 }: AccountDeletionDeps) => {
   // --- 1. HTTPS endpoint (Gen 2): securely delete account and related data ---
   // A fresh Gen 2 function to avoid GCP locks and Gen 1 compatibility issues.
@@ -140,10 +143,33 @@ export const createAccountDeletionFunctions = ({
         await auth.deleteUser(uid);
         console.log(`[Account Deletion] Successfully deleted Auth user: ${uid}`);
 
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "account_deleted",
+            category: "business",
+            severity: "warning",
+            source: "function",
+            userId: uid,
+            dedupeKey: `account_deleted:${uid}`,
+          });
+        }
+
         // Return a clean success response
         sendJson(res, 200, { ok: true, message: "Account deleted successfully" });
       } catch (err: any) {
         console.error("[Account Deletion] Error during secure deletion:", err);
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "account_deletion_failed",
+            category: "technical",
+            severity: "critical",
+            source: "function",
+            dedupeKey: `account_deletion_failed:${err?.message || "unknown"}`,
+            context: {
+              message: err?.message || "unknown_error",
+            },
+          });
+        }
         // Fallback for custom requireAuth error handling format
         if (err?.status) {
           sendJson(
@@ -200,9 +226,37 @@ export const createAccountDeletionFunctions = ({
             createdAt: new Date().toISOString(),
           });
 
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "account_deletion_feedback_submitted",
+            category: "business",
+            severity: "info",
+            source: "function",
+            dedupeKey: `account_deletion_feedback:${reason}:${Date.now()}`,
+            context: {
+              reason: reason.slice(0, 80),
+              hasComment: typeof comment === "string" && comment.trim().length > 0,
+              commentPreview:
+                typeof comment === "string" && comment.trim().length > 0
+                  ? comment.trim().slice(0, 180)
+                  : null,
+            },
+          });
+        }
+
         sendJson(res, 200, { ok: true });
       } catch (err) {
         const message = err instanceof Error ? err.message : "unknown_error";
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "account_deletion_feedback_failed",
+            category: "technical",
+            severity: "warning",
+            source: "function",
+            dedupeKey: `account_deletion_feedback_failed:${message}`,
+            context: { message },
+          });
+        }
         sendJson(res, 500, { error: "feedback_failed", message });
       }
     },

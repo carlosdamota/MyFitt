@@ -5,6 +5,7 @@ import type { Request, Response } from "express";
 import type Stripe from "stripe";
 import { billingCollection } from "./data.js";
 import { getPostHogClient } from "./utils/posthog.js";
+import type { MonitoringEventInput } from "./monitoring-functions.js";
 
 type PlanType = "free" | "pro";
 
@@ -15,6 +16,7 @@ interface WebhookDeps {
   stripe: Stripe;
   stripeWebhookSecret: string;
   sendProSubscriptionEmail: (userId: string, isSubscribing: boolean) => Promise<void>;
+  enqueueMonitoringEvent?: (event: MonitoringEventInput) => Promise<void>;
 }
 
 export const createStripeWebhookFunction = ({
@@ -24,6 +26,7 @@ export const createStripeWebhookFunction = ({
   stripe,
   stripeWebhookSecret,
   sendProSubscriptionEmail,
+  enqueueMonitoringEvent,
 }: WebhookDeps) => {
   const updatePlanForCustomer = async (
     customerId: string,
@@ -80,6 +83,15 @@ export const createStripeWebhookFunction = ({
         const payload = (req as any).rawBody;
         event = stripe.webhooks.constructEvent(payload, sig, stripeWebhookSecret);
       } catch {
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "stripe_webhook_invalid_signature",
+            category: "technical",
+            severity: "warning",
+            source: "stripe",
+            dedupeKey: "stripe_webhook_invalid_signature",
+          });
+        }
         res.status(400).send("invalid_signature");
         return;
       }
@@ -91,6 +103,22 @@ export const createStripeWebhookFunction = ({
             if (session.customer) {
               const customerId = String(session.customer);
               await updatePlanForCustomer(customerId, true, String(session.subscription));
+
+              if (enqueueMonitoringEvent) {
+                await enqueueMonitoringEvent({
+                  eventType: "payment_succeeded",
+                  category: "business",
+                  severity: "info",
+                  source: "stripe",
+                  dedupeKey: `stripe:checkout:${session.id}`,
+                  context: {
+                    checkoutSessionId: session.id,
+                    customerId,
+                    amount: (session.amount_total || 0) / 100,
+                    currency: session.currency,
+                  },
+                });
+              }
 
               // Track Revenue in PostHog
               try {
@@ -129,6 +157,28 @@ export const createStripeWebhookFunction = ({
             const customerId = String(subscription.customer);
             await updatePlanForCustomer(customerId, isActive, subscription.id);
 
+            if (enqueueMonitoringEvent) {
+              const eventType =
+                event.type === "customer.subscription.deleted"
+                  ? "subscription_cancelled"
+                  : isActive
+                    ? "subscription_activated"
+                    : "subscription_status_changed";
+              await enqueueMonitoringEvent({
+                eventType,
+                category: "business",
+                severity: event.type === "customer.subscription.deleted" ? "warning" : "info",
+                source: "stripe",
+                dedupeKey: `stripe:sub:${subscription.id}:${event.type}`,
+                context: {
+                  customerId,
+                  subscriptionId: subscription.id,
+                  status: subscription.status,
+                  cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                },
+              });
+            }
+
             // Track Subscription Change in PostHog
             try {
               const userQuery = await db
@@ -157,10 +207,43 @@ export const createStripeWebhookFunction = ({
             }
             break;
           }
+          case "invoice.payment_failed": {
+            const invoice = event.data.object as Stripe.Invoice;
+            const customerId = String(invoice.customer || "");
+            if (enqueueMonitoringEvent) {
+              await enqueueMonitoringEvent({
+                eventType: "payment_failed",
+                category: "business",
+                severity: "warning",
+                source: "stripe",
+                dedupeKey: `stripe:invoice_failed:${invoice.id}`,
+                context: {
+                  invoiceId: invoice.id,
+                  customerId,
+                  amountDue: Number(invoice.amount_due || 0) / 100,
+                  currency: invoice.currency,
+                  attemptCount: invoice.attempt_count,
+                },
+              });
+            }
+            break;
+          }
           default:
             break;
         }
       } catch {
+        if (enqueueMonitoringEvent) {
+          await enqueueMonitoringEvent({
+            eventType: "stripe_webhook_failed",
+            category: "technical",
+            severity: "critical",
+            source: "stripe",
+            dedupeKey: `stripe_webhook_failed:${event.type}`,
+            context: {
+              eventType: event.type,
+            },
+          });
+        }
         res.status(500).send("webhook_failed");
         return;
       }

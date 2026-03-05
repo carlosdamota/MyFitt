@@ -14,3 +14,6 @@ export const profileDoc = (db: Firestore, appId: string, uid: string) =>
     .doc(uid)
     .collection("app_data")
     .doc("profile");
+
+export const monitoringEventsCollection = (db: Firestore, appId: string) =>
+  db.collection("artifacts").doc(appId).collection("monitoring_alert_events");

@@ -5,6 +5,7 @@ import { db, appId } from "../config/firebase";
 import type { User } from "firebase/auth";
 import type { WorkoutLogs, WorkoutLogEntry } from "../types";
 import posthog from "posthog-js";
+import { emitMonitoringEvent } from "../api/monitoring";
 
 const BASE_STORAGE_KEY = "myfitt_pending_session";
 const getStorageKey = (uid: string) => `${BASE_STORAGE_KEY}_${uid}`;
@@ -173,6 +174,19 @@ export const useWorkoutSession = (user: User | null): UseWorkoutSessionReturn =>
           duration: metadata.duration || null,
           routine_title: metadata.routineTitle || null,
           rating: metadata.rating || null,
+        });
+
+        await emitMonitoringEvent({
+          eventType: "workout_completed",
+          category: "business",
+          severity: "info",
+          dedupeKey: `workout_completed:${user.uid}:${sessionDate}`,
+          context: {
+            duration: metadata.duration || null,
+            routineTitle: metadata.routineTitle || null,
+            rating: metadata.rating || null,
+            exercisesCount: Object.keys(currentLogs).length,
+          },
         });
       } catch (e) {
         console.error("Session flush error", e);

@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import { createAiGenerateFunction } from "./ai-function.js";
 import { createCheckoutSessionFunction, createBillingPortalFunction } from "./billing-functions.js";
 import { createStripeWebhookFunction } from "./webhook-function.js";
+import { createMonitoringFunctions } from "./monitoring-functions.js";
 import { createShareImageFunction } from "./share-image-function.js";
 import { createEmailAgentFunctions } from "./email-agent.js";
 import { createPushAgentFunctions } from "./push-agent.js";
@@ -58,12 +59,21 @@ const pushAgentFns = createPushAgentFunctions({
   appId: APP_ID,
 });
 
+const monitoringFns = createMonitoringFunctions({
+  db,
+  auth,
+  appId: APP_ID,
+  webOrigin: WEB_ORIGIN,
+  environment: process.env.MONITORING_ENV || process.env.NODE_ENV || "production",
+});
+
 const accountDeletionFns = createAccountDeletionFunctions({
   db,
   auth,
   appId: APP_ID,
   stripe,
   webOrigin: WEB_ORIGIN,
+  enqueueMonitoringEvent: monitoringFns.enqueueMonitoringEvent,
 });
 
 // --- Cloud Functions ---
@@ -124,7 +134,14 @@ export const stripeWebhook = createStripeWebhookFunction({
   stripe,
   stripeWebhookSecret,
   sendProSubscriptionEmail: emailAgentFns.sendProSubscriptionEmail,
+  enqueueMonitoringEvent: monitoringFns.enqueueMonitoringEvent,
 });
+
+export const emitMonitoringEvent = monitoringFns.emitMonitoringEvent;
+export const dispatchMonitoringAlerts = monitoringFns.dispatchMonitoringAlerts;
+export const cleanupMonitoringEvents = monitoringFns.cleanupMonitoringEvents;
+export const trackNewUserSignup = monitoringFns.trackNewUserSignup;
+export const trackUserDeleted = monitoringFns.trackUserDeleted;
 
 export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
 export const weeklyReengagement = emailAgentFns.weeklyReengagement;

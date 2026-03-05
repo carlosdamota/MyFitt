@@ -1,5 +1,6 @@
 import { getIdToken } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { emitMonitoringEvent } from "./monitoring";
 
 export type AiTask =
   | "exercise_instructions"
@@ -79,6 +80,17 @@ export const callAI = async (
   };
 
   if (!response.ok) {
+    void emitMonitoringEvent({
+      eventType: "ai_api_failed",
+      category: "technical",
+      severity: response.status >= 500 ? "critical" : "warning",
+      dedupeKey: `ai_api_failed:${task}:${response.status}`,
+      context: {
+        task,
+        status: response.status,
+      },
+    });
+
     if (response.status === 429) {
       throw new AiError(
         data.message || "Has alcanzado el limite de IA.",
