@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.10] - 2026-03-05
+
+- **Cambio**: Fix: Parseo de títulos en uploads de Strava.
+- **Para qué**: Ahora el título de las actividades subidas a Strava elimina prefijos y se limpia (ej: "Day 1:" o el nombre del programa), igualando el formato de las Social Cards.
+
 ## [1.0.9] - 2026-03-04
 
 - **Cambio**: Integración completa con Strava y sincronización de actividades.

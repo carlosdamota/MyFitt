@@ -16,3 +16,13 @@ export function buildHashtags(logs: { exercise: string }[], n: number): string {
   if (n >= 6) tags.add("#fullbody");
   return [...tags].join(" ");
 }
+
+/** Extrae el subtítulo de la rutina: quita prefijos de programa y "Día X" */
+export const getDisplayTitle = (title?: string): string | undefined => {
+  if (!title) return undefined;
+  // Quitar prefijo de programa seguido de ":" o " - "
+  let t = title.replace(/^[^:\-]+[:\-]\s*/i, "").trim();
+  // Quitar "Día X:" o "Day X:"
+  t = t.replace(/^(D[íi]a|Day)\s*\d+[:\s-]*/i, "").trim();
+  return t || title;
+};
