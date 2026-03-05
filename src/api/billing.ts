@@ -1,5 +1,6 @@
 import { getIdToken } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { emitMonitoringEvent } from "./monitoring";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "";
 
@@ -39,6 +40,15 @@ export const createCheckoutSession = async (
 
   const data = (await response.json().catch(() => ({}))) as { url?: string; message?: string };
   if (!response.ok) {
+    void emitMonitoringEvent({
+      eventType: "billing_checkout_failed",
+      category: "technical",
+      severity: "warning",
+      dedupeKey: `billing_checkout_failed:${response.status}`,
+      context: {
+        status: response.status,
+      },
+    });
     throw new Error(parseErrorMessage(data, "checkout_failed"));
   }
   if (!data.url) throw new Error("checkout_url_missing");
@@ -58,6 +68,15 @@ export const createBillingPortalSession = async (returnUrl?: string) => {
 
   const data = (await response.json().catch(() => ({}))) as { url?: string; message?: string };
   if (!response.ok) {
+    void emitMonitoringEvent({
+      eventType: "billing_portal_failed",
+      category: "technical",
+      severity: "warning",
+      dedupeKey: `billing_portal_failed:${response.status}`,
+      context: {
+        status: response.status,
+      },
+    });
     throw new Error(parseErrorMessage(data, "portal_failed"));
   }
   if (!data.url) throw new Error("portal_url_missing");

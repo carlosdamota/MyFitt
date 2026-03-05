@@ -13,6 +13,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
+import { emitMonitoringEvent } from "./api/monitoring";
 
 // Delay PostHog initialization to prioritize first paint
 const initPostHog = () => {
@@ -29,6 +30,38 @@ if (typeof window !== "undefined") {
   } else {
     setTimeout(initPostHog, 1000);
   }
+
+  window.addEventListener("error", (event) => {
+    void emitMonitoringEvent({
+      eventType: "frontend_error",
+      category: "technical",
+      severity: "warning",
+      dedupeKey: `frontend_error:${event.filename || "unknown"}:${event.lineno || 0}`,
+      context: {
+        message: event.message,
+        file: event.filename,
+        line: event.lineno,
+        column: event.colno,
+      },
+    });
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    void emitMonitoringEvent({
+      eventType: "frontend_unhandled_rejection",
+      category: "technical",
+      severity: "critical",
+      dedupeKey: "frontend_unhandled_rejection",
+      context: {
+        reason:
+          typeof event.reason === "string"
+            ? event.reason
+            : event.reason instanceof Error
+              ? event.reason.message
+              : JSON.stringify(event.reason),
+      },
+    });
+  });
 }
 const queryClient = new QueryClient({
   defaultOptions: {

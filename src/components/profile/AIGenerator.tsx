@@ -9,6 +9,7 @@ import type { User as FirebaseUser } from "firebase/auth";
 import { AiError } from "../../api/ai";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import posthog from "posthog-js";
+import { emitMonitoringEvent } from "../../api/monitoring";
 
 // Motivational phrases for loading state
 const MOTIVATIONAL_PHRASES = [
@@ -189,6 +190,18 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       posthog.capture("ai_routine_generated", {
         total_days: program.days.length,
         program_name: program.programName,
+      });
+
+      await emitMonitoringEvent({
+        eventType: "workout_generated",
+        category: "business",
+        severity: "info",
+        dedupeKey: `workout_generated:${user.uid}:${programId}`,
+        context: {
+          totalDays: program.days.length,
+          goal: formData.goal,
+          experience: formData.experienceLevel,
+        },
       });
 
       setTimeout(() => {
