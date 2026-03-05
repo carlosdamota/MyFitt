@@ -470,7 +470,7 @@ const Landing: React.FC = () => {
           aria-labelledby='social-share-title'
         >
           <div className='order-2 lg:order-1 relative h-[350px] md:h-[450px] flex items-center justify-center group cursor-pointer'>
-            <div className='relative w-56 md:w-64 aspect-[3/4]'>
+            <div className='relative w-56 md:w-64 aspect-3/4'>
               {/* Background glow */}
               <div className='absolute inset-0 bg-accent-500/20 blur-3xl rounded-full scale-150 group-hover:bg-primary-500/30 transition-colors duration-700' />
 
@@ -485,7 +485,7 @@ const Landing: React.FC = () => {
                   alt='Estilo detallado'
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
-                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent' />
+                <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
               </div>
 
               {/* Card 2 (Right) */}
@@ -499,7 +499,7 @@ const Landing: React.FC = () => {
                   alt='Estilo minimalista'
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
-                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent' />
+                <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
               </div>
 
               {/* Card 3 (Center) */}
@@ -513,7 +513,7 @@ const Landing: React.FC = () => {
                   alt='Estilo historia'
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
-                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent' />
+                <div className='absolute inset-0 bg-linear-to-t from-slate-900/40 to-transparent' />
                 <div className='absolute bottom-4 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100'>
                   <div className='bg-white/90 dark:bg-surface-900/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-semibold text-slate-900 dark:text-white shadow-lg flex items-center gap-2'>
                     <Share2
