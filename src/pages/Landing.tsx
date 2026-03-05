@@ -13,6 +13,9 @@ import {
   Target,
   Chrome,
   User,
+  Share2,
+  CheckCircle2,
+  ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 const AuthModal = React.lazy(() => import("../components/auth/AuthModal"));
@@ -461,6 +464,125 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
+        {/* Social Share Section */}
+        <section
+          className='mb-24 grid lg:grid-cols-2 gap-16 lg:gap-10 items-center'
+          aria-labelledby='social-share-title'
+        >
+          <div className='order-2 lg:order-1 relative h-[350px] md:h-[450px] flex items-center justify-center group cursor-pointer'>
+            <div className='relative w-56 md:w-64 aspect-[3/4]'>
+              {/* Background glow */}
+              <div className='absolute inset-0 bg-accent-500/20 blur-3xl rounded-full scale-150 group-hover:bg-primary-500/30 transition-colors duration-700' />
+
+              {/* Card 1 (Left) */}
+              <div
+                className='absolute inset-0 origin-bottom-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
+                -rotate-12 -translate-x-6 scale-95 opacity-80
+                group-hover:-rotate-24 group-hover:-translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
+              >
+                <img
+                  src='/assets/images/fittwiz-workout-2.webp'
+                  alt='Estilo detallado'
+                  className='w-full h-full object-cover select-none pointer-events-none'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent' />
+              </div>
+
+              {/* Card 2 (Right) */}
+              <div
+                className='absolute inset-0 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
+                rotate-12 translate-x-6 scale-95 opacity-80
+                group-hover:rotate-24 group-hover:translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
+              >
+                <img
+                  src='/assets/images/fittwiz-workout-3.webp'
+                  alt='Estilo minimalista'
+                  className='w-full h-full object-cover select-none pointer-events-none'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent' />
+              </div>
+
+              {/* Card 3 (Center) */}
+              <div
+                className='absolute inset-0 origin-bottom transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-10 shadow-xl rounded-2xl overflow-hidden border border-slate-200 dark:border-surface-800 bg-white dark:bg-surface-900 
+                rotate-0 translate-y-0 scale-100 opacity-100
+                group-hover:-translate-y-12 group-hover:scale-110 group-hover:shadow-2xl'
+              >
+                <img
+                  src='/assets/images/fittwiz-workout-1.webp'
+                  alt='Estilo historia'
+                  className='w-full h-full object-cover select-none pointer-events-none'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent' />
+                <div className='absolute bottom-4 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100'>
+                  <div className='bg-white/90 dark:bg-surface-900/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-semibold text-slate-900 dark:text-white shadow-lg flex items-center gap-2'>
+                    <Share2
+                      size={16}
+                      className='text-primary-500'
+                    />{" "}
+                    Comparte tu sudor
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='order-1 lg:order-2 space-y-6 animate-in slide-in-from-right-8 fade-in duration-700'>
+            <div className='inline-block p-3 rounded-2xl bg-accent-500/10 text-accent-600 dark:text-accent-400 mb-2'>
+              <Share2 size={24} />
+            </div>
+            <p className='text-sm uppercase tracking-[0.2em] text-slate-500 font-semibold'>
+              Comparte tus logros
+            </p>
+            <h2
+              id='social-share-title'
+              className='text-3xl md:text-4xl font-bold text-slate-900 dark:text-white transition-colors'
+            >
+              Muestra tu esfuerzo al mundo
+            </h2>
+            <p className='text-lg text-slate-500 dark:text-slate-300 max-w-xl leading-relaxed'>
+              Genera imágenes optimizadas de tus entrenamientos con un solo clic. Elige entre 3
+              estilos visuales premium y sube tu progreso a Instagram, Twitter o Strava para
+              enorgullecerte de tu trabajo e inspirar a otros.
+            </p>
+            <ul className='space-y-4 mt-8'>
+              <li className='flex items-start gap-3'>
+                <CheckCircle2 className='w-6 h-6 text-primary-500 shrink-0 mt-0.5' />
+                <div>
+                  <h4 className='font-semibold text-slate-900 dark:text-white text-base'>
+                    Formatos adaptados
+                  </h4>
+                  <p className='text-sm text-slate-500 dark:text-slate-400'>
+                    Perfectos para Stories o el feed principal.
+                  </p>
+                </div>
+              </li>
+              <li className='flex items-start gap-3'>
+                <CheckCircle2 className='w-6 h-6 text-emerald-500 shrink-0 mt-0.5' />
+                <div>
+                  <h4 className='font-semibold text-slate-900 dark:text-white text-base'>
+                    Métricas al grano
+                  </h4>
+                  <p className='text-sm text-slate-500 dark:text-slate-400'>
+                    Volumen total, tiempos y PRs destacados automáticamente.
+                  </p>
+                </div>
+              </li>
+              <li className='flex items-start gap-3'>
+                <CheckCircle2 className='w-6 h-6 text-accent-500 shrink-0 mt-0.5' />
+                <div>
+                  <h4 className='font-semibold text-slate-900 dark:text-white text-base'>
+                    Diseño premium
+                  </h4>
+                  <p className='text-sm text-slate-500 dark:text-slate-400'>
+                    Sin marcas de agua molestas, solo tú y tu progreso.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+
         <section
           className='mb-20'
           aria-labelledby='benefits-title'
@@ -518,6 +640,29 @@ const Landing: React.FC = () => {
                   }
                   title='Feedback IA'
                   desc='Análisis semanal y variaciones de ejercicios.'
+                />
+                <FeatureCard
+                  icon={
+                    <svg
+                      className='w-5 h-5 text-orange-500'
+                      viewBox='0 0 24 24'
+                      fill='currentColor'
+                    >
+                      <path d='M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169' />
+                    </svg>
+                  }
+                  title='Sincronización Strava'
+                  desc='Sube y analiza tus sesiones directamente con tu comunidad.'
+                />
+                <FeatureCard
+                  icon={
+                    <BarChart2
+                      size={20}
+                      className='text-blue-400'
+                    />
+                  }
+                  title='Progreso Guiado'
+                  desc='Rachas, cálculo del tonelaje y progresión de fuerza.'
                 />
               </div>
             </div>
@@ -605,6 +750,63 @@ const Landing: React.FC = () => {
               onClick={handleUpgrade}
               tone='accent'
             />
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className='mb-24 flex flex-col items-center max-w-3xl mx-auto'>
+          <div className='text-center mb-10'>
+            <p className='text-sm uppercase tracking-[0.2em] text-slate-500'>Dudas frecuentes</p>
+            <h2 className='text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mt-2 transition-colors'>
+              Todo lo que necesitas saber
+            </h2>
+          </div>
+          <div className='w-full space-y-4'>
+            {/* FAQ 1 */}
+            <details className='group bg-white/60 dark:bg-surface-900/60 backdrop-blur-sm border border-slate-200 dark:border-surface-800 rounded-2xl open:bg-white dark:open:bg-surface-900 transition-all'>
+              <summary className='flex justify-between items-center cursor-pointer p-6 font-semibold text-slate-900 dark:text-white select-none'>
+                ¿Es la aplicación realmente gratis?
+                <ChevronDown
+                  className='text-slate-400 group-open:rotate-180 transition-transform duration-300'
+                  size={20}
+                />
+              </summary>
+              <div className='px-6 pb-6 text-slate-500 dark:text-slate-400'>
+                Sí, el plan básico es 100% gratuito para siempre. Te permite generar rutinas, hacer
+                logs y ver tu progreso esencial. Ofrecemos un plan Pro para quienes necesitan más
+                volumen de rutinas IA y funcionalidades avanzadas.
+              </div>
+            </details>
+            {/* FAQ 2 */}
+            <details className='group bg-white/60 dark:bg-surface-900/60 backdrop-blur-sm border border-slate-200 dark:border-surface-800 rounded-2xl open:bg-white dark:open:bg-surface-900 transition-all'>
+              <summary className='flex justify-between items-center cursor-pointer p-6 font-semibold text-slate-900 dark:text-white select-none'>
+                ¿Cómo genera la IA mis entrenamientos?
+                <ChevronDown
+                  className='text-slate-400 group-open:rotate-180 transition-transform duration-300'
+                  size={20}
+                />
+              </summary>
+              <div className='px-6 pb-6 text-slate-500 dark:text-slate-400'>
+                Nuestro motor de inteligencia artificial analiza tu nivel de experiencia, el equipo
+                disponible, los días que quieres entrenar y tu objetivo principal. Luego, diseña una
+                progresión semanal óptima basada en volumen y ciencia deportiva, no en rutinas
+                aleatorias.
+              </div>
+            </details>
+            {/* FAQ 3 */}
+            <details className='group bg-white/60 dark:bg-surface-900/60 backdrop-blur-sm border border-slate-200 dark:border-surface-800 rounded-2xl open:bg-white dark:open:bg-surface-900 transition-all'>
+              <summary className='flex justify-between items-center cursor-pointer p-6 font-semibold text-slate-900 dark:text-white select-none'>
+                ¿Puedo conectarla con otras apps?
+                <ChevronDown
+                  className='text-slate-400 group-open:rotate-180 transition-transform duration-300'
+                  size={20}
+                />
+              </summary>
+              <div className='px-6 pb-6 text-slate-500 dark:text-slate-400'>
+                ¡Por supuesto! FITTWIZ se integra nativamente con Strava para que puedas subir tus
+                sesiones generadas en un clic y compartirlas con tu comunidad de atletas.
+              </div>
+            </details>
           </div>
         </section>
 
