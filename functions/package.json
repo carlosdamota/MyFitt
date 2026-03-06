@@ -10,7 +10,9 @@
   "scripts": {
     "build": "node --max_old_space_size=4096 ./node_modules/typescript/bin/tsc",
     "serve": "firebase emulators:start --only functions",
-    "deploy": "firebase deploy --only functions"
+    "deploy": "firebase deploy --only functions",
+    "backfill:gamification": "node lib/backfill-gamification.js --commit",
+    "backfill:gamification:dry": "node lib/backfill-gamification.js"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^5.0.2",

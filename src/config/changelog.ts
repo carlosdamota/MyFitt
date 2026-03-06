@@ -7,6 +7,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.0.13",
+    date: "2026-03-06",
+    change: "Rediseño visual interactivo del Progreso Semanal",
+    reason:
+      "Se dividió el panel de WeeklyProgress en zonas de 1/3 y 2/3 para mayor claridad, se incorporaron nuevas medallas dinámicas en SVG y se arregló la visibilidad y colapso automático del tooltip de escudos.",
+  },
+  {
     version: "1.0.12",
     date: "2026-03-06",
     change: "Optimización UX Mobile: Ahorro masivo de espacio vertical",

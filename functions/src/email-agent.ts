@@ -22,6 +22,12 @@ interface EmailContent {
   body_html: string;
 }
 
+type GamificationNotificationType =
+  | "shield_rescue"
+  | "medal_unlocked"
+  | "streak_lost"
+  | "streak_risk";
+
 // ─── Factory ────────────────────────────────────────────────────────
 export const createEmailAgentFunctions = ({
   geminiApiKey,
@@ -344,6 +350,45 @@ export const createEmailAgentFunctions = ({
         },
       });
     }
+  };
+
+  const buildGamificationEmail = (
+    type: GamificationNotificationType,
+    profileName: string,
+    meta?: Record<string, unknown>,
+  ): EmailContent => {
+    const safeName = profileName || "Atleta";
+
+    if (type === "shield_rescue") {
+      const streak = Number(meta?.previousStreak ?? 0);
+      return {
+        subject: "🛡️ Escudo activado: tu racha sigue viva",
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>Detectamos que no pudiste entrenar la semana pasada, así que activamos uno de tus escudos para proteger tu progreso.</p><p>Tu racha se mantiene en <strong>${streak} semanas</strong>. Recupera ritmo esta semana y seguimos a por tu próxima medalla.</p>`,
+      };
+    }
+
+    if (type === "medal_unlocked") {
+      const tier = String(meta?.tier || "").toLowerCase();
+      const tierLabel = tier === "gold" ? "Oro" : tier === "silver" ? "Plata" : "Bronce";
+      const streak = Number(meta?.streakWeeks ?? 0);
+      return {
+        subject: `🏅 Medalla ${tierLabel} desbloqueada en FittWiz`,
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>¡Enhorabuena! Acabas de desbloquear la medalla <strong>${tierLabel}</strong> por tu constancia.</p><p>Tu racha actual es de <strong>${streak} semanas</strong>. Sigue con este nivel y llega al siguiente hito.</p>`,
+      };
+    }
+
+    if (type === "streak_lost") {
+      const previousStreak = Number(meta?.previousStreak ?? 0);
+      return {
+        subject: "Reiniciamos tu racha, pero puedes volver hoy",
+        body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>La semana cerró sin entrenos y sin escudos disponibles, así que tu racha de <strong>${previousStreak} semanas</strong> se reinició.</p><p>No pasa nada: un solo entreno esta semana basta para volver a construir tu constancia.</p>`,
+      };
+    }
+
+    return {
+      subject: "🔥 Tu racha está en riesgo esta semana",
+      body_html: `<p>Hola <strong>${safeName}</strong>,</p><p>Estás a tiempo de salvar tu racha semanal: con un solo entreno esta semana mantienes el progreso vivo.</p><p>Entra en FittWiz y completa una sesión corta hoy.</p>`,
+    };
   };
 
   /** Call Gemini to generate email content */
@@ -859,6 +904,91 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
     },
   );
 
+  // ─── 2e. GAMIFICATION TRANSACTIONAL EMAILS (Notification trigger) ──
+  const sendGamificationEmail = onDocumentCreated(
+    `artifacts/${appId}/users/{userId}/notifications/{notificationId}`,
+    async (event) => {
+      const snapshot = event.data;
+      const userId = event.params.userId;
+      if (!snapshot) return;
+
+      const notification = snapshot.data() as {
+        type?: string;
+        meta?: Record<string, unknown>;
+      };
+
+      const allowedTypes: GamificationNotificationType[] = [
+        "shield_rescue",
+        "medal_unlocked",
+        "streak_lost",
+        "streak_risk",
+      ];
+
+      if (!notification.type || !allowedTypes.includes(notification.type as GamificationNotificationType)) {
+        return;
+      }
+
+      try {
+        const profileRef = db
+          .collection("artifacts")
+          .doc(appId)
+          .collection("users")
+          .doc(userId)
+          .collection("app_data")
+          .doc("profile");
+        const profileSnap = await profileRef.get();
+        const profile = profileSnap.data() || {};
+
+        const optedOut = await isEmailOptedOut(userId);
+        if (optedOut) {
+          await snapshot.ref.set({ emailStatus: "skipped_optout" }, { merge: true });
+          return;
+        }
+
+        let email = profile.email as string | undefined;
+        const displayName = (profile.displayName as string | undefined) || "Atleta";
+
+        if (!email) {
+          try {
+            const userRecord = await auth.getUser(userId);
+            email = userRecord.email || undefined;
+          } catch (err) {
+            logger.error(`[sendGamificationEmail] Failed to fetch auth user ${userId}`, err);
+          }
+        }
+
+        if (!email) {
+          await snapshot.ref.set({ emailStatus: "skipped_no_email" }, { merge: true });
+          return;
+        }
+
+        const content = buildGamificationEmail(
+          notification.type as GamificationNotificationType,
+          displayName,
+          notification.meta,
+        );
+
+        await sendEmail(email, content, userId);
+        await snapshot.ref.set(
+          {
+            emailStatus: "sent",
+            emailSentAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+      } catch (err) {
+        logger.error(`[sendGamificationEmail] Failed for user ${userId}`, err);
+        await snapshot.ref.set(
+          {
+            emailStatus: "failed",
+            emailErrorAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+    },
+  );
+
   // ─── 3. SECURITY ALERT (HTTP endpoint) ────────────────────────────
   const sendSecurityAlert = onRequest(
     { timeoutSeconds: 30, invoker: "public" },
@@ -955,6 +1085,7 @@ CRITICAL INSTRUCTIONS FOR 'body_html':
     queuePushReengagement,
     queueFirstWorkoutNudge,
     queueOnboardingReminderNudge,
+    sendGamificationEmail,
     sendSecurityAlert,
     sendProSubscriptionEmail,
   };
