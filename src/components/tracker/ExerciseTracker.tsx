@@ -219,9 +219,9 @@ const ExerciseTracker: React.FC<ExerciseTrackerProps> = ({
   }, [restTime, configuredReps, isLastInBlock]);
 
   return (
-    <div className='mt-4 bg-white/90 dark:bg-surface-950/90 backdrop-blur-xl p-5 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-sm dark:shadow-2xl relative overflow-hidden transition-colors'>
+    <div className='mt-4 bg-white/90 dark:bg-surface-950/90 backdrop-blur-xl p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-surface-800 shadow-sm dark:shadow-2xl relative overflow-hidden transition-colors'>
       <div className='absolute top-0 left-0 w-1 h-12 bg-linear-to-b from-blue-500 dark:from-cyan-400 to-transparent' />
-      <div className='flex items-center justify-between mb-4'>
+      <div className='flex items-center justify-between mb-3'>
         <span className='text-xs text-slate-500 dark:text-slate-300 font-bold uppercase tracking-widest flex items-center gap-2 transition-colors'>
           <History
             size={16}

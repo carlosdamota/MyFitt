@@ -25,14 +25,14 @@ const ExerciseVisual: React.FC<ExerciseVisualProps> = ({ name, svg, svgIcon, ima
         {/* White pill container — GIFs from ExerciseDB have white/near-white backgrounds,
             so we embrace it with a clean rounded container instead of fighting with blend modes */}
         <div
-          className={`bg-white rounded-2xl p-1 shadow-sm dark:shadow-lg dark:shadow-black/20 transition-opacity duration-300 ${
+          className={`bg-white rounded-xl p-0.5 shadow-sm dark:shadow-lg dark:shadow-black/20 transition-opacity duration-300 ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
         >
           <img
             src={imageUrl}
             alt={`Ilustración de ${name}`}
-            className='max-h-36 w-auto object-contain rounded-xl'
+            className='w-full h-auto object-contain rounded-lg'
             loading='lazy'
             onLoad={() => setIsLoaded(true)}
             onError={() => setHasError(true)}

@@ -111,156 +111,125 @@ export default function WeeklyProgress({
   const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
 
   return (
-    <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-5 mb-6 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors'>
+    <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-3 mb-4 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors'>
       {/* Background decoration */}
-      <div className='absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none' />
+      <div className='absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none' />
 
-      <div className='flex justify-between items-start mb-6 relative z-10'>
-        <div>
-          <h2 className='text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 transition-colors'>
-            Progreso Semanal
-            {isGoalMet && (
-              <Trophy className='text-amber-500 dark:text-amber-400 w-5 h-5 animate-pulse' />
-            )}
-          </h2>
-          <p className='text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors'>
-            {motivationalMessage}
-          </p>
-        </div>
+      <div className='flex justify-between items-center mb-2 relative z-10'>
+        <h2 className='text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 transition-colors'>
+          Progreso Semanal
+          {isGoalMet && (
+            <Trophy className='text-amber-500 dark:text-amber-400 size-4 animate-pulse' />
+          )}
+        </h2>
         <Link
           to='/app/stats'
-          className='text-blue-600 dark:text-cyan-400 text-xs sm:text-sm font-medium flex items-center hover:text-blue-700 dark:hover:text-cyan-300 transition-colors bg-slate-50 dark:bg-surface-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-surface-700'
+          className='text-blue-600 dark:text-cyan-400 text-[10px] sm:text-xs font-medium flex items-center hover:text-blue-700 dark:hover:text-cyan-300 transition-colors bg-slate-50 dark:bg-surface-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-surface-700 whitespace-nowrap shrink-0'
         >
-          Ver estadísticas{" "}
+          Estadísticas{" "}
           <ChevronRight
-            size={14}
-            className='ml-1'
+            size={12}
+            className='ml-0.5'
           />
         </Link>
       </div>
 
-      <div className='flex flex-col md:flex-row items-center gap-6 md:gap-8 relative z-10'>
-        {/* Progress Ring & Stats */}
-        <div className='flex items-center gap-5 shrink-0'>
-          {/* Circular Progress */}
-          <div className='relative w-24 h-24 flex items-center justify-center'>
-            <svg
-              className='transform -rotate-90 w-24 h-24 drop-shadow-[0_0_10px_rgba(6,182,212,0.15)]'
-              viewBox='0 0 80 80'
-            >
-              {/* Background circle */}
-              <circle
-                className='text-slate-200 dark:text-surface-800 transition-colors'
-                strokeWidth='6'
-                stroke='currentColor'
-                fill='transparent'
-                r={radius}
-                cx='40'
-                cy='40'
+      <div className='flex flex-col gap-2 relative z-10'>
+        {/* Flame Progress Bar */}
+        <div className='flex flex-col gap-2'>
+          <div className='flex justify-between items-end'>
+            <p className='text-slate-500 dark:text-slate-400 text-xs font-medium transition-colors'>
+              {motivationalMessage}
+            </p>
+            <div className='flex items-center gap-1.5 bg-orange-500/10 dark:bg-orange-500/20 px-2 py-0.5 rounded-full border border-orange-500/20'>
+              <Flame
+                size={12}
+                className='text-orange-500'
+                fill='currentColor'
               />
-              {/* Progress circle */}
-              <circle
-                className={`${isGoalMet ? "text-blue-500 dark:text-cyan-400" : "text-blue-400 dark:text-cyan-500"} transition-colors`}
-                strokeWidth='6'
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap='round'
-                stroke='currentColor'
-                fill='transparent'
-                r={radius}
-                cx='40'
-                cy='40'
-              />
-            </svg>
-            <div className='absolute inset-0 flex flex-col items-center justify-center pt-1'>
-              <span className='text-2xl font-black text-slate-900 dark:text-white leading-none transition-colors'>
-                {workoutsThisWeek}
-                <span className='text-sm text-slate-500 dark:text-slate-500 font-medium'>
-                  /{targetDays}
-                </span>
+              <span className='text-[10px] sm:text-xs font-bold text-orange-600 dark:text-orange-400'>
+                {streak} {streak === 1 ? "sem" : "sems"}
               </span>
             </div>
           </div>
 
-          {/* Stats Info */}
-          <div className='flex flex-col gap-3'>
-            <div className='flex flex-col'>
-              <span className='text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold transition-colors'>
-                Objetivo
-              </span>
-              <span className='text-sm text-slate-900 dark:text-white font-medium flex items-center gap-1.5 transition-colors'>
-                <Target
-                  size={14}
-                  className='text-blue-500 dark:text-cyan-500'
-                />
-                {targetDays} Sesiones
-              </span>
+          <div className='flex gap-2 h-10 items-center justify-between bg-slate-50/50 dark:bg-surface-950/50 p-2 rounded-xl border border-slate-100 dark:border-surface-800/50'>
+            <div className='flex gap-2 flex-1'>
+              {Array.from({ length: Math.max(targetDays, 5) }).map((_, i) => {
+                const isActive = i < workoutsThisWeek;
+                const isNext = i === workoutsThisWeek && !isGoalMet;
+                return (
+                  <div
+                    key={i}
+                    className={`
+                      relative flex-1 h-6 max-w-10 rounded-lg flex items-center justify-center transition-all duration-500
+                      ${
+                        isActive
+                          ? "bg-linear-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-red-600 shadow-[0_0_10px_rgba(249,115,22,0.4)]"
+                          : "bg-slate-200 dark:bg-surface-800 opacity-40"
+                      }
+                      ${isNext ? "animate-pulse border-2 border-orange-500/30" : ""}
+                    `}
+                  >
+                    <Flame
+                      size={i < workoutsThisWeek ? 14 : 12}
+                      className={`transition-colors ${isActive ? "text-white" : "text-slate-400 dark:text-slate-600"}`}
+                      fill={isActive ? "currentColor" : "none"}
+                    />
+                  </div>
+                );
+              })}
             </div>
-            <div className='flex flex-col'>
-              <span className='text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold transition-colors'>
-                Racha Actual Semanas
-              </span>
-              <span className='text-sm text-slate-900 dark:text-white font-medium flex items-center gap-1.5 transition-colors'>
-                <Flame
-                  size={14}
-                  className='text-orange-500'
-                  fill='currentColor'
-                />
-                {streak} {streak === 1 ? "Semana" : "Semanas"}
+            <div className='pl-3 border-l border-slate-200 dark:border-surface-800 shrink-0'>
+              <span className='text-sm font-black text-slate-900 dark:text-white leading-none'>
+                {workoutsThisWeek}
+                <span className='text-[10px] text-slate-500 font-medium ml-0.5'>/{targetDays}</span>
               </span>
             </div>
           </div>
         </div>
 
-        {/* Days Grid */}
-        <div className='flex-1 w-full bg-slate-50 dark:bg-surface-950 rounded-2xl p-2 sm:p-3 border border-slate-200 dark:border-surface-800 flex items-center gap-1 sm:gap-2 justify-between transition-colors'>
+        {/* Days Grid - Optimized for space */}
+        <div className='bg-slate-50/50 dark:bg-surface-950/50 rounded-xl p-1.5 border border-slate-100 dark:border-surface-800/50 flex items-center gap-1 transition-colors'>
           <button
             onClick={() => changeWeek(-1)}
-            className='p-1.5 sm:p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-surface-800 transition-all active:scale-95 shrink-0'
-            aria-label='Semana anterior'
+            className='p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors active:scale-95'
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </button>
 
-          <div className='flex-1 flex justify-around items-center'>
+          <div className='flex-1 flex justify-around'>
             {currentWeek.map((date, index) => {
               const dateString = date.toDateString();
               const hasWorkout = daysWithWorkouts.has(dateString);
               const isToday = new Date().toDateString() === dateString;
-              const isFuture = date > new Date();
 
               return (
                 <div
                   key={index}
-                  className='flex flex-col items-center gap-1.5 relative group'
+                  className='flex flex-col items-center gap-1'
                 >
                   <span
-                    className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-colors ${
-                      isToday
-                        ? "text-blue-600 dark:text-cyan-400"
-                        : "text-slate-500 dark:text-slate-500"
-                    }`}
+                    className={`text-[8px] font-bold uppercase ${isToday ? "text-blue-500 dark:text-cyan-400" : "text-slate-400 dark:text-slate-600"}`}
                   >
                     {weekDays[index]}
                   </span>
-
                   <div
                     className={`
-                      w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 relative shrink-0
-                      ${
-                        hasWorkout
-                          ? "bg-linear-to-br from-blue-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.4)] dark:shadow-[0_0_12px_rgba(34,211,238,0.4)] scale-105 border-none"
-                          : isToday
-                            ? "bg-blue-50 dark:bg-surface-800 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-cyan-500/50"
-                            : "bg-white dark:bg-surface-800/30 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-surface-800"
-                      }
-                      ${isFuture ? "opacity-30" : "opacity-100"}
-                    `}
+                    w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300
+                    ${
+                      hasWorkout
+                        ? "bg-linear-to-br from-blue-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 text-white shadow-sm scale-110"
+                        : isToday
+                          ? "border border-blue-400/50 dark:border-cyan-500/50"
+                          : "bg-slate-200/50 dark:bg-surface-800/50"
+                    }
+                  `}
                   >
                     {hasWorkout && (
                       <Dumbbell
-                        size={12}
-                        className='sm:w-4 sm:h-4 text-white'
+                        size={10}
+                        className='text-white'
                         strokeWidth={3}
                       />
                     )}
@@ -273,14 +242,9 @@ export default function WeeklyProgress({
           <button
             onClick={() => changeWeek(1)}
             disabled={isCurrentWeek}
-            className={`p-1.5 sm:p-2 rounded-xl transition-all active:scale-95 shrink-0 ${
-              isCurrentWeek
-                ? "text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-surface-800"
-            }`}
-            aria-label='Semana siguiente'
+            className={`p-1 rounded-lg transition-colors active:scale-95 ${isCurrentWeek ? "opacity-20 cursor-not-allowed" : "text-slate-400 hover:text-slate-900"}`}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>

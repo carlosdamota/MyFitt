@@ -255,15 +255,6 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         onEditRoutine={onEditRoutine}
       />
 
-      <RoutineTimer
-        timeFormatted={formatTime(time)}
-        isRunning={isRunning}
-        onToggle={toggle}
-        onStop={handleStopTimer}
-        onCancel={time > 0 || completedCount > 0 ? handleCancelWorkout : undefined}
-        className='mb-8'
-      />
-
       {showProCta && <ProUpgradeCta />}
 
       {/* Warmup Section */}
@@ -273,12 +264,12 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
           text={routine.warmup.text}
           icon={<Flame size={20} />}
           tone='warmup'
-          className='mb-8'
+          className='mb-4'
         />
       )}
 
       {/* Exercise Blocks */}
-      <div className='space-y-6'>
+      <div className='space-y-4'>
         {routine.blocks && routine.blocks.length > 0 ? (
           routine.blocks.map((block, index) => (
             <WorkoutBlock
@@ -319,7 +310,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
           text={routine.cooldown.text}
           icon={<Shield size={20} />}
           tone='cooldown'
-          className='mt-8 mb-8'
+          className='mt-4 mb-4'
         />
       )}
 
@@ -330,7 +321,7 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
         onToggle={toggle}
         onStop={handleStopTimer}
         onCancel={time > 0 || completedCount > 0 ? handleCancelWorkout : undefined}
-        className='mb-8'
+        className='z-40'
       />
 
       {/* Rest Timer Overlay */}
