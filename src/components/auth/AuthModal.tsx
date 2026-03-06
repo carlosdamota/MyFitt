@@ -119,6 +119,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
           <img
             src={mainLogo.src}
             alt={mainLogo.alt}
+            width={48}
+            height={48}
             className='h-12 w-12 rounded-2xl border border-slate-200 dark:border-surface-700/70 bg-white dark:bg-surface-900/80 p-1.5 object-contain transition-colors'
           />
         </div>

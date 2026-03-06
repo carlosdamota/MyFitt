@@ -142,6 +142,8 @@ const Header: React.FC<HeaderProps> = ({
                 <img
                   src={iconLogo.src}
                   alt={iconLogo.alt}
+                  width={24}
+                  height={24}
                   className='w-5 h-5 md:w-6 md:h-6'
                 />
                 <span className='text-slate-900 dark:text-white hidden sm:inline font-black italic tracking-tighter text-xl transition-colors'>
@@ -278,6 +280,8 @@ const Header: React.FC<HeaderProps> = ({
             <img
               src={iconLogo.src}
               alt={iconLogo.alt}
+              width={24}
+              height={24}
               className='w-6 h-6'
             />
             <span className='text-lg font-black italic tracking-tighter text-slate-900 dark:text-white transition-colors'>

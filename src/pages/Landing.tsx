@@ -483,6 +483,8 @@ const Landing: React.FC = () => {
                 <img
                   src='/assets/images/fittwiz-workout-2.webp'
                   alt='Estilo detallado'
+                  width={300}
+                  height={400}
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
                 <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
@@ -497,6 +499,8 @@ const Landing: React.FC = () => {
                 <img
                   src='/assets/images/fittwiz-workout-3.webp'
                   alt='Estilo minimalista'
+                  width={300}
+                  height={400}
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
                 <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
@@ -511,6 +515,8 @@ const Landing: React.FC = () => {
                 <img
                   src='/assets/images/fittwiz-workout-1.webp'
                   alt='Estilo historia'
+                  width={300}
+                  height={400}
                   className='w-full h-full object-cover select-none pointer-events-none'
                 />
                 <div className='absolute inset-0 bg-linear-to-t from-slate-900/40 to-transparent' />
