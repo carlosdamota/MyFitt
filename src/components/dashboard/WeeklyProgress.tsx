@@ -1,253 +1,309 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import { Flame, Dumbbell, ChevronRight, ChevronLeft, Trophy, Target } from "lucide-react";
-import type { WorkoutLogs } from "../../types";
+import { Award, ChevronRight, Flame, Info, Shield, Trophy } from "lucide-react";
+import type { UserStats, WorkoutLogs } from "../../types";
+import { useToast } from "../../hooks/useToast";
+import { MedalIcon } from "../icons/MedalIcon";
 
 interface WeeklyProgressProps {
   streak: number;
   workoutLogs: WorkoutLogs;
+  stats: UserStats | null;
   targetDays?: number;
 }
 
-// Helper to safely parse dates from various formats (String, Timestamp, Date)
-const safeParseDate = (date: any): Date | null => {
-  if (!date) return null;
-  if (date instanceof Date && !isNaN(date.getTime())) return date;
-  if (typeof date === "object" && typeof date.toDate === "function") {
-    // Firestore Timestamp
-    return date.toDate();
-  }
-  if (typeof date === "object" && "seconds" in date) {
-    // Firestore Timestamp dictionary
-    return new Date(date.seconds * 1000);
-  }
-  const parsed = new Date(date);
-  if (!isNaN(parsed.getTime())) return parsed;
-  return null;
+const safeParseDate = (date: unknown): Date | null => {
+  const parsed = new Date(String(date));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const resolveMedalTarget = (streak: number) => {
+  if (streak >= 24) return { targetWeeks: 24, baseWeeks: 24, label: "Oro" };
+  if (streak >= 12) return { targetWeeks: 24, baseWeeks: 12, label: "Oro" };
+  if (streak >= 4) return { targetWeeks: 12, baseWeeks: 4, label: "Plata" };
+  return { targetWeeks: 4, baseWeeks: 0, label: "Bronce" };
+};
+
+const resolveCurrentMedal = (streak: number) => {
+  if (streak >= 24) return "Oro";
+  if (streak >= 12) return "Plata";
+  if (streak >= 4) return "Bronce";
+  return "Sin medalla";
 };
 
 export default function WeeklyProgress({
   streak,
   workoutLogs,
+  stats,
   targetDays = 3,
 }: WeeklyProgressProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { success, info } = useToast();
+  const [showShieldInfo, setShowShieldInfo] = useState(false);
 
-  const currentWeek = useMemo(() => {
-    const day = currentDate.getDay();
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    const Monday = new Date(currentDate);
-    Monday.setDate(diff);
-
-    const week = [];
-    for (let i = 0; i < 7; i++) {
-      const dayDate = new Date(Monday);
-      dayDate.setDate(Monday.getDate() + i);
-      week.push(dayDate);
+  // Auto-cerrar el tooltip después de 5 segundos
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (showShieldInfo) {
+      timeout = setTimeout(() => {
+        setShowShieldInfo(false);
+      }, 5000);
     }
-    return week;
-  }, [currentDate]);
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [showShieldInfo]);
+  const effectiveStreak = Math.max(0, Number(stats?.gamification?.weekStreak ?? streak));
+  const totalSessions = Math.max(0, Number(stats?.totalSessions ?? 0));
+  const inferredShieldCount = Math.min(3, Math.floor(totalSessions / 10));
+  const inferredShieldProgress = inferredShieldCount >= 3 ? 0 : totalSessions % 10;
+  const shieldCount = Math.min(
+    3,
+    Math.max(0, Number(stats?.gamification?.shieldCount ?? inferredShieldCount)),
+  );
+  const shieldProgress = Math.min(
+    9,
+    Math.max(0, Number(stats?.gamification?.shieldProgress ?? inferredShieldProgress)),
+  );
 
-  const daysWithWorkouts = useMemo(() => {
-    const dates = new Set<string>();
+  const previousShieldCountRef = useRef<number | null>(null);
+  const previousRescueWeekRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (previousShieldCountRef.current !== null && shieldCount > previousShieldCountRef.current) {
+      success("¡Escudo conseguido por tu constancia! Tu racha está protegida.");
+    }
+    previousShieldCountRef.current = shieldCount;
+  }, [shieldCount, success]);
+
+  useEffect(() => {
+    const rescueWeek = stats?.gamification?.lastRescueWeekKey || null;
+    if (
+      rescueWeek &&
+      previousRescueWeekRef.current &&
+      rescueWeek !== previousRescueWeekRef.current
+    ) {
+      info("Escudo activado la semana pasada. Tu racha sigue intacta.");
+    }
+    previousRescueWeekRef.current = rescueWeek;
+  }, [stats?.gamification?.lastRescueWeekKey, info]);
+
+  const workoutsThisWeek = useMemo(() => {
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 7);
+
+    const trainedDays = new Set<string>();
     Object.values(workoutLogs).forEach((logs) => {
       logs.forEach((log) => {
-        const parsedDate = safeParseDate(log.date);
-        if (parsedDate) {
-          dates.add(parsedDate.toDateString());
+        const parsed = safeParseDate(log.date);
+        if (parsed && parsed >= monday && parsed < sunday) {
+          trainedDays.add(parsed.toDateString());
         }
       });
     });
-    return dates;
+
+    return trainedDays.size;
   }, [workoutLogs]);
 
-  const weekDays = ["L", "M", "X", "J", "V", "S", "D"];
+  const medalTarget = resolveMedalTarget(effectiveStreak);
+  const currentMedal = resolveCurrentMedal(effectiveStreak);
+  const weeksRemaining = Math.max(0, medalTarget.targetWeeks - effectiveStreak);
 
-  const changeWeek = (direction: -1 | 1) => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + direction * 7);
-    setCurrentDate(newDate);
-  };
-
-  const isCurrentWeek = useMemo(() => {
-    const today = new Date();
-    const startOfCurrentWeek = new Date(today);
-    const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-    startOfCurrentWeek.setDate(diff);
-    startOfCurrentWeek.setHours(0, 0, 0, 0);
-
-    const startOfViewedWeek = new Date(currentWeek[0]);
-    startOfViewedWeek.setHours(0, 0, 0, 0);
-
-    return startOfCurrentWeek.getTime() === startOfViewedWeek.getTime();
-  }, [currentWeek]);
-
-  // Calculate weekly progress
-  const workoutsThisWeek = useMemo(() => {
-    let count = 0;
-    currentWeek.forEach((date) => {
-      if (daysWithWorkouts.has(date.toDateString())) {
-        count++;
-      }
-    });
-    return count;
-  }, [currentWeek, daysWithWorkouts]);
-
-  const progressPercentage = Math.min((workoutsThisWeek / targetDays) * 100, 100);
-  const isGoalMet = workoutsThisWeek >= targetDays;
-
-  // Motivational message based on progress
-  const motivationalMessage = useMemo(() => {
-    if (workoutsThisWeek === 0) return "¡A por la primera sesión!";
-    if (workoutsThisWeek >= targetDays) return "¡Objetivo cumplido! 🔥";
-    if (workoutsThisWeek >= targetDays / 2) return "¡Ya falta poco! Sigue así.";
-    return "¡Buen comienzo! 💪";
-  }, [workoutsThisWeek, targetDays]);
-
-  // Circular Progress Component
-  const radius = 34;
+  const radius = 18;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
+  const shieldOffset = circumference - (shieldProgress / 10) * circumference;
+  const longTermProgressPct = Math.min((effectiveStreak / 24) * 100, 100);
+
+  const medalMilestones = [
+    { label: "B", name: "Bronce", week: 4 },
+    { label: "P", name: "Plata", week: 12 },
+    { label: "O", name: "Oro", week: 24 },
+  ];
 
   return (
-    <div className='bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-800 rounded-2xl p-3 mb-4 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors'>
-      {/* Background decoration */}
-      <div className='absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none' />
+    <section
+      className={`relative rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm backdrop-blur-sm transition-colors dark:border-surface-800 dark:bg-surface-900/90 dark:shadow-xl ${showShieldInfo ? "z-50" : ""}`}
+    >
+      {/* Contenedor de fondo para contener el blur sin cortar los popups */}
+      <div className='pointer-events-none absolute inset-0 overflow-hidden rounded-2xl'>
+        <div className='absolute right-0 top-0 h-40 w-40 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary-500/10 blur-3xl' />
+      </div>
 
-      <div className='flex justify-between items-center mb-2 relative z-10'>
-        <h2 className='text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 transition-colors'>
-          Progreso Semanal
-          {isGoalMet && (
-            <Trophy className='text-amber-500 dark:text-amber-400 size-4 animate-pulse' />
-          )}
+      <div className='relative z-10 flex items-center justify-between gap-2'>
+        <h2 className='flex items-center gap-2 text-sm font-bold text-slate-900 transition-colors dark:text-white sm:text-base'>
+          Progreso semanal <Trophy className='size-4 text-amber-500 dark:text-amber-400' />
         </h2>
         <Link
           to='/app/stats'
-          className='text-blue-600 dark:text-cyan-400 text-[10px] sm:text-xs font-medium flex items-center hover:text-blue-700 dark:hover:text-cyan-300 transition-colors bg-slate-50 dark:bg-surface-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-surface-700 whitespace-nowrap shrink-0'
+          className='inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-primary-600 transition-colors hover:text-primary-700 dark:border-surface-700 dark:bg-surface-800 dark:text-primary-400 dark:hover:text-primary-300 sm:text-xs'
         >
-          Estadísticas{" "}
-          <ChevronRight
-            size={12}
-            className='ml-0.5'
-          />
+          Estadísticas <ChevronRight size={12} />
         </Link>
       </div>
 
-      <div className='flex flex-col gap-2 relative z-10'>
-        {/* Flame Progress Bar */}
-        <div className='flex flex-col gap-2'>
-          <div className='flex justify-between items-end'>
-            <p className='text-slate-500 dark:text-slate-400 text-xs font-medium transition-colors'>
-              {motivationalMessage}
-            </p>
-            <div className='flex items-center gap-1.5 bg-orange-500/10 dark:bg-orange-500/20 px-2 py-0.5 rounded-full border border-orange-500/20'>
-              <Flame
-                size={12}
-                className='text-orange-500'
-                fill='currentColor'
-              />
-              <span className='text-[10px] sm:text-xs font-bold text-orange-600 dark:text-orange-400'>
-                {streak} {streak === 1 ? "sem" : "sems"}
+      {/* Días completados The Flames */}
+      <div className='relative z-10 mt-2 flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/80 px-2.5 py-2 transition-colors dark:border-surface-800/70 dark:bg-surface-950/40'>
+        <div className='flex items-center gap-1.5'>
+          {Array.from({ length: Math.max(1, targetDays) }).map((_, index) => {
+            const active = index < Math.min(workoutsThisWeek, targetDays);
+            return (
+              <span
+                key={index}
+                className={`relative flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 ${active ? "bg-orange-500/15" : "bg-white dark:bg-surface-900 shadow-sm border border-slate-100 dark:border-surface-800"}`}
+              >
+                <Flame
+                  size={16}
+                  className={active ? "text-orange-500" : "text-slate-300 dark:text-surface-700"}
+                  fill={active ? "currentColor" : "none"}
+                />
+                {active && (
+                  <span className='absolute inset-0 rounded-xl shadow-[0_0_10px_rgba(249,115,22,0.3)] pointer-events-none' />
+                )}
               </span>
-            </div>
-          </div>
+            );
+          })}
+        </div>
+        <p className='whitespace-nowrap text-xs font-semibold text-slate-700 dark:text-slate-300 sm:text-sm'>
+          {workoutsThisWeek}/{targetDays} entrenos completados
+        </p>
+      </div>
 
-          <div className='flex gap-2 h-10 items-center justify-between bg-slate-50/50 dark:bg-surface-950/50 p-2 rounded-xl border border-slate-100 dark:border-surface-800/50'>
-            <div className='flex gap-2 flex-1'>
-              {Array.from({ length: Math.max(targetDays, 5) }).map((_, i) => {
-                const isActive = i < workoutsThisWeek;
-                const isNext = i === workoutsThisWeek && !isGoalMet;
-                return (
-                  <div
-                    key={i}
-                    className={`
-                      relative flex-1 h-6 max-w-10 rounded-lg flex items-center justify-center transition-all duration-500
-                      ${
-                        isActive
-                          ? "bg-linear-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-red-600 shadow-[0_0_10px_rgba(249,115,22,0.4)]"
-                          : "bg-slate-200 dark:bg-surface-800 opacity-40"
-                      }
-                      ${isNext ? "animate-pulse border-2 border-orange-500/30" : ""}
-                    `}
-                  >
-                    <Flame
-                      size={i < workoutsThisWeek ? 14 : 12}
-                      className={`transition-colors ${isActive ? "text-white" : "text-slate-400 dark:text-slate-600"}`}
-                      fill={isActive ? "currentColor" : "none"}
-                    />
+      {/* Escudos y Medallas en layout 1/3 y 2/3 */}
+      <div className='relative z-30 mt-2 flex items-stretch gap-0 rounded-xl border border-slate-100 bg-slate-50/80 transition-colors dark:border-surface-800/70 dark:bg-surface-950/40'>
+        {/* Left Side: Escudos (~1/3) */}
+        <div className='relative flex w-[35%] shrink-0 flex-col sm:flex-row items-center sm:items-start justify-center p-2 sm:p-3 gap-2'>
+          <div className='relative flex h-14 w-14 shrink-0 items-center justify-center'>
+            <svg
+              className='absolute inset-0 h-full w-full -rotate-90'
+              viewBox='0 0 44 44'
+            >
+              <circle
+                cx='22'
+                cy='22'
+                r={radius}
+                stroke='currentColor'
+                strokeWidth='3'
+                className='text-slate-200 dark:text-surface-700/60'
+                fill='none'
+              />
+              <circle
+                cx='22'
+                cy='22'
+                r={radius}
+                stroke='currentColor'
+                strokeWidth='3'
+                strokeLinecap='round'
+                strokeDasharray={circumference}
+                strokeDashoffset={shieldOffset}
+                className='text-primary-500 drop-shadow-[0_0_4px_rgba(6,182,212,0.4)] transition-all duration-500'
+                fill='none'
+              />
+            </svg>
+            <Shield
+              size={20}
+              className='text-slate-700 dark:text-slate-200 z-10'
+            />
+          </div>
+          <div className='flex flex-col items-center sm:items-start text-center sm:text-left leading-tight'>
+            <div className='relative flex items-center gap-1 justify-center sm:justify-start w-full'>
+              <p className='text-[11px] sm:text-xs font-extrabold text-slate-800 dark:text-slate-100'>
+                x{shieldCount} escudos
+              </p>
+              <div className='relative inline-flex items-center justify-center'>
+                <button
+                  type='button'
+                  onClick={() => setShowShieldInfo((prev) => !prev)}
+                  className='inline-flex shrink-0 h-4 w-4 items-center justify-center rounded-full border border-primary-500/40 bg-primary-500/10 text-primary-700 transition-colors hover:bg-primary-500/20 dark:text-primary-300'
+                  aria-label='Cómo funciona el escudo'
+                >
+                  <Info size={10} />
+                </button>
+
+                {showShieldInfo && (
+                  <div className='absolute z-[100] left-1/2 md:left-full bottom-[110%] md:bottom-auto mb-2 md:mb-0 md:ml-2 w-56 -translate-x-[20%] md:translate-x-0 rounded-xl border border-slate-200 bg-white p-2.5 text-[10px] sm:text-xs text-slate-600 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.3)] transition-colors dark:border-surface-700 dark:bg-surface-900 dark:text-slate-300 pointer-events-none'>
+                    Ganas 1 escudo cada 10 entrenos (max. 3). Si una semana terminas con 0 entrenos,
+                    se consume 1 para proteger tu racha.
+                    <div className='absolute -bottom-2 md:bottom-auto md:top-1/2 left-[20%] md:-left-2 -translate-x-1/2 md:translate-x-0 md:-translate-y-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-t-white dark:border-t-surface-900 border-l-transparent border-r-transparent md:border-t-transparent md:border-b-transparent md:border-r-8 md:border-r-white md:dark:border-r-surface-900'></div>
                   </div>
-                );
-              })}
+                )}
+              </div>
             </div>
-            <div className='pl-3 border-l border-slate-200 dark:border-surface-800 shrink-0'>
-              <span className='text-sm font-black text-slate-900 dark:text-white leading-none'>
-                {workoutsThisWeek}
-                <span className='text-[10px] text-slate-500 font-medium ml-0.5'>/{targetDays}</span>
-              </span>
-            </div>
+            <p className='text-[10px] text-slate-500 dark:text-slate-400 mt-0.5'>
+              {shieldProgress}/10 entrenos
+            </p>
           </div>
         </div>
 
-        {/* Days Grid - Optimized for space */}
-        <div className='bg-slate-50/50 dark:bg-surface-950/50 rounded-xl p-1.5 border border-slate-100 dark:border-surface-800/50 flex items-center gap-1 transition-colors'>
-          <button
-            onClick={() => changeWeek(-1)}
-            className='p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors active:scale-95'
-          >
-            <ChevronLeft size={16} />
-          </button>
+        {/* Separator Line */}
+        <div className='w-px bg-slate-200 dark:bg-surface-700/80 my-2 shrink-0' />
 
-          <div className='flex-1 flex justify-around'>
-            {currentWeek.map((date, index) => {
-              const dateString = date.toDateString();
-              const hasWorkout = daysWithWorkouts.has(dateString);
-              const isToday = new Date().toDateString() === dateString;
+        {/* Right Side: Progresión Racha (~2/3) */}
+        <div className='flex min-w-0 flex-1 flex-col justify-center p-2 sm:p-3'>
+          <div className='mb-2 flex items-center justify-end gap-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100'>
+            <Flame
+              size={14}
+              className='text-orange-500'
+              fill='currentColor'
+            />
+            {effectiveStreak} Semanas seguidas
+          </div>
+
+          <div className='relative mb-2 pb-1 pt-1 ml-3 mr-3'>
+            {/* Base track */}
+            <div className='absolute top-3 left-0 right-0 h-2 -translate-y-1/2 rounded-full bg-slate-200 dark:bg-surface-800' />
+            {/* Progress track */}
+            <div
+              className='absolute top-3 left-0 h-2 -translate-y-1/2 rounded-full bg-linear-to-r from-primary-600 via-primary-400 to-cyan-300 drop-shadow-[0_0_6px_rgba(6,182,212,0.4)] transition-all duration-700'
+              style={{ width: `${longTermProgressPct}%` }}
+            />
+
+            {/* SVG Medals at milestones */}
+            {medalMilestones.map((milestone) => {
+              const milestonePct = (milestone.week / 24) * 100;
+              const isLocked = effectiveStreak < milestone.week;
+              const isAchieved = effectiveStreak >= milestone.week;
+
+              // Type coercion based on name ( Bronce -> bronze )
+              const type =
+                milestone.name === "Bronce"
+                  ? "bronze"
+                  : milestone.name === "Plata"
+                    ? "silver"
+                    : "gold";
 
               return (
                 <div
-                  key={index}
-                  className='flex flex-col items-center gap-1'
+                  key={milestone.name}
+                  className='absolute top-3 -translate-y-1/2 -translate-x-1/2 z-10'
+                  style={{ left: `${milestonePct}%` }}
+                  title={`${milestone.name}: semana ${milestone.week}`}
                 >
-                  <span
-                    className={`text-[8px] font-bold uppercase ${isToday ? "text-blue-500 dark:text-cyan-400" : "text-slate-400 dark:text-slate-600"}`}
-                  >
-                    {weekDays[index]}
-                  </span>
-                  <div
-                    className={`
-                    w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300
-                    ${
-                      hasWorkout
-                        ? "bg-linear-to-br from-blue-500 to-blue-600 dark:from-cyan-400 dark:to-blue-500 text-white shadow-sm scale-110"
-                        : isToday
-                          ? "border border-blue-400/50 dark:border-cyan-500/50"
-                          : "bg-slate-200/50 dark:bg-surface-800/50"
-                    }
-                  `}
-                  >
-                    {hasWorkout && (
-                      <Dumbbell
-                        size={10}
-                        className='text-white'
-                        strokeWidth={3}
-                      />
-                    )}
-                  </div>
+                  <MedalIcon
+                    type={type}
+                    locked={isLocked}
+                    achieved={isAchieved}
+                    className='h-7 w-7 sm:h-8 sm:w-8 -mt-2.5'
+                  />
                 </div>
               );
             })}
           </div>
 
-          <button
-            onClick={() => changeWeek(1)}
-            disabled={isCurrentWeek}
-            className={`p-1 rounded-lg transition-colors active:scale-95 ${isCurrentWeek ? "opacity-20 cursor-not-allowed" : "text-slate-400 hover:text-slate-900"}`}
-          >
-            <ChevronRight size={16} />
-          </button>
+          <div className='mt-2 text-center sm:text-right'>
+            <div className='inline-flex items-center overflow-hidden rounded-xl border border-primary-500/20 bg-primary-500/5 px-2 py-0.5 font-bold shadow-sm backdrop-blur-sm'>
+              <span className='text-[10px] sm:text-xs text-primary-700 dark:text-cyan-300 drop-shadow-sm glow'>
+                Objetivo: {medalTarget.label}{" "}
+                {weeksRemaining > 0 ? `(${weeksRemaining} sem)` : "(comprobado)"}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

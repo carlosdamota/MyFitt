@@ -201,7 +201,12 @@ export const useWorkoutLogs = (user: User | null): UseWorkoutLogsReturn => {
       currentWeekStreak = tempStreak;
     }
 
-    return { dayStreak: currentDayStreak, weekStreak: currentWeekStreak };
+    const backendWeekStreak = Number(resolvedStats?.gamification?.weekStreak ?? NaN);
+    const safeWeekStreak = Number.isFinite(backendWeekStreak)
+      ? Math.max(0, backendWeekStreak)
+      : currentWeekStreak;
+
+    return { dayStreak: currentDayStreak, weekStreak: safeWeekStreak };
   })();
 
   const saveCoachAdvice = async (advice: string) => {

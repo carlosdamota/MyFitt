@@ -129,6 +129,16 @@ export interface UserStats {
   totalVolume: number;
   totalExercises: number;
   workoutDates: string[];
+  gamification?: {
+    weekStreak: number;
+    bestWeekStreak: number;
+    shieldCount: number;
+    shieldProgress: number;
+    medalTier: "none" | "bronze" | "silver" | "gold";
+    lastProcessedWeekKey?: string;
+    lastRescueAt?: string;
+    lastRescueWeekKey?: string;
+  };
   personalBests: {
     [exerciseName: string]: {
       low?: PersonalBest;

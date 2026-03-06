@@ -12,6 +12,10 @@ import { createPushAgentFunctions } from "./push-agent.js";
 import { createAccountDeletionFunctions } from "./account-deletion.js";
 import { createUpdateUserStatsFunction } from "./user-stats.js";
 import {
+  createWeeklyGamificationRollupFunction,
+  createStreakRiskReminderFunction,
+} from "./gamification-weekly.js";
+import {
   createStravaExchangeTokenFunction,
   createStravaSyncWorkoutFunction,
   createStravaDisconnectFunction,
@@ -147,6 +151,8 @@ export const sendWelcomeEmail = emailAgentFns.sendWelcomeEmail;
 export const weeklyReengagement = emailAgentFns.weeklyReengagement;
 export const queuePushReengagement = emailAgentFns.queuePushReengagement;
 export const queueFirstWorkoutNudge = emailAgentFns.queueFirstWorkoutNudge;
+export const queueOnboardingReminderNudge = emailAgentFns.queueOnboardingReminderNudge;
+export const sendGamificationEmail = emailAgentFns.sendGamificationEmail;
 export const sendSecurityAlert = emailAgentFns.sendSecurityAlert;
 
 export const pushAgent = pushAgentFns.sendPushOnNotification;
@@ -162,6 +168,18 @@ export const createShareImage = createShareImageFunction({
 
 export const updateUserStats = createUpdateUserStatsFunction({
   appId: APP_ID,
+});
+
+export const weeklyGamificationRollup = createWeeklyGamificationRollupFunction({
+  db,
+  appId: APP_ID,
+  timeZone: "Europe/Madrid",
+});
+
+export const streakRiskReminder = createStreakRiskReminderFunction({
+  db,
+  appId: APP_ID,
+  timeZone: "Europe/Madrid",
 });
 
 // --- Strava Integration ---

@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.13] - 2026-03-06
+
+- **Cambio**: Rediseño visual interactivo del panel de Progreso Semanal.
+- **Para qué**: El panel ahora se estructura en un 1/3 (Escudos) y 2/3 (Racha). Se reemplazaron las letras de nivel por Medallas dinámicas de alta fidelidad en SVG, y se solucionó un problema oculto con el "Tooltip" de ayuda, que ahora tiene z-index inteligente y auto-cierre a los 5 segundos para mejorar UX nativo en móviles.
+
 ## [1.0.12] - 2026-03-06
 
 - **Cambio**: Optimización agresiva de espacio vertical en móvil (WeeklyProgress, ExerciseCard y SmartSuggestion).
