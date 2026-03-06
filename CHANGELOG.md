@@ -2,6 +2,16 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.12] - 2026-03-06
+
+- **Cambio**: Optimización agresiva de espacio vertical en móvil (WeeklyProgress, ExerciseCard y SmartSuggestion).
+- **Para qué**: Reduce la necesidad de scroll en un 40-50% al expandir ejercicios, mejora la usabilidad en pantallas estrechas con layouts en fila e integra visuales (GIFs) con notas de forma más compacta y premium.
+
+## [1.0.11] - 2026-03-06
+
+- **Cambio**: Rediseño de temporizadores de rutina y descanso (Docked Style).
+- **Para qué**: Mejora la usabilidad en dispositivos móviles al colocar los controles en la 'zona del pulgar' y unifica el diseño para que el descanso tape completamente el tiempo total sin desajustes.
+
 ## [1.0.10] - 2026-03-05
 
 - **Cambio**: Fix: Parseo de títulos en uploads de Strava.

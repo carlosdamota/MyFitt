@@ -7,6 +7,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.0.12",
+    date: "2026-03-06",
+    change: "Optimización UX Mobile: Ahorro masivo de espacio vertical",
+    reason:
+      "Se ha rediseñado el WeeklyProgress, las fichas de ejercicio y las sugerencias inteligentes para que ocupen un 50% menos de espacio en móvil, permitiendo ver más contenido sin scroll.",
+  },
+  {
+    version: "1.0.11",
+    date: "2026-03-06",
+    change: "Mejora de UX: Rediseño de temporizadores de entrenamiento",
+    reason:
+      "Se ha implementado un nuevo diseño anclado a la base de la pantalla (docked), unificando el estilo de los temporizadores de rutina y descanso para un solapamiento perfecto y mejor usabilidad móvil.",
+  },
+  {
     version: "1.0.10",
     date: "2026-03-05",
     change: "Fix: Parseo de títulos en uploads de Strava",

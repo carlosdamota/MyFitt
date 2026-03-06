@@ -13,7 +13,7 @@ import { useLegacyLogsMigration } from "../hooks/useLegacyLogsMigration";
 
 // Layout components
 import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+// Footer removed for mobile layout
 import TimerOverlay from "../components/layout/TimerOverlay";
 import AuthModal from "../components/auth/AuthModal";
 import CookieBanner from "../components/legal/CookieBanner";
@@ -214,7 +214,7 @@ function DashboardLayoutContent() {
       </main>
 
       <div className='flex-none'>
-        <Footer />
+        {/* Footer has been removed from the main app layout per mobile-first UI best practices */}
       </div>
       <TimerOverlay
         timer={timer}

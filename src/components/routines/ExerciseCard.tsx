@@ -73,8 +73,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         <div className='absolute left-0 top-0 bottom-0 w-1 bg-blue-500 dark:bg-blue-500/50 transition-colors' />
       )}
 
-      <div className='p-4 sm:p-5'>
-        <div className='flex items-center gap-4'>
+      <div className='p-3 sm:p-4'>
+        <div className='flex items-center gap-3'>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -106,7 +106,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <div className='flex justify-between items-center'>
               <div>
                 <h3
-                  className={`font-bold text-lg leading-tight mb-1 transition-colors ${
+                  className={`font-bold text-base sm:text-lg leading-tight mb-0.5 transition-colors ${
                     isCompleted
                       ? "text-slate-400 dark:text-slate-500 line-through decoration-2 decoration-slate-300 dark:decoration-slate-700"
                       : "text-slate-900 dark:text-slate-100"
@@ -153,27 +153,29 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         </div>
 
         {isExpanded && (
-          <div className='mt-5 pt-5 border-t border-slate-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-300 transition-colors'>
-            <div className='w-full h-48 bg-slate-100 dark:bg-surface-950 rounded-xl border border-slate-200 dark:border-white/5 mb-4 overflow-hidden relative flex items-center justify-center p-4 transition-colors'>
-              <ExerciseVisual
-                name={displayName}
-                svg={displaySvg}
-                svgIcon={exercise.svg_icon}
-                imageUrl={displayImageUrl}
-              />
-            </div>
-
-            {exercise.note && (
-              <div className='flex items-start gap-3 bg-blue-50 dark:bg-primary-950/30 border border-blue-200 dark:border-primary-500/20 p-4 rounded-xl mb-4 transition-colors'>
-                <Info
-                  size={18}
-                  className='text-blue-500 dark:text-primary-400 shrink-0 mt-0.5 transition-colors'
+          <div className='mt-3 pt-3 border-t border-slate-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-300 transition-colors'>
+            <div className='flex gap-3 mb-3 items-center'>
+              <div className='w-24 h-24 sm:w-28 sm:h-28 bg-slate-100 dark:bg-surface-950 rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden relative flex items-center justify-center p-1 shrink-0 transition-colors'>
+                <ExerciseVisual
+                  name={displayName}
+                  svg={displaySvg}
+                  svgIcon={exercise.svg_icon}
+                  imageUrl={displayImageUrl}
                 />
-                <p className='text-sm text-blue-900 dark:text-primary-100/80 leading-relaxed transition-colors'>
-                  {exercise.note}
-                </p>
               </div>
-            )}
+
+              {exercise.note && (
+                <div className='flex-1 flex items-start gap-2 py-1.5 px-1 border-l-2 border-primary-500/30 dark:border-primary-500/50 transition-colors'>
+                  <Info
+                    size={14}
+                    className='text-primary-500 dark:text-primary-400 shrink-0 mt-0.5 transition-colors'
+                  />
+                  <p className='text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed transition-colors'>
+                    {exercise.note}
+                  </p>
+                </div>
+              )}
+            </div>
 
             <ExerciseTracker
               exerciseName={exercise.name}

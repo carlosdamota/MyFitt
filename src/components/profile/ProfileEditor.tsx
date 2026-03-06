@@ -1,6 +1,17 @@
 import React, { useState, useEffect, FormEvent } from "react";
-import { Dumbbell, Loader, Check, Trash2, Sparkles, Link, Unlink } from "lucide-react";
-import { useNavigate } from "react-router";
+import {
+  Dumbbell,
+  Loader,
+  Check,
+  Trash2,
+  Sparkles,
+  Link,
+  Unlink,
+  Shield,
+  FileText,
+  Scale,
+} from "lucide-react";
+import { useNavigate, Link as RouterLink } from "react-router";
 import { Button } from "../ui/Button";
 import { useProfile } from "../../hooks/useProfile";
 import { useEntitlement } from "../../hooks/useEntitlement";
@@ -297,7 +308,29 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
             />
             <span>Novedades</span>
           </button>
-          <p className='text-[9px] text-slate-300 dark:text-slate-700'>FittWiz © 2026</p>
+
+          <div className='flex items-center justify-center gap-4 py-3'>
+            <RouterLink
+              to='/privacy'
+              className='text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors flex items-center gap-1'
+            >
+              <Shield size={10} /> Privacidad
+            </RouterLink>
+            <RouterLink
+              to='/terms'
+              className='text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors flex items-center gap-1'
+            >
+              <FileText size={10} /> Términos
+            </RouterLink>
+            <RouterLink
+              to='/legal'
+              className='text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors flex items-center gap-1'
+            >
+              <Scale size={10} /> Legal
+            </RouterLink>
+          </div>
+
+          <p className='text-[9px] text-slate-300 dark:text-slate-700 pt-2'>FittWiz © 2026</p>
         </div>
 
         {/* ── Danger Zone ─────────────────────────── */}
