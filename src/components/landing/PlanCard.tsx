@@ -38,7 +38,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         </h3>
       </div>
       <span
-        className={`text-sm font-semibold px-3 py-1 rounded-full ${
+        className={`text-sm font-semibold px-4 py-1 rounded-full whitespace-nowrap shrink-0 ${
           tone === "accent"
             ? "bg-primary-500/20 text-primary-200"
             : "bg-slate-100 dark:bg-surface-800 text-slate-600 dark:text-slate-300"
