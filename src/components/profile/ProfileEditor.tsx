@@ -124,8 +124,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
           isPro={isPro}
         />
 
-        {/* Save button — hidden on mobile (rendered sticky below) */}
-        <div className='hidden sm:block'>
+        {/* Save button */}
+        <div className='w-full'>
           <Button
             onClick={handleSaveClick}
             disabled={isSaving}
@@ -316,30 +316,6 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onRequireAuth }) =>
             </p>
           </div>
         )}
-      </div>
-
-      {/* ── Sticky Save Button (mobile only) ─────────────────────────── */}
-      <div className='sm:hidden fixed bottom-16 left-0 right-0 z-30 px-4 pb-2 pointer-events-none'>
-        <div className='pointer-events-auto'>
-          <Button
-            onClick={handleSaveClick}
-            disabled={isSaving}
-            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-black/20 ${savedSuccess ? "bg-success-600 hover:bg-success-600 text-white" : ""}`}
-            variant='primary'
-            leftIcon={
-              isSaving ? (
-                <Loader
-                  size={18}
-                  className='animate-spin'
-                />
-              ) : savedSuccess ? (
-                <Check size={18} />
-              ) : undefined
-            }
-          >
-            {savedSuccess ? "Guardado ✓" : "Guardar Perfil"}
-          </Button>
-        </div>
       </div>
 
       {/* ── Modals ─────────────────────────── */}

@@ -1,80 +1,7 @@
 import React from "react";
 import { X, Sparkles } from "lucide-react";
 import { APP_VERSION } from "../../config/version";
-
-interface ChangelogEntry {
-  version: string;
-  date: string;
-  change: string;
-  reason: string;
-}
-
-// Parsed from CHANGELOG.md — update alongside the file
-const CHANGELOG: ChangelogEntry[] = [
-  {
-    version: "1.0.9",
-    date: "2026-03-04",
-    change: "Integración completa con Strava",
-    reason:
-      "Sincronización automática de actividades, botón para compartir en Strava en el resumen de sesión y actualización de políticas de privacidad para cumplimiento oficial.",
-  },
-  {
-    version: "1.0.8",
-    date: "2026-03-04",
-    change: "Fix: Persistencia en cuentas antiguas",
-    reason:
-      "Se resolvió un problema que impedía guardar cambios en el perfil a usuarios antiguos por falta de migración de campos y restricciones en las reglas de Firestore.",
-  },
-  {
-    version: "1.0.7",
-    date: "2026-03-04",
-    change: "Mejoras de UX mobile en Perfil",
-    reason:
-      "El botón Guardar es sticky en mobile, las secciones Notificaciones y Apariencia son más discretas, y se ocultan descripciones del Coach en móvil para ahorrar espacio.",
-  },
-  {
-    version: "1.0.6",
-    date: "2026-03-04",
-    change: "Rediseño de Entrenadores Inteligentes",
-    reason:
-      "La sección Coaches del perfil ahora usa iconos SVG, cards glassmorphism con descripción, estado activo con gradiente, y un botón Guardar sticky en mobile.",
-  },
-  {
-    version: "1.0.5",
-    date: "2026-03-04",
-    change: "Persistencia de personalidad del coach",
-    reason:
-      "El perfil no guardaba la personalidad por falta de permisos en Firestore y la IA Sargento era demasiado amable. Ahora el guardado es robusto y el análisis semanal respeta la semana natural.",
-  },
-  {
-    version: "1.0.4",
-    date: "2026-03-04",
-    change: "Fix: tabs mezclados en dashboard",
-    reason:
-      "Tras onboarding o generación los tabs mostraban días de múltiples programas mezclados. Ahora el dashboard filtra correctamente por programa activo.",
-  },
-  {
-    version: "1.0.3",
-    date: "2026-03-04",
-    change: "Fix: selección de rutinas desde Mis Rutinas",
-    reason:
-      "El dashboard se quedaba en la rutina base porque el guardado fallaba por permisos. Ahora lee el parámetro de URL como fuente primaria.",
-  },
-  {
-    version: "1.0.2",
-    date: "2026-03-04",
-    change: "Rutinas IA se activan automáticamente",
-    reason:
-      "Tras generar un programa con IA, el dashboard seguía mostrando la rutina base. Ahora la primera rutina generada se establece como activa.",
-  },
-  {
-    version: "1.0.1",
-    date: "2026-03-03",
-    change: "Sistema de versionado y changelog",
-    reason:
-      "Se implementa el sistema de versiones centralizado (version.ts) y el registro automático de cambios en CHANGELOG.md.",
-  },
-];
+import { CHANGELOG_DATA } from "../../config/changelog";
 
 interface ChangelogModalProps {
   isOpen: boolean;
@@ -127,7 +54,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
 
         {/* Changelog list */}
         <div className='overflow-y-auto max-h-[65vh] px-5 py-4 space-y-4'>
-          {CHANGELOG.map((entry, index) => (
+          {CHANGELOG_DATA.map((entry, index) => (
             <div
               key={entry.version}
               className='flex gap-3'
@@ -137,7 +64,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
                 <div
                   className={`w-2 h-2 rounded-full shrink-0 ${index === 0 ? "bg-primary-400" : "bg-slate-300 dark:bg-surface-600"}`}
                 />
-                {index < CHANGELOG.length - 1 && (
+                {index < CHANGELOG_DATA.length - 1 && (
                   <div className='w-px flex-1 mt-1 bg-slate-200 dark:bg-surface-700' />
                 )}
               </div>
