@@ -24,13 +24,6 @@ const resolveMedalTarget = (streak: number) => {
   return { targetWeeks: 4, baseWeeks: 0, label: "Bronce" };
 };
 
-const resolveCurrentMedal = (streak: number) => {
-  if (streak >= 24) return "Oro";
-  if (streak >= 12) return "Plata";
-  if (streak >= 4) return "Bronce";
-  return "Sin medalla";
-};
-
 export default function WeeklyProgress({
   streak,
   workoutLogs,
@@ -111,19 +104,21 @@ export default function WeeklyProgress({
   }, [workoutLogs]);
 
   const medalTarget = resolveMedalTarget(effectiveStreak);
-  const currentMedal = resolveCurrentMedal(effectiveStreak);
   const weeksRemaining = Math.max(0, medalTarget.targetWeeks - effectiveStreak);
 
   const radius = 18;
   const circumference = 2 * Math.PI * radius;
   const shieldOffset = circumference - (shieldProgress / 10) * circumference;
-  const longTermProgressPct = Math.min((effectiveStreak / 24) * 100, 100);
 
-  const medalMilestones = [
-    { label: "B", name: "Bronce", week: 4 },
-    { label: "P", name: "Plata", week: 12 },
-    { label: "O", name: "Oro", week: 24 },
-  ];
+  const range = medalTarget.targetWeeks - medalTarget.baseWeeks;
+  const progressInLevel = Math.max(0, effectiveStreak - medalTarget.baseWeeks);
+  const levelProgressPct = range > 0 ? Math.min((progressInLevel / range) * 100, 100) : 100;
+
+  const getMedalType = (label: string) => {
+    if (label === "Oro") return "gold";
+    if (label === "Plata") return "silver";
+    return "bronze";
+  };
 
   return (
     <section
@@ -135,8 +130,35 @@ export default function WeeklyProgress({
       </div>
 
       <div className='relative z-10 flex items-center justify-between gap-2'>
-        <h2 className='flex items-center gap-2 text-sm font-bold text-slate-900 transition-colors dark:text-white sm:text-base'>
-          Progreso semanal <Trophy className='size-4 text-amber-500 dark:text-amber-400' />
+        <h2 className='flex items-center text-sm font-bold text-slate-900 transition-colors dark:text-white sm:text-base'>
+          Progreso semanal
+          <div className='ml-2 flex flex-wrap items-center gap-0.5'>
+            {effectiveStreak >= 4 ? (
+              <>
+                <MedalIcon
+                  type='bronze'
+                  achieved
+                  className='h-5 w-5 drop-shadow-sm'
+                />
+                {effectiveStreak >= 12 && (
+                  <MedalIcon
+                    type='silver'
+                    achieved
+                    className='h-5 w-5 drop-shadow-sm'
+                  />
+                )}
+                {effectiveStreak >= 24 && (
+                  <MedalIcon
+                    type='gold'
+                    achieved
+                    className='h-5 w-5 drop-shadow-sm'
+                  />
+                )}
+              </>
+            ) : (
+              <Trophy className='size-4 md:size-5 text-slate-300 dark:text-surface-700' />
+            )}
+          </div>
         </h2>
         <Link
           to='/app/stats'
@@ -147,18 +169,17 @@ export default function WeeklyProgress({
       </div>
 
       {/* Días completados The Flames */}
-      <div className='relative z-10 mt-2 flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/80 px-2.5 py-2 transition-colors dark:border-surface-800/70 dark:bg-surface-950/40'>
-        <div className='flex items-center gap-1.5'>
+      <div className='relative z-10 mt-2 flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/80 px-2.5 sm:px-3 py-2 transition-colors dark:border-surface-800/70 dark:bg-surface-950/40'>
+        <div className='flex items-center gap-1 sm:gap-1.5'>
           {Array.from({ length: Math.max(1, targetDays) }).map((_, index) => {
             const active = index < Math.min(workoutsThisWeek, targetDays);
             return (
               <span
                 key={index}
-                className={`relative flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 ${active ? "bg-orange-500/15" : "bg-white dark:bg-surface-900 shadow-sm border border-slate-100 dark:border-surface-800"}`}
+                className={`relative flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl transition-all duration-300 ${active ? "bg-orange-500/15" : "bg-white dark:bg-surface-900 shadow-sm border border-slate-100 dark:border-surface-800"}`}
               >
                 <Flame
-                  size={16}
-                  className={active ? "text-orange-500" : "text-slate-300 dark:text-surface-700"}
+                  className={`${active ? "text-orange-500" : "text-slate-300 dark:text-surface-700"} h-3.5 w-3.5 sm:h-4 sm:w-4`}
                   fill={active ? "currentColor" : "none"}
                 />
                 {active && (
@@ -169,7 +190,7 @@ export default function WeeklyProgress({
           })}
         </div>
         <p className='whitespace-nowrap text-xs font-semibold text-slate-700 dark:text-slate-300 sm:text-sm'>
-          {workoutsThisWeek}/{targetDays} entrenos completados
+          {workoutsThisWeek}/{targetDays} entrenos
         </p>
       </div>
 
@@ -244,7 +265,7 @@ export default function WeeklyProgress({
 
         {/* Right Side: Progresión Racha (~2/3) */}
         <div className='flex min-w-0 flex-1 flex-col justify-center p-2 sm:p-3'>
-          <div className='mb-2 flex items-center justify-end gap-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100'>
+          <div className='flex items-center justify-end gap-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100'>
             <Flame
               size={14}
               className='text-orange-500'
@@ -253,52 +274,42 @@ export default function WeeklyProgress({
             {effectiveStreak} Semanas seguidas
           </div>
 
-          <div className='relative mb-2 pb-1 pt-1 ml-3 mr-3'>
-            {/* Base track */}
-            <div className='absolute top-3 left-0 right-0 h-2 -translate-y-1/2 rounded-full bg-slate-200 dark:bg-surface-800' />
-            {/* Progress track */}
-            <div
-              className='absolute top-3 left-0 h-2 -translate-y-1/2 rounded-full bg-linear-to-r from-primary-600 via-primary-400 to-cyan-300 drop-shadow-[0_0_6px_rgba(6,182,212,0.4)] transition-all duration-700'
-              style={{ width: `${longTermProgressPct}%` }}
-            />
+          <div className='flex items-center gap-2 my-1.5 px-1'>
+            {medalTarget.baseWeeks > 0 && (
+              <div className='shrink-0 -mr-1 z-10'>
+                <MedalIcon
+                  type={
+                    effectiveStreak >= 24 ? "gold" : effectiveStreak >= 12 ? "silver" : "bronze"
+                  }
+                  achieved
+                  className='h-6 w-6 sm:h-7 sm:w-7 drop-shadow-sm'
+                />
+              </div>
+            )}
 
-            {/* SVG Medals at milestones */}
-            {medalMilestones.map((milestone) => {
-              const milestonePct = (milestone.week / 24) * 100;
-              const isLocked = effectiveStreak < milestone.week;
-              const isAchieved = effectiveStreak >= milestone.week;
+            <div className='relative flex-1 h-2 rounded-full bg-slate-200 dark:bg-surface-800'>
+              <div
+                className='absolute top-0 left-0 h-full rounded-full bg-linear-to-r from-primary-600 via-primary-400 to-cyan-300 drop-shadow-[0_0_6px_rgba(6,182,212,0.4)] transition-all duration-700'
+                style={{ width: `${levelProgressPct}%` }}
+              />
+            </div>
 
-              // Type coercion based on name ( Bronce -> bronze )
-              const type =
-                milestone.name === "Bronce"
-                  ? "bronze"
-                  : milestone.name === "Plata"
-                    ? "silver"
-                    : "gold";
-
-              return (
-                <div
-                  key={milestone.name}
-                  className='absolute top-3 -translate-y-1/2 -translate-x-1/2 z-10'
-                  style={{ left: `${milestonePct}%` }}
-                  title={`${milestone.name}: semana ${milestone.week}`}
-                >
-                  <MedalIcon
-                    type={type}
-                    locked={isLocked}
-                    achieved={isAchieved}
-                    className='h-7 w-7 sm:h-8 sm:w-8 -mt-2.5'
-                  />
-                </div>
-              );
-            })}
+            <div className='shrink-0 -ml-1 z-10'>
+              <MedalIcon
+                type={getMedalType(medalTarget.label)}
+                locked={effectiveStreak < medalTarget.targetWeeks}
+                achieved={effectiveStreak >= medalTarget.targetWeeks}
+                className='h-6 w-6 sm:h-7 sm:w-7 drop-shadow-sm'
+              />
+            </div>
           </div>
 
-          <div className='mt-2 text-center sm:text-right'>
+          <div className='mt-0.5 text-center sm:text-right'>
             <div className='inline-flex items-center overflow-hidden rounded-xl border border-primary-500/20 bg-primary-500/5 px-2 py-0.5 font-bold shadow-sm backdrop-blur-sm'>
               <span className='text-[10px] sm:text-xs text-primary-700 dark:text-cyan-300 drop-shadow-sm glow'>
-                Objetivo: {medalTarget.label}{" "}
-                {weeksRemaining > 0 ? `(${weeksRemaining} sem)` : "(comprobado)"}
+                {effectiveStreak >= 24
+                  ? "¡Objetivo Máximo alcanzado!"
+                  : `Objetivo: ${medalTarget.label} (${weeksRemaining} sem)`}
               </span>
             </div>
           </div>
