@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.14] - 2026-03-08
+
+- **Cambio**: Auditoría de comunicaciones + Rediseño de interruptores (Toggles) de notificación.
+- **Para qué**: Se realizó una auditoría completa del flujo de emails y push (documentada). Se mejoró la UX del perfil eliminando la lógica negativa (Opt-Out) por una clara (Enabled), y se añadieron animaciones fluidas (`translate-x`) a los interruptores para que el estado activo/inactivo sea inequívoco.
+
 ## [1.0.13] - 2026-03-06
 
 - **Cambio**: Rediseño visual interactivo del panel de Progreso Semanal.
