@@ -7,6 +7,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.0.14",
+    date: "2026-03-08",
+    change: "Auditoría de comunicaciones y mejora de UX en Toggles",
+    reason:
+      "Se simplificó la lógica de notificaciones de 'Opt-Out' a 'Enabled' para evitar confusión y se añadieron animaciones suaves a los interruptores del perfil.",
+  },
+  {
     version: "1.0.13",
     date: "2026-03-06",
     change: "Rediseño visual interactivo del Progreso Semanal",

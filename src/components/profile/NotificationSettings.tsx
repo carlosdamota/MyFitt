@@ -15,7 +15,7 @@ const getProfileRef = (userId: string) =>
   doc(db as any, "artifacts", appId, "users", userId, "app_data", "profile");
 
 const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => {
-  const [emailOptOut, setEmailOptOut] = useState(false);
+  const [emailsEnabled, setEmailsEnabled] = useState(true);
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission>("default");
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
     const loadPrefs = async () => {
       const snap = await getDoc(getProfileRef(user.uid));
       const data = snap.data();
-      setEmailOptOut(data?.emailOptOut === true);
+      setEmailsEnabled(data?.emailOptOut !== true);
       setPushEnabled(!!data?.pushEnabled);
       setLoading(false);
     };
@@ -39,11 +39,11 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
     }
   }, [user]);
 
-  const toggleEmailOptOut = async () => {
+  const toggleEmails = async () => {
     if (!user || !db) return;
-    const newValue = !emailOptOut;
-    setEmailOptOut(newValue);
-    await updateDoc(getProfileRef(user.uid), { emailOptOut: newValue, updatedAt: new Date() });
+    const newValue = !emailsEnabled;
+    setEmailsEnabled(newValue);
+    await updateDoc(getProfileRef(user.uid), { emailOptOut: !newValue, updatedAt: new Date() });
   };
 
   const handlePushToggle = async () => {
@@ -83,11 +83,11 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
 
       {/* Email Toggle */}
       <button
-        onClick={toggleEmailOptOut}
+        onClick={toggleEmails}
         className='w-full flex justify-between items-center py-3 px-4 rounded-xl bg-slate-50 dark:bg-surface-800 border border-slate-200 dark:border-surface-700 hover:border-slate-300 dark:hover:border-surface-600 transition-colors'
       >
         <div className='flex items-center gap-3'>
-          {emailOptOut ? (
+          {!emailsEnabled ? (
             <MailX
               size={18}
               className='text-danger-400'
@@ -101,20 +101,20 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
           <div className='text-left'>
             <p className='text-sm font-semibold text-slate-800 dark:text-white'>Emails</p>
             <p className='text-xs text-slate-500 dark:text-slate-400'>
-              {emailOptOut
+              {!emailsEnabled
                 ? "No recibirás emails comerciales"
                 : "Recibirás emails de motivación y novedades"}
             </p>
           </div>
         </div>
         <div
-          className={`w-10 h-6 rounded-full transition-colors relative ${
-            emailOptOut ? "bg-slate-300 dark:bg-surface-600" : "bg-success-500"
+          className={`w-11 h-6 rounded-full transition-colors relative flex items-center ${
+            !emailsEnabled ? "bg-slate-300 dark:bg-surface-600" : "bg-success-500"
           }`}
         >
           <div
-            className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-              emailOptOut ? "left-1" : "left-5"
+            className={`absolute w-5 h-5 rounded-full bg-white transition-all transform duration-200 ease-in-out shadow-sm ${
+              !emailsEnabled ? "translate-x-0.5" : "translate-x-5.5"
             }`}
           />
         </div>
@@ -151,15 +151,15 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user }) => 
           </div>
         </div>
         <div
-          className={`w-10 h-6 rounded-full transition-colors relative ${
+          className={`w-11 h-6 rounded-full transition-colors relative flex items-center ${
             pushEnabled && pushPermission !== "denied"
               ? "bg-success-500"
               : "bg-slate-300 dark:bg-surface-600"
           }`}
         >
           <div
-            className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-              pushEnabled && pushPermission !== "denied" ? "left-5" : "left-1"
+            className={`absolute w-5 h-5 rounded-full bg-white transition-all transform duration-200 ease-in-out shadow-sm ${
+              pushEnabled && pushPermission !== "denied" ? "translate-x-5.5" : "translate-x-0.5"
             }`}
           />
         </div>

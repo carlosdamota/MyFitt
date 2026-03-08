@@ -15,7 +15,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ user, onLoginClick, on
       aria-label='Introducción'
     >
       <div className='space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700'>
-        <div className='inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 dark:bg-surface-900/60 border border-slate-200 dark:border-surface-800 backdrop-blur-sm transition-colors'>
+        <div className='inline-flex items-center gap-2 px-4 py-2 mt-6 rounded-full bg-white/60 dark:bg-surface-900/60 border border-slate-200 dark:border-surface-800 backdrop-blur-sm transition-colors'>
           <span className='relative flex h-3 w-3'>
             <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
             <span className='relative inline-flex rounded-full h-3 w-3 bg-emerald-500'></span>
