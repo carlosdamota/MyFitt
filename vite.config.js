@@ -82,11 +82,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Only react core is shared across ALL routes — keep it split for caching.
-          // firebase, konva, posthog are now reached only via lazy DashboardLayout,
-          // so Rollup will bundle them into dashboard-level chunks automatically.
-          vendor: ["react", "react-dom", "react-router", "@tanstack/react-query"],
+        manualChunks: (id) => {
+          if (id.includes("node_modules/firebase")) {
+            return "firebase";
+          }
+          if (id.includes("node_modules/@tanstack")) {
+            return "tanstack";
+          }
+          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
+            return "vendor";
+          }
         },
       },
     },

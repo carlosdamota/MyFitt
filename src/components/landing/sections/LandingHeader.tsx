@@ -32,10 +32,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             role="link"
             aria-label="FITTWIZ - Ir al inicio"
           >
-            <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
+            <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-xl -z-10 animate-pulse' />
             <img
               src={iconLogo.src}
               alt={iconLogo.alt}
+              width={24}
+              height={24}
               className='w-5 h-5 md:w-6 md:h-6'
               loading='eager'
               fetchPriority='high'
