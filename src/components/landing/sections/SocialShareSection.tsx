@@ -23,6 +23,8 @@ export const SocialShareSection: React.FC = () => {
               alt='Estilo detallado'
               width={300}
               height={400}
+              loading='lazy'
+              decoding='async'
               className='w-full h-full object-cover select-none pointer-events-none'
             />
             <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
@@ -39,6 +41,8 @@ export const SocialShareSection: React.FC = () => {
               alt='Estilo minimalista'
               width={300}
               height={400}
+              loading='lazy'
+              decoding='async'
               className='w-full h-full object-cover select-none pointer-events-none'
             />
             <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
@@ -55,6 +59,8 @@ export const SocialShareSection: React.FC = () => {
               alt='Estilo historia'
               width={300}
               height={400}
+              loading='lazy'
+              decoding='async'
               className='w-full h-full object-cover select-none pointer-events-none'
             />
             <div className='absolute inset-0 bg-linear-to-t from-slate-900/40 to-transparent' />

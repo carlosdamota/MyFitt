@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.15] - 2026-03-10
+
+- **Cambio**: Optimización de rendimiento de la Landing Page (PageSpeed Mobile).
+- **Para qué**: Se eliminó el bloqueo de render por la fuente Google Fonts, se aplicó lazy-loading a 8 secciones below-the-fold y al módulo de billing, y se añadió carga diferida a las imágenes. El chunk de la Landing se redujo y el tiempo de interactividad (TTI) mejora significativamente.
+
 ## [1.0.14] - 2026-03-08
 
 - **Cambio**: Auditoría de comunicaciones + Rediseño de interruptores (Toggles) de notificación.

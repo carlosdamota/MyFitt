@@ -3,21 +3,50 @@ import { useNavigate } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../hooks/useAuth";
 const AuthModal = React.lazy(() => import("../components/auth/AuthModal"));
-import { createCheckoutSession } from "../api/billing";
 import { socialPreview } from "../branding/logoConfig";
 import { useEntitlement } from "../hooks/useEntitlement";
 
-// Import new sections
+// Above-fold sections (eager — critical for first paint)
 import { LandingHeader } from "../components/landing/sections/LandingHeader";
 import { HeroSection } from "../components/landing/sections/HeroSection";
-import { HowItWorksSection } from "../components/landing/sections/HowItWorksSection";
-import { FeaturesSection } from "../components/landing/sections/FeaturesSection";
-import { SocialShareSection } from "../components/landing/sections/SocialShareSection";
-import { BenefitsSection } from "../components/landing/sections/BenefitsSection";
-import { PricingSection } from "../components/landing/sections/PricingSection";
-import { FaqSection } from "../components/landing/sections/FaqSection";
-import { CtaSection } from "../components/landing/sections/CtaSection";
-import { LandingFooter } from "../components/landing/sections/LandingFooter";
+
+// Below-fold sections (lazy — code-split for faster TTI)
+const HowItWorksSection = React.lazy(() =>
+  import("../components/landing/sections/HowItWorksSection").then((m) => ({
+    default: m.HowItWorksSection,
+  })),
+);
+const FeaturesSection = React.lazy(() =>
+  import("../components/landing/sections/FeaturesSection").then((m) => ({
+    default: m.FeaturesSection,
+  })),
+);
+const SocialShareSection = React.lazy(() =>
+  import("../components/landing/sections/SocialShareSection").then((m) => ({
+    default: m.SocialShareSection,
+  })),
+);
+const BenefitsSection = React.lazy(() =>
+  import("../components/landing/sections/BenefitsSection").then((m) => ({
+    default: m.BenefitsSection,
+  })),
+);
+const PricingSection = React.lazy(() =>
+  import("../components/landing/sections/PricingSection").then((m) => ({
+    default: m.PricingSection,
+  })),
+);
+const FaqSection = React.lazy(() =>
+  import("../components/landing/sections/FaqSection").then((m) => ({ default: m.FaqSection })),
+);
+const CtaSection = React.lazy(() =>
+  import("../components/landing/sections/CtaSection").then((m) => ({ default: m.CtaSection })),
+);
+const LandingFooter = React.lazy(() =>
+  import("../components/landing/sections/LandingFooter").then((m) => ({
+    default: m.LandingFooter,
+  })),
+);
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -47,6 +76,7 @@ const Landing: React.FC = () => {
 
     try {
       const origin = window.location.origin;
+      const { createCheckoutSession } = await import("../api/billing");
       const url = await createCheckoutSession(origin, origin, "OmyEug7I");
       window.location.assign(url);
     } catch (error) {
@@ -153,23 +183,27 @@ const Landing: React.FC = () => {
           onLoginClick={onLogin}
           onExploreClick={onExplore}
         />
-        <HowItWorksSection />
-        <FeaturesSection />
-        <SocialShareSection />
-        <BenefitsSection />
-        <PricingSection
-          plan={plan}
-          onLoginClick={onLogin}
-          onUpgradeClick={handleUpgrade}
-        />
-        <FaqSection />
-        <CtaSection
-          isLoggedIn={!!user}
-          onLoginClick={onLogin}
-        />
+        <Suspense fallback={null}>
+          <HowItWorksSection />
+          <FeaturesSection />
+          <SocialShareSection />
+          <BenefitsSection />
+          <PricingSection
+            plan={plan}
+            onLoginClick={onLogin}
+            onUpgradeClick={handleUpgrade}
+          />
+          <FaqSection />
+          <CtaSection
+            isLoggedIn={!!user}
+            onLoginClick={onLogin}
+          />
+        </Suspense>
       </main>
 
-      <LandingFooter />
+      <Suspense fallback={null}>
+        <LandingFooter />
+      </Suspense>
 
       {/* Modals */}
       <Suspense fallback={null}>
