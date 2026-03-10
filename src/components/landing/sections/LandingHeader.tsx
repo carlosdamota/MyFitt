@@ -6,12 +6,14 @@ import { iconLogo } from "../../../branding/logoConfig";
 
 interface LandingHeaderProps {
   user: any | null;
+  loading?: boolean;
   onLoginClick: () => void;
   onGoogleLogin: () => Promise<void>;
 }
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({
   user,
+  loading = false,
   onLoginClick,
   onGoogleLogin,
 }) => {
@@ -42,7 +44,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
         {/* Auth Actions */}
         <div className='flex items-center gap-3'>
-          {!user ? (
+          {loading ? (
+            // Skeleton mientras Firebase resuelve el estado de auth (evita flash de botones)
+            <div className='flex items-center gap-3'>
+              <div className='w-16 h-8 rounded-lg bg-slate-200 dark:bg-surface-800 animate-pulse hidden sm:block' />
+              <div className='w-24 h-8 rounded-lg bg-slate-200 dark:bg-surface-800 animate-pulse hidden sm:block' />
+              <div className='w-16 h-8 rounded-lg bg-slate-200 dark:bg-surface-800 animate-pulse sm:hidden' />
+            </div>
+          ) : !user ? (
             <>
               <Button
                 variant='primary'
