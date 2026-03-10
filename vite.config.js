@@ -14,6 +14,16 @@ export default defineConfig({
       strategies: "injectManifest",
       registerType: "prompt",
       includeAssets: ["favicon.svg", "pwa-192x192.png", "pwa-512x512.png", "robots.txt"],
+      injectManifest: {
+        // Only precache essential assets — lazy chunks are served via runtime cache in sw.js
+        // This reduces SW install payload from ~1.95 MB to ~400 KB
+        globPatterns: [
+          "**/*.{html,css}",
+          "assets/vendor-*.js",
+          "assets/index-*.js",
+          "**/*.{ico,png,svg,webp}",
+        ],
+      },
       manifest: {
         name: "FITTWIZ",
         short_name: "FITTWIZ",

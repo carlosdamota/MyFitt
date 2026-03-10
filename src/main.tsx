@@ -11,16 +11,18 @@ import "./index.css";
 
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import posthog from "posthog-js";
-import { PostHogProvider } from "posthog-js/react";
 import { emitMonitoringEvent } from "./api/monitoring";
 
-// Delay PostHog initialization to prioritize first paint
+// Delay PostHog initialization to avoid blocking the first paint.
+// posthog-js (~176 KB) is loaded dynamically — NOT part of the main bundle.
 const initPostHog = () => {
-  posthog.init(import.meta.env.VITE_POSTHOG_KEY || "", {
-    api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
-    person_profiles: "identified_only",
-    capture_pageview: false, // We'll handle this manually or let the provider do it later
+  void import("posthog-js").then((mod) => {
+    const ph = mod.default;
+    ph.init(import.meta.env.VITE_POSTHOG_KEY || "", {
+      api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
+      person_profiles: "identified_only",
+      capture_pageview: false,
+    });
   });
 };
 
@@ -63,6 +65,7 @@ if (typeof window !== "undefined") {
     });
   });
 }
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -78,13 +81,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <ErrorBoundary>
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
-            <PostHogProvider client={posthog}>
-              <ToastProvider>
-                <RouterProvider router={router} />
-                <UpdateToast />
-                <NotificationManager />
-              </ToastProvider>
-            </PostHogProvider>
+            <ToastProvider>
+              <RouterProvider router={router} />
+              <UpdateToast />
+              <NotificationManager />
+            </ToastProvider>
           </QueryClientProvider>
         </ThemeProvider>
       </ErrorBoundary>

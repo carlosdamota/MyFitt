@@ -1,10 +1,9 @@
 import React, { useState, Suspense } from "react";
 import { useNavigate } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { useAuth } from "../hooks/useAuth";
+import { useLazyAuth } from "../hooks/useLazyAuth";
 const AuthModal = React.lazy(() => import("../components/auth/AuthModal"));
 import { socialPreview } from "../branding/logoConfig";
-import { useEntitlement } from "../hooks/useEntitlement";
 
 // Above-fold sections (eager — critical for first paint)
 import { LandingHeader } from "../components/landing/sections/LandingHeader";
@@ -50,8 +49,7 @@ const LandingFooter = React.lazy(() =>
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
-  const { plan } = useEntitlement(user);
+  const { user, loading: authLoading, loginWithGoogle, loginWithEmail, signupWithEmail } = useLazyAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const socialPreviewUrl = `https://fittwiz.app${socialPreview.src}`;
 
@@ -66,11 +64,6 @@ const Landing: React.FC = () => {
   const handleUpgrade = async () => {
     if (!user) {
       setShowAuthModal(true);
-      return;
-    }
-
-    if (plan === "pro") {
-      navigate("/app");
       return;
     }
 
@@ -173,6 +166,7 @@ const Landing: React.FC = () => {
 
       <LandingHeader
         user={user}
+        loading={authLoading}
         onLoginClick={onLogin}
         onGoogleLogin={loginWithGoogle}
       />
@@ -189,7 +183,7 @@ const Landing: React.FC = () => {
           <SocialShareSection />
           <BenefitsSection />
           <PricingSection
-            plan={plan}
+            plan={null}
             onLoginClick={onLogin}
             onUpgradeClick={handleUpgrade}
           />

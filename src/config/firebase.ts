@@ -9,7 +9,8 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getMessaging } from "firebase/messaging";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+// AppCheck is intentionally NOT imported at module level
+// It is loaded lazily via initAppCheck() to avoid blocking first paint
 
 // Type for Firebase configuration
 interface FirebaseConfig {
@@ -60,17 +61,7 @@ if (firebaseConfig) {
   auth = getAuth(app);
   db = getFirestore(app);
 
-  const appCheckKey = import.meta.env.VITE_FIREBASE_APPCHECK_KEY as string | undefined;
-  if (appCheckKey) {
-    if (import.meta.env.DEV) {
-      // @ts-ignore
-      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-    }
-    initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(appCheckKey),
-      isTokenAutoRefreshEnabled: true,
-    });
-  }
+  // AppCheck is NOT initialized here — call initAppCheck() lazily after user interaction
 
   isSupported().then((yes) => {
     if (yes && app) {
@@ -99,3 +90,26 @@ if (firebaseConfig) {
 }
 
 export { app, auth, db, analytics, messaging, firebaseConfig };
+
+/**
+ * Lazily initializes Firebase AppCheck (reCAPTCHA v3).
+ * Call this ONCE before the first authenticated Firebase operation.
+ * Avoids loading the reCAPTCHA script (~150 KB) during the initial page load.
+ */
+let appCheckInitialized = false;
+export const initAppCheck = async (): Promise<void> => {
+  if (appCheckInitialized || !app) return;
+  const appCheckKey = import.meta.env.VITE_FIREBASE_APPCHECK_KEY as string | undefined;
+  if (!appCheckKey) return;
+
+  const { initializeAppCheck, ReCaptchaV3Provider } = await import("firebase/app-check");
+  if (import.meta.env.DEV) {
+    // @ts-ignore
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(appCheckKey),
+    isTokenAutoRefreshEnabled: true,
+  });
+  appCheckInitialized = true;
+};
