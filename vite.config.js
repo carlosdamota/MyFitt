@@ -70,6 +70,7 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true,
+        // "module" is required if we use top-level 'import' in sw.js
         type: "module",
         navigateFallback: "index.html",
       },
@@ -82,11 +83,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/storage"],
-          konva: ["konva", "react-konva"],
+          // Only react core is shared across ALL routes — keep it split for caching.
+          // firebase, konva, posthog are now reached only via lazy DashboardLayout,
+          // so Rollup will bundle them into dashboard-level chunks automatically.
           vendor: ["react", "react-dom", "react-router", "@tanstack/react-query"],
-          ui: ["lucide-react"],
-          analytics: ["posthog-js"],
         },
       },
     },

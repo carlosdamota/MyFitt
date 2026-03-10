@@ -9,6 +9,7 @@ interface LandingHeaderProps {
   loading?: boolean;
   onLoginClick: () => void;
   onGoogleLogin: () => Promise<void>;
+  onMouseEnter?: () => void;
 }
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({
@@ -16,6 +17,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   loading = false,
   onLoginClick,
   onGoogleLogin,
+  onMouseEnter,
 }) => {
   const navigate = useNavigate();
 
@@ -48,7 +50,10 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         </div>
 
         {/* Auth Actions */}
-        <div className='flex items-center gap-3'>
+        <div 
+          className='flex items-center gap-3'
+          onMouseEnter={onMouseEnter}
+        >
           {loading ? (
             // Skeleton mientras Firebase resuelve el estado de auth (evita flash de botones)
             <div className='flex items-center gap-3'>

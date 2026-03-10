@@ -24,6 +24,7 @@ export interface UseLazyAuthReturn {
   loginWithEmail: (email: string, password: string) => Promise<void>;
   signupWithEmail: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  initFirebase: () => Promise<void>;
 }
 
 // Cargamos el módulo Firebase Auth una sola vez (singleton)
@@ -37,17 +38,20 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
 
   /** Carga dinámica de Firebase Auth. Idempotente — solo se ejecuta una vez. */
   const initFirebase = useCallback(() => {
-    if (firebaseInitPromise) return firebaseInitPromise;
+    if (firebaseInitPromise) {
+      firebaseInitPromise.then(() => {
+        if (mountedRef.current) setLoading(false);
+      });
+      return firebaseInitPromise;
+    }
 
     firebaseInitPromise = (async () => {
       const [{ auth }, { onAuthStateChanged }, posthogMod] = await Promise.all([
         import("../config/firebase"),
         import("firebase/auth"),
-        // Pre-fetch posthog mientras cargamos Firebase (aprovechamos el idle time)
         import("posthog-js").catch(() => null),
       ]);
 
-      // Initialize AppCheck lazily — reCAPTCHA script only loads here, not on first paint
       const { initAppCheck } = await import("../config/firebase");
       void initAppCheck();
 
@@ -66,7 +70,6 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
             displayName: firebaseUser.displayName,
             isAnonymous: firebaseUser.isAnonymous,
           });
-          // Identificar en PostHog si ya está cargado
           if (posthogMod && !firebaseUser.isAnonymous) {
             posthogMod.default?.identify(firebaseUser.uid, {
               email: firebaseUser.email,
@@ -78,6 +81,17 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
         }
         setLoading(false);
       });
+
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          isAnonymous: currentUser.isAnonymous,
+        });
+      }
+      if (mountedRef.current) setLoading(false);
     })();
 
     return firebaseInitPromise;
@@ -89,9 +103,9 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
     // Iniciamos Firebase en idle — no bloquea el primer paint
     const scheduleInit = () => {
       if ("requestIdleCallback" in window) {
-        (window as Window).requestIdleCallback(() => void initFirebase(), { timeout: 2000 });
+        (window as Window).requestIdleCallback(() => void initFirebase(), { timeout: 500 });
       } else {
-        setTimeout(() => void initFirebase(), 500);
+        setTimeout(() => void initFirebase(), 200);
       }
     };
 
@@ -159,5 +173,5 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
     await signOut(auth);
   }, [initFirebase]);
 
-  return { user, loading, loginWithGoogle, loginWithEmail, signupWithEmail, logout };
+  return { user, loading, loginWithGoogle, loginWithEmail, signupWithEmail, logout, initFirebase };
 };

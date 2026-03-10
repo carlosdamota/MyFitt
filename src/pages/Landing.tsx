@@ -49,7 +49,7 @@ const LandingFooter = React.lazy(() =>
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading, loginWithGoogle, loginWithEmail, signupWithEmail } = useLazyAuth();
+  const { user, loading: authLoading, loginWithGoogle, loginWithEmail, signupWithEmail, initFirebase } = useLazyAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const socialPreviewUrl = `https://fittwiz.app${socialPreview.src}`;
 
@@ -169,6 +169,7 @@ const Landing: React.FC = () => {
         loading={authLoading}
         onLoginClick={onLogin}
         onGoogleLogin={loginWithGoogle}
+        onMouseEnter={initFirebase}
       />
 
       <main className='grow max-w-[1200px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 relative z-10'>

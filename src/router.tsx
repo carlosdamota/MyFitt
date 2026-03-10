@@ -1,9 +1,6 @@
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 
-// Layouts
-import DashboardLayout from "./layouts/DashboardLayout";
-
 // Public pages
 const Landing = lazyImport(() => import("./pages/Landing"));
 const Privacy = lazyImport(() => import("./pages/Privacy"));
@@ -80,9 +77,14 @@ export const router = createBrowserRouter([
   },
 
   // App routes (with shared dashboard layout)
+  // DashboardLayout is lazy-loaded to keep it OUT of the Landing page bundle.
+  // This eliminates ~1.2MB of JS (Firebase, PostHog, Konva, hooks) from the initial load.
   {
     path: "/app",
-    Component: DashboardLayout,
+    lazy: async () => {
+      const { default: Component } = await import("./layouts/DashboardLayout");
+      return { Component };
+    },
     children: [
       {
         index: true,
