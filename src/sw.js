@@ -25,5 +25,16 @@ addEventListener("message", (event) => {
 clientsClaim();
 
 // 4. Import Firebase Messaging from public folder
-// This avoids bundling heavy Firebase code into the PWA worker
-importScripts('/firebase-messaging-sw.js');
+// Note: importScripts() is not supported in Module Workers (Chrome dev mode with type: "module").
+// We wrap it in a check and a try-catch to avoid crashing the SW in dev.
+if (typeof importScripts === 'function') {
+  try {
+    importScripts('/firebase-messaging-sw.js');
+  } catch (error) {
+    console.error('Error loading firebase-messaging-sw.js:', error);
+  }
+} else {
+  // In development, the worker is often loaded as a module where importScripts is unavailable.
+  // This is expected if devOptions.type is "module" in vite.config.js.
+  console.warn('SW: importScripts not supported in module mode. Background notifications might be disabled in dev.');
+}
