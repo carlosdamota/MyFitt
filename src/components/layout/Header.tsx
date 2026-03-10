@@ -138,7 +138,7 @@ const Header: React.FC<HeaderProps> = ({
                 to='/app'
                 className='text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2 relative hover:opacity-80 transition-opacity'
               >
-                <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
+                <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-xl -z-10 animate-pulse' />
                 <img
                   src={iconLogo.src}
                   alt={iconLogo.alt}
