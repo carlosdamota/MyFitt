@@ -7,6 +7,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.0.15",
+    date: "2026-03-10",
+    change: "Optimización de rendimiento de la Landing Page",
+    reason:
+      "Se eliminó el bloqueo de render por Google Fonts, se aplicó lazy-loading a 8 secciones below-the-fold y al módulo de billing, y se añadió carga diferida a las imágenes para mejorar el TTI en móviles.",
+  },
+  {
     version: "1.0.14",
     date: "2026-03-08",
     change: "Auditoría de comunicaciones y mejora de UX en Toggles",
