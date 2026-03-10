@@ -24,7 +24,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
       <div className='max-w-6xl mx-auto flex items-center justify-between px-2'>
         {/* Logo */}
         <div className='flex items-center gap-2'>
-          <div className='text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2 relative'>
+          <div 
+            className='text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2 relative cursor-pointer'
+            onClick={() => navigate("/")}
+            role="link"
+            aria-label="FITTWIZ - Ir al inicio"
+          >
             <div className='absolute inset-0 bg-linear-to-r from-cyan-500/20 to-amber-500/20 blur-2xl -z-10 animate-pulse' />
             <img
               src={iconLogo.src}
