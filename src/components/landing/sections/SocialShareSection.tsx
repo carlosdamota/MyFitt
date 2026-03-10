@@ -20,7 +20,7 @@ export const SocialShareSection: React.FC = () => {
           >
             <img
               src='/assets/images/fittwiz-workout-2.webp'
-              alt='Estilo detallado'
+              alt='Previsualización de rutina en estilo tarjeta oscura'
               width={300}
               height={400}
               loading='lazy'
@@ -38,7 +38,7 @@ export const SocialShareSection: React.FC = () => {
           >
             <img
               src='/assets/images/fittwiz-workout-3.webp'
-              alt='Estilo minimalista'
+              alt='Previsualización de rutina en estilo tarjeta clara y minimalista'
               width={300}
               height={400}
               loading='lazy'
@@ -56,7 +56,7 @@ export const SocialShareSection: React.FC = () => {
           >
             <img
               src='/assets/images/fittwiz-workout-1.webp'
-              alt='Estilo historia'
+              alt='Previsualización de rutina lista para compartir en historias de redes sociales'
               width={300}
               height={400}
               loading='lazy'
