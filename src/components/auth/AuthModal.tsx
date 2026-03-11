@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Lock, LogIn, UserPlus, Chrome, ArrowLeft, KeyRound } from "lucide-react";
+import { Button } from "../ui/Button";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import Modal from "../common/Modal";
@@ -196,14 +197,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
                 {error && <p className='text-xs text-red-300 font-semibold'>{error}</p>}
 
-                <button
+                <Button
                   onClick={handleForgotPassword}
-                  disabled={loading}
-                  className='w-full py-3 rounded-xl font-bold text-sm bg-amber-400 hover:bg-amber-300 text-slate-900 flex items-center justify-center gap-2 transition-all disabled:opacity-50'
+                  isLoading={loading}
+                  variant='primary'
+                  className='w-full'
                 >
-                  <KeyRound size={16} />
+                  <KeyRound size={16} className='mr-2' />
                   {loading ? "Enviando..." : "Enviar enlace de recuperación"}
-                </button>
+                </Button>
               </>
             )}
           </>
@@ -330,14 +332,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             )}
 
-            <button
+            <Button
               onClick={handleEmailAuth}
-              disabled={loading || (mode === "signup" && !acceptedTerms)}
-              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98] shadow-lg shadow-cyan-900/20 disabled:opacity-50 disabled:scale-100'
+              disabled={mode === "signup" && !acceptedTerms}
+              isLoading={loading}
+              variant='primary'
+              size='lg'
+              className='w-full rounded-2xl shadow-lg shadow-cyan-900/20'
             >
-              {mode === "login" ? <LogIn size={18} /> : <UserPlus size={18} />}
+              {mode === "login" ? (
+                <LogIn size={18} className='mr-2' />
+              ) : (
+                <UserPlus size={18} className='mr-2' />
+              )}
               {mode === "login" ? "Entrar con email" : "Crear mi cuenta"}
-            </button>
+            </Button>
 
             <div className='relative flex items-center py-4'>
               <div className='flex-1 h-px bg-slate-200 dark:bg-surface-800/60 transition-colors' />
@@ -347,17 +356,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
               <div className='flex-1 h-px bg-slate-200 dark:bg-surface-800/60 transition-colors' />
             </div>
 
-            <button
+            <Button
               onClick={handleGoogle}
-              disabled={loading}
-              className='w-full py-3.5 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-surface-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-surface-700 flex items-center justify-center gap-3 transition-all hover:scale-[1.01] active:scale-[0.98] border border-slate-200 dark:border-surface-700/50'
+              isLoading={loading}
+              variant='secondary'
+              size='lg'
+              className='w-full rounded-2xl border border-slate-200 dark:border-surface-700/50'
+              leftIcon={
+                <Chrome
+                  size={18}
+                  className='text-slate-700 dark:text-white transition-colors'
+                />
+              }
             >
-              <Chrome
-                size={18}
-                className='text-slate-700 dark:text-white transition-colors'
-              />
               Continuar con Google
-            </button>
+            </Button>
           </>
         )}
       </div>

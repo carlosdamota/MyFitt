@@ -24,6 +24,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<"checkout" | "portal" | "refresh" | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [promoCode, setPromoCode] = useState("OFERTA_LANZAMIENTO");
 
   const planLabel = plan === "pro" ? "Pro" : "Free";
   const renewalLabel = useMemo(
@@ -40,13 +41,12 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
     setProcessing("checkout");
     try {
       const origin = window.location.origin;
-      // Hardcoded Founders Coupon
-      const url = await createCheckoutSession(origin, origin, "OmyEug7I");
+      // Send the user-input promo code instead of hardcoding
+      const url = await createCheckoutSession(origin, origin, promoCode.trim() || undefined);
       window.location.assign(url);
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo iniciar el pago.";
       setError(message);
-    } finally {
       setProcessing(null);
     }
   };
@@ -65,7 +65,6 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo abrir el portal.";
       setError(message);
-    } finally {
       setProcessing(null);
     }
   };
@@ -106,14 +105,9 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             variant='outline'
             size='sm'
             onClick={handleRefreshPlan}
-            disabled={!user || processing === "refresh"}
+            disabled={!user}
+            isLoading={processing === "refresh"}
             className='inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl transition disabled:opacity-60'
-            leftIcon={
-              <RefreshCw
-                size={14}
-                className={processing === "refresh" ? "animate-spin" : ""}
-              />
-            }
           >
             Actualizar estado
           </Button>
@@ -158,22 +152,37 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             <Button
               variant='outline'
               onClick={handlePortal}
-              disabled={processing === "portal"}
+              isLoading={processing === "portal"}
               leftIcon={<CreditCard size={16} />}
+              className="w-full sm:w-auto"
             >
               Gestionar suscripcion
             </Button>
           ) : (
-            <Button
-              variant='primary'
-              onClick={handleCheckout}
-              disabled={processing === "checkout" || !acceptedTerms}
-              leftIcon={<CreditCard size={16} />}
-            >
-              Desbloquear Oferta Pro (2.99€)
-            </Button>
+            <div className="flex flex-col gap-3 w-full sm:w-auto">
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">Código de descuento (opcional)</label>
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  placeholder="Introduce tu código"
+                  className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-surface-700 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white"
+                />
+              </div>
+              <Button
+                variant='primary'
+                onClick={handleCheckout}
+                disabled={!acceptedTerms}
+                isLoading={processing === "checkout"}
+                leftIcon={<CreditCard size={16} />}
+                className="w-full"
+              >
+                {promoCode.trim().toUpperCase() === "OFERTA_LANZAMIENTO" ? "Desbloquear Oferta Pro (2.99€)" : "Comenzar Suscripción Pro"}
+              </Button>
+            </div>
           )}
-          <p className='text-xs text-slate-500 sm:self-center'>
+          <p className='text-xs text-slate-500 sm:self-center w-full sm:w-auto'>
             Los cambios pueden tardar unos segundos tras el pago.
           </p>
         </div>

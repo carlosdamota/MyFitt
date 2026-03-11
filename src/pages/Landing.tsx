@@ -51,6 +51,7 @@ const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, loginWithGoogle, loginWithEmail, signupWithEmail, initFirebase } = useLazyAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
   const socialPreviewUrl = `https://fittwiz.app${socialPreview.src}`;
 
   const onLogin = () => {
@@ -67,6 +68,7 @@ const Landing: React.FC = () => {
       return;
     }
 
+    setUpgrading(true);
     try {
       const origin = window.location.origin;
       const { createCheckoutSession } = await import("../api/billing");
@@ -74,6 +76,7 @@ const Landing: React.FC = () => {
       window.location.assign(url);
     } catch (error) {
       console.error("Checkout error:", error);
+      setUpgrading(false);
       navigate("/app");
     }
   };
@@ -187,6 +190,7 @@ const Landing: React.FC = () => {
             plan={null}
             onLoginClick={onLogin}
             onUpgradeClick={handleUpgrade}
+            isUpgrading={upgrading}
           />
           <FaqSection />
           <CtaSection

@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import UpdateToast from "./components/common/UpdateToast";
 import NotificationManager from "./components/common/NotificationManager";
 import { ToastProvider } from "./hooks/useToast";
+import { PwaInstallPrompt } from "./components/common/PwaInstallPrompt";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import "./index.css";
 
@@ -83,6 +84,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <QueryClientProvider client={queryClient}>
             <ToastProvider>
               <RouterProvider router={router} />
+              <PwaInstallPrompt />
               <UpdateToast />
               <NotificationManager />
             </ToastProvider>

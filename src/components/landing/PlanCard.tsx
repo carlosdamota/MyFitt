@@ -11,6 +11,7 @@ export interface PlanCardProps {
   cta: string;
   onClick: () => void;
   tone?: "accent" | "neutral";
+  isLoading?: boolean;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
@@ -22,6 +23,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   cta,
   onClick,
   tone = "neutral",
+  isLoading = false,
 }) => (
   <div
     className={`flex flex-col justify-between rounded-3xl border p-6 md:p-8 text-left space-y-6 ${
@@ -64,6 +66,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
     <Button
       variant={tone === "accent" ? "primary" : "secondary"}
       onClick={onClick}
+      isLoading={isLoading}
       className='w-full h-auto py-3'
       rightIcon={<ArrowRight size={16} />}
     >

@@ -22,6 +22,17 @@ interface BillingFunctionDeps {
   stripePricePro: string;
 }
 
+const PROMO_CODES: Record<string, string> = {
+  OFERTA_LANZAMIENTO: "OmyEug7I",
+  "1YEARFREE": "promo_1T9lJeCIqLktR6ZHbdKHLvqq",
+};
+
+const resolveCoupon = (couponCode?: string) => {
+  if (!couponCode) return undefined;
+  const normalized = String(couponCode).trim().toUpperCase();
+  return PROMO_CODES[normalized] || normalized; // Fallback to the raw string if not heavily mapped
+};
+
 export const createCheckoutSessionFunction = ({
   db,
   auth,
@@ -65,11 +76,21 @@ export const createCheckoutSessionFunction = ({
       const defaultOrigin = allowedOrigins[0] || "";
       const successUrl = sanitizeReturnUrl(req.body?.successUrl, allowedOrigins) || defaultOrigin;
       const cancelUrl = sanitizeReturnUrl(req.body?.cancelUrl, allowedOrigins) || defaultOrigin;
+      const stripeCouponId = resolveCoupon(req.body?.couponId);
+
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         customer: customerId,
         line_items: [{ price: stripePricePro, quantity: 1 }],
-        discounts: req.body?.couponId ? [{ coupon: String(req.body.couponId) }] : undefined,
+        discounts: stripeCouponId
+          ? [
+              stripeCouponId.startsWith("promo_")
+                ? { promotion_code: stripeCouponId }
+                : { coupon: stripeCouponId },
+            ]
+          : undefined,
+        allow_promotion_codes: stripeCouponId ? undefined : true,
+        payment_method_collection: "if_required",
         success_url: successUrl || "https://example.com/success",
         cancel_url: cancelUrl || "https://example.com/cancel",
         client_reference_id: uid,
@@ -91,11 +112,21 @@ export const createCheckoutSessionFunction = ({
           const successUrl = sanitizeReturnUrl(req.body?.successUrl, allowedOrigins) || defaultOrigin;
           const cancelUrl = sanitizeReturnUrl(req.body?.cancelUrl, allowedOrigins) || defaultOrigin;
 
+          const stripeCouponId = resolveCoupon(req.body?.couponId);
+
           const session = await stripe.checkout.sessions.create({
             mode: "subscription",
             customer: newCustomerId,
             line_items: [{ price: stripePricePro, quantity: 1 }],
-            discounts: req.body?.couponId ? [{ coupon: String(req.body.couponId) }] : undefined,
+            discounts: stripeCouponId
+              ? [
+                  stripeCouponId.startsWith("promo_")
+                    ? { promotion_code: stripeCouponId }
+                    : { coupon: stripeCouponId },
+                ]
+              : undefined,
+            allow_promotion_codes: stripeCouponId ? undefined : true,
+            payment_method_collection: "if_required",
             success_url: successUrl || "https://example.com/success",
             cancel_url: cancelUrl || "https://example.com/cancel",
             client_reference_id: uid,
