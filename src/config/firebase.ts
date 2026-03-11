@@ -102,14 +102,19 @@ export const initAppCheck = async (): Promise<void> => {
   const appCheckKey = import.meta.env.VITE_FIREBASE_APPCHECK_KEY as string | undefined;
   if (!appCheckKey) return;
 
-  const { initializeAppCheck, ReCaptchaV3Provider } = await import("firebase/app-check");
-  if (import.meta.env.DEV) {
-    // @ts-ignore
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  try {
+    const { initializeAppCheck, ReCaptchaV3Provider } = await import("firebase/app-check");
+    if (import.meta.env.DEV) {
+      // @ts-ignore
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    }
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(appCheckKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+    appCheckInitialized = true;
+  } catch (error) {
+    // Soft log failure without throwing to prevent blocking auth flows (e.g. adblockers blocking reCAPTCHA)
+    console.debug("[Firebase] AppCheck initialization skipped or blocked:", error);
   }
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(appCheckKey),
-    isTokenAutoRefreshEnabled: true,
-  });
-  appCheckInitialized = true;
 };
