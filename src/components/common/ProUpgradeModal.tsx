@@ -58,6 +58,7 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("OFERTA_LANZAMIENTO");
 
   useScrollLock(isOpen);
 
@@ -76,7 +77,7 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
     try {
       const token = await getIdToken(user, true);
       const origin = window.location.origin;
-      const url = await createCheckoutSession(origin, origin, "OmyEug7I");
+      const url = await createCheckoutSession(origin, origin, promoCode.trim() || undefined);
       window.location.assign(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al iniciar el pago");
@@ -180,12 +181,39 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
         {/* Price and CTA */}
         <div className='px-6 pb-6'>
           <div className='text-center mb-4'>
-            <span className='text-4xl font-black text-slate-900 dark:text-white transition-colors'>
-              2,99€
-            </span>
-            <span className='text-slate-500 dark:text-slate-400 text-sm ml-2 transition-colors'>
-              /mes
-            </span>
+            {promoCode.trim().toUpperCase() === "OFERTA_LANZAMIENTO" ? (
+              <div className="flex flex-col items-center">
+                <span className="text-sm text-slate-500 line-through dark:text-slate-400">4,99€ /mes</span>
+                <div>
+                   <span className='text-4xl font-black text-slate-900 dark:text-white transition-colors'>
+                    2,99€
+                  </span>
+                  <span className='text-slate-500 dark:text-slate-400 text-sm ml-2 transition-colors'>
+                    /mes
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <span className='text-4xl font-black text-slate-900 dark:text-white transition-colors'>
+                  4,99€
+                </span>
+                <span className='text-slate-500 dark:text-slate-400 text-sm ml-2 transition-colors'>
+                  /mes
+                </span>
+              </div>
+            )}
+          </div>
+          
+          <div className="mb-4">
+            <label className="text-xs text-slate-500 mb-1 block">Código de descuento (opcional)</label>
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+              placeholder="Introduce tu código"
+              className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-surface-700 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white"
+            />
           </div>
 
           {error && (
