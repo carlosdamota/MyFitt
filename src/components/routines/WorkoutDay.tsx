@@ -179,18 +179,16 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     });
     setSessionSummary(Array.from(uniqueEntriesMap.values()));
 
-    if (!onFlushSession) {
-      setShowSocialShare(true);
-      return;
-    }
-
-    // Delayed flush with undo capability
     let cancelled = false;
+
+    // Mostrar modal inmediatamente
+    setShowSocialShare(true);
 
     success("✅ Sesión guardada", {
       label: "Deshacer",
       onClick: () => {
         cancelled = true;
+        setShowSocialShare(false); // Ocultar si se deshace
         if (flushTimerRef.current) {
           clearTimeout(flushTimerRef.current);
           flushTimerRef.current = null;
@@ -203,16 +201,17 @@ const WorkoutDay: React.FC<WorkoutDayProps> = ({
     flushTimerRef.current = setTimeout(async () => {
       if (cancelled) return;
       try {
-        await onFlushSession({
-          duration: formatTime(time),
-          routineTitle: routine?.title,
-          rating: selectedRating,
-        });
+        if (onFlushSession) {
+          await onFlushSession({
+            duration: formatTime(finalTime), // Usar el tiempo exacto de fin
+            routineTitle: routine?.title,
+            rating: selectedRating,
+          });
+        }
       } catch (e) {
         error("Error guardando la sesión. Tus datos están seguros localmente.");
         return;
       }
-      setShowSocialShare(true);
       reset();
     }, 5000);
   };
