@@ -90,6 +90,7 @@ export const createCheckoutSessionFunction = ({
             ]
           : undefined,
         allow_promotion_codes: stripeCouponId ? undefined : true,
+        payment_method_collection: "if_required",
         success_url: successUrl || "https://example.com/success",
         cancel_url: cancelUrl || "https://example.com/cancel",
         client_reference_id: uid,
@@ -125,6 +126,7 @@ export const createCheckoutSessionFunction = ({
                 ]
               : undefined,
             allow_promotion_codes: stripeCouponId ? undefined : true,
+            payment_method_collection: "if_required",
             success_url: successUrl || "https://example.com/success",
             cancel_url: cancelUrl || "https://example.com/cancel",
             client_reference_id: uid,
