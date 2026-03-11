@@ -46,7 +46,6 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo iniciar el pago.";
       setError(message);
-    } finally {
       setProcessing(null);
     }
   };
@@ -65,7 +64,6 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo abrir el portal.";
       setError(message);
-    } finally {
       setProcessing(null);
     }
   };
@@ -106,14 +104,9 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             variant='outline'
             size='sm'
             onClick={handleRefreshPlan}
-            disabled={!user || processing === "refresh"}
+            disabled={!user}
+            isLoading={processing === "refresh"}
             className='inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl transition disabled:opacity-60'
-            leftIcon={
-              <RefreshCw
-                size={14}
-                className={processing === "refresh" ? "animate-spin" : ""}
-              />
-            }
           >
             Actualizar estado
           </Button>
@@ -158,7 +151,7 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             <Button
               variant='outline'
               onClick={handlePortal}
-              disabled={processing === "portal"}
+              isLoading={processing === "portal"}
               leftIcon={<CreditCard size={16} />}
             >
               Gestionar suscripcion
@@ -167,7 +160,8 @@ const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({ user, onRequireAu
             <Button
               variant='primary'
               onClick={handleCheckout}
-              disabled={processing === "checkout" || !acceptedTerms}
+              disabled={!acceptedTerms}
+              isLoading={processing === "checkout"}
               leftIcon={<CreditCard size={16} />}
             >
               Desbloquear Oferta Pro (2.99€)

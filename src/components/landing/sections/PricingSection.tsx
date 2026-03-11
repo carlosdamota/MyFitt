@@ -5,12 +5,14 @@ interface PricingSectionProps {
   plan: string | null;
   onLoginClick: () => void;
   onUpgradeClick: () => void;
+  isUpgrading?: boolean;
 }
 
 export const PricingSection: React.FC<PricingSectionProps> = ({
   plan,
   onLoginClick,
   onUpgradeClick,
+  isUpgrading = false,
 }) => {
   return (
     <section
@@ -66,6 +68,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           cta={plan === "pro" ? "Ir al panel (Ya eres Pro)" : "Desbloquear Oferta Pro"}
           onClick={onUpgradeClick}
           tone='accent'
+          isLoading={isUpgrading}
         />
       </div>
     </section>

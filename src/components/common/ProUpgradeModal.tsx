@@ -7,7 +7,6 @@ import {
   Zap,
   BarChart3,
   ChefHat,
-  Loader,
   CreditCard,
 } from "lucide-react";
 import { createCheckoutSession } from "../../api/billing";
@@ -199,18 +198,9 @@ const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
             variant='primary'
             size='lg'
             onClick={handleUpgrade}
-            disabled={loading}
+            isLoading={loading}
             className='w-full shadow-lg shadow-primary-900/30'
-            leftIcon={
-              loading ? (
-                <Loader
-                  size={20}
-                  className='animate-spin'
-                />
-              ) : (
-                <CreditCard size={20} />
-              )
-            }
+            leftIcon={<CreditCard size={20} />}
           >
             {loading ? "Redirigiendo..." : "Desbloquear Pro Ahora"}
           </Button>
