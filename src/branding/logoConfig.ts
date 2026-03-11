@@ -16,7 +16,7 @@ export const mainLogo: LogoAsset = {
 };
 
 export const iconLogo: LogoAsset = {
-  src: "/pwa-192x192.png",
+  src: "/favicon.svg",
   alt: "FITTWIZ icon",
 };
 

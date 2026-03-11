@@ -52,9 +52,6 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
         import("posthog-js").catch(() => null),
       ]);
 
-      const { initAppCheck } = await import("../config/firebase");
-      void initAppCheck();
-
       if (!auth) {
         if (mountedRef.current) setLoading(false);
         return;
@@ -118,11 +115,12 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
 
   const loginWithGoogle = useCallback(async () => {
     await initFirebase();
-    const [{ auth }, { signInWithPopup, linkWithPopup, GoogleAuthProvider }] = await Promise.all([
+    const [{ auth, initAppCheck }, { signInWithPopup, linkWithPopup, GoogleAuthProvider }] = await Promise.all([
       import("../config/firebase"),
       import("firebase/auth"),
     ]);
     if (!auth) throw new Error("Firebase no configurado");
+    await initAppCheck();
     const provider = new GoogleAuthProvider();
     if (auth.currentUser?.isAnonymous) {
       await linkWithPopup(auth.currentUser, provider);
@@ -134,9 +132,10 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
   const loginWithEmail = useCallback(
     async (email: string, password: string) => {
       await initFirebase();
-      const [{ auth }, { signInWithEmailAndPassword, linkWithCredential, EmailAuthProvider }] =
+      const [{ auth, initAppCheck }, { signInWithEmailAndPassword, linkWithCredential, EmailAuthProvider }] =
         await Promise.all([import("../config/firebase"), import("firebase/auth")]);
       if (!auth) throw new Error("Firebase no configurado");
+      await initAppCheck();
       if (auth.currentUser?.isAnonymous) {
         await linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password));
       } else {
@@ -149,9 +148,10 @@ export const useLazyAuth = (): UseLazyAuthReturn => {
   const signupWithEmail = useCallback(
     async (email: string, password: string) => {
       await initFirebase();
-      const [{ auth }, { createUserWithEmailAndPassword, linkWithCredential, EmailAuthProvider }] =
+      const [{ auth, initAppCheck }, { createUserWithEmailAndPassword, linkWithCredential, EmailAuthProvider }] =
         await Promise.all([import("../config/firebase"), import("firebase/auth")]);
       if (!auth) throw new Error("Firebase no configurado");
+      await initAppCheck();
       if (auth.currentUser?.isAnonymous) {
         await linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password));
       } else {

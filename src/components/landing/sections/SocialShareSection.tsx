@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Share2, CheckCircle2 } from "lucide-react";
 
 export const SocialShareSection: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const updateLayout = (event?: MediaQueryListEvent) => {
+      setIsMobile(event?.matches ?? mediaQuery.matches);
+    };
+
+    updateLayout();
+    mediaQuery.addEventListener("change", updateLayout);
+
+    return () => mediaQuery.removeEventListener("change", updateLayout);
+  }, []);
+
   return (
     <section
       className='mb-24 grid lg:grid-cols-2 gap-16 lg:gap-10 items-center'
@@ -12,41 +26,47 @@ export const SocialShareSection: React.FC = () => {
           {/* Background glow */}
           <div className='absolute inset-0 bg-accent-500/20 blur-3xl rounded-full scale-150 group-hover:bg-primary-500/30 transition-colors duration-700' />
 
-          {/* Card 1 (Left) */}
-          <div
-            className='absolute inset-0 origin-bottom-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
-            -rotate-12 -translate-x-6 scale-95 opacity-80
-            group-hover:-rotate-24 group-hover:-translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
-          >
-            <img
-              src='/assets/images/fittwiz-workout-2.webp'
-              alt='Previsualización de rutina en estilo tarjeta oscura'
-              width={300}
-              height={400}
-              loading='lazy'
-              decoding='async'
-              className='w-full h-full object-cover select-none pointer-events-none'
-            />
-            <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
-          </div>
+          {!isMobile && (
+            <>
+              {/* Card 1 (Left) */}
+              <div
+                className='absolute inset-0 origin-bottom-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
+                -rotate-12 -translate-x-6 scale-95 opacity-80
+                group-hover:-rotate-24 group-hover:-translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
+              >
+                <img
+                  src='/assets/images/fittwiz-workout-2.webp'
+                  alt='Previsualización de rutina en estilo tarjeta oscura'
+                  width={300}
+                  height={400}
+                  loading='lazy'
+                  decoding='async'
+                  fetchPriority='low'
+                  className='w-full h-full object-cover select-none pointer-events-none'
+                />
+                <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
+              </div>
 
-          {/* Card 2 (Right) */}
-          <div
-            className='absolute inset-0 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
-            rotate-12 translate-x-6 scale-95 opacity-80
-            group-hover:rotate-24 group-hover:translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
-          >
-            <img
-              src='/assets/images/fittwiz-workout-3.webp'
-              alt='Previsualización de rutina en estilo tarjeta clara y minimalista'
-              width={300}
-              height={400}
-              loading='lazy'
-              decoding='async'
-              className='w-full h-full object-cover select-none pointer-events-none'
-            />
-            <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
-          </div>
+              {/* Card 2 (Right) */}
+              <div
+                className='absolute inset-0 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg rounded-2xl overflow-hidden border border-slate-200/50 dark:border-surface-800/50 bg-white dark:bg-surface-900 
+                rotate-12 translate-x-6 scale-95 opacity-80
+                group-hover:rotate-24 group-hover:translate-x-24 group-hover:-translate-y-4 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-2xl group-hover:z-20'
+              >
+                <img
+                  src='/assets/images/fittwiz-workout-3.webp'
+                  alt='Previsualización de rutina en estilo tarjeta clara y minimalista'
+                  width={300}
+                  height={400}
+                  loading='lazy'
+                  decoding='async'
+                  fetchPriority='low'
+                  className='w-full h-full object-cover select-none pointer-events-none'
+                />
+                <div className='absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent' />
+              </div>
+            </>
+          )}
 
           {/* Card 3 (Center) */}
           <div
@@ -61,6 +81,7 @@ export const SocialShareSection: React.FC = () => {
               height={400}
               loading='lazy'
               decoding='async'
+              fetchPriority='low'
               className='w-full h-full object-cover select-none pointer-events-none'
             />
             <div className='absolute inset-0 bg-linear-to-t from-slate-900/40 to-transparent' />
