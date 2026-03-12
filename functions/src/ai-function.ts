@@ -133,11 +133,12 @@ export const createAiGenerateFunction = ({
         if (task === "routine_program") {
           const catalog = await getNormalizedExercises(db);
           const userEquipment = ((payload.profile as any)?.equipment ?? []) as string[];
-          // Filter catalog by user equipment overlap
-          const filtered =
-            userEquipment.length > 0
-              ? catalog.filter((ex) => ex.equipment.some((eq) => userEquipment.includes(eq)))
-              : catalog;
+          // Filter catalog by user equipment overlap: STICKT filtering (.every)
+          // Also allow exercises with no equipment requirements
+          const filtered = catalog.filter((ex) => {
+            if (!ex.equipment || ex.equipment.length === 0) return true;
+            return ex.equipment.every((eq) => userEquipment.includes(eq));
+          });
           payload.exerciseCatalog = filtered;
         }
 
@@ -236,14 +237,37 @@ export const createAiGenerateFunction = ({
               }
             }
 
-            // Post-process: copy exerciseId → normalizedId for backward compatibility
+            // Post-process: Validate against strict catalog and apply fallback
             if (programObj) {
+              // Ensure we have the filtered catalog available. It was set in payload earlier.
+              const catalog = (payload.exerciseCatalog as CachedExercise[]) || [];
+              const validIds = new Set(catalog.map((e) => e.id));
+
               programObj.days.forEach((day) => {
                 day.blocks.forEach((block) => {
                   block.exercises.forEach((ex) => {
-                    // If AI provided exerciseId, use it as normalizedId
-                    if ((ex as any).exerciseId && !ex.normalizedId) {
-                      ex.normalizedId = (ex as any).exerciseId;
+                    const aiGeneratedId = (ex as any).exerciseId;
+                    
+                    // Priority 1: Use aiGeneratedId if valid
+                    if (aiGeneratedId && validIds.has(aiGeneratedId)) {
+                      ex.normalizedId = aiGeneratedId;
+                    } 
+                    // Priority 2: Fallback logic - aiGeneratedId is missing or invalid
+                    else {
+                      const targetMuscleGroup = (ex as any).muscleGroup || "";
+                      
+                      // Find candidates targeting the same muscle group
+                      const muscleCandidates = catalog.filter((c) => c.muscleGroup === targetMuscleGroup);
+                      
+                      const candidates = muscleCandidates.length > 0 ? muscleCandidates : catalog;
+                      
+                      if (candidates.length > 0) {
+                        // Pick a random replacement
+                        const replacement = candidates[Math.floor(Math.random() * candidates.length)];
+                        ex.normalizedId = replacement.id;
+                        ex.name = replacement.name; // Overwrite the invented name
+                        ex.note = ex.note ? `${ex.note} (Sustituido por equipo)` : "Sustituido por adaptación de material";
+                      }
                     }
                   });
                 });

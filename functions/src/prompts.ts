@@ -35,7 +35,6 @@ Reglas:
       const hasInjuries = !!(profile.injuries && profile.injuries.trim().length > 0);
       const exerciseCatalog = (payload.exerciseCatalog as any[]) ?? [];
 
-      // Build compact catalog string for the prompt
       const catalogStr =
         exerciseCatalog.length > 0
           ? exerciseCatalog
@@ -46,8 +45,13 @@ Reglas:
               .join("\n")
           : "";
 
+      const focusAreas = (profile.focusAreas || []) as string[];
+      const focusAreasInstruction = focusAreas.length > 0 
+        ? `\nPRIORITY MUSCLE FOCUS: The user strongly wants to focus on developing: ${focusAreas.join(", ")}. You MUST bias your exercise selection to heavily feature these muscle groups while keeping the overall session balanced and functional.`
+        : "";
+
       const system = `You are an elite Personal Trainer and Fitness Architect.
-${hasInjuries ? "ADDITIONAL ROLE: You are also acting as a Biomedical/Physiotherapy Consultant. Given the specified injuries, you MUST ensure exercise selection is safe, sustainable, and rehabilitative where appropriate." : ""}
+${hasInjuries ? "ADDITIONAL ROLE: You are also acting as a Biomedical/Physiotherapy Consultant. Given the specified injuries, you MUST ensure exercise selection is safe, sustainable, and rehabilitative where appropriate." : ""}${focusAreasInstruction}
 
 Your task is to generate a COMPLETE TRAINING PROGRAM for ${totalDays} days of the week.
 Each session must be designed to last approximately ${dailyTime} minutes.
@@ -58,22 +62,26 @@ ${catalogStr || "No catalog provided — use standard exercise names."}
 
 ### CRITICAL: EXERCISE SELECTION RULES:
 1. **YOU MUST use exercises from the catalog above**. For each exercise, provide both "exerciseId" (from column 1) and "name" (from column 2).
-2. **NEVER invent exercise names**. If you need a movement not in the catalog, pick the closest available alternative.
-3. **EQUIPMENT CONSTRAINT**: Only use exercises whose equipment matches the user's available equipment: ${JSON.stringify(profile.equipment ?? [])}.
+2. **ONLY and EXCLUSIVELY use the exact IDs provided in the EXERCISE CATALOG list**. Do not invent names or IDs.
+3. **EQUIPMENT CONSTRAINT**: Only use exercises from the catalog. The catalog has already been perfectly filtered for the user's available equipment.
 
 ### OUTPUT LANGUAGE RULES:
 1. **exerciseId and name**: Use EXACTLY as shown in the catalog (English names).
 2. **USER-FACING TEXT**: Use **SPANISH** for: "description", "title", "warmup.text", "cooldown.text", "note", and "instructions".
-3. **TONE**: Professional, technical, and motivating. Functional titles (e.g., "Programa de Hipertrofia Mixto").
-
+3. **TONE**: Professional, technical, and motivating.
+4. **TITLES**:
+   - **programName**: Descriptive and functional (e.g., "Hipertrofia Express").
+   - **day.title**: Minimal (e.g., "Día 1").
+   - **day.focus**: **DESCRIPTION OF TARGETED MUSCLES** (e.g., "Pecho, Hombros y Tríceps"). This is what the user will primarily see.
+ 
 ### JSON STRUCTURE (Return ONLY valid JSON, no markdown):
 {
   "programName": "Functional and descriptive name in Spanish",
   "description": "Brief program overview in Spanish",
   "days": [
     {
-      "title": "Day name in Spanish",
-      "focus": "Main target",
+      "title": "Short title in Spanish (e.g. 'Día 1')",
+      "focus": "Descriptive muscle focus in Spanish (e.g. 'Empuje y Cuádriceps')",
       "mode": "heavy" | "metabolic",
       "weight": "Carga Alta" | "Carga Media",
       "estimatedCalories": 300,
@@ -114,10 +122,7 @@ ${catalogStr || "No catalog provided — use standard exercise names."}
    - <= 30 min: Max 4-5 exercises, 2-3 sets each. Use supersets to save time.
    - 45 min: 5-6 exercises, 3 sets each.
    - >= 60 min: 6-8 exercises, 3-4 sets each.
-3. **EQUIPMENT (STRICT)**:
-   - Available: ${JSON.stringify(profile.equipment ?? [])}.
-   - NEVER suggest machines if the user only has dumbbells or bodyweight.
-4. **EXERCISE VARIETY**: Don't repeat exercises across days unless explicitly needed.`;
+3. **EXERCISE VARIETY**: Don't repeat exercises across days unless explicitly needed.`;
       return {
         system,
         user: `Generate a ${totalDays}-day program in Spanish for this profile: ${JSON.stringify(profile)}`,

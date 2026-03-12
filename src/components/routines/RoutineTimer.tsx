@@ -33,7 +33,7 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
                   ? "bg-[#064e3b] border border-[#047857] text-[#10b981]"
                   : isPristine
                     ? "bg-amber-900/30 border border-amber-500/30 text-amber-500"
-                    : "bg-[#1e293b] text-[#94a3b8]"
+                  : "bg-slate-100 dark:bg-[#1e293b] text-slate-500 dark:text-[#94a3b8]"
               }`}
             >
               <Timer
@@ -44,12 +44,12 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
             <div className='flex flex-col justify-center'>
               <span
                 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                  isPristine ? "text-amber-500 font-black animate-pulse" : "text-[#94a3b8]"
+                  isPristine ? "text-amber-500 font-black animate-pulse" : "text-slate-500 dark:text-[#94a3b8]"
                 }`}
               >
                 {isPristine ? "Boton parpadeando" : "Tiempo Total"}
               </span>
-              <span className='text-2xl font-mono font-bold tracking-widest leading-none mt-1 transition-colors text-white'>
+              <span className='text-2xl font-mono font-bold tracking-widest leading-none mt-1 transition-colors text-slate-900 dark:text-white'>
                 {timeFormatted}
               </span>
             </div>
@@ -63,7 +63,7 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
                   ? "bg-[#451a03] text-[#f59e0b] border border-[#78350f]"
                   : isPristine
                     ? "bg-[#166534] text-[#4ade80] border border-[#14532d] shadow-[0_0_15px_rgba(22,101,52,0.8)] animate-pulse"
-                    : "bg-[#1e293b] text-white border border-[#334155] hover:bg-[#334155]"
+                    : "bg-slate-100 dark:bg-[#1e293b] text-slate-900 dark:text-white border border-slate-200 dark:border-[#334155] hover:bg-slate-200 dark:hover:bg-[#334155]"
               }`}
               aria-label={isRunning ? "Pausar" : "Iniciar"}
             >
@@ -97,7 +97,7 @@ const RoutineTimer: React.FC<RoutineTimerProps> = ({
             {onCancel && !isPristine && (
               <button
                 onClick={onCancel}
-                className='w-10 h-10 rounded-full bg-[#0f172a] text-[#475569] hover:text-[#94a3b8] flex items-center justify-center transition-colors ml-1'
+                className='w-10 h-10 rounded-full bg-slate-100 dark:bg-[#0f172a] text-slate-500 dark:text-[#475569] hover:text-slate-900 dark:hover:text-[#94a3b8] flex items-center justify-center transition-colors ml-1'
                 aria-label='Cancelar y descartar'
                 title='Cancelar entrenamiento'
               >
