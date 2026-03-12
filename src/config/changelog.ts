@@ -7,6 +7,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: "1.0.16",
+    date: "2026-03-12",
+    change: "Mejoras de IA, PWA y Optimización de Auth",
+    reason:
+      "Implementación de Service Worker para PWA, mejoras drásticas en la precisión de generación de rutinas por IA (v2), y carga perezosa de Firebase Auth para mejorar el rendimiento de la landing page.",
+  },
+  {
     version: "1.0.15",
     date: "2026-03-10",
     change: "Optimización de rendimiento de la Landing Page",
