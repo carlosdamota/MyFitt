@@ -200,12 +200,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
                       : "text-slate-800 dark:text-slate-300 group-hover/day:text-slate-900 dark:group-hover/day:text-white"
                   }`}
                 >
-                  {cleanRoutineTitle(data.title) || `Día ${data.dayNumber}`}
+                  {data.focus || data.title || `Día ${data.dayNumber}`}
                 </h4>
-                <p className='text-[10px] text-slate-500 dark:text-slate-500 truncate transition-colors'>
-                  {data.focus}
-                  <span className='mx-1'>·</span>
-                  {data.blocks.length} Bloques
+                <p className='text-[10px] text-slate-400 dark:text-slate-500 truncate transition-colors'>
+                  {data.blocks.length} Bloques de entrenamiento
                 </p>
               </div>
 

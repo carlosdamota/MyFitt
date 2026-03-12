@@ -19,21 +19,21 @@ const TimerOverlay: React.FC<TimerOverlayProps> = ({ timer, isRunning, onReset, 
     >
       <div className='max-w-md mx-auto flex items-center justify-between px-2'>
         <div className='flex flex-col'>
-          <span className='text-[10px] uppercase tracking-widest text-slate-500 font-bold'>
+          <span className='text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold'>
             Descanso Restante
           </span>
           <span
             className={`text-4xl font-mono font-bold tracking-tighter ${timer < 10 ? "text-danger-500 animate-pulse" : "text-slate-900 dark:text-white transition-colors"}`}
           >
             {timer}
-            <span className='text-lg text-slate-600'>s</span>
+            <span className='text-lg text-slate-600 dark:text-slate-400'>s</span>
           </span>
         </div>
         <div className='flex items-center gap-3'>
           <Button
-            variant='outline'
+            variant='secondary'
             onClick={() => onReset(60)}
-            className='w-12 h-12 flex items-center justify-center rounded-full p-0 border-surface-700 bg-surface-800 flex-none'
+            className='w-12 h-12 flex items-center justify-center rounded-full p-0 border-slate-200 dark:border-surface-700 bg-slate-100 dark:bg-surface-800 text-slate-600 dark:text-white flex-none hover:bg-slate-200 dark:hover:bg-surface-700'
             aria-label='Reiniciar temporizador'
           >
             <RotateCcw size={20} />
