@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios de MyFitt (FittWiz) se registran aquí.
 
+## [1.0.16] - 2026-03-12
+
+- **Cambio**: PWA + IA v2 + Lazy Auth.
+- **Para qué**: Se implementó el Service Worker para soporte PWA. Se mejoró drásticamente la generación de rutinas (v2) con filtrado estricto de equipo y se optimizó la landing page cargando Firebase Auth de forma perezosa, mejorando la velocidad de carga inicial. Además, se corrigieron bugs en el modal de compartir y se afinó la rapidez de los modales de pago.
+
 ## [1.0.15] - 2026-03-10
 
 - **Cambio**: Optimización de rendimiento de la Landing Page (PageSpeed Mobile).

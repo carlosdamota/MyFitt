@@ -79,10 +79,12 @@ export const createAiGenerateFunction = ({
   freeMaxDays,
   webOrigin,
 }: AiFunctionDeps) => {
+  const allowedOrigins = getAllowedOrigins(webOrigin);
+  const corsOption = allowedOrigins.length > 0 ? allowedOrigins : true;
+
   return onRequest(
-    { timeoutSeconds: 60, invoker: "public" },
+    { timeoutSeconds: 300, invoker: "public", cors: corsOption },
     async (req: Request, res: Response) => {
-      const allowedOrigins = getAllowedOrigins(webOrigin);
       setCors(req.headers.origin, res, allowedOrigins);
       if (!isOriginAllowed(req.headers.origin, allowedOrigins)) {
         sendJson(res, 403, { error: "origin_not_allowed" });
