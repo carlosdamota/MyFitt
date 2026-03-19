@@ -3,6 +3,7 @@ import type { SocialShareEngineResult, SocialShareGenerateParams } from "../type
 import { type WorkoutImageFormat } from "../../generateWorkoutImage";
 import { iconLogo } from "../../../branding/logoConfig";
 import { FORMAT_DIMENSIONS, ICON_PATHS, LAYOUT, formatDate } from "./constants";
+import { getDisplayTitle } from "../../../components/common/social-share/utils";
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -91,12 +92,13 @@ export const generateWithKonvaEngine = async (
 
   // 3. Header
   const { x: paddingX, y: paddingY } = LAYOUT.getPadding(format);
+  const displayTitle = getDisplayTitle(data.routineTitle);
 
   layer.add(
     new Konva.Text({
       x: paddingX,
       y: paddingY,
-      text: "RESUMEN DE SESIÓN",
+      text: data.routineTitle ? formatDate(data.date) : "RESUMEN DE SESIÓN",
       fontSize: 18,
       fontFamily: "Sora",
       fontWeight: "700",
@@ -105,15 +107,19 @@ export const generateWithKonvaEngine = async (
     }),
   );
 
+  const titleText = displayTitle || formatDate(data.date);
   layer.add(
     new Konva.Text({
       x: paddingX,
       y: paddingY + 30,
-      text: formatDate(data.date),
-      fontSize: 52,
+      text: titleText,
+      fontSize: displayTitle && displayTitle.length > 24 ? 38 : 52,
       fontFamily: "Sora",
       fontWeight: "900",
       fill: theme.primaryTextColor,
+      width: width - paddingX * 2 - 110,
+      ellipsis: true,
+      wrap: "none",
     }),
   );
 
