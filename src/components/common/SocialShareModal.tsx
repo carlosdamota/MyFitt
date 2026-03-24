@@ -111,6 +111,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
     syncWorkout,
   } = useStrava({ user, profile });
   const [stravaSynced, setStravaSynced] = useState(false);
+  const [isLocalStravaSyncing, setIsLocalStravaSyncing] = useState(false);
 
   const theme = THEMES[themeKey];
   const totalVolume = logs.reduce((s, l) => s + (l.volume || 0), 0);
@@ -127,8 +128,13 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   }, [duration, totalExercises, totalVolume, totalReps, hashtags]);
 
   const fileNameBase = useMemo(() => {
+    const displayTitle = getDisplayTitle(routineTitle);
+    if (displayTitle) {
+      const safeTitle = displayTitle.replace(/[^a-z0-9\u00C0-\u017F]/gi, "-").toLowerCase().slice(0, 25).replace(/-+$/, "");
+      return `${safeTitle}-${date}`;
+    }
     return `fittwiz-workout-${date}`;
-  }, [date]);
+  }, [date, routineTitle]);
 
   const token = useMemo(() => {
     return `${themeKey}-${format}-${JSON.stringify(stickers)}`;
@@ -147,6 +153,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
         duration,
         theme,
         stickers,
+        routineTitle,
       };
 
       const img = await generate(cardRef.current, format, fileNameBase, { mode, data });
@@ -165,6 +172,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       duration,
       theme,
       stickers,
+      routineTitle,
     ],
   );
 
@@ -189,7 +197,8 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   const handleShare = async () => {
     const a = asset ?? (await ensureAsset("export"));
     if (!a) return;
-    await share(a, { title: "Mi Entrenamiento en FITTWIZ", text: shareText });
+    const finalTitle = routineTitle || "Mi Entrenamiento en FITTWIZ";
+    await share(a, { title: finalTitle, text: shareText });
   };
 
   const handleDownload = async () => {
@@ -211,6 +220,8 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   };
 
   const handleStravaSync = async () => {
+    if (isLocalStravaSyncing || stravaSyncing) return;
+    setIsLocalStravaSyncing(true);
     try {
       let seconds = durationSeconds ?? 3600; // Por defecto 1 hora
 
@@ -276,6 +287,8 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
       toast$("¡Entrenamiento sincronizado con Strava!");
     } catch (err) {
       toastErr(err instanceof Error ? err.message : "Error al sincronizar con Strava");
+    } finally {
+      setIsLocalStravaSyncing(false);
     }
   };
 
@@ -406,7 +419,7 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             canWriteClipboard={capabilities.canWriteClipboard}
             copied={copied}
             stravaLinked={stravaLinked}
-            stravaSyncing={stravaSyncing}
+            stravaSyncing={stravaSyncing || isLocalStravaSyncing}
             stravaSynced={stravaSynced}
             onStravaSync={handleStravaSync}
           />
